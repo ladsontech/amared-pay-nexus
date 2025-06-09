@@ -63,11 +63,11 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           >
             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
-          <Link to="/dashboard" className="flex items-center flex-1 justify-center lg:justify-start">
+          <Link to="/dashboard" className="flex items-center flex-1 justify-center lg:justify-start h-full py-2">
             <img 
               src="/public/images/Almaredpay_logo.png" 
               alt="Logo" 
-              className="h-8 w-auto max-w-[200px] sm:h-10 sm:max-w-[250px] md:h-12 md:max-w-[300px] lg:h-14 lg:max-w-[350px] xl:h-16 xl:max-w-[400px] object-contain"
+              className="h-full w-auto object-contain"
             />
           </Link>
         </div>

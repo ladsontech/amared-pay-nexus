@@ -1,25 +1,40 @@
 
-import { Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const SplashScreen = () => {
+interface SplashScreenProps {
+  onFinish: () => void;
+}
+
+const SplashScreen = ({ onFinish }: SplashScreenProps) => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(false);
+      setTimeout(onFinish, 300); // Allow fade out animation to complete
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [onFinish]);
+
   return (
-    <div className="min-h-screen financial-gradient flex items-center justify-center p-4">
-      <div className="text-center text-white">
-        <div className="flex items-center justify-center mb-8">
-          <div className="relative">
-            <img 
-              src="/public/images/Almaredpay_logo.png" 
-              alt="Amared Pay Logo" 
-              className="w-32 h-16 sm:w-40 sm:h-20 md:w-48 md:h-24 lg:w-56 lg:h-28 object-contain rounded-lg bg-white p-2 shadow-lg"
-            />
-            <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
-          </div>
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 transition-opacity duration-300 ${
+        isVisible ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      <div className="text-center space-y-8 animate-pulse">
+        <div className="flex items-center justify-center h-20 sm:h-24 md:h-28 lg:h-32">
+          <img 
+            src="/public/images/Almaredpay_logo.png" 
+            alt="Logo" 
+            className="h-full w-auto object-contain filter brightness-0 invert"
+          />
         </div>
-        <p className="text-lg sm:text-xl opacity-90 mb-8">Secure Bulk Payment System</p>
-        <div className="flex items-center justify-center space-x-2">
-          <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
-          <div className="w-2 h-2 bg-white rounded-full animate-bounce delay-100"></div>
-          <div className="w-2 h-2 bg-white rounded-full animate-bounce delay-200"></div>
+        <div className="flex space-x-2 justify-center">
+          <div className="w-3 h-3 bg-white rounded-full animate-bounce"></div>
+          <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+          <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
         </div>
       </div>
     </div>
