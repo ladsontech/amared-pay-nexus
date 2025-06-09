@@ -1,0 +1,141 @@
+
+import { useState } from "react";
+import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
+  Coins,
+  Home,
+  CreditCard,
+  Users,
+  Settings,
+  Menu,
+  X,
+  LogOut,
+  Bell,
+  Search,
+  UserCircle,
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface DashboardLayoutProps {
+  children?: React.ReactNode;
+}
+
+const DashboardLayout = ({ children }: DashboardLayoutProps) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+
+  const handleLogout = () => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user");
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
+    });
+    navigate("/login");
+  };
+
+  const menuItems = [
+    { icon: Home, label: "Dashboard", path: "/dashboard" },
+    { icon: CreditCard, label: "Bulk Payments", path: "/bulk-payments" },
+    { icon: Coins, label: "Collections", path: "/collections" },
+    { icon: Users, label: "Organizations", path: "/organizations" },
+    { icon: UserCircle, label: "Sub-Admins", path: "/sub-admins" },
+    { icon: Settings, label: "Settings", path: "/settings" },
+  ];
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="bg-white border-b border-border px-4 lg:px-6 h-16 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+          <Link to="/dashboard" className="flex items-center space-x-2">
+            <Coins className="h-8 w-8 text-primary" />
+            <span className="text-xl font-bold">Amared Pay</span>
+          </Link>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-2 bg-muted rounded-lg px-3 py-2">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search..."
+              className="bg-transparent border-none outline-none text-sm"
+            />
+          </div>
+          <Button variant="ghost" size="icon">
+            <Bell className="h-5 w-5" />
+          </Button>
+          <div className="flex items-center space-x-2">
+            <div className="hidden md:block text-right">
+              <p className="text-sm font-medium">{user.name || "Demo User"}</p>
+              <p className="text-xs text-muted-foreground">{user.organization || "Demo Org"}</p>
+            </div>
+            <Button variant="ghost" size="icon" onClick={handleLogout}>
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex">
+        {/* Sidebar */}
+        <aside
+          className={`${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-border transition-transform duration-300 ease-in-out lg:transition-none`}
+        >
+          <div className="flex flex-col h-full">
+            <div className="flex-1 py-6">
+              <nav className="space-y-2 px-4">
+                {menuItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                      location.pathname === item.path
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.label}</span>
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          </div>
+        </aside>
+
+        {/* Overlay for mobile */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Main Content */}
+        <main className="flex-1 p-6">
+          {children || <Outlet />}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default DashboardLayout;
