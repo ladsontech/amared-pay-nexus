@@ -14,6 +14,7 @@ import {
   Search,
   UserCircle,
   Coins,
+  Link as LinkIcon,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import MobileBottomNav from "./MobileBottomNav";
@@ -52,8 +53,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-border px-4 lg:px-6 h-16 flex items-center justify-between shadow-sm">
-        <div className="flex items-center space-x-4">
+      <header className="bg-white border-b border-border px-2 sm:px-4 lg:px-6 h-16 flex items-center justify-between shadow-sm">
+        <div className="flex items-center space-x-2 sm:space-x-4 flex-1">
           <Button
             variant="ghost"
             size="icon"
@@ -62,35 +63,35 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           >
             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
-          <Link to="/dashboard" className="flex items-center">
+          <Link to="/dashboard" className="flex items-center flex-1 justify-center lg:justify-start">
             <img 
               src="/public/images/Almaredpay_logo.png" 
-              alt="Amared Pay Logo" 
-              className="h-8 w-16 sm:h-10 sm:w-20 md:h-12 md:w-24 object-contain"
+              alt="Logo" 
+              className="h-8 w-auto max-w-[200px] sm:h-10 sm:max-w-[250px] md:h-12 md:max-w-[300px] lg:h-14 lg:max-w-[350px] xl:h-16 xl:max-w-[400px] object-contain"
             />
           </Link>
         </div>
 
-        <div className="flex items-center space-x-2 md:space-x-4">
+        <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
           <div className="hidden md:flex items-center space-x-2 bg-muted rounded-lg px-3 py-2">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search..."
-              className="bg-transparent border-none outline-none text-sm w-32 lg:w-48"
+              className="bg-transparent border-none outline-none text-sm w-24 lg:w-32 xl:w-48"
             />
           </div>
           <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
+            <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="absolute -top-1 -right-1 h-2 w-2 sm:h-3 sm:w-3 bg-red-500 rounded-full text-xs"></span>
           </Button>
           <div className="hidden md:flex items-center space-x-2">
             <div className="text-right">
-              <p className="text-sm font-medium">{user.name || "Demo User"}</p>
+              <p className="text-xs sm:text-sm font-medium">{user.name || "Demo User"}</p>
               <p className="text-xs text-muted-foreground">{user.organization || "Demo Org"}</p>
             </div>
             <Button variant="ghost" size="icon" onClick={handleLogout}>
-              <LogOut className="h-5 w-5" />
+              <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </div>
         </div>
