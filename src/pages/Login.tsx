@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Coins, Eye, EyeOff, Mail, Shield } from "lucide-react";
+import { Eye, EyeOff, Mail, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
@@ -62,16 +62,17 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen trust-gradient flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
-          <div className="flex items-center justify-center mb-4">
-            <div className="flex items-center space-x-2">
-              <Coins className="w-8 h-8 text-primary" />
-              <span className="text-2xl font-bold">Amared Pay</span>
-            </div>
+          <div className="flex items-center justify-center mb-6">
+            <img 
+              src="/public/images/Almaredpay_logo.png" 
+              alt="Amared Pay Logo" 
+              className="w-16 h-16 object-contain"
+            />
           </div>
-          <CardTitle className="text-2xl">Welcome Back</CardTitle>
+          <CardTitle className="text-2xl text-primary">Welcome Back</CardTitle>
           <CardDescription>
             Sign in to your account to access the bulk payment system
           </CardDescription>

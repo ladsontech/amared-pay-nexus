@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Coins, Users, CreditCard, TrendingUp, DollarSign, Activity } from "lucide-react";
+import { Coins, Users, CreditCard, TrendingUp, DollarSign, Activity, Shield } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useToast } from "@/hooks/use-toast";
 
@@ -89,24 +89,30 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Overview of your bulk payment system performance
-          </p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-primary">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Overview of your bulk payment system performance
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 bg-primary/5 p-3 rounded-lg">
+            <Shield className="h-5 w-5 text-primary" />
+            <span className="text-sm font-medium text-primary">Secure & Trusted</span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-6">
           {statCards.map((card, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
+            <Card key={index} className="hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-xs md:text-sm font-medium">
                   {card.title}
                 </CardTitle>
-                <card.icon className={`h-4 w-4 ${card.color}`} />
+                <card.icon className={`h-3 w-3 md:h-4 md:w-4 ${card.color}`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{card.value}</div>
+                <div className="text-lg md:text-2xl font-bold">{card.value}</div>
                 <CardDescription className="text-xs">
                   {card.description}
                 </CardDescription>
@@ -115,10 +121,13 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle>Recent Bulk Payments</CardTitle>
+              <CardTitle className="flex items-center space-x-2">
+                <CreditCard className="h-5 w-5 text-primary" />
+                <span>Recent Bulk Payments</span>
+              </CardTitle>
               <CardDescription>
                 Latest bulk payment transactions
               </CardDescription>
@@ -126,9 +135,11 @@ const Dashboard = () => {
             <CardContent>
               <div className="space-y-4">
                 {[1, 2, 3].map((item) => (
-                  <div key={item} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div key={item} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <div className={`w-2 h-2 rounded-full ${
+                        item === 1 ? "bg-green-500" : item === 2 ? "bg-blue-500" : "bg-yellow-500"
+                      }`}></div>
                       <div>
                         <p className="font-medium">Payment #{item}0{item}</p>
                         <p className="text-sm text-muted-foreground">
@@ -150,45 +161,92 @@ const Dashboard = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>System Status</CardTitle>
+              <CardTitle className="flex items-center space-x-2">
+                <Shield className="h-5 w-5 text-primary" />
+                <span>Security & Trust</span>
+              </CardTitle>
               <CardDescription>
-                Current system health and status
+                Secure payment processing
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="space-y-4">
+              <div className="flex justify-center">
+                <img 
+                  src="/public/images/pay_safe.jpg" 
+                  alt="Secure Payment" 
+                  className="w-full max-w-48 h-32 object-cover rounded-lg shadow-sm"
+                />
+              </div>
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span>API Status</span>
+                  <span className="text-sm">SSL Encryption</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-green-600">Operational</span>
+                    <span className="text-sm text-green-600">Active</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Payment Gateway</span>
+                  <span className="text-sm">PCI Compliance</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-green-600">Connected</span>
+                    <span className="text-sm text-green-600">Certified</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Database</span>
+                  <span className="text-sm">Fraud Detection</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-green-600">Healthy</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Backup System</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm text-yellow-600">Scheduled</span>
+                    <span className="text-sm text-green-600">Protected</span>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Activity className="h-5 w-5 text-primary" />
+              <span>System Status</span>
+            </CardTitle>
+            <CardDescription>
+              Current system health and performance
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <span className="text-sm font-medium">API Status</span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-green-600">Operational</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <span className="text-sm font-medium">Payment Gateway</span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-green-600">Connected</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <span className="text-sm font-medium">Database</span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-green-600">Healthy</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <span className="text-sm font-medium">Backup System</span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                  <span className="text-sm text-yellow-600">Scheduled</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

@@ -1,16 +1,19 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Save, Shield, Bell, Database, DollarSign } from "lucide-react";
+import { Save, Shield, Bell, Database, DollarSign, LogOut, User } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [settings, setSettings] = useState({
     notifications: {
       emailAlerts: true,
@@ -32,7 +35,15 @@ const Settings = () => {
     },
   });
 
-  const { toast } = useToast();
+  const handleLogout = () => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user");
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
+    });
+    navigate("/login");
+  };
 
   const handleSave = (section: string) => {
     toast({
@@ -51,15 +62,60 @@ const Settings = () => {
     }));
   };
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-primary">Settings</h1>
           <p className="text-muted-foreground">
             Configure your bulk payment system preferences
           </p>
         </div>
+
+        {/* Account Section */}
+        <Card className="border-l-4 border-l-primary">
+          <CardHeader>
+            <div className="flex items-center space-x-2">
+              <User className="h-5 w-5 text-primary" />
+              <CardTitle>Account Information</CardTitle>
+            </div>
+            <CardDescription>
+              Your account details and logout options
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Name</Label>
+                <Input value={user.name || "Demo User"} disabled />
+              </div>
+              <div>
+                <Label>Email</Label>
+                <Input value={user.email || "demo@example.com"} disabled />
+              </div>
+            </div>
+            <div>
+              <Label>Organization</Label>
+              <Input value={user.organization || "Demo Organization"} disabled />
+            </div>
+            <Separator />
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                variant="destructive" 
+                onClick={handleLogout}
+                className="flex items-center space-x-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </Button>
+              <Button variant="outline">
+                Change Password
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Notification Settings */}
@@ -296,23 +352,23 @@ const Settings = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-red-200 rounded-lg gap-3">
               <div>
                 <h4 className="font-medium">Reset All Settings</h4>
                 <p className="text-sm text-muted-foreground">
                   Reset all configuration to default values
                 </p>
               </div>
-              <Button variant="destructive">Reset Settings</Button>
+              <Button variant="destructive" size="sm">Reset Settings</Button>
             </div>
-            <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-red-200 rounded-lg gap-3">
               <div>
                 <h4 className="font-medium">Clear Transaction History</h4>
                 <p className="text-sm text-muted-foreground">
                   Permanently delete all transaction records
                 </p>
               </div>
-              <Button variant="destructive">Clear History</Button>
+              <Button variant="destructive" size="sm">Clear History</Button>
             </div>
           </CardContent>
         </Card>
