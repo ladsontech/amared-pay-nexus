@@ -36,7 +36,7 @@ const Login = () => {
         localStorage.setItem("user", JSON.stringify(data.user));
         toast({
           title: "Login Successful",
-          description: "Welcome to your dashboard!",
+          description: "Welcome to Amared Pay!",
         });
         navigate("/dashboard");
       } else {
@@ -53,7 +53,7 @@ const Login = () => {
       }));
       toast({
         title: "Login Successful",
-        description: "Welcome to your dashboard!",
+        description: "Welcome to Amared Pay!",
       });
       navigate("/dashboard");
     } finally {
@@ -65,11 +65,11 @@ const Login = () => {
     <div className="min-h-screen trust-gradient flex items-center justify-center p-4">
       <Card className="w-full max-w-sm sm:max-w-md shadow-xl">
         <CardHeader className="text-center">
-          <div className="flex items-center justify-center mb-6 h-16 sm:h-20 md:h-24">
+          <div className="flex items-center justify-center mb-6">
             <img 
               src="/public/images/Almaredpay_logo.png" 
-              alt="Logo" 
-              className="h-full w-auto object-contain"
+              alt="Amared Pay Logo" 
+              className="w-24 h-12 sm:w-32 sm:h-16 md:w-40 md:h-20 object-contain"
             />
           </div>
           <CardTitle className="text-xl sm:text-2xl text-primary">Welcome Back</CardTitle>
