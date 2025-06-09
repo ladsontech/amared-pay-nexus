@@ -88,11 +88,11 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-primary">Dashboard</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">Dashboard</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Overview of your bulk payment system performance
             </p>
           </div>
@@ -102,17 +102,17 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
           {statCards.map((card, index) => (
             <Card key={index} className="hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">
+                <CardTitle className="text-xs sm:text-sm font-medium">
                   {card.title}
                 </CardTitle>
-                <card.icon className={`h-3 w-3 md:h-4 md:w-4 ${card.color}`} />
+                <card.icon className={`h-3 w-3 sm:h-4 sm:w-4 ${card.color}`} />
               </CardHeader>
               <CardContent>
-                <div className="text-lg md:text-2xl font-bold">{card.value}</div>
+                <div className="text-base sm:text-lg md:text-2xl font-bold">{card.value}</div>
                 <CardDescription className="text-xs">
                   {card.description}
                 </CardDescription>
@@ -121,19 +121,19 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
+              <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
                 <CreditCard className="h-5 w-5 text-primary" />
                 <span>Recent Bulk Payments</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Latest bulk payment transactions
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {[1, 2, 3].map((item) => (
                   <div key={item} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="flex items-center space-x-3">
@@ -141,15 +141,15 @@ const Dashboard = () => {
                         item === 1 ? "bg-green-500" : item === 2 ? "bg-blue-500" : "bg-yellow-500"
                       }`}></div>
                       <div>
-                        <p className="font-medium">Payment #{item}0{item}</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm sm:text-base font-medium">Payment #{item}0{item}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
                           {item === 1 ? "Completed" : item === 2 ? "Processing" : "Pending"}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">${(item * 15000).toLocaleString()}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm sm:text-base font-medium">${(item * 15000).toLocaleString()}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         {item} hour{item > 1 ? "s" : ""} ago
                       </p>
                     </div>
@@ -161,11 +161,11 @@ const Dashboard = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
+              <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
                 <Shield className="h-5 w-5 text-primary" />
                 <span>Security & Trust</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Secure payment processing
               </CardDescription>
             </CardHeader>
@@ -174,29 +174,29 @@ const Dashboard = () => {
                 <img 
                   src="/public/images/pay_safe.jpg" 
                   alt="Secure Payment" 
-                  className="w-full max-w-48 h-32 object-cover rounded-lg shadow-sm"
+                  className="w-full max-w-32 sm:max-w-48 h-24 sm:h-32 object-cover rounded-lg shadow-sm"
                 />
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">SSL Encryption</span>
+                  <span className="text-xs sm:text-sm">SSL Encryption</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-green-600">Active</span>
+                    <span className="text-xs sm:text-sm text-green-600">Active</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">PCI Compliance</span>
+                  <span className="text-xs sm:text-sm">PCI Compliance</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-green-600">Certified</span>
+                    <span className="text-xs sm:text-sm text-green-600">Certified</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Fraud Detection</span>
+                  <span className="text-xs sm:text-sm">Fraud Detection</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-green-600">Protected</span>
+                    <span className="text-xs sm:text-sm text-green-600">Protected</span>
                   </div>
                 </div>
               </div>
@@ -206,42 +206,42 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
+            <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
               <Activity className="h-5 w-5 text-primary" />
               <span>System Status</span>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Current system health and performance
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <div className="flex items-center justify-between p-3 border rounded-lg">
-                <span className="text-sm font-medium">API Status</span>
+                <span className="text-xs sm:text-sm font-medium">API Status</span>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-green-600">Operational</span>
+                  <span className="text-xs sm:text-sm text-green-600">Operational</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg">
-                <span className="text-sm font-medium">Payment Gateway</span>
+                <span className="text-xs sm:text-sm font-medium">Payment Gateway</span>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-green-600">Connected</span>
+                  <span className="text-xs sm:text-sm text-green-600">Connected</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg">
-                <span className="text-sm font-medium">Database</span>
+                <span className="text-xs sm:text-sm font-medium">Database</span>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-green-600">Healthy</span>
+                  <span className="text-xs sm:text-sm text-green-600">Healthy</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg">
-                <span className="text-sm font-medium">Backup System</span>
+                <span className="text-xs sm:text-sm font-medium">Backup System</span>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                  <span className="text-sm text-yellow-600">Scheduled</span>
+                  <span className="text-xs sm:text-sm text-yellow-600">Scheduled</span>
                 </div>
               </div>
             </div>

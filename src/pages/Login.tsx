@@ -63,17 +63,17 @@ const Login = () => {
 
   return (
     <div className="min-h-screen trust-gradient flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-xl">
+      <Card className="w-full max-w-sm sm:max-w-md shadow-xl">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-6">
             <img 
               src="/public/images/Almaredpay_logo.png" 
               alt="Amared Pay Logo" 
-              className="w-16 h-16 object-contain"
+              className="w-24 h-12 sm:w-32 sm:h-16 md:w-40 md:h-20 object-contain"
             />
           </div>
-          <CardTitle className="text-2xl text-primary">Welcome Back</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl sm:text-2xl text-primary">Welcome Back</CardTitle>
+          <CardDescription className="text-sm sm:text-base">
             Sign in to your account to access the bulk payment system
           </CardDescription>
         </CardHeader>

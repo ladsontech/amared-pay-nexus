@@ -102,15 +102,15 @@ const BulkPayments = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Bulk Payments</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Bulk Payments</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Manage and monitor your bulk payment transactions
             </p>
           </div>
-          <Button className="flex items-center space-x-2">
+          <Button className="flex items-center space-x-2 text-sm sm:text-base">
             <Plus className="h-4 w-4" />
             <span>Create Bulk Payment</span>
           </Button>
@@ -127,11 +127,11 @@ const BulkPayments = () => {
             />
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
@@ -139,7 +139,7 @@ const BulkPayments = () => {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[1, 2, 3].map((i) => (
               <Card key={i} className="animate-pulse">
                 <CardHeader>
@@ -156,35 +156,35 @@ const BulkPayments = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredPayments.map((payment) => (
               <Card key={payment.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{payment.id}</CardTitle>
+                    <CardTitle className="text-base sm:text-lg">{payment.id}</CardTitle>
                     <Badge className={getStatusColor(payment.status)}>
                       {payment.status}
                     </Badge>
                   </div>
-                  <CardDescription>{payment.description}</CardDescription>
+                  <CardDescription className="text-sm">{payment.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Amount</span>
-                      <span className="font-medium">${payment.amount.toLocaleString()}</span>
+                      <span className="text-xs sm:text-sm text-muted-foreground">Amount</span>
+                      <span className="text-sm sm:text-base font-medium">${payment.amount.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Recipients</span>
-                      <span className="font-medium">{payment.recipients}</span>
+                      <span className="text-xs sm:text-sm text-muted-foreground">Recipients</span>
+                      <span className="text-sm sm:text-base font-medium">{payment.recipients}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Created</span>
-                      <span className="font-medium">
+                      <span className="text-xs sm:text-sm text-muted-foreground">Created</span>
+                      <span className="text-sm sm:text-base font-medium">
                         {new Date(payment.createdAt).toLocaleDateString()}
                       </span>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full mt-4">
+                    <Button variant="outline" size="sm" className="w-full mt-4 text-xs sm:text-sm">
                       <Eye className="h-4 w-4 mr-2" />
                       View Details
                     </Button>
@@ -197,11 +197,11 @@ const BulkPayments = () => {
 
         {filteredPayments.length === 0 && !isLoading && (
           <Card>
-            <CardContent className="text-center py-12">
+            <CardContent className="text-center py-8 sm:py-12">
               <div className="text-muted-foreground">
-                <CreditCard className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-medium mb-2">No bulk payments found</h3>
-                <p>Create your first bulk payment to get started.</p>
+                <CreditCard className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-4 opacity-50" />
+                <h3 className="text-base sm:text-lg font-medium mb-2">No bulk payments found</h3>
+                <p className="text-sm sm:text-base">Create your first bulk payment to get started.</p>
               </div>
             </CardContent>
           </Card>

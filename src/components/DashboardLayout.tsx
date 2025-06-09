@@ -62,13 +62,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           >
             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
-          <Link to="/dashboard" className="flex items-center space-x-2">
+          <Link to="/dashboard" className="flex items-center">
             <img 
               src="/public/images/Almaredpay_logo.png" 
               alt="Amared Pay Logo" 
-              className="h-8 w-8 object-contain"
+              className="h-8 w-16 sm:h-10 sm:w-20 md:h-12 md:w-24 object-contain"
             />
-            <span className="text-xl font-bold text-primary hidden sm:block">Amared Pay</span>
           </Link>
         </div>
 
@@ -136,7 +135,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6">
+        <main className="flex-1 p-3 sm:p-4 md:p-6 pb-20 md:pb-6">
           {children || <Outlet />}
         </main>
       </div>
