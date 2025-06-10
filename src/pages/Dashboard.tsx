@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Coins, Users, CreditCard, TrendingUp, DollarSign, Activity, Shield } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useToast } from "@/hooks/use-toast";
-
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalPayments: 0,
@@ -11,10 +10,11 @@ const Dashboard = () => {
     successfulTransactions: 0,
     pendingTransactions: 0,
     organizations: 0,
-    monthlyGrowth: 0,
+    monthlyGrowth: 0
   });
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   useEffect(() => {
     // Simulate fetching dashboard stats
     const fetchStats = async () => {
@@ -26,67 +26,56 @@ const Dashboard = () => {
           successfulTransactions: 1180,
           pendingTransactions: 70,
           organizations: 45,
-          monthlyGrowth: 12.5,
+          monthlyGrowth: 12.5
         });
       } catch (error) {
         toast({
           title: "Error",
           description: "Failed to load dashboard statistics",
-          variant: "destructive",
+          variant: "destructive"
         });
       }
     };
-
     fetchStats();
   }, [toast]);
-
-  const statCards = [
-    {
-      title: "Total Payments",
-      value: stats.totalPayments.toLocaleString(),
-      icon: CreditCard,
-      description: "All-time bulk payments",
-      color: "text-blue-600",
-    },
-    {
-      title: "Total Amount",
-      value: `UGX ${stats.totalAmount.toLocaleString()}`,
-      icon: DollarSign,
-      description: "Total processed amount",
-      color: "text-green-600",
-    },
-    {
-      title: "Successful",
-      value: stats.successfulTransactions.toLocaleString(),
-      icon: TrendingUp,
-      description: "Completed transactions",
-      color: "text-emerald-600",
-    },
-    {
-      title: "Pending",
-      value: stats.pendingTransactions.toLocaleString(),
-      icon: Activity,
-      description: "Processing transactions",
-      color: "text-orange-600",
-    },
-    {
-      title: "Organizations",
-      value: stats.organizations.toLocaleString(),
-      icon: Users,
-      description: "Active organizations",
-      color: "text-purple-600",
-    },
-    {
-      title: "Growth",
-      value: `+${stats.monthlyGrowth}%`,
-      icon: TrendingUp,
-      description: "Monthly growth rate",
-      color: "text-cyan-600",
-    },
-  ];
-
-  return (
-    <DashboardLayout>
+  const statCards = [{
+    title: "Total Payments",
+    value: stats.totalPayments.toLocaleString(),
+    icon: CreditCard,
+    description: "All-time bulk payments",
+    color: "text-blue-600"
+  }, {
+    title: "Total Amount",
+    value: `UGX ${stats.totalAmount.toLocaleString()}`,
+    icon: DollarSign,
+    description: "Total processed amount",
+    color: "text-green-600"
+  }, {
+    title: "Successful",
+    value: stats.successfulTransactions.toLocaleString(),
+    icon: TrendingUp,
+    description: "Completed transactions",
+    color: "text-emerald-600"
+  }, {
+    title: "Pending",
+    value: stats.pendingTransactions.toLocaleString(),
+    icon: Activity,
+    description: "Processing transactions",
+    color: "text-orange-600"
+  }, {
+    title: "Organizations",
+    value: stats.organizations.toLocaleString(),
+    icon: Users,
+    description: "Active organizations",
+    color: "text-purple-600"
+  }, {
+    title: "Growth",
+    value: `+${stats.monthlyGrowth}%`,
+    icon: TrendingUp,
+    description: "Monthly growth rate",
+    color: "text-cyan-600"
+  }];
+  return <DashboardLayout>
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -102,8 +91,7 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
-          {statCards.map((card, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow">
+          {statCards.map((card, index) => <Card key={index} className="hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-xs sm:text-sm font-medium">
                   {card.title}
@@ -116,8 +104,7 @@ const Dashboard = () => {
                   {card.description}
                 </CardDescription>
               </CardContent>
-            </Card>
-          ))}
+            </Card>)}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -133,12 +120,9 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3 sm:space-y-4">
-                {[1, 2, 3].map((item) => (
-                  <div key={item} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                {[1, 2, 3].map(item => <div key={item} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="flex items-center space-x-3">
-                      <div className={`w-2 h-2 rounded-full ${
-                        item === 1 ? "bg-green-500" : item === 2 ? "bg-blue-500" : "bg-yellow-500"
-                      }`}></div>
+                      <div className={`w-2 h-2 rounded-full ${item === 1 ? "bg-green-500" : item === 2 ? "bg-blue-500" : "bg-yellow-500"}`}></div>
                       <div>
                         <p className="text-sm sm:text-base font-medium">Payment #{item}0{item}</p>
                         <p className="text-xs sm:text-sm text-muted-foreground">
@@ -152,55 +136,12 @@ const Dashboard = () => {
                         {item} hour{item > 1 ? "s" : ""} ago
                       </p>
                     </div>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
-                <Shield className="h-5 w-5 text-primary" />
-                <span>Security & Trust</span>
-              </CardTitle>
-              <CardDescription className="text-sm">
-                Secure payment processing
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-center">
-                <img 
-                  src="/public/images/pay_safe.jpg" 
-                  alt="Secure Payment" 
-                  className="w-full max-w-32 sm:max-w-48 h-24 sm:h-32 object-cover rounded-lg shadow-sm"
-                />
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs sm:text-sm">SSL Encryption</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-xs sm:text-sm text-green-600">Active</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs sm:text-sm">PCI Compliance</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-xs sm:text-sm text-green-600">Certified</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs sm:text-sm">Fraud Detection</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-xs sm:text-sm text-green-600">Protected</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          
         </div>
 
         <Card>
@@ -247,8 +188,6 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
-  );
+    </DashboardLayout>;
 };
-
 export default Dashboard;
