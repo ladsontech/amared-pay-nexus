@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Home, CreditCard, Coins, Link as LinkIcon, Settings } from "lucide-react";
+import { Home, CreditCard, Coins, Settings, Users } from "lucide-react";
 
 const MobileBottomNav = () => {
   const location = useLocation();
@@ -9,7 +9,7 @@ const MobileBottomNav = () => {
     { icon: Home, label: "Home", path: "/dashboard" },
     { icon: CreditCard, label: "Payments", path: "/bulk-payments" },
     { icon: Coins, label: "Collections", path: "/collections" },
-    { icon: LinkIcon, label: "Links", path: "/payment-links" },
+    { icon: Users, label: "Orgs", path: "/organizations" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ];
 

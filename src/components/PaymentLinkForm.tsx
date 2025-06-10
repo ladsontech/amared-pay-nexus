@@ -14,27 +14,16 @@ const PaymentLinkForm = ({ onSuccess }: PaymentLinkFormProps) => {
   const [formData, setFormData] = useState({
     amount: "",
     reference: "",
-    phoneNumber: "+256",
     paymentReason: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleCreatePaymentLink = async () => {
-    if (!formData.amount || !formData.reference || !formData.phoneNumber || !formData.paymentReason) {
+    if (!formData.amount || !formData.reference || !formData.paymentReason) {
       toast({
         title: "Error",
         description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate phone number format
-    if (!formData.phoneNumber.startsWith("+256") || formData.phoneNumber.length < 13) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid Ugandan phone number (+256XXXXXXXXX).",
         variant: "destructive",
       });
       return;
@@ -51,7 +40,6 @@ const PaymentLinkForm = ({ onSuccess }: PaymentLinkFormProps) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          phone_number: formData.phoneNumber,
           amount: parseFloat(formData.amount),
           currency: "UGX",
           reference: formData.reference,
@@ -63,9 +51,9 @@ const PaymentLinkForm = ({ onSuccess }: PaymentLinkFormProps) => {
         const data = await response.json();
         toast({
           title: "Payment Link Created",
-          description: "Your payment collection link has been generated successfully.",
+          description: "Your payment collection link has been generated successfully and can now be shared via WhatsApp.",
         });
-        setFormData({ amount: "", reference: "", phoneNumber: "+256", paymentReason: "" });
+        setFormData({ amount: "", reference: "", paymentReason: "" });
         onSuccess();
       } else {
         throw new Error("Failed to create payment link");
@@ -106,16 +94,6 @@ const PaymentLinkForm = ({ onSuccess }: PaymentLinkFormProps) => {
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="phoneNumber">Phone Number</Label>
-        <Input
-          id="phoneNumber"
-          placeholder="+256701234567"
-          value={formData.phoneNumber}
-          onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-        />
-      </div>
-      
-      <div className="space-y-2">
         <Label htmlFor="paymentReason">Payment Reason</Label>
         <Textarea
           id="paymentReason"
@@ -123,6 +101,10 @@ const PaymentLinkForm = ({ onSuccess }: PaymentLinkFormProps) => {
           value={formData.paymentReason}
           onChange={(e) => setFormData({ ...formData, paymentReason: e.target.value })}
         />
+      </div>
+      
+      <div className="bg-muted p-3 rounded-lg text-sm text-muted-foreground">
+        <p>💡 The payment link will be shareable via WhatsApp. When users click the link, they'll enter their phone number (+256) to complete the payment.</p>
       </div>
       
       <Button onClick={handleCreatePaymentLink} className="w-full" disabled={isLoading}>

@@ -223,23 +223,24 @@ const Collections = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="space-y-4 md:space-y-6">
+        <div className="flex flex-col space-y-4">
           <div>
-            <h1 className="text-3xl font-bold">Collections & Payment Links</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl md:text-3xl font-bold">Collections & Payment Links</h1>
+            <p className="text-sm md:text-base text-muted-foreground">
               Manage mobile money collections and payment links (UGX only)
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" className="flex items-center space-x-2">
+                <Button variant="outline" className="flex items-center justify-center space-x-2 w-full sm:w-auto">
                   <Plus className="h-4 w-4" />
-                  <span>Initiate Collection</span>
+                  <span className="hidden sm:inline">Initiate Collection</span>
+                  <span className="sm:hidden">Collection</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent>
+              <SheetContent className="w-full sm:max-w-md">
                 <SheetHeader>
                   <SheetTitle>Initiate Mobile Money Collection</SheetTitle>
                   <SheetDescription>
@@ -284,16 +285,17 @@ const Collections = () => {
 
             <Sheet>
               <SheetTrigger asChild>
-                <Button className="flex items-center space-x-2">
+                <Button className="flex items-center justify-center space-x-2 w-full sm:w-auto">
                   <LinkIcon className="h-4 w-4" />
-                  <span>Create Payment Link</span>
+                  <span className="hidden sm:inline">Create Payment Link</span>
+                  <span className="sm:hidden">Payment Link</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent>
+              <SheetContent className="w-full sm:max-w-md">
                 <SheetHeader>
                   <SheetTitle>Create Payment Link</SheetTitle>
                   <SheetDescription>
-                    Generate a collection link for multiple payees (UGX only)
+                    Generate a collection link to share via WhatsApp (UGX only)
                   </SheetDescription>
                 </SheetHeader>
                 <div className="mt-6">
@@ -305,10 +307,10 @@ const Collections = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 bg-muted p-1 rounded-lg w-fit">
+        <div className="flex space-x-1 bg-muted p-1 rounded-lg w-full sm:w-fit overflow-x-auto">
           <button
             onClick={() => setActiveTab("collections")}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap flex-1 sm:flex-none ${
               activeTab === "collections"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
@@ -318,7 +320,7 @@ const Collections = () => {
           </button>
           <button
             onClick={() => setActiveTab("links")}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap flex-1 sm:flex-none ${
               activeTab === "links"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
@@ -329,7 +331,7 @@ const Collections = () => {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {activeTab === "collections" ? (
             <>
               <Card>
@@ -402,7 +404,7 @@ const Collections = () => {
         </div>
 
         {/* Search and Filter */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
@@ -413,11 +415,11 @@ const Collections = () => {
             />
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
@@ -429,7 +431,7 @@ const Collections = () => {
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <Card key={i} className="animate-pulse">
-                <CardContent className="p-6">
+                <CardContent className="p-4 md:p-6">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-muted rounded-full"></div>
                     <div className="flex-1 space-y-2">
@@ -446,20 +448,20 @@ const Collections = () => {
           <div className="space-y-4">
             {filteredCollections.map((collection) => (
               <Card key={collection.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                        <Smartphone className="h-6 w-6 text-primary" />
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start space-x-3 sm:space-x-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Smartphone className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                       </div>
-                      <div>
-                        <div className="flex items-center space-x-2 mb-1">
-                          <h3 className="font-semibold">{collection.id}</h3>
-                          <Badge className={getStatusColor(collection.status)}>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                          <h3 className="font-semibold text-sm sm:text-base truncate">{collection.id}</h3>
+                          <Badge className={`${getStatusColor(collection.status)} text-xs w-fit`}>
                             {collection.status}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-xs sm:text-sm text-muted-foreground break-all">
                           {collection.phoneNumber} • {collection.reference}
                         </p>
                         <p className="text-xs text-muted-foreground">
@@ -467,11 +469,11 @@ const Collections = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left sm:text-right flex-shrink-0">
                       <div className="text-lg font-bold">
                         UGX {collection.amount.toLocaleString()}
                       </div>
-                      <div className="text-sm text-muted-foreground capitalize">
+                      <div className="text-xs sm:text-sm text-muted-foreground capitalize">
                         {collection.method.replace("_", " ")}
                       </div>
                     </div>
@@ -484,31 +486,31 @@ const Collections = () => {
           <div className="space-y-4">
             {filteredPaymentLinks.map((link) => (
               <Card key={link.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex flex-col gap-4">
                     <div className="flex-1 space-y-3">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                        <h3 className="font-semibold text-lg">{link.reference}</h3>
-                        <Badge className={getStatusColor(link.status)}>
+                        <h3 className="font-semibold text-base md:text-lg">{link.reference}</h3>
+                        <Badge className={`${getStatusColor(link.status)} w-fit`}>
                           <span className="capitalize">{link.status}</span>
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground">{link.paymentReason}</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Amount</p>
+                          <p className="text-muted-foreground text-xs">Amount</p>
                           <p className="font-medium">UGX {link.amount.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Total Payees</p>
+                          <p className="text-muted-foreground text-xs">Total Payees</p>
                           <p className="font-medium">{link.totalPayees}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Successful</p>
+                          <p className="text-muted-foreground text-xs">Successful</p>
                           <p className="font-medium text-green-600">{link.successfulPayments}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Pending</p>
+                          <p className="text-muted-foreground text-xs">Pending</p>
                           <p className="font-medium text-yellow-600">{link.pendingPayments}</p>
                         </div>
                       </div>
@@ -518,7 +520,7 @@ const Collections = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => copyToClipboard(link.link)}
-                        className="flex items-center space-x-2"
+                        className="flex items-center justify-center space-x-2 flex-1 sm:flex-none"
                       >
                         <Copy className="h-4 w-4" />
                         <span>Copy Link</span>
@@ -526,7 +528,7 @@ const Collections = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex items-center space-x-2"
+                        className="flex items-center justify-center space-x-2 flex-1 sm:flex-none"
                       >
                         <QrCode className="h-4 w-4" />
                         <span>QR Code</span>
@@ -534,7 +536,7 @@ const Collections = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex items-center space-x-2"
+                        className="flex items-center justify-center space-x-2 flex-1 sm:flex-none"
                       >
                         <Share className="h-4 w-4" />
                         <span>Share</span>
@@ -576,3 +578,5 @@ const Collections = () => {
 };
 
 export default Collections;
+
+</edits_to_apply>
