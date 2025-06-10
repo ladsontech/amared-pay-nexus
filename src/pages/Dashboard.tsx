@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Coins, Users, CreditCard, TrendingUp, DollarSign, Activity, Shield } from "lucide-react";
@@ -51,7 +50,7 @@ const Dashboard = () => {
     },
     {
       title: "Total Amount",
-      value: `$${stats.totalAmount.toLocaleString()}`,
+      value: `UGX ${stats.totalAmount.toLocaleString()}`,
       icon: DollarSign,
       description: "Total processed amount",
       color: "text-green-600",
@@ -148,7 +147,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm sm:text-base font-medium">${(item * 15000).toLocaleString()}</p>
+                      <p className="text-sm sm:text-base font-medium">UGX ${(item * 15000).toLocaleString()}</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         {item} hour{item > 1 ? "s" : ""} ago
                       </p>

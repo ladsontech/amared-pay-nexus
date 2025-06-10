@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -68,7 +69,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               <p className="text-xs sm:text-sm font-medium">{user.name || "Demo User"}</p>
               <p className="text-xs text-muted-foreground">{user.organization || "Demo Org"}</p>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleLogout}>
+            <Button variant="ghost" size="icon" onClick={handleLogout} className="lg:hidden">
               <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </div>
@@ -98,6 +99,18 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                   </Link>
                 ))}
               </nav>
+            </div>
+            
+            {/* Logout button in sidebar for desktop/tablet */}
+            <div className="hidden lg:block p-4 border-t border-border">
+              <Button 
+                variant="ghost" 
+                onClick={handleLogout}
+                className="w-full justify-start space-x-3 text-muted-foreground hover:text-foreground hover:bg-muted"
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="font-medium">Logout</span>
+              </Button>
             </div>
           </div>
         </aside>
