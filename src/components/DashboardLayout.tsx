@@ -1,15 +1,12 @@
-
 import { useState } from "react";
 import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home, CreditCard, Users, Settings, Menu, X, LogOut, Bell, Search, UserCircle, Coins, Link as LinkIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import MobileBottomNav from "./MobileBottomNav";
-
 interface DashboardLayoutProps {
   children?: React.ReactNode;
 }
-
 const DashboardLayout = ({
   children
 }: DashboardLayoutProps) => {
@@ -19,7 +16,6 @@ const DashboardLayout = ({
   const {
     toast
   } = useToast();
-
   const handleLogout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("user");
@@ -29,7 +25,6 @@ const DashboardLayout = ({
     });
     navigate("/login");
   };
-
   const menuItems = [{
     icon: Home,
     label: "Dashboard",
@@ -55,11 +50,8 @@ const DashboardLayout = ({
     label: "Settings",
     path: "/settings"
   }];
-
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-white border-b border-border px-2 sm:px-4 lg:px-6 h-16 flex items-center justify-between shadow-sm">
         <div className="flex items-center space-x-2 sm:space-x-4 flex-1">
@@ -67,7 +59,7 @@ const DashboardLayout = ({
             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
           <Link to="/dashboard" className="flex items-center justify-start">
-            <img src="/public/images/Almaredpay_logo.png" alt="Logo" className="h-full max-h-14 w-auto object-contain sm:max-h-16 md:max-h-full" />
+            <img src="/public/images/Almaredpay_logo.png" alt="Logo" className="h-full max-h-14 w-auto sm:max-h-16 md:max-h-full object-contain" />
           </Link>
         </div>
 
@@ -118,8 +110,6 @@ const DashboardLayout = ({
 
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
-    </div>
-  );
+    </div>;
 };
-
 export default DashboardLayout;
