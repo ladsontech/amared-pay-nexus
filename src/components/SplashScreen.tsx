@@ -3,8 +3,8 @@ import { Zap } from "lucide-react";
 
 const SplashScreen = () => {
   return (
-    <div className="min-h-screen financial-gradient flex items-center justify-center p-4">
-      <div className="text-center text-white">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="text-center text-primary">
         <div className="flex items-center justify-center mb-8">
           <div className="relative">
             <img 
@@ -17,9 +17,9 @@ const SplashScreen = () => {
         </div>
         <p className="text-lg sm:text-xl opacity-90 mb-8">Secure Bulk Payment System</p>
         <div className="flex items-center justify-center space-x-2">
-          <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
-          <div className="w-2 h-2 bg-white rounded-full animate-bounce delay-100"></div>
-          <div className="w-2 h-2 bg-white rounded-full animate-bounce delay-200"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-100"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-200"></div>
         </div>
       </div>
     </div>
