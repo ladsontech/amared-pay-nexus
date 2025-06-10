@@ -9,7 +9,6 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import BulkPayments from "./pages/BulkPayments";
 import Collections from "./pages/Collections";
-import PaymentLinks from "./pages/PaymentLinks";
 import Organizations from "./pages/Organizations";
 import SubAdmins from "./pages/SubAdmins";
 import Settings from "./pages/Settings";
@@ -29,7 +28,6 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/bulk-payments" element={<BulkPayments />} />
           <Route path="/collections" element={<Collections />} />
-          <Route path="/payment-links" element={<PaymentLinks />} />
           <Route path="/organizations" element={<Organizations />} />
           <Route path="/sub-admins" element={<SubAdmins />} />
           <Route path="/settings" element={<Settings />} />
