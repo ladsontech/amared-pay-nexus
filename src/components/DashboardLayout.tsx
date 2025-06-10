@@ -59,7 +59,7 @@ const DashboardLayout = ({
             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
           <Link to="/dashboard" className="flex items-center justify-start">
-            <img src="/public/images/Almaredpay_logo.png" alt="Logo" className="col-auto " />
+            <img src="/public/images/Almaredpay_logo.png" alt="Logo" className="-bottom-0 " />
           </Link>
         </div>
 
