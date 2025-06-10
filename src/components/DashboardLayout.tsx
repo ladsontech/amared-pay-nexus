@@ -1,21 +1,20 @@
 import { useState } from "react";
 import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, CreditCard, Users, Settings, Menu, X, LogOut, Bell, Search, UserCircle, Coins, Link as LinkIcon } from "lucide-react";
+import { Home, CreditCard, Users, Settings, Menu, X, LogOut, Bell, Search, UserCircle, Coins } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import MobileBottomNav from "./MobileBottomNav";
+
 interface DashboardLayoutProps {
   children?: React.ReactNode;
 }
-const DashboardLayout = ({
-  children
-}: DashboardLayoutProps) => {
+
+const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
   const handleLogout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("user");
@@ -25,33 +24,20 @@ const DashboardLayout = ({
     });
     navigate("/login");
   };
-  const menuItems = [{
-    icon: Home,
-    label: "Dashboard",
-    path: "/dashboard"
-  }, {
-    icon: CreditCard,
-    label: "Bulk Payments",
-    path: "/bulk-payments"
-  }, {
-    icon: Coins,
-    label: "Collections",
-    path: "/collections"
-  }, {
-    icon: Users,
-    label: "Organizations",
-    path: "/organizations"
-  }, {
-    icon: UserCircle,
-    label: "Sub-Admins",
-    path: "/sub-admins"
-  }, {
-    icon: Settings,
-    label: "Settings",
-    path: "/settings"
-  }];
+
+  const menuItems = [
+    { icon: Home, label: "Dashboard", path: "/dashboard" },
+    { icon: CreditCard, label: "Bulk Payments", path: "/bulk-payments" },
+    { icon: Coins, label: "Collections", path: "/collections" },
+    { icon: Users, label: "Organizations", path: "/organizations" },
+    { icon: UserCircle, label: "Sub-Admins", path: "/sub-admins" },
+    { icon: Settings, label: "Settings", path: "/settings" }
+  ];
+
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  return <div className="min-h-screen bg-background">
+
+  return (
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-white border-b border-border px-2 sm:px-4 lg:px-6 h-16 flex items-center justify-between shadow-sm">
         <div className="flex items-center space-x-2 sm:space-x-4 flex-1">
@@ -59,10 +45,15 @@ const DashboardLayout = ({
             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
           <Link to="/dashboard" className="flex items-center justify-start">
-            <img src="/public/images/Almaredpay_logo.png" alt="Logo" className="h-full max-h-14 w-auto sm:max-h-16 md:max-h-full object-contain" />
+            <img 
+              src="/public/images/Almaredpay_logo.png" 
+              alt="Logo" 
+              className="h-12 w-auto object-contain" 
+            />
           </Link>
         </div>
 
+        
         <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
           <div className="hidden md:flex items-center space-x-2 bg-muted rounded-lg px-3 py-2">
             <Search className="h-4 w-4 text-muted-foreground" />
@@ -84,23 +75,37 @@ const DashboardLayout = ({
         </div>
       </header>
 
+      
       <div className="flex">
         {/* Sidebar */}
         <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-border transition-transform duration-300 ease-in-out lg:transition-none shadow-lg lg:shadow-none`}>
           <div className="flex flex-col h-full">
             <div className="flex-1 py-6">
               <nav className="space-y-2 px-4">
-                {menuItems.map(item => <Link key={item.path} to={item.path} className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${location.pathname === item.path ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`} onClick={() => setSidebarOpen(false)}>
+                {menuItems.map(item => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                      location.pathname === item.path
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                    onClick={() => setSidebarOpen(false)}
+                  >
                     <item.icon className="h-5 w-5" />
                     <span className="font-medium">{item.label}</span>
-                  </Link>)}
+                  </Link>
+                ))}
               </nav>
             </div>
           </div>
         </aside>
 
         {/* Overlay for mobile */}
-        {sidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+        {sidebarOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        )}
 
         {/* Main Content */}
         <main className="flex-1 p-3 sm:p-4 md:p-6 pb-20 md:pb-6">
@@ -110,7 +115,8 @@ const DashboardLayout = ({
 
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
-    </div>;
+    </div>
+  );
 };
 
 export default DashboardLayout;

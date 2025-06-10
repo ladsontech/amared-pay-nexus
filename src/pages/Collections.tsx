@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Plus, Search, Filter, Download, Smartphone, Copy, QrCode, Share, Link as LinkIcon } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
+import PaymentLinkForm from "@/components/PaymentLinkForm";
 import { useToast } from "@/hooks/use-toast";
 
 interface Collection {
@@ -20,6 +20,7 @@ interface Collection {
   createdAt: string;
   reference: string;
   description?: string;
+  currency: string;
 }
 
 interface PaymentLink {
@@ -33,6 +34,7 @@ interface PaymentLink {
   totalPayees: number;
   successfulPayments: number;
   pendingPayments: number;
+  currency: string;
 }
 
 const Collections = () => {
@@ -42,14 +44,9 @@ const Collections = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"collections" | "links">("collections");
   const [formData, setFormData] = useState({
-    phoneNumber: "",
+    phoneNumber: "+256",
     amount: "",
     description: "",
-  });
-  const [linkFormData, setLinkFormData] = useState({
-    amount: "",
-    reference: "",
-    paymentReason: "",
   });
   const { toast } = useToast();
 
@@ -77,21 +74,23 @@ const Collections = () => {
         setCollections([
           {
             id: "COL001",
-            amount: 5000,
+            amount: 50000,
             phoneNumber: "+256701234567",
             status: "successful",
             method: "mobile_money",
             createdAt: "2024-01-15T10:30:00Z",
             reference: "REF001",
+            currency: "UGX",
           },
           {
             id: "COL002",
-            amount: 2500,
+            amount: 25000,
             phoneNumber: "+256789012345",
             status: "pending",
             method: "mobile_money",
             createdAt: "2024-01-14T14:20:00Z",
             reference: "REF002",
+            currency: "UGX",
           },
         ]);
       }
@@ -108,11 +107,11 @@ const Collections = () => {
   };
 
   const fetchPaymentLinks = async () => {
-    // Mock data for payment links since there's no specific endpoint
+    // Mock data for payment links
     setPaymentLinks([
       {
         id: "PL001",
-        amount: 5000,
+        amount: 50000,
         reference: "SCHOOL_FEES_2024",
         paymentReason: "School Fees Payment for Q1 2024",
         link: "https://pay.almaredpay.com/link/PL001",
@@ -121,6 +120,7 @@ const Collections = () => {
         totalPayees: 50,
         successfulPayments: 30,
         pendingPayments: 20,
+        currency: "UGX",
       },
     ]);
   };
@@ -130,6 +130,16 @@ const Collections = () => {
       toast({
         title: "Error",
         description: "Please fill in phone number and amount.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate phone number format
+    if (!formData.phoneNumber.startsWith("+256") || formData.phoneNumber.length < 13) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid Ugandan phone number (+256XXXXXXXXX).",
         variant: "destructive",
       });
       return;
@@ -146,6 +156,7 @@ const Collections = () => {
         body: JSON.stringify({
           phone_number: formData.phoneNumber,
           amount: parseFloat(formData.amount),
+          currency: "UGX",
           description: formData.description,
         }),
       });
@@ -156,7 +167,7 @@ const Collections = () => {
           title: "Collection Initiated",
           description: "Mobile money collection has been initiated successfully.",
         });
-        setFormData({ phoneNumber: "", amount: "", description: "" });
+        setFormData({ phoneNumber: "+256", amount: "", description: "" });
         fetchCollections();
       } else {
         throw new Error("Failed to initiate collection");
@@ -169,38 +180,6 @@ const Collections = () => {
         variant: "destructive",
       });
     }
-  };
-
-  const handleCreatePaymentLink = () => {
-    if (!linkFormData.amount || !linkFormData.reference || !linkFormData.paymentReason) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const newLink: PaymentLink = {
-      id: `PL${String(paymentLinks.length + 1).padStart(3, '0')}`,
-      amount: parseFloat(linkFormData.amount),
-      reference: linkFormData.reference,
-      paymentReason: linkFormData.paymentReason,
-      link: `https://pay.almaredpay.com/link/PL${String(paymentLinks.length + 1).padStart(3, '0')}`,
-      status: "active",
-      createdAt: new Date().toISOString(),
-      totalPayees: 0,
-      successfulPayments: 0,
-      pendingPayments: 0,
-    };
-
-    setPaymentLinks([newLink, ...paymentLinks]);
-    setLinkFormData({ amount: "", reference: "", paymentReason: "" });
-
-    toast({
-      title: "Payment Link Created",
-      description: "Your payment collection link has been generated successfully.",
-    });
   };
 
   const copyToClipboard = (link: string) => {
@@ -249,7 +228,7 @@ const Collections = () => {
           <div>
             <h1 className="text-3xl font-bold">Collections & Payment Links</h1>
             <p className="text-muted-foreground">
-              Manage mobile money collections and payment links
+              Manage mobile money collections and payment links (UGX only)
             </p>
           </div>
           <div className="flex gap-2">
@@ -264,7 +243,7 @@ const Collections = () => {
                 <SheetHeader>
                   <SheetTitle>Initiate Mobile Money Collection</SheetTitle>
                   <SheetDescription>
-                    Request payment from a specific phone number
+                    Request payment from a specific phone number (UGX only)
                   </SheetDescription>
                 </SheetHeader>
                 <div className="space-y-4 mt-6">
@@ -278,11 +257,11 @@ const Collections = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="amount">Amount</Label>
+                    <Label htmlFor="amount">Amount (UGX)</Label>
                     <Input
                       id="amount"
                       type="number"
-                      placeholder="5000"
+                      placeholder="50000"
                       value={formData.amount}
                       onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                     />
@@ -314,41 +293,11 @@ const Collections = () => {
                 <SheetHeader>
                   <SheetTitle>Create Payment Link</SheetTitle>
                   <SheetDescription>
-                    Generate a collection link for multiple payees
+                    Generate a collection link for multiple payees (UGX only)
                   </SheetDescription>
                 </SheetHeader>
-                <div className="space-y-4 mt-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="linkAmount">Amount per Payment</Label>
-                    <Input
-                      id="linkAmount"
-                      type="number"
-                      placeholder="5000"
-                      value={linkFormData.amount}
-                      onChange={(e) => setLinkFormData({ ...linkFormData, amount: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="reference">Reference Code</Label>
-                    <Input
-                      id="reference"
-                      placeholder="SCHOOL_FEES_2024"
-                      value={linkFormData.reference}
-                      onChange={(e) => setLinkFormData({ ...linkFormData, reference: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="paymentReason">Payment Reason</Label>
-                    <Textarea
-                      id="paymentReason"
-                      placeholder="Describe what this payment is for..."
-                      value={linkFormData.paymentReason}
-                      onChange={(e) => setLinkFormData({ ...linkFormData, paymentReason: e.target.value })}
-                    />
-                  </div>
-                  <Button onClick={handleCreatePaymentLink} className="w-full">
-                    Create Payment Link
-                  </Button>
+                <div className="mt-6">
+                  <PaymentLinkForm onSuccess={fetchPaymentLinks} />
                 </div>
               </SheetContent>
             </Sheet>
@@ -409,7 +358,7 @@ const Collections = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    ${collections.reduce((sum, c) => sum + c.amount, 0).toLocaleString()}
+                    UGX {collections.reduce((sum, c) => sum + c.amount, 0).toLocaleString()}
                   </div>
                   <p className="text-sm text-muted-foreground">Total collected</p>
                 </CardContent>
@@ -443,7 +392,7 @@ const Collections = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    ${paymentLinks.reduce((sum, link) => sum + (link.amount * link.successfulPayments), 0).toLocaleString()}
+                    UGX {paymentLinks.reduce((sum, link) => sum + (link.amount * link.successfulPayments), 0).toLocaleString()}
                   </div>
                   <p className="text-sm text-muted-foreground">From payment links</p>
                 </CardContent>
@@ -520,7 +469,7 @@ const Collections = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-bold">
-                        ${collection.amount.toLocaleString()}
+                        UGX {collection.amount.toLocaleString()}
                       </div>
                       <div className="text-sm text-muted-foreground capitalize">
                         {collection.method.replace("_", " ")}
@@ -548,7 +497,7 @@ const Collections = () => {
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                         <div>
                           <p className="text-muted-foreground">Amount</p>
-                          <p className="font-medium">${link.amount.toLocaleString()}</p>
+                          <p className="font-medium">UGX {link.amount.toLocaleString()}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Total Payees</p>
