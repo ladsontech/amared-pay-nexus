@@ -53,7 +53,7 @@ const DashboardLayout = ({
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   return <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-border px-2 sm:px-4 lg:px-6 h-16 flex items-center justify-between shadow-sm">
+      <header className="bg-white border-b border-border px-2 sm:px-4 lg:px-6 h-16 flex items-center justify-between shadow-sm py-[5px]">
         <div className="flex items-center space-x-2 sm:space-x-4 flex-1">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
