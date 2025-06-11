@@ -67,7 +67,7 @@ const Login = () => {
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-6">
             <img 
-              src="/public/images/Almaredpay_logo.png" 
+              src="/images/Almaredpay_logo.png" 
               alt="Amared Pay Logo" 
               className="w-24 h-12 sm:w-32 sm:h-16 md:w-40 md:h-20 object-contain"
             />
