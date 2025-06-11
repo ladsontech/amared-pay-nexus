@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,7 @@ const Settings = () => {
       sessionTimeout: "30",
     },
     payment: {
-      defaultCurrency: "USD",
+      defaultCurrency: "UGX",
       maxTransactionAmount: "1000000",
       commissionRate: "2.5",
     },
@@ -262,7 +261,7 @@ const Settings = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="max-amount">Maximum Transaction Amount</Label>
+                <Label htmlFor="max-amount">Maximum Transaction Amount (UGX)</Label>
                 <Input
                   id="max-amount"
                   type="number"

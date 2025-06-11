@@ -172,7 +172,7 @@ const BulkPayments = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-xs sm:text-sm text-muted-foreground">Amount</span>
-                      <span className="text-sm sm:text-base font-medium">${payment.amount.toLocaleString()}</span>
+                      <span className="text-sm sm:text-base font-medium">UGX {payment.amount.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-xs sm:text-sm text-muted-foreground">Recipients</span>

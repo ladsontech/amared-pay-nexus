@@ -47,7 +47,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </Button>
           <Link to="/dashboard" className="flex items-center justify-start">
             <img 
-              src="/public/images/Almaredpay_logo.png" 
+              src="/images/Almaredpay_logo.png" 
               alt="Logo" 
               className="h-12 w-auto object-contain" 
             />
