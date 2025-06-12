@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, CreditCard, Users, Settings, Menu, X, LogOut, Bell, Search, UserCircle, Coins } from "lucide-react";
+import { Home, CreditCard, Users, Settings, Menu, X, LogOut, Bell, Search, UserCircle, Coins, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import MobileBottomNav from "./MobileBottomNav";
 
@@ -30,6 +30,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { icon: Home, label: "Dashboard", path: "/dashboard" },
     { icon: CreditCard, label: "Bulk Payments", path: "/bulk-payments" },
     { icon: Coins, label: "Collections", path: "/collections" },
+    { icon: Wallet, label: "Petty Cash", path: "/petty-cash" },
     { icon: Users, label: "Organizations", path: "/organizations" },
     { icon: UserCircle, label: "Sub-Admins", path: "/sub-admins" },
     { icon: Settings, label: "Settings", path: "/settings" }

@@ -12,6 +12,7 @@ import Collections from "./pages/Collections";
 import Organizations from "./pages/Organizations";
 import SubAdmins from "./pages/SubAdmins";
 import Settings from "./pages/Settings";
+import PettyCash from "./pages/PettyCash";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/collections" element={<Collections />} />
           <Route path="/organizations" element={<Organizations />} />
           <Route path="/sub-admins" element={<SubAdmins />} />
+          <Route path="/petty-cash" element={<PettyCash />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
