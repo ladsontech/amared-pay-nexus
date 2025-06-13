@@ -41,7 +41,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-border px-2 sm:px-4 lg:px-6 h-16 flex items-center justify-between shadow-sm">
+      <header className="fixed md:static top-0 left-0 right-0 z-50 bg-white border-b border-border px-2 sm:px-4 lg:px-6 h-16 flex items-center justify-between shadow-sm">
         <div className="flex items-center space-x-2 sm:space-x-4 flex-1">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -78,10 +78,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       </header>
 
       
-      <div className="flex">
+      <div className="flex pt-16 md:pt-0">
         {/* Sidebar */}
-        <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-border transition-transform duration-300 ease-in-out lg:transition-none shadow-lg lg:shadow-none`}>
-          <div className="flex flex-col h-full">
+        <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-border transition-transform duration-300 ease-in-out lg:transition-none shadow-lg lg:shadow-none`}>
+          <div className="flex flex-col h-full pt-16 lg:pt-0">
             <div className="flex-1 py-6">
               <nav className="space-y-2 px-4">
                 {menuItems.map(item => (
@@ -118,7 +118,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
         {/* Overlay for mobile */}
         {sidebarOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />
         )}
 
         {/* Main Content */}
