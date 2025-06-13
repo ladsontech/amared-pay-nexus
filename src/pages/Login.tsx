@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Mail, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { authService } from "@/services/authService";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -21,41 +22,24 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Simulate API call to /auth/login/
-      const response = await fetch("/api/auth/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+      await authService.login({
+        email,
+        password,
+        username: email, // Using email as username as well
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("auth_token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        toast({
-          title: "Login Successful",
-          description: "Welcome to Amared Pay!",
-        });
-        navigate("/dashboard");
-      } else {
-        throw new Error("Invalid credentials");
-      }
-    } catch (error) {
-      // For demo purposes, simulate successful login
-      localStorage.setItem("auth_token", "demo_token_123");
-      localStorage.setItem("user", JSON.stringify({ 
-        id: 1, 
-        email: email, 
-        name: "Demo User",
-        organization: "Demo Org" 
-      }));
       toast({
         title: "Login Successful",
         description: "Welcome to Amared Pay!",
       });
       navigate("/dashboard");
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Login Failed",
+        description: error instanceof Error ? error.message : "Invalid credentials. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

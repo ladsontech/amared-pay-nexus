@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/drawer";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { authService } from "@/services/authService";
 
 const MobileBottomNav = () => {
   const location = useLocation();
@@ -33,15 +34,25 @@ const MobileBottomNav = () => {
     { icon: Settings, label: "Settings", path: "/settings" },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user");
-    toast({
-      title: "Logged Out",
-      description: "You have been successfully logged out."
-    });
-    navigate("/login");
-    setDrawerOpen(false);
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out."
+      });
+      navigate("/login");
+      setDrawerOpen(false);
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Logout Error",
+        description: "There was an issue logging you out, but you've been signed out locally.",
+        variant: "destructive",
+      });
+      navigate("/login");
+      setDrawerOpen(false);
+    }
   };
 
   return (

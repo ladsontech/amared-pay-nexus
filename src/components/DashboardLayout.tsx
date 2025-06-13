@@ -4,6 +4,7 @@ import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home, CreditCard, Users, Settings, Menu, X, LogOut, Bell, Search, UserCircle, Coins, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { authService } from "@/services/authService";
 import MobileBottomNav from "./MobileBottomNav";
 
 interface DashboardLayoutProps {
@@ -16,14 +17,23 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const location = useLocation();
   const { toast } = useToast();
 
-  const handleLogout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user");
-    toast({
-      title: "Logged Out",
-      description: "You have been successfully logged out."
-    });
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out."
+      });
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Logout Error",
+        description: "There was an issue logging you out, but you've been signed out locally.",
+        variant: "destructive",
+      });
+      navigate("/login");
+    }
   };
 
   const menuItems = [
@@ -36,7 +46,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { icon: Settings, label: "Settings", path: "/settings" }
   ];
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = authService.getCurrentUser() || {};
 
   return (
     <div className="min-h-screen bg-background">
