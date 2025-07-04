@@ -30,143 +30,77 @@ export interface TokenVerifyRequest {
 
 class AuthService {
   private getAuthHeaders() {
-    const token = localStorage.getItem("auth_token");
     return {
       "Content-Type": "application/json",
-      ...(token && { "Authorization": `Bearer ${token}` })
+      "Authorization": `Bearer demo_token`
     };
   }
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const response = await fetch(`${API_BASE_URL}/auth/login/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(credentials),
-    });
+    // Mock login for demo purposes
+    const mockResponse = {
+      username: "Demo User",
+      email: credentials.email,
+      token: "demo_token_123",
+      access: "demo_access_token",
+      refresh: "demo_refresh_token"
+    };
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Login failed");
-    }
-
-    const data = await response.json();
+    // Store mock data
+    localStorage.setItem("auth_token", mockResponse.token);
+    localStorage.setItem("access_token", mockResponse.access);
+    localStorage.setItem("refresh_token", mockResponse.refresh);
     
-    // Store token and user data
-    if (data.token) {
-      localStorage.setItem("auth_token", data.token);
-    }
-    if (data.access) {
-      localStorage.setItem("access_token", data.access);
-    }
-    if (data.refresh) {
-      localStorage.setItem("refresh_token", data.refresh);
-    }
-    
-    // Store user data
     const userData = {
-      username: data.username,
-      email: data.email,
+      username: mockResponse.username,
+      email: mockResponse.email,
+      name: "Demo User",
+      organization: "Demo Organization"
     };
     localStorage.setItem("user", JSON.stringify(userData));
 
-    return data;
+    return mockResponse;
   }
 
   async logout(): Promise<void> {
-    try {
-      await fetch(`${API_BASE_URL}/auth/logout/`, {
-        method: "POST",
-        headers: this.getAuthHeaders(),
-      });
-    } catch (error) {
-      console.error("Logout API call failed:", error);
-    } finally {
-      // Clear local storage regardless of API call success
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("user");
-    }
+    // Clear local storage
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
   }
 
   async changePassword(passwordData: ChangePasswordRequest): Promise<{ success: boolean; message: string }> {
-    const response = await fetch(`${API_BASE_URL}/auth/password/change`, {
-      method: "POST",
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify(passwordData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Password change failed");
-    }
-
-    return await response.json();
+    // Mock response for demo
+    return { success: true, message: "Password changed successfully" };
   }
 
   async refreshToken(): Promise<{ access: string; refresh: string }> {
-    const refreshToken = localStorage.getItem("refresh_token");
-    if (!refreshToken) {
-      throw new Error("No refresh token available");
-    }
-
-    const response = await fetch(`${API_BASE_URL}/auth/token/refresh/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ refresh: refreshToken }),
-    });
-
-    if (!response.ok) {
-      // If refresh fails, clear all tokens
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("user");
-      throw new Error("Token refresh failed");
-    }
-
-    const data = await response.json();
-    
-    // Update stored tokens
-    if (data.access) {
-      localStorage.setItem("access_token", data.access);
-    }
-    if (data.refresh) {
-      localStorage.setItem("refresh_token", data.refresh);
-    }
-
-    return data;
+    // Mock token refresh for demo
+    return {
+      access: "demo_access_token_refreshed",
+      refresh: "demo_refresh_token_refreshed"
+    };
   }
 
   async verifyToken(token: string): Promise<boolean> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/token/verify/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token }),
-      });
-
-      return response.ok;
-    } catch (error) {
-      console.error("Token verification failed:", error);
-      return false;
-    }
+    // Always return true for demo purposes
+    return true;
   }
 
   isAuthenticated(): boolean {
-    const token = localStorage.getItem("auth_token") || localStorage.getItem("access_token");
-    return !!token;
+    // Always return true for demo purposes
+    return true;
   }
 
   getCurrentUser() {
-    const userData = localStorage.getItem("user");
-    return userData ? JSON.parse(userData) : null;
+    // Return mock user data for demo
+    return {
+      username: "Demo User",
+      email: "demo@example.com",
+      name: "Demo User",
+      organization: "Demo Organization"
+    };
   }
 }
 
