@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -46,7 +45,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { icon: Settings, label: "Settings", path: "/settings" }
   ];
 
-  const user = authService.getCurrentUser() || {};
+  const user = authService.getCurrentUser();
 
   return (
     <div className="min-h-screen bg-background">
@@ -77,8 +76,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </Button>
           <div className="hidden md:flex items-center space-x-2">
             <div className="text-right">
-              <p className="text-xs sm:text-sm font-medium">{user.name || "Demo User"}</p>
-              <p className="text-xs text-muted-foreground">{user.organization || "Demo Org"}</p>
+              <p className="text-xs sm:text-sm font-medium">{user?.name || "Demo User"}</p>
+              <p className="text-xs text-muted-foreground">{user?.organization || "Demo Org"}</p>
             </div>
             <Button variant="ghost" size="icon" onClick={handleLogout} className="lg:hidden">
               <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
