@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Shield, Building, Users, DollarSign, TrendingUp, Activity, AlertTriangle } from "lucide-react";
-import DashboardLayout from "@/components/DashboardLayout";
+import AdminDashboardLayout from "@/components/AdminDashboardLayout";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
@@ -87,7 +87,7 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <DashboardLayout>
+    <AdminDashboardLayout>
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -182,7 +182,7 @@ const AdminDashboard = () => {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </AdminDashboardLayout>
   );
 };
 

@@ -9,7 +9,6 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import OrganizationDashboard from "./pages/OrganizationDashboard";
-import RoleTesting from "./pages/RoleTesting";
 import BulkPayments from "./pages/BulkPayments";
 import Collections from "./pages/Collections";
 import Organizations from "./pages/Organizations";
@@ -28,7 +27,6 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/role-testing" element={<RoleTesting />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />

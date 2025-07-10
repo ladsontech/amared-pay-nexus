@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building, Wallet, CreditCard, Users, Coins, TrendingUp, DollarSign, Activity } from "lucide-react";
-import DashboardLayout from "@/components/DashboardLayout";
+import OrganizationDashboardLayout from "@/components/OrganizationDashboardLayout";
 import { useToast } from "@/hooks/use-toast";
 
 const OrganizationDashboard = () => {
@@ -52,20 +51,6 @@ const OrganizationDashboard = () => {
 
   const orgStatCards = [
     {
-      title: "Current Balance",
-      value: `UGX ${orgStats.currentBalance.toLocaleString()}`,
-      icon: Wallet,
-      description: "Organization wallet",
-      color: "text-green-600"
-    },
-    {
-      title: "Petty Cash Balance",
-      value: `UGX ${orgStats.pettyCashBalance.toLocaleString()}`,
-      icon: Coins,
-      description: "Available petty cash",
-      color: "text-blue-600"
-    },
-    {
       title: "Total Payments",
       value: orgStats.totalPayments.toString(),
       icon: CreditCard,
@@ -96,34 +81,18 @@ const OrganizationDashboard = () => {
   ];
 
   return (
-    <DashboardLayout>
+    <OrganizationDashboardLayout>
       <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">{orgInfo.name} Dashboard</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
               {orgInfo.type} • Organization ID: {orgInfo.id}
             </p>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 bg-green-50 p-3 rounded-lg border border-green-200">
-              <Wallet className="h-5 w-5 text-green-600" />
-              <div>
-                <p className="text-sm font-medium text-green-800">Wallet Balance</p>
-                <p className="text-lg font-bold text-green-600">UGX {orgStats.currentBalance.toLocaleString()}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2 bg-blue-50 p-3 rounded-lg border border-blue-200">
-              <Coins className="h-5 w-5 text-blue-600" />
-              <div>
-                <p className="text-sm font-medium text-blue-800">Petty Cash</p>
-                <p className="text-lg font-bold text-blue-600">UGX {orgStats.pettyCashBalance.toLocaleString()}</p>
-              </div>
-            </div>
-          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {orgStatCards.map((card, index) => (
             <Card key={index} className="hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -206,7 +175,7 @@ const OrganizationDashboard = () => {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </OrganizationDashboardLayout>
   );
 };
 
