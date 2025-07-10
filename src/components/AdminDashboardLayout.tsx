@@ -109,7 +109,7 @@ const AdminDashboardLayout = ({ children }: AdminDashboardLayoutProps) => {
               </nav>
             </div>
             
-            <div className="hidden lg:block p-4 border-t border-border">
+            <div className="p-4 border-t border-border">
               <Button 
                 variant="ghost" 
                 onClick={handleLogout}
