@@ -37,11 +37,11 @@ const AdminDashboardLayout = ({ children }: AdminDashboardLayoutProps) => {
 
   const adminMenuItems = [
     { icon: Home, label: "Admin Dashboard", path: "/admin-dashboard" },
-    { icon: Building, label: "Organizations", path: "/organizations" },
-    { icon: Users, label: "System Users", path: "/system-users" },
-    { icon: TrendingUp, label: "Analytics", path: "/analytics" },
-    { icon: AlertTriangle, label: "System Alerts", path: "/system-alerts" },
-    { icon: Settings, label: "Settings", path: "/settings" }
+    { icon: Building, label: "Organizations", path: "/admin-organizations" },
+    { icon: Users, label: "System Users", path: "/admin-system-users" },
+    { icon: TrendingUp, label: "Analytics", path: "/admin-analytics" },
+    { icon: AlertTriangle, label: "System Alerts", path: "/admin-system-alerts" },
+    { icon: Settings, label: "Settings", path: "/admin-settings" }
   ];
 
   const user = authService.getCurrentUser();

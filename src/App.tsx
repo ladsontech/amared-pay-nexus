@@ -8,6 +8,9 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminOrganizations from "./pages/AdminOrganizations";
+import AdminSystemUsers from "./pages/AdminSystemUsers";
+import AdminAnalytics from "./pages/AdminAnalytics";
 import OrganizationDashboard from "./pages/OrganizationDashboard";
 import BulkPayments from "./pages/BulkPayments";
 import Collections from "./pages/Collections";
@@ -30,6 +33,9 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/admin-organizations" element={<AdminOrganizations />} />
+          <Route path="/admin-system-users" element={<AdminSystemUsers />} />
+          <Route path="/admin-analytics" element={<AdminAnalytics />} />
           <Route path="/org-dashboard" element={<OrganizationDashboard />} />
           <Route path="/bulk-payments" element={<BulkPayments />} />
           <Route path="/collections" element={<Collections />} />
