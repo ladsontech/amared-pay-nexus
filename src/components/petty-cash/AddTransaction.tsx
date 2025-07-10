@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Receipt, Wallet } from "lucide-react";
+import { Receipt, Wallet, Plus } from "lucide-react";
 
 interface AddTransactionProps {
   currentBalance: number;
@@ -20,20 +21,23 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
     amount: "",
     description: "",
     category: "",
-    receipt: ""
+    receipt: "",
+    requestorName: "",
+    mobileNumber: ""
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  const categories = {
+  const [showNewCategoryDialog, setShowNewCategoryDialog] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState({
     expense: ["Office Supplies", "Travel", "Meals", "Utilities", "Maintenance", "Emergency", "Other"],
     addition: ["Cash Addition", "Reimbursement", "Transfer", "Other"]
-  };
+  });
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.amount || !formData.description || !formData.category) {
+    if (!formData.amount || !formData.description || !formData.category || !formData.requestorName || !formData.mobileNumber) {
       toast({
         title: "Error",
         description: "Please fill in all required fields.",
@@ -58,27 +62,44 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const newBalance = transactionType === "expense" 
-        ? currentBalance - amount 
-        : currentBalance + amount;
-      
-      setCurrentBalance(newBalance);
-      
       toast({
-        title: "Transaction Recorded",
-        description: `${transactionType === "expense" ? "Expense" : "Addition"} of UGX ${amount.toLocaleString()} has been recorded.`,
+        title: "Request Submitted",
+        description: `${transactionType === "expense" ? "Expense" : "Addition"} request of UGX ${amount.toLocaleString()} has been submitted for approval.`,
       });
 
       // Reset form
-      setFormData({ amount: "", description: "", category: "", receipt: "" });
+      setFormData({ 
+        amount: "", 
+        description: "", 
+        category: "", 
+        receipt: "", 
+        requestorName: "", 
+        mobileNumber: "" 
+      });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to record transaction. Please try again.",
+        description: "Failed to submit request. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAddCategory = () => {
+    if (newCategory.trim()) {
+      setCategories(prev => ({
+        ...prev,
+        [transactionType]: [...prev[transactionType], newCategory.trim()]
+      }));
+      setFormData({ ...formData, category: newCategory.trim() });
+      setNewCategory("");
+      setShowNewCategoryDialog(false);
+      toast({
+        title: "Category Added",
+        description: `"${newCategory.trim()}" has been added to ${transactionType} categories.`,
+      });
     }
   };
 
@@ -91,7 +112,7 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
           className="flex items-center gap-2"
         >
           <Receipt className="h-4 w-4" />
-          Record Expense
+          Request Expense
         </Button>
         <Button
           variant={transactionType === "addition" ? "default" : "outline"}
@@ -99,24 +120,48 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
           className="flex items-center gap-2"
         >
           <Wallet className="h-4 w-4" />
-          Add Cash
+          Request Cash Addition
         </Button>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>
-            {transactionType === "expense" ? "Record Expense" : "Add Cash to Fund"}
+            {transactionType === "expense" ? "Request Expense Approval" : "Request Cash Addition"}
           </CardTitle>
           <CardDescription>
             {transactionType === "expense" 
-              ? "Enter details for the petty cash expense" 
-              : "Add money to the petty cash fund"
+              ? "Submit expense request for organization admin approval" 
+              : "Request money to be added to the petty cash fund"
             }
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="requestorName">Requestor Name *</Label>
+                <Input
+                  id="requestorName"
+                  placeholder="Full name"
+                  value={formData.requestorName}
+                  onChange={(e) => setFormData({ ...formData, requestorName: e.target.value })}
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="mobileNumber">Mobile Number *</Label>
+                <Input
+                  id="mobileNumber"
+                  placeholder="+256 700 000 000"
+                  value={formData.mobileNumber}
+                  onChange={(e) => setFormData({ ...formData, mobileNumber: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="amount">Amount (UGX) *</Label>
@@ -132,18 +177,55 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
               
               <div className="space-y-2">
                 <Label htmlFor="category">Category *</Label>
-                <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories[transactionType].map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-2">
+                  <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories[transactionType].map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Dialog open={showNewCategoryDialog} onOpenChange={setShowNewCategoryDialog}>
+                    <DialogTrigger asChild>
+                      <Button type="button" variant="outline" size="icon">
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New Category</DialogTitle>
+                        <DialogDescription>
+                          Create a new category for {transactionType} transactions.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="newCategory">Category Name</Label>
+                          <Input
+                            id="newCategory"
+                            placeholder="Enter category name"
+                            value={newCategory}
+                            onChange={(e) => setNewCategory(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowNewCategoryDialog(false)}>
+                          Cancel
+                        </Button>
+                        <Button onClick={handleAddCategory}>
+                          Add Category
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
             </div>
             
@@ -151,7 +233,7 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
               <Label htmlFor="description">Description *</Label>
               <Textarea
                 id="description"
-                placeholder="Describe the transaction..."
+                placeholder="Describe the transaction purpose and details..."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 required
@@ -178,11 +260,14 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
                     <span className="font-medium">Balance After Transaction:</span> UGX {(currentBalance - parseFloat(formData.amount || "0")).toLocaleString()}
                   </p>
                 )}
+                <p className="text-sm mt-2 text-muted-foreground">
+                  * This request will be sent to your organization admin for approval.
+                </p>
               </div>
             )}
             
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Processing..." : `Record ${transactionType === "expense" ? "Expense" : "Addition"}`}
+              {isLoading ? "Submitting..." : `Submit ${transactionType === "expense" ? "Expense" : "Addition"} Request`}
             </Button>
           </form>
         </CardContent>
