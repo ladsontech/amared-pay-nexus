@@ -151,7 +151,7 @@ const AdminAnalytics = () => {
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip formatter={(value, name) => [
-                    name === 'amount' ? `UGX ${(value / 1000000).toFixed(1)}M` : value,
+                    name === 'amount' ? `UGX ${(Number(value) / 1000000).toFixed(1)}M` : value,
                     name === 'amount' ? 'Amount' : 'Transactions'
                   ]} />
                   <Line type="monotone" dataKey="transactions" stroke="#8884d8" strokeWidth={2} />
