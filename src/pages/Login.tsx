@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff, Mail, Shield } from "lucide-react";
+import { Eye, EyeOff, Mail, Shield, User, UserCheck, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { authService } from "@/services/authService";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -16,18 +16,14 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await authService.login({
-        email,
-        password,
-        username: email, // Using email as username as well
-      });
-
+      await login(email, password);
       toast({
         title: "Login Successful",
         description: "Welcome to Amared Pay!",
@@ -38,6 +34,27 @@ const Login = () => {
       toast({
         title: "Login Failed",
         description: error instanceof Error ? error.message : "Invalid credentials. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDirectLogin = async (userEmail: string) => {
+    setIsLoading(true);
+    try {
+      await login(userEmail, 'password');
+      toast({
+        title: "Login Successful",
+        description: "Welcome to Amared Pay!",
+      });
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Login Failed", 
+        description: "Failed to login",
         variant: "destructive",
       });
     } finally {
@@ -118,6 +135,41 @@ const Login = () => {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
+          
+          {/* Testing Login Buttons */}
+          <div className="mt-6 space-y-3">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-3">Quick Login for Testing:</p>
+            </div>
+            <Button 
+              onClick={() => handleDirectLogin('admin@almaredpay.com')} 
+              disabled={isLoading}
+              variant="outline" 
+              className="w-full"
+            >
+              <Crown className="w-4 h-4 mr-2" />
+              Login as Admin
+            </Button>
+            <Button 
+              onClick={() => handleDirectLogin('manager@organization.com')} 
+              disabled={isLoading}
+              variant="outline" 
+              className="w-full"
+            >
+              <UserCheck className="w-4 h-4 mr-2" />
+              Login as Manager
+            </Button>
+            <Button 
+              onClick={() => handleDirectLogin('staff@organization.com')} 
+              disabled={isLoading}
+              variant="outline" 
+              className="w-full"
+            >
+              <User className="w-4 h-4 mr-2" />
+              Login as Staff
+            </Button>
+          </div>
+
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
