@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Filter, UserCircle, Mail, Phone, Building, Shield } from "lucide-react";
+import { Plus, Search, Filter, UserCircle, Mail, Phone, Building, Shield, Wallet } from "lucide-react";
 import AdminDashboardLayout from "@/components/AdminDashboardLayout";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SystemUser {
   id: string;
@@ -25,6 +26,7 @@ const AdminSystemUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -155,13 +157,41 @@ const AdminSystemUsers = () => {
     }
   };
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.organization.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.role.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleDeposit = (userId: string) => {
+    toast({
+      title: "Deposit Initiated",
+      description: `Deposit of UGX 50,000 has been successfully added to user ${userId}`,
+    });
+  };
+
+  const handleFunding = () => {
+    toast({
+      title: "Funding Request",
+      description: "UGX 100,000 funding request has been submitted for approval",
+    });
+  };
+
+  // Filter users based on current user's role
+  const getFilteredUsers = () => {
+    let baseFilteredUsers = users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.organization.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.role.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // If current user is a manager, only show users from their organization
+    if (currentUser?.role === 'manager') {
+      baseFilteredUsers = baseFilteredUsers.filter(
+        user => user.organization === currentUser.organizationId || user.organization === "Tech Solutions Ltd"
+      );
+    }
+
+    return baseFilteredUsers;
+  };
+
+  const filteredUsers = getFilteredUsers();
 
   return (
     <AdminDashboardLayout>
@@ -173,10 +203,20 @@ const AdminSystemUsers = () => {
               Manage all users across the system
             </p>
           </div>
-          <Button className="flex items-center space-x-2">
-            <Plus className="h-4 w-4" />
-            <span>Add User</span>
-          </Button>
+          <div className="flex gap-2">
+            <Button className="flex items-center space-x-2">
+              <Plus className="h-4 w-4" />
+              <span>Add User</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleFunding}
+              className="flex items-center space-x-2"
+            >
+              <Wallet className="h-4 w-4" />
+              <span>Request Funding</span>
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -309,14 +349,23 @@ const AdminSystemUsers = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                        Suspend
-                      </Button>
-                    </div>
+                     <div className="flex items-center space-x-2">
+                       <Button variant="outline" size="sm">
+                         Edit
+                       </Button>
+                       <Button 
+                         variant="outline" 
+                         size="sm" 
+                         onClick={() => handleDeposit(user.id)}
+                         className="text-green-600 hover:text-green-700"
+                       >
+                         <Wallet className="h-3 w-3 mr-1" />
+                         Deposit
+                       </Button>
+                       <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                         Suspend
+                       </Button>
+                     </div>
                   </div>
                 </CardContent>
               </Card>
