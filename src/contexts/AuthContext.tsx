@@ -30,12 +30,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Simulate loading user from localStorage or API
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setAuthState({
-        user,
-        isAuthenticated: true,
-        loading: false,
-      });
+      try {
+        const user = JSON.parse(storedUser);
+        // Ensure user has permissions array
+        if (user && user.permissions && Array.isArray(user.permissions)) {
+          setAuthState({
+            user,
+            isAuthenticated: true,
+            loading: false,
+          });
+        } else {
+          // Invalid user data, clear localStorage
+          localStorage.removeItem('user');
+          setAuthState(prev => ({ ...prev, loading: false }));
+        }
+      } catch (error) {
+        // Invalid JSON, clear localStorage
+        localStorage.removeItem('user');
+        setAuthState(prev => ({ ...prev, loading: false }));
+      }
     } else {
       setAuthState(prev => ({ ...prev, loading: false }));
     }
