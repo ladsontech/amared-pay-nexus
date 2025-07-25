@@ -94,7 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const hasPermission = (permission: Permission): boolean => {
-    return authState.user?.permissions.includes(permission) || false;
+    return authState.user?.permissions?.includes(permission) || false;
   };
 
   const hasAnyPermission = (permissions: Permission[]): boolean => {
