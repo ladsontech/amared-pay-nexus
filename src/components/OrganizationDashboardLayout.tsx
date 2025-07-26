@@ -37,12 +37,12 @@ const OrganizationDashboardLayout = ({ children }: OrganizationDashboardLayoutPr
   };
 
   const orgMenuItems = [
-    { icon: Home, label: "Dashboard", path: "/org-dashboard" },
-    { icon: CreditCard, label: "Bulk Payments", path: "/bulk-payments" },
-    { icon: Coins, label: "Collections", path: "/collections" },
-    { icon: Wallet, label: "Petty Cash", path: "/petty-cash" },
-    { icon: Users, label: "Sub-Admins", path: "/sub-admins" },
-    { icon: Settings, label: "Settings", path: "/settings" }
+    { icon: Home, label: "Dashboard", path: "/org/dashboard" },
+    { icon: CreditCard, label: "Bulk Payments", path: "/org/bulk-payments" },
+    { icon: Coins, label: "Collections", path: "/org/collections" },
+    { icon: Wallet, label: "Petty Cash", path: "/org/petty-cash" },
+    { icon: Users, label: "Sub-Admins", path: "/org/sub-admins" },
+    { icon: Settings, label: "Settings", path: "/org/settings" }
   ];
 
   const user = authService.getCurrentUser();
