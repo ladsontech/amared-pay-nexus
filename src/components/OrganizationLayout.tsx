@@ -98,7 +98,7 @@ const OrganizationLayout = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => window.location.href = "/org/bulk-payments"}
-                  className="hidden lg:flex items-center space-x-1"
+                  className="flex items-center space-x-1"
                 >
                   <Send className="h-4 w-4" />
                   <span>Bulk Payments</span>
@@ -110,7 +110,7 @@ const OrganizationLayout = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => window.location.href = "/org/collections"}
-                  className="hidden lg:flex items-center space-x-1"
+                  className="flex items-center space-x-1"
                 >
                   <DollarSign className="h-4 w-4" />
                   <span>Collections</span>
