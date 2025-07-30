@@ -93,33 +93,9 @@ const OrganizationLayout = () => {
               ))}
             </nav>
             
-            {/* Quick Action Buttons - Hidden on mobile */}
+            {/* Only NewActionButton remains */}
             <div className="hidden md:flex items-center space-x-2">
               <NewActionButton />
-              
-              {hasPermission("access_bulk_payments") && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.location.href = "/org/bulk-payments"}
-                  className="flex items-center space-x-1"
-                >
-                  <Send className="h-4 w-4" />
-                  <span className="hidden lg:inline">Bulk Payments</span>
-                </Button>
-              )}
-              
-              {hasPermission("access_collections") && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.location.href = "/org/collections"}
-                  className="flex items-center space-x-1"
-                >
-                  <DollarSign className="h-4 w-4" />
-                  <span className="hidden lg:inline">Collections</span>
-                </Button>
-              )}
             </div>
             
             <DropdownMenu>
