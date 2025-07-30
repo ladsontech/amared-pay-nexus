@@ -1,8 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthState, Permission } from '@/types/auth';
+import { demoUsers } from '@/data/demoData';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
+  loginAsUser: (userId: string) => void;
   logout: () => void;
   hasPermission: (permission: Permission) => boolean;
   hasAnyPermission: (permissions: Permission[]) => boolean;
@@ -54,37 +56,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = async (email: string, password: string) => {
-    // Simulate API call
-    const mockUsers: Record<string, User> = {
-      'admin@almaredpay.com': {
-        id: '1',
-        name: 'John Admin',
-        email: 'admin@almaredpay.com',
-        role: 'admin',
-        permissions: ['system_admin', 'manage_organizations', 'manage_system_users', 'view_system_analytics'],
-      },
-      'manager@organization.com': {
-        id: '2',
-        name: 'Jane Manager',
-        email: 'manager@organization.com',
-        role: 'manager',
-        organizationId: 'org-1',
-        department: 'Finance',
-        permissions: ['approve_transactions', 'approve_funding', 'view_department_reports', 'access_petty_cash'],
-      },
-      'staff@organization.com': {
-        id: '3',
-        name: 'Bob Staff',
-        email: 'staff@organization.com',
-        role: 'staff',
-        organizationId: 'org-1',
-        department: 'Operations',
-        permissions: ['submit_transactions', 'request_funding', 'view_own_history', 'access_petty_cash'],
-      },
-    };
+  const loginAsUser = (userId: string) => {
+    const user = demoUsers.find(u => u.id === userId);
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+      setAuthState({
+        user,
+        isAuthenticated: true,
+        loading: false,
+      });
+    }
+  };
 
-    const user = mockUsers[email];
+  const login = async (email: string, password: string) => {
+    // Find user by email
+    const user = demoUsers.find(u => u.email === email);
     if (user && password === 'password') {
       localStorage.setItem('user', JSON.stringify(user));
       setAuthState({
@@ -123,6 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         ...authState,
         login,
+        loginAsUser,
         logout,
         hasPermission,
         hasAnyPermission,

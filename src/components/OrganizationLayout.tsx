@@ -25,6 +25,7 @@ import {
   Building,
   CheckCircle,
 } from "lucide-react";
+import NewActionButton from "./NewActionButton";
 
 const OrganizationLayout = () => {
   const { user, logout, hasPermission } = useAuth();
@@ -93,6 +94,8 @@ const OrganizationLayout = () => {
             
             {/* Quick Action Buttons */}
             <div className="flex items-center space-x-2">
+              <NewActionButton />
+              
               {hasPermission("access_bulk_payments") && (
                 <Button
                   variant="outline"

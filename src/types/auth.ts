@@ -1,12 +1,21 @@
+export interface Organization {
+  id: string;
+  name: string;
+  description: string;
+  industry: string;
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
   role: UserRole;
-  organizationId?: string;
+  organizationId: string;
+  organization: Organization;
   permissions: Permission[];
   department?: string;
   avatar?: string;
+  position: string;
 }
 
 export type UserRole = 'admin' | 'manager' | 'staff';
@@ -21,6 +30,7 @@ export type Permission =
   // Manager permissions
   | 'approve_transactions'
   | 'approve_funding'
+  | 'approve_bulk_payments'
   | 'view_department_reports'
   | 'manage_team'
   
@@ -33,6 +43,10 @@ export type Permission =
   | 'access_petty_cash'
   | 'access_bulk_payments'
   | 'access_collections';
+
+export interface DemoUser extends User {
+  description: string;
+}
 
 export interface AuthState {
   user: User | null;
@@ -48,6 +62,7 @@ export const rolePermissions: Record<UserRole, Permission[]> = {
     'view_system_analytics',
     'approve_transactions',
     'approve_funding',
+    'approve_bulk_payments',
     'view_department_reports',
     'manage_team',
     'submit_transactions',
@@ -60,6 +75,7 @@ export const rolePermissions: Record<UserRole, Permission[]> = {
   manager: [
     'approve_transactions',
     'approve_funding',
+    'approve_bulk_payments',
     'view_department_reports',
     'manage_team',
     'submit_transactions',
