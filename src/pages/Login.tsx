@@ -170,7 +170,14 @@ const Login = () => {
             </Button>
           </div>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-3">
+            <Button 
+              onClick={() => navigate('/')} 
+              variant="secondary" 
+              className="w-full"
+            >
+              Try Demo Organizations
+            </Button>
             <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
               <Link to="/register" className="text-primary hover:underline">
