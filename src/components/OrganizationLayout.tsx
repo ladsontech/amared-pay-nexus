@@ -26,6 +26,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import NewActionButton from "./NewActionButton";
+import MobileActionFab from "./MobileActionFab";
 
 const OrganizationLayout = () => {
   const { user, logout, hasPermission } = useAuth();
@@ -92,8 +93,8 @@ const OrganizationLayout = () => {
               ))}
             </nav>
             
-            {/* Quick Action Buttons */}
-            <div className="flex items-center space-x-2">
+            {/* Quick Action Buttons - Hidden on mobile */}
+            <div className="hidden md:flex items-center space-x-2">
               <NewActionButton />
               
               {hasPermission("access_bulk_payments") && (
@@ -104,7 +105,7 @@ const OrganizationLayout = () => {
                   className="flex items-center space-x-1"
                 >
                   <Send className="h-4 w-4" />
-                  <span>Bulk Payments</span>
+                  <span className="hidden lg:inline">Bulk Payments</span>
                 </Button>
               )}
               
@@ -116,7 +117,7 @@ const OrganizationLayout = () => {
                   className="flex items-center space-x-1"
                 >
                   <DollarSign className="h-4 w-4" />
-                  <span>Collections</span>
+                  <span className="hidden lg:inline">Collections</span>
                 </Button>
               )}
             </div>
@@ -189,11 +190,14 @@ const OrganizationLayout = () => {
       )}
 
       {/* Main Content */}
-      <main className="flex-1">
-        <div className="container py-6">
+      <main className="flex-1 pb-16 md:pb-0">
+        <div className="container py-4 sm:py-6 px-4">
           <Outlet />
         </div>
       </main>
+      
+      {/* Mobile FAB */}
+      <MobileActionFab />
     </div>
   );
 };
