@@ -31,6 +31,7 @@ export type Permission =
   | 'approve_transactions'
   | 'approve_funding'
   | 'approve_bulk_payments'
+  | 'approve_bank_deposits'
   | 'view_department_reports'
   | 'manage_team'
   
@@ -42,7 +43,8 @@ export type Permission =
   // Common permissions
   | 'access_petty_cash'
   | 'access_bulk_payments'
-  | 'access_collections';
+  | 'access_collections'
+  | 'access_bank_deposits';
 
 export interface DemoUser extends User {
   description: string;
@@ -63,6 +65,7 @@ export const rolePermissions: Record<UserRole, Permission[]> = {
     'approve_transactions',
     'approve_funding',
     'approve_bulk_payments',
+    'approve_bank_deposits',
     'view_department_reports',
     'manage_team',
     'submit_transactions',
@@ -70,12 +73,14 @@ export const rolePermissions: Record<UserRole, Permission[]> = {
     'view_own_history',
     'access_petty_cash',
     'access_bulk_payments',
-    'access_collections'
+    'access_collections',
+    'access_bank_deposits'
   ],
   manager: [
     'approve_transactions',
     'approve_funding',
     'approve_bulk_payments',
+    'approve_bank_deposits',
     'view_department_reports',
     'manage_team',
     'submit_transactions',
@@ -83,7 +88,8 @@ export const rolePermissions: Record<UserRole, Permission[]> = {
     'view_own_history',
     'access_petty_cash',
     'access_bulk_payments',
-    'access_collections'
+    'access_collections',
+    'access_bank_deposits'
   ],
   staff: [
     'submit_transactions',

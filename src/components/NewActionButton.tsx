@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Plus, Wallet, Send, DollarSign } from "lucide-react";
+import { Plus, Wallet, Send, DollarSign, Banknote, CheckCircle } from "lucide-react";
 
 const NewActionButton = () => {
   const { hasPermission } = useAuth();
@@ -21,13 +21,37 @@ const NewActionButton = () => {
       label: "New Petty Cash Transaction",
       icon: Wallet,
       permission: "access_petty_cash" as const,
-      action: () => navigate("/org/petty-cash?action=new"),
+      action: () => navigate("/org/petty-cash?tab=add"),
+    },
+    {
+      label: "Petty Cash Approvals",
+      icon: CheckCircle,
+      permission: "approve_transactions" as const,
+      action: () => navigate("/org/petty-cash?tab=approvals"),
     },
     {
       label: "New Bulk Payment",
       icon: Send,
       permission: "access_bulk_payments" as const,
-      action: () => navigate("/org/bulk-payments?action=new"),
+      action: () => navigate("/org/bulk-payments?tab=create"),
+    },
+    {
+      label: "Bulk Payment Approvals",
+      icon: CheckCircle,
+      permission: "approve_bulk_payments" as const,
+      action: () => navigate("/org/bulk-payments?tab=approvals"),
+    },
+    {
+      label: "New Bank Deposit",
+      icon: Banknote,
+      permission: "access_bank_deposits" as const,
+      action: () => navigate("/org/deposits?tab=create"),
+    },
+    {
+      label: "Deposit Approvals",
+      icon: CheckCircle,
+      permission: "approve_bank_deposits" as const,
+      action: () => navigate("/org/deposits?tab=approvals"),
     },
     {
       label: "New Collection",

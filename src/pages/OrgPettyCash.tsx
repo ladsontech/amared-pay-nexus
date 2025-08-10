@@ -14,9 +14,12 @@ import PettyCashReconciliation from "@/components/petty-cash/PettyCashReconcilia
 import PendingApprovals from "@/components/petty-cash/PendingApprovals";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
 import OrgLayoutWrapper from "@/components/OrgLayoutWrapper";
+import { useSearchParams } from "react-router-dom";
 
 const PettyCash = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = (searchParams.get("tab") as string) || "overview";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [currentBalance, setCurrentBalance] = useState(150000); // Initial petty cash balance
   const { toast } = useToast();
   const { hasPermission } = useAuth();
@@ -82,15 +85,14 @@ const PettyCash = () => {
             </div>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 h-auto gap-1 sm:gap-0">
-              <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-              <TabsTrigger value="add" className="text-xs sm:text-sm">Add Transaction</TabsTrigger>
-              <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
-              <TabsTrigger value="approvals" className="text-xs sm:text-sm">PC Approvals</TabsTrigger>
-              <TabsTrigger value="bulk-approvals" className="text-xs sm:text-sm">BP Approvals</TabsTrigger>
-              <TabsTrigger value="reconciliation" className="text-xs sm:text-sm">Reconciliation</TabsTrigger>
-            </TabsList>
+            <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto gap-1 sm:gap-0">
+                <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+                <TabsTrigger value="add" className="text-xs sm:text-sm">Add Transaction</TabsTrigger>
+                <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
+                <TabsTrigger value="approvals" className="text-xs sm:text-sm">PC Approvals</TabsTrigger>
+                <TabsTrigger value="reconciliation" className="text-xs sm:text-sm">Reconciliation</TabsTrigger>
+              </TabsList>
 
             <TabsContent value="overview" className="space-y-4">
               <PettyCashOverview currentBalance={currentBalance} />
@@ -117,14 +119,7 @@ const PettyCash = () => {
               <TransactionHistory />
             </TabsContent>
 
-            <TabsContent value="approvals" className="space-y-4">
-              <PendingApprovals />
-            </TabsContent>
-
-            <TabsContent value="bulk-approvals" className="space-y-4">
-              <BulkPaymentApprovals />
-            </TabsContent>
-
+            
             <TabsContent value="reconciliation" className="space-y-4">
               <PettyCashReconciliation currentBalance={currentBalance} />
             </TabsContent>

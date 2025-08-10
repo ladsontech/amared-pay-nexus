@@ -31,6 +31,7 @@ export const demoUsers: DemoUser[] = [
       'approve_transactions',
       'approve_funding',
       'approve_bulk_payments',
+      'approve_bank_deposits',
       'view_department_reports',
       'manage_team',
       'submit_transactions',
@@ -38,7 +39,8 @@ export const demoUsers: DemoUser[] = [
       'view_own_history',
       'access_petty_cash',
       'access_bulk_payments',
-      'access_collections'
+      'access_collections',
+      'access_bank_deposits'
     ]
   },
   {
@@ -74,7 +76,8 @@ export const demoUsers: DemoUser[] = [
       'request_funding',
       'view_own_history',
       'access_petty_cash',
-      'access_bulk_payments'
+      'access_bulk_payments',
+      'access_bank_deposits'
     ]
   },
   {
@@ -110,6 +113,7 @@ export const demoUsers: DemoUser[] = [
       'approve_transactions',
       'approve_funding',
       'approve_bulk_payments',
+      'approve_bank_deposits',
       'view_department_reports',
       'manage_team',
       'submit_transactions',
@@ -117,7 +121,8 @@ export const demoUsers: DemoUser[] = [
       'view_own_history',
       'access_petty_cash',
       'access_bulk_payments',
-      'access_collections'
+      'access_collections',
+      'access_bank_deposits'
     ]
   },
   {
@@ -154,7 +159,8 @@ export const demoUsers: DemoUser[] = [
       'request_funding',
       'view_own_history',
       'access_petty_cash',
-      'access_bulk_payments'
+      'access_bulk_payments',
+      'access_bank_deposits'
     ]
   },
   {

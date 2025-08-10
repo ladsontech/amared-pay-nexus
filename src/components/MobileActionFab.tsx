@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, X, Wallet, Send, DollarSign, FileText } from "lucide-react";
+import { Plus, X, Wallet, Send, DollarSign, FileText, Banknote, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -13,14 +13,38 @@ const MobileActionFab = () => {
     {
       icon: Wallet,
       label: "New Petty Cash",
-      path: "/org/petty-cash?action=new",
+      path: "/org/petty-cash?tab=add",
       permission: "access_petty_cash" as const,
+    },
+    {
+      icon: CheckCircle,
+      label: "PC Approvals",
+      path: "/org/petty-cash?tab=approvals",
+      permission: "approve_transactions" as const,
     },
     {
       icon: Send,
       label: "New Bulk Payment",
-      path: "/org/bulk-payments?action=new",
+      path: "/org/bulk-payments?tab=create",
       permission: "access_bulk_payments" as const,
+    },
+    {
+      icon: CheckCircle,
+      label: "BP Approvals",
+      path: "/org/bulk-payments?tab=approvals",
+      permission: "approve_bulk_payments" as const,
+    },
+    {
+      icon: Banknote,
+      label: "New Deposit",
+      path: "/org/deposits?tab=create",
+      permission: "access_bank_deposits" as const,
+    },
+    {
+      icon: CheckCircle,
+      label: "Deposit Approvals",
+      path: "/org/deposits?tab=approvals",
+      permission: "approve_bank_deposits" as const,
     },
     {
       icon: DollarSign,
