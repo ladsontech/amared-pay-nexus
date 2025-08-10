@@ -20,6 +20,7 @@ import OrgDashboard from "./pages/OrgDashboard";
 import OrgPettyCash from "./pages/OrgPettyCash";
 import OrgBulkPayments from "./pages/OrgBulkPayments";
 import OrgCollections from "./pages/OrgCollections";
+import OrgDeposits from "./pages/OrgDeposits";
 import OrgApprovals from "./pages/OrgApprovals";
 import OrgReports from "./pages/OrgReports";
 import OrgSettings from "./pages/OrgSettings";
@@ -79,6 +80,11 @@ const AppRoutes = () => {
         <Route path="collections" element={
           <ProtectedRoute requiredPermissions={['access_collections']}>
             <OrgCollections />
+          </ProtectedRoute>
+        } />
+        <Route path="deposits" element={
+          <ProtectedRoute requiredPermissions={['access_bank_deposits']}>
+            <OrgDeposits />
           </ProtectedRoute>
         } />
         <Route path="approvals" element={

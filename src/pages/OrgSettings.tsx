@@ -18,7 +18,8 @@ import {
   Save,
   Plus,
   Trash2,
-  Edit
+  Edit,
+  Layout
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -42,6 +43,12 @@ const OrgSettings = () => {
     pushNotifications: true
   });
 
+  const [interfaceSettings, setInterfaceSettings] = useState({
+    menuPlacement: 'header', // 'header' or 'sidebar'
+    compactMode: false,
+    darkMode: false
+  });
+
   const [expenseCategories, setExpenseCategories] = useState([
     { id: 1, name: 'Office Supplies', description: 'Stationery, equipment, etc.', budget: 500000 },
     { id: 2, name: 'Travel', description: 'Business travel expenses', budget: 1000000 },
@@ -61,6 +68,13 @@ const OrgSettings = () => {
     toast({
       title: "Notification settings updated",
       description: "Your notification preferences have been saved.",
+    });
+  };
+
+  const handleSaveInterface = () => {
+    toast({
+      title: "Interface settings updated",
+      description: "Your interface preferences have been saved. Please refresh to see changes.",
     });
   };
 
@@ -94,9 +108,10 @@ const OrgSettings = () => {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="interface">Interface</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
           <TabsTrigger value="organization">Organization</TabsTrigger>
         </TabsList>
@@ -282,6 +297,79 @@ const OrgSettings = () => {
                 <Button onClick={handleSaveNotifications}>
                   <Save className="h-4 w-4 mr-2" />
                   Save Preferences
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="interface">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Layout className="h-5 w-5" />
+                Interface Settings
+              </CardTitle>
+              <CardDescription>
+                Customize your interface layout and appearance
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Menu Placement</Label>
+                  <Select 
+                    value={interfaceSettings.menuPlacement} 
+                    onValueChange={(value) => setInterfaceSettings({...interfaceSettings, menuPlacement: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="header">Header Navigation</SelectItem>
+                      <SelectItem value="sidebar">Sidebar Navigation</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground">
+                    Choose where to display the main navigation menu
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Compact Mode</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Reduce spacing and use smaller elements
+                    </p>
+                  </div>
+                  <Switch
+                    checked={interfaceSettings.compactMode}
+                    onCheckedChange={(checked) => 
+                      setInterfaceSettings({...interfaceSettings, compactMode: checked})
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Dark Mode</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Use dark theme for the interface
+                    </p>
+                  </div>
+                  <Switch
+                    checked={interfaceSettings.darkMode}
+                    onCheckedChange={(checked) => 
+                      setInterfaceSettings({...interfaceSettings, darkMode: checked})
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button onClick={handleSaveInterface}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Interface Settings
                 </Button>
               </div>
             </CardContent>
