@@ -11,7 +11,6 @@ import { Plus, Search, Filter, Download, Eye, CreditCard, Upload, Trash2, Check,
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
-import OrganizationDashboardLayout from "@/components/OrganizationDashboardLayout";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
 
 interface BulkPayment {
@@ -208,283 +207,281 @@ const BulkPayments = () => {
   const totalAmount = paymentRows.reduce((sum, row) => sum + row.amount, 0);
 
   return (
-    <OrganizationDashboardLayout>
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Bulk Payments</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Manage and monitor your bulk payment transactions
-            </p>
-          </div>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Bulk Payments</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Manage and monitor your bulk payment transactions
+          </p>
         </div>
+      </div>
 
-        <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 h-auto gap-1 sm:gap-0">
-            <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-            <TabsTrigger value="create" className="text-xs sm:text-sm">Create Payment</TabsTrigger>
-            {hasPermission("approve_bulk_payments") && (
-              <TabsTrigger value="approvals" className="text-xs sm:text-sm">Approvals</TabsTrigger>
-            )}
-          </TabsList>
+      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 h-auto gap-1 sm:gap-0">
+          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+          <TabsTrigger value="create" className="text-xs sm:text-sm">Create Payment</TabsTrigger>
+          {hasPermission("approve_bulk_payments") && (
+            <TabsTrigger value="approvals" className="text-xs sm:text-sm">Approvals</TabsTrigger>
+          )}
+        </TabsList>
 
-          <TabsContent value="overview" className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search payments..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+        <TabsContent value="overview" className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search payments..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                <Filter className="h-4 w-4 mr-2" />
+                Filter
+              </Button>
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader>
+                    <div className="h-4 bg-muted rounded w-1/2"></div>
+                    <div className="h-3 bg-muted rounded w-3/4"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-muted rounded"></div>
+                      <div className="h-3 bg-muted rounded w-2/3"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {filteredPayments.map((payment) => (
+                <Card key={payment.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base sm:text-lg">{payment.id}</CardTitle>
+                      <Badge className={getStatusColor(payment.status)}>
+                        {payment.status}
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-sm">{payment.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Amount</span>
+                        <span className="text-sm sm:text-base font-medium">UGX {payment.amount.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Recipients</span>
+                        <span className="text-sm sm:text-base font-medium">{payment.recipients}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Created</span>
+                        <span className="text-sm sm:text-base font-medium">
+                          {new Date(payment.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <Button variant="outline" size="sm" className="w-full mt-4 text-xs sm:text-sm">
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Details
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {filteredPayments.length === 0 && !isLoading && (
+            <Card>
+              <CardContent className="text-center py-8 sm:py-12">
+                <div className="text-muted-foreground">
+                  <CreditCard className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-4 opacity-50" />
+                  <h3 className="text-base sm:text-lg font-medium mb-2">No bulk payments found</h3>
+                  <p className="text-sm sm:text-base">Create your first bulk payment to get started.</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="create" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Create Bulk Payment
+              </CardTitle>
+              <CardDescription>
+                Add payment details manually or upload a CSV file
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="bulk-description">Payment Description</Label>
+                <Textarea
+                  id="bulk-description"
+                  placeholder="Enter description for this bulk payment batch..."
+                  value={bulkDescription}
+                  onChange={(e) => setBulkDescription(e.target.value)}
                 />
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filter
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button onClick={addPaymentRow} variant="outline" className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add Payment Row
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-              </div>
-            </div>
-
-            {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {[1, 2, 3].map((i) => (
-                  <Card key={i} className="animate-pulse">
-                    <CardHeader>
-                      <div className="h-4 bg-muted rounded w-1/2"></div>
-                      <div className="h-3 bg-muted rounded w-3/4"></div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="h-3 bg-muted rounded"></div>
-                        <div className="h-3 bg-muted rounded w-2/3"></div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {filteredPayments.map((payment) => (
-                  <Card key={payment.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-base sm:text-lg">{payment.id}</CardTitle>
-                        <Badge className={getStatusColor(payment.status)}>
-                          {payment.status}
-                        </Badge>
-                      </div>
-                      <CardDescription className="text-sm">{payment.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-xs sm:text-sm text-muted-foreground">Amount</span>
-                          <span className="text-sm sm:text-base font-medium">UGX {payment.amount.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-xs sm:text-sm text-muted-foreground">Recipients</span>
-                          <span className="text-sm sm:text-base font-medium">{payment.recipients}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-xs sm:text-sm text-muted-foreground">Created</span>
-                          <span className="text-sm sm:text-base font-medium">
-                            {new Date(payment.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <Button variant="outline" size="sm" className="w-full mt-4 text-xs sm:text-sm">
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-
-            {filteredPayments.length === 0 && !isLoading && (
-              <Card>
-                <CardContent className="text-center py-8 sm:py-12">
-                  <div className="text-muted-foreground">
-                    <CreditCard className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-base sm:text-lg font-medium mb-2">No bulk payments found</h3>
-                    <p className="text-sm sm:text-base">Create your first bulk payment to get started.</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="create" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Create Bulk Payment
-                </CardTitle>
-                <CardDescription>
-                  Add payment details manually or upload a CSV file
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="bulk-description">Payment Description</Label>
-                  <Textarea
-                    id="bulk-description"
-                    placeholder="Enter description for this bulk payment batch..."
-                    value={bulkDescription}
-                    onChange={(e) => setBulkDescription(e.target.value)}
+                
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleCSVUpload}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button onClick={addPaymentRow} variant="outline" className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add Payment Row
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Upload className="h-4 w-4" />
+                    Upload CSV
                   </Button>
-                  
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept=".csv"
-                      onChange={handleCSVUpload}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    />
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Upload className="h-4 w-4" />
-                      Upload CSV
-                    </Button>
-                  </div>
-
-                  {paymentRows.length > 0 && (
-                    <Button onClick={verifyAllPayments} variant="outline" className="flex items-center gap-2">
-                      <Check className="h-4 w-4" />
-                      Verify All
-                    </Button>
-                  )}
                 </div>
 
                 {paymentRows.length > 0 && (
-                  <div className="space-y-4">
-                    <div className="rounded-md border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Recipient Name</TableHead>
-                            <TableHead>Account Number</TableHead>
-                            <TableHead>Amount (UGX)</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {paymentRows.map((row) => (
-                            <TableRow key={row.id}>
-                              <TableCell>
-                                <Input
-                                  value={row.recipientName}
-                                  onChange={(e) => updatePaymentRow(row.id, "recipientName", e.target.value)}
-                                  placeholder="Recipient name"
-                                  className="min-w-32"
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Input
-                                  value={row.recipientAccount}
-                                  onChange={(e) => updatePaymentRow(row.id, "recipientAccount", e.target.value)}
-                                  placeholder="Account number"
-                                  className="min-w-32"
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Input
-                                  type="number"
-                                  value={row.amount}
-                                  onChange={(e) => updatePaymentRow(row.id, "amount", parseFloat(e.target.value) || 0)}
-                                  placeholder="0"
-                                  className="min-w-24"
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Input
-                                  value={row.description}
-                                  onChange={(e) => updatePaymentRow(row.id, "description", e.target.value)}
-                                  placeholder="Payment description"
-                                  className="min-w-32"
-                                />
-                              </TableCell>
-                              <TableCell>
-                                {row.verified ? (
-                                  <Badge className="bg-green-100 text-green-800">
-                                    <Check className="h-3 w-3 mr-1" />
-                                    Verified
-                                  </Badge>
-                                ) : (
-                                  <Badge variant="outline" className="text-orange-600">
-                                    <AlertCircle className="h-3 w-3 mr-1" />
-                                    Pending
-                                  </Badge>
-                                )}
-                              </TableCell>
-                              <TableCell>
-                                <div className="flex gap-1">
-                                  {!row.verified && (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => verifyPaymentRow(row.id)}
-                                      className="h-8 w-8 p-0"
-                                    >
-                                      <Check className="h-3 w-3" />
-                                    </Button>
-                                  )}
+                  <Button onClick={verifyAllPayments} variant="outline" className="flex items-center gap-2">
+                    <Check className="h-4 w-4" />
+                    Verify All
+                  </Button>
+                )}
+              </div>
+
+              {paymentRows.length > 0 && (
+                <div className="space-y-4">
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Recipient Name</TableHead>
+                          <TableHead>Account Number</TableHead>
+                          <TableHead>Amount (UGX)</TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {paymentRows.map((row) => (
+                          <TableRow key={row.id}>
+                            <TableCell>
+                              <Input
+                                value={row.recipientName}
+                                onChange={(e) => updatePaymentRow(row.id, "recipientName", e.target.value)}
+                                placeholder="Recipient name"
+                                className="min-w-32"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                value={row.recipientAccount}
+                                onChange={(e) => updatePaymentRow(row.id, "recipientAccount", e.target.value)}
+                                placeholder="Account number"
+                                className="min-w-32"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                value={row.amount}
+                                onChange={(e) => updatePaymentRow(row.id, "amount", parseFloat(e.target.value) || 0)}
+                                placeholder="0"
+                                className="min-w-24"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                value={row.description}
+                                onChange={(e) => updatePaymentRow(row.id, "description", e.target.value)}
+                                placeholder="Payment description"
+                                className="min-w-32"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              {row.verified ? (
+                                <Badge className="bg-green-100 text-green-800">
+                                  <Check className="h-3 w-3 mr-1" />
+                                  Verified
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="text-orange-600">
+                                  <AlertCircle className="h-3 w-3 mr-1" />
+                                  Pending
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-1">
+                                {!row.verified && (
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => removePaymentRow(row.id)}
-                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                                    onClick={() => verifyPaymentRow(row.id)}
+                                    className="h-8 w-8 p-0"
                                   >
-                                    <Trash2 className="h-3 w-3" />
+                                    <Check className="h-3 w-3" />
                                   </Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-
-                    <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
-                      <div>
-                        <p className="text-sm font-medium">Total Recipients: {paymentRows.length}</p>
-                        <p className="text-lg font-bold">Total Amount: UGX {totalAmount.toLocaleString()}</p>
-                      </div>
-                      <Button onClick={initiatePayments} className="flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        Initiate Payments
-                      </Button>
-                    </div>
+                                )}
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => removePaymentRow(row.id)}
+                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
 
-          {hasPermission("approve_bulk_payments") && (
-            <TabsContent value="approvals" className="space-y-4">
-              <BulkPaymentApprovals />
-            </TabsContent>
-          )}
-        </Tabs>
-      </div>
-    </OrganizationDashboardLayout>
+                  <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
+                    <div>
+                      <p className="text-sm font-medium">Total Recipients: {paymentRows.length}</p>
+                      <p className="text-lg font-bold">Total Amount: UGX {totalAmount.toLocaleString()}</p>
+                    </div>
+                    <Button onClick={initiatePayments} className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Initiate Payments
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {hasPermission("approve_bulk_payments") && (
+          <TabsContent value="approvals" className="space-y-4">
+            <BulkPaymentApprovals />
+          </TabsContent>
+        )}
+      </Tabs>
+    </div>
   );
 };
 

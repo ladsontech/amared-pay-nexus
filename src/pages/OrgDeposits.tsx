@@ -11,7 +11,6 @@ import { Banknote, Search, Filter, Download, Eye, Plus, AlertCircle, Check, File
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
-import OrganizationDashboardLayout from "@/components/OrganizationDashboardLayout";
 
 interface BankDeposit {
   id: string;
@@ -346,223 +345,221 @@ const OrgDeposits = () => {
   };
 
   return (
-    <OrganizationDashboardLayout>
-      <div className="space-y-4 sm:space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Bank Deposits</h1>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                Manage and track your bank deposit transactions
-              </p>
+    <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Bank Deposits</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Manage and track your bank deposit transactions
+            </p>
+          </div>
+          <div className="w-full sm:w-auto">
+            <Button onClick={() => { setActiveTab("create"); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', 'create'); return p; }); }} className="w-full sm:w-auto">
+              <Banknote className="h-4 w-4 mr-2" />
+              Deposit to Bank
+            </Button>
+          </div>
+        </div>
+
+      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 h-auto gap-1 sm:gap-0">
+          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+          <TabsTrigger value="create" className="text-xs sm:text-sm">New Deposit</TabsTrigger>
+          {hasPermission("approve_bank_deposits") && (
+            <TabsTrigger value="approvals" className="text-xs sm:text-sm">Approvals</TabsTrigger>
+          )}
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search deposits..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            <div className="w-full sm:w-auto">
-              <Button onClick={() => { setActiveTab("create"); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', 'create'); return p; }); }} className="w-full sm:w-auto">
-                <Banknote className="h-4 w-4 mr-2" />
-                Deposit to Bank
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                <Filter className="h-4 w-4 mr-2" />
+                Filter
+              </Button>
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                <Download className="h-4 w-4 mr-2" />
+                Export
               </Button>
             </div>
           </div>
 
-        <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 h-auto gap-1 sm:gap-0">
-            <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-            <TabsTrigger value="create" className="text-xs sm:text-sm">New Deposit</TabsTrigger>
-            {hasPermission("approve_bank_deposits") && (
-              <TabsTrigger value="approvals" className="text-xs sm:text-sm">Approvals</TabsTrigger>
-            )}
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search deposits..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filter
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-              </div>
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader>
+                    <div className="h-4 bg-muted rounded w-1/2"></div>
+                    <div className="h-3 bg-muted rounded w-3/4"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-muted rounded"></div>
+                      <div className="h-3 bg-muted rounded w-2/3"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-
-            {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {[1, 2, 3].map((i) => (
-                  <Card key={i} className="animate-pulse">
-                    <CardHeader>
-                      <div className="h-4 bg-muted rounded w-1/2"></div>
-                      <div className="h-3 bg-muted rounded w-3/4"></div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="h-3 bg-muted rounded"></div>
-                        <div className="h-3 bg-muted rounded w-2/3"></div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {filteredDeposits.map((deposit) => (
+                <Card key={deposit.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base sm:text-lg">{deposit.id}</CardTitle>
+                      <Badge className={getStatusColor(deposit.status)}>
+                        {deposit.status}
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-sm">{deposit.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Amount</span>
+                        <span className="text-sm sm:text-base font-medium">UGX {deposit.amount.toLocaleString()}</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {filteredDeposits.map((deposit) => (
-                  <Card key={deposit.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-base sm:text-lg">{deposit.id}</CardTitle>
-                        <Badge className={getStatusColor(deposit.status)}>
-                          {deposit.status}
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Bank Account</span>
+                        <span className="text-sm sm:text-base font-medium">{deposit.bankAccount}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Type</span>
+                        <Badge className={getDepositTypeColor(deposit.depositType)} variant="outline">
+                          {deposit.depositType}
                         </Badge>
                       </div>
-                      <CardDescription className="text-sm">{deposit.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-xs sm:text-sm text-muted-foreground">Amount</span>
-                          <span className="text-sm sm:text-base font-medium">UGX {deposit.amount.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-xs sm:text-sm text-muted-foreground">Bank Account</span>
-                          <span className="text-sm sm:text-base font-medium">{deposit.bankAccount}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-xs sm:text-sm text-muted-foreground">Type</span>
-                          <Badge className={getDepositTypeColor(deposit.depositType)} variant="outline">
-                            {deposit.depositType}
-                          </Badge>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-xs sm:text-sm text-muted-foreground">Requested By</span>
-                          <span className="text-sm sm:text-base font-medium">{deposit.requestedBy}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-xs sm:text-sm text-muted-foreground">Created</span>
-                          <span className="text-sm sm:text-base font-medium">
-                            {new Date(deposit.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <Button variant="outline" size="sm" className="w-full mt-4 text-xs sm:text-sm">
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
-                        </Button>
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Requested By</span>
+                        <span className="text-sm sm:text-base font-medium">{deposit.requestedBy}</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+                      <div className="flex justify-between">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Created</span>
+                        <span className="text-sm sm:text-base font-medium">
+                          {new Date(deposit.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <Button variant="outline" size="sm" className="w-full mt-4 text-xs sm:text-sm">
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Details
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
-            {filteredDeposits.length === 0 && !isLoading && (
-              <Card>
-                <CardContent className="text-center py-8 sm:py-12">
-                  <div className="text-muted-foreground">
-                    <Banknote className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-base sm:text-lg font-medium mb-2">No deposits found</h3>
-                    <p className="text-sm sm:text-base">Create your first bank deposit to get started.</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="create" className="space-y-4">
+          {filteredDeposits.length === 0 && !isLoading && (
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Banknote className="h-5 w-5" />
-                  New Bank Deposit
-                </CardTitle>
-                <CardDescription>
-                  Submit a new bank deposit request for approval
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="amount">Deposit Amount *</Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      placeholder="Enter amount"
-                      value={newDeposit.amount || ""}
-                      onChange={(e) => setNewDeposit({...newDeposit, amount: parseFloat(e.target.value) || 0})}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="depositType">Deposit Type *</Label>
-                    <Select 
-                      value={newDeposit.depositType} 
-                      onValueChange={(value: "cash" | "check" | "transfer") => setNewDeposit({...newDeposit, depositType: value})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cash">Cash Deposit</SelectItem>
-                        <SelectItem value="check">Check Deposit</SelectItem>
-                        <SelectItem value="transfer">Wire Transfer</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="bankAccount">Bank Account *</Label>
-                  <Select 
-                    value={newDeposit.bankAccount} 
-                    onValueChange={(value) => setNewDeposit({...newDeposit, bankAccount: value})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select bank account" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
-                      <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
-                      <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
-                      <SelectItem value="equity-1122">Equity Bank - ***1122</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Enter deposit description..."
-                    value={newDeposit.description}
-                    onChange={(e) => setNewDeposit({...newDeposit, description: e.target.value})}
-                    rows={3}
-                  />
-                </div>
-
-                <div className="flex justify-end">
-                  <Button onClick={handleCreateDeposit} className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Submit Deposit Request
-                  </Button>
+              <CardContent className="text-center py-8 sm:py-12">
+                <div className="text-muted-foreground">
+                  <Banknote className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-4 opacity-50" />
+                  <h3 className="text-base sm:text-lg font-medium mb-2">No deposits found</h3>
+                  <p className="text-sm sm:text-base">Create your first bank deposit to get started.</p>
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          {hasPermission("approve_bank_deposits") && (
-            <TabsContent value="approvals" className="space-y-4">
-              <DepositApprovals />
-            </TabsContent>
           )}
-        </Tabs>
-      </div>
-    </OrganizationDashboardLayout>
+        </TabsContent>
+
+        <TabsContent value="create" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Banknote className="h-5 w-5" />
+                New Bank Deposit
+              </CardTitle>
+              <CardDescription>
+                Submit a new bank deposit request for approval
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Deposit Amount *</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    placeholder="Enter amount"
+                    value={newDeposit.amount || ""}
+                    onChange={(e) => setNewDeposit({...newDeposit, amount: parseFloat(e.target.value) || 0})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="depositType">Deposit Type *</Label>
+                  <Select 
+                    value={newDeposit.depositType} 
+                    onValueChange={(value: "cash" | "check" | "transfer") => setNewDeposit({...newDeposit, depositType: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash Deposit</SelectItem>
+                      <SelectItem value="check">Check Deposit</SelectItem>
+                      <SelectItem value="transfer">Wire Transfer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bankAccount">Bank Account *</Label>
+                <Select 
+                  value={newDeposit.bankAccount} 
+                  onValueChange={(value) => setNewDeposit({...newDeposit, bankAccount: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select bank account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
+                    <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
+                    <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
+                    <SelectItem value="equity-1122">Equity Bank - ***1122</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description *</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Enter deposit description..."
+                  value={newDeposit.description}
+                  onChange={(e) => setNewDeposit({...newDeposit, description: e.target.value})}
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <Button onClick={handleCreateDeposit} className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Submit Deposit Request
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {hasPermission("approve_bank_deposits") && (
+          <TabsContent value="approvals" className="space-y-4">
+            <DepositApprovals />
+          </TabsContent>
+        )}
+      </Tabs>
+    </div>
   );
 };
 
