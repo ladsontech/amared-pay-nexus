@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,31 +12,30 @@ import PettyCashReconciliation from "@/components/petty-cash/PettyCashReconcilia
 import PendingApprovals from "@/components/petty-cash/PendingApprovals";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
 import { useSearchParams } from "react-router-dom";
-
 const PettyCash = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab = (searchParams.get("tab") as string) || "overview";
+  const initialTab = searchParams.get("tab") as string || "overview";
   const [activeTab, setActiveTab] = useState(initialTab);
   const [currentBalance, setCurrentBalance] = useState(150000); // Initial petty cash balance
-  const { toast } = useToast();
-  const { hasPermission } = useAuth();
-
+  const {
+    toast
+  } = useToast();
+  const {
+    hasPermission
+  } = useAuth();
   const handleBulkPayment = () => {
     toast({
       title: "Bulk Payment Initiated",
-      description: "Bulk payment of UGX 500,000 has been submitted for approval",
+      description: "Bulk payment of UGX 500,000 has been submitted for approval"
     });
   };
-
   const handleCollection = () => {
     toast({
       title: "Collection Recorded",
-      description: "Collection of UGX 250,000 has been successfully recorded",
+      description: "Collection of UGX 250,000 has been successfully recorded"
     });
   };
-
-  return (
-    <div className="space-y-4 sm:space-y-6">
+  return <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Petty Cash Management</h1>
@@ -48,40 +46,25 @@ const PettyCash = () => {
         
         {/* Quick Action Buttons */}
         <div className="flex flex-wrap gap-2">
-          {hasPermission("access_bulk_payments") && (
-            <Button
-              variant="outline"
-              onClick={handleBulkPayment}
-              className="flex items-center space-x-2"
-            >
-              <Send className="h-4 w-4" />
-              <span>Bulk Payment</span>
-            </Button>
-          )}
+          {hasPermission("access_bulk_payments")}
           
-          {hasPermission("access_collections") && (
-            <Button
-              variant="outline"
-              onClick={handleCollection}
-              className="flex items-center space-x-2"
-            >
-              <DollarSign className="h-4 w-4" />
-              <span>Collection</span>
-            </Button>
-          )}
+          {hasPermission("access_collections")}
           
-          <Button
-            variant="default"
-            onClick={() => setActiveTab("add")}
-            className="flex items-center space-x-2"
-          >
+          <Button variant="default" onClick={() => setActiveTab("add")} className="flex items-center space-x-2">
             <Plus className="h-4 w-4" />
             <span>Add Transaction</span>
           </Button>
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
+      <Tabs value={activeTab} onValueChange={val => {
+      setActiveTab(val);
+      setSearchParams(prev => {
+        const p = new URLSearchParams(prev);
+        p.set('tab', val);
+        return p;
+      });
+    }} className="w-full">
         <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto gap-1 sm:gap-0">
           <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
           <TabsTrigger value="add" className="text-xs sm:text-sm">Add Transaction</TabsTrigger>
@@ -123,8 +106,6 @@ const PettyCash = () => {
           <PettyCashReconciliation currentBalance={currentBalance} />
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 };
-
 export default PettyCash;
