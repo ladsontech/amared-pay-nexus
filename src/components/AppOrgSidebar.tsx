@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Home, Wallet, Send, DollarSign, BarChart3, Settings, CheckCircle, Building } from "lucide-react";
+import NewActionButton from "./NewActionButton";
 
 type NavItem = { title: string; url: string; icon: React.ComponentType<{ className?: string }>; permission?: Permission };
 
@@ -44,6 +45,9 @@ export default function AppOrgSidebar() {
             </div>
           </SidebarGroupLabel>
           <SidebarGroupContent>
+            <div className="px-2 pb-2">
+              <NewActionButton />
+            </div>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>

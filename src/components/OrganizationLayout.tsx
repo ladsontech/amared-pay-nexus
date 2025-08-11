@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Building, LogOut } from "lucide-react";
-import NewActionButton from "./NewActionButton";
+
 import MobileActionFab from "./MobileActionFab";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppOrgSidebar from "./AppOrgSidebar";
@@ -45,14 +45,10 @@ const OrganizationLayout = () => {
             <div className="container flex h-14 items-center justify-between">
               <div className="flex items-center gap-3">
                 <SidebarTrigger className="md:ml-0" />
-                <Building className="h-6 w-6 text-primary" />
-                <span className="hidden sm:inline-block font-bold">Organization Portal</span>
+                <img src="/images/Almaredpay_logo.png" alt="Almared Pay logo" className="h-6 w-auto" />
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="hidden md:flex">
-                  <NewActionButton />
-                </div>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
