@@ -4,36 +4,49 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
-import { 
-  DollarSign, 
-  Wallet, 
-  TrendingUp, 
-  TrendingDown, 
-  Activity, 
-  Users, 
-  CheckCircle,
-  Clock,
-  AlertCircle,
-  ArrowUpRight,
-  ArrowDownRight
-} from "lucide-react";
-
+import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, ArrowUpRight, ArrowDownRight } from "lucide-react";
 const OrgDashboard = () => {
-  const { user, hasPermission } = useAuth();
-
+  const {
+    user,
+    hasPermission
+  } = useAuth();
   const dashboardData = {
     totalCollections: 45600000,
     walletBalance: 12300000,
     pettyCashBalance: 850000,
     monthlyTransactions: 1247,
     pendingApprovals: 8,
-    recentTransactions: [
-      { id: '1', type: 'Petty Cash', amount: 125000, status: 'approved', date: '2024-01-20' },
-      { id: '2', type: 'Bulk Payment', amount: 2500000, status: 'pending', date: '2024-01-20' },
-      { id: '3', type: 'Collection', amount: 850000, status: 'completed', date: '2024-01-19' },
-      { id: '4', type: 'Petty Cash', amount: 75000, status: 'rejected', date: '2024-01-19' },
-      { id: '5', type: 'Bulk Payment', amount: 1200000, status: 'completed', date: '2024-01-18' },
-    ],
+    recentTransactions: [{
+      id: '1',
+      type: 'Petty Cash',
+      amount: 125000,
+      status: 'approved',
+      date: '2024-01-20'
+    }, {
+      id: '2',
+      type: 'Bulk Payment',
+      amount: 2500000,
+      status: 'pending',
+      date: '2024-01-20'
+    }, {
+      id: '3',
+      type: 'Collection',
+      amount: 850000,
+      status: 'completed',
+      date: '2024-01-19'
+    }, {
+      id: '4',
+      type: 'Petty Cash',
+      amount: 75000,
+      status: 'rejected',
+      date: '2024-01-19'
+    }, {
+      id: '5',
+      type: 'Bulk Payment',
+      amount: 1200000,
+      status: 'completed',
+      date: '2024-01-18'
+    }],
     teamMetrics: {
       totalStaff: 12,
       activeStaff: 9,
@@ -41,7 +54,6 @@ const OrgDashboard = () => {
       budgetUsed: 3200000
     }
   };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
@@ -55,7 +67,6 @@ const OrgDashboard = () => {
         return 'text-gray-600 bg-gray-50';
     }
   };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved':
@@ -69,9 +80,7 @@ const OrgDashboard = () => {
         return Activity;
     }
   };
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -80,10 +89,7 @@ const OrgDashboard = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button>
-            <ArrowUpRight className="h-4 w-4 mr-2" />
-            Deposit to Bank
-          </Button>
+          
         </div>
       </div>
 
@@ -160,10 +166,9 @@ const OrgDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {dashboardData.recentTransactions.map((transaction) => {
-                const StatusIcon = getStatusIcon(transaction.status);
-                return (
-                  <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
+              {dashboardData.recentTransactions.map(transaction => {
+              const StatusIcon = getStatusIcon(transaction.status);
+              return <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center space-x-3">
                       <StatusIcon className="h-4 w-4 text-muted-foreground" />
                       <div>
@@ -177,9 +182,8 @@ const OrgDashboard = () => {
                         {transaction.status}
                       </Badge>
                     </div>
-                  </div>
-                );
-              })}
+                  </div>;
+            })}
             </div>
           </CardContent>
         </Card>
@@ -187,8 +191,7 @@ const OrgDashboard = () => {
         {/* Side Panel */}
         <div className="space-y-6">
           {/* Pending Approvals - Only for managers */}
-          {hasPermission('approve_transactions') && (
-            <Card>
+          {hasPermission('approve_transactions') && <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   Pending Approvals
@@ -210,12 +213,10 @@ const OrgDashboard = () => {
                   </Button>
                 </div>
               </CardContent>
-            </Card>
-          )}
+            </Card>}
 
           {/* Team Metrics - Only for managers */}
-          {hasPermission('manage_team') && (
-            <Card>
+          {hasPermission('manage_team') && <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
@@ -236,21 +237,17 @@ const OrgDashboard = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Monthly Budget</span>
                     <span className="text-sm font-medium">
-                      {Math.round((dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget) * 100)}%
+                      {Math.round(dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100)}%
                     </span>
                   </div>
-                  <Progress 
-                    value={(dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget) * 100} 
-                    className="h-2"
-                  />
+                  <Progress value={dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100} className="h-2" />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>UGX {(dashboardData.teamMetrics.budgetUsed / 1000000).toFixed(1)}M used</span>
                     <span>UGX {(dashboardData.teamMetrics.monthlyBudget / 1000000).toFixed(1)}M total</span>
                   </div>
                 </div>
               </CardContent>
-            </Card>
-          )}
+            </Card>}
 
           {/* Quick Actions */}
           <Card>
@@ -258,30 +255,22 @@ const OrgDashboard = () => {
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {hasPermission('access_petty_cash') && (
-                <Button variant="outline" size="sm" className="w-full justify-start">
+              {hasPermission('access_petty_cash') && <Button variant="outline" size="sm" className="w-full justify-start">
                   <Wallet className="h-4 w-4 mr-2" />
                   Add Petty Cash Transaction
-                </Button>
-              )}
-              {hasPermission('access_bulk_payments') && (
-                <Button variant="outline" size="sm" className="w-full justify-start">
+                </Button>}
+              {hasPermission('access_bulk_payments') && <Button variant="outline" size="sm" className="w-full justify-start">
                   <ArrowUpRight className="h-4 w-4 mr-2" />
                   New Bulk Payment
-                </Button>
-              )}
-              {hasPermission('request_funding') && (
-                <Button variant="outline" size="sm" className="w-full justify-start">
+                </Button>}
+              {hasPermission('request_funding') && <Button variant="outline" size="sm" className="w-full justify-start">
                   <ArrowDownRight className="h-4 w-4 mr-2" />
                   Request Funding
-                </Button>
-              )}
+                </Button>}
             </CardContent>
           </Card>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default OrgDashboard;
