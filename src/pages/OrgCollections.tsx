@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Plus, Search, Filter, Download, Smartphone, Copy, QrCode, Share, Link as LinkIcon, Building, Phone, Eye, History } from "lucide-react";
-import DashboardLayout from "@/components/DashboardLayout";
+
 import PaymentLinkForm from "@/components/PaymentLinkForm";
 import { useToast } from "@/hooks/use-toast";
 
@@ -301,7 +301,6 @@ const Collections = () => {
   );
 
   return (
-    <DashboardLayout>
       <div className="space-y-4 md:space-y-6">
         <div className="flex flex-col space-y-4">
           <div>
@@ -800,7 +799,6 @@ const Collections = () => {
           </Card>
         )}
       </div>
-    </DashboardLayout>
   );
 };
 
