@@ -151,7 +151,7 @@ const Collections = () => {
             id: "PAY001",
             payerName: "John Doe",
             phoneNumber: "+256701234567",
-            amount: 5000,
+            amount: 50000,
             status: "completed",
             paidAt: "2024-01-15T10:30:00Z"
           },
@@ -159,9 +159,17 @@ const Collections = () => {
             id: "PAY002",
             payerName: "Jane Smith", 
             phoneNumber: "+256789012345",
-            amount: 5000,
+            amount: 50000,
             status: "completed",
             paidAt: "2024-01-15T11:15:00Z"
+          },
+          {
+            id: "PAY003",
+            payerName: "Michael Johnson",
+            phoneNumber: "+256700111222",
+            amount: 50000,
+            status: "pending",
+            paidAt: "2024-01-15T12:00:00Z"
           }
         ]
       },
@@ -441,6 +449,115 @@ const Collections = () => {
                     UGX {collections.reduce((sum, c) => sum + c.amount, 0).toLocaleString()}
                   </div>
                   <p className="text-sm text-muted-foreground">Total collected</p>
+                  <div className="flex gap-2 mt-3">
+                    <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
+                      <DialogTrigger asChild>
+                        <Button size="sm" variant="outline" className="flex-1">
+                          <Building className="h-3 w-3 mr-1" />
+                          Send to Bank
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Send to Bank</DialogTitle>
+                          <DialogDescription>
+                            Transfer collected funds to bank account
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="bank-amount">Amount (UGX)</Label>
+                            <Input
+                              id="bank-amount"
+                              type="number"
+                              placeholder="Enter amount"
+                              value={bankTransferData.amount}
+                              onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="bank-account">Bank Account</Label>
+                            <Select 
+                              value={bankTransferData.bankAccount} 
+                              onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select bank account" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
+                                <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
+                                <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
+                                <SelectItem value="equity-6789">Equity Bank - ***6789</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="bank-description">Description</Label>
+                            <Input
+                              id="bank-description"
+                              placeholder="Transfer description"
+                              value={bankTransferData.description}
+                              onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
+                            />
+                          </div>
+                          <Button onClick={handleSendToBank} className="w-full">
+                            Send to Bank
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
+                    <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
+                      <DialogTrigger asChild>
+                        <Button size="sm" variant="outline" className="flex-1">
+                          <Phone className="h-3 w-3 mr-1" />
+                          Withdraw
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Withdraw by Phone</DialogTitle>
+                          <DialogDescription>
+                            Send collected funds to mobile money account
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="withdraw-amount">Amount (UGX)</Label>
+                            <Input
+                              id="withdraw-amount"
+                              type="number"
+                              placeholder="Enter amount"
+                              value={withdrawData.amount}
+                              onChange={(e) => setWithdrawData({...withdrawData, amount: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="withdraw-phone">Phone Number</Label>
+                            <Input
+                              id="withdraw-phone"
+                              placeholder="+256701234567"
+                              value={withdrawData.phoneNumber}
+                              onChange={(e) => setWithdrawData({...withdrawData, phoneNumber: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="withdraw-description">Description</Label>
+                            <Input
+                              id="withdraw-description"
+                              placeholder="Withdrawal description"
+                              value={withdrawData.description}
+                              onChange={(e) => setWithdrawData({...withdrawData, description: e.target.value})}
+                            />
+                          </div>
+                          <Button onClick={handleWithdraw} className="w-full">
+                            Withdraw
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </CardContent>
               </Card>
             </>

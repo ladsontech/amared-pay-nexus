@@ -213,6 +213,7 @@ const OrgDashboard = () => {
                           <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
                           <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
                           <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
+                          <SelectItem value="equity-6789">Equity Bank - ***6789</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -417,7 +418,7 @@ const OrgDashboard = () => {
             <CardContent className="space-y-2">
               {hasPermission('access_petty_cash') && <Button variant="outline" size="sm" className="w-full justify-start">
                   <Wallet className="h-4 w-4 mr-2" />
-                  Add Petty Cash Transaction
+                  Fund Petty Cash
                 </Button>}
               {hasPermission('access_bulk_payments') && <Button variant="outline" size="sm" className="w-full justify-start">
                   <ArrowUpRight className="h-4 w-4 mr-2" />
