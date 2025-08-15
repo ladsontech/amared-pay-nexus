@@ -30,7 +30,7 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState({
     expense: ["Office Supplies", "Travel", "Meals", "Utilities", "Maintenance", "Emergency", "Other"],
-    addition: ["Cash Addition", "Reimbursement", "Transfer", "Other"]
+    addition: ["Fund Addition", "Reimbursement", "Transfer", "Other"]
   });
   const { toast } = useToast();
 

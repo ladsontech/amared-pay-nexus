@@ -32,8 +32,11 @@ const SystemAdminLayout = () => {
             <div className="container flex h-14 items-center justify-between">
               <div className="flex items-center gap-3">
                 <SidebarTrigger className="md:ml-0" />
-                <Shield className="h-6 w-6 text-primary" />
-                <span className="hidden sm:inline-block font-bold">System Admin</span>
+                <img src="/images/Almaredpay_logo.png" alt="Almared Pay logo" className="h-full w-auto object-contain py-0" />
+                <div className="hidden sm:flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-primary" />
+                  <span className="font-bold">System Admin</span>
+                </div>
               </div>
 
               <div className="flex items-center gap-2">

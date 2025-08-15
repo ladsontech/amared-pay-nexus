@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Search, Filter, Download, Eye, CreditCard, Upload, Trash2, Check, AlertCircle, FileText } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -25,7 +26,8 @@ interface BulkPayment {
 interface PaymentRow {
   id: string;
   recipientName: string;
-  recipientAccount: string;
+  recipientAccount?: string;
+  phoneNumber?: string;
   amount: number;
   description: string;
   verified: boolean;
@@ -39,7 +41,9 @@ const BulkPayments = () => {
   const [payments, setPayments] = useState<BulkPayment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [paymentRows, setPaymentRows] = useState<PaymentRow[]>([]);
+  const [bankPaymentRows, setBankPaymentRows] = useState<PaymentRow[]>([]);
+  const [mobilePaymentRows, setMobilePaymentRows] = useState<PaymentRow[]>([]);
+  const [paymentType, setPaymentType] = useState<"bank" | "mobile">("bank");
   const [bulkDescription, setBulkDescription] = useState("");
   const { toast } = useToast();
 
@@ -90,6 +94,23 @@ const BulkPayments = () => {
     fetchPayments();
   }, [toast]);
 
+  // Initialize with 10 empty rows for each payment type
+  useEffect(() => {
+    const createEmptyRows = (type: "bank" | "mobile") => {
+      return Array.from({ length: 10 }, (_, index) => ({
+        id: `${type}-row-${index + 1}`,
+        recipientName: "",
+        ...(type === "bank" ? { recipientAccount: "" } : { phoneNumber: "+256" }),
+        amount: 0,
+        description: "",
+        verified: false,
+      }));
+    };
+
+    setBankPaymentRows(createEmptyRows("bank"));
+    setMobilePaymentRows(createEmptyRows("mobile"));
+  }, []);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
@@ -111,30 +132,45 @@ const BulkPayments = () => {
       payment.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const addPaymentRow = () => {
+  const addPaymentRow = (type: "bank" | "mobile") => {
     const newRow: PaymentRow = {
-      id: `row-${Date.now()}`,
+      id: `${type}-row-${Date.now()}`,
       recipientName: "",
-      recipientAccount: "",
+      ...(type === "bank" ? { recipientAccount: "" } : { phoneNumber: "+256" }),
       amount: 0,
       description: "",
       verified: false,
     };
-    setPaymentRows([...paymentRows, newRow]);
+    
+    if (type === "bank") {
+      setBankPaymentRows(prev => [...prev, newRow]);
+    } else {
+      setMobilePaymentRows(prev => [...prev, newRow]);
+    }
   };
 
-  const updatePaymentRow = (id: string, field: keyof PaymentRow, value: any) => {
-    setPaymentRows(prev => prev.map(row => 
+  const updatePaymentRow = (type: "bank" | "mobile", id: string, field: keyof PaymentRow, value: any) => {
+    const updateFunction = (prev: PaymentRow[]) => prev.map(row => 
       row.id === id ? { ...row, [field]: value } : row
-    ));
+    );
+    
+    if (type === "bank") {
+      setBankPaymentRows(updateFunction);
+    } else {
+      setMobilePaymentRows(updateFunction);
+    }
   };
 
-  const removePaymentRow = (id: string) => {
-    setPaymentRows(prev => prev.filter(row => row.id !== id));
+  const removePaymentRow = (type: "bank" | "mobile", id: string) => {
+    if (type === "bank") {
+      setBankPaymentRows(prev => prev.filter(row => row.id !== id));
+    } else {
+      setMobilePaymentRows(prev => prev.filter(row => row.id !== id));
+    }
   };
 
-  const verifyPaymentRow = (id: string) => {
-    updatePaymentRow(id, "verified", true);
+  const verifyPaymentRow = (type: "bank" | "mobile", id: string) => {
+    updatePaymentRow(type, id, "verified", true);
     toast({
       title: "Payment Verified",
       description: "Payment row has been verified successfully",
@@ -158,14 +194,22 @@ const BulkPayments = () => {
           return {
             id: `csv-${Date.now()}-${index}`,
             recipientName: values[0]?.trim() || "",
-            recipientAccount: values[1]?.trim() || "",
+            ...(paymentType === "bank" 
+              ? { recipientAccount: values[1]?.trim() || "" }
+              : { phoneNumber: values[1]?.trim() || "+256" }
+            ),
             amount: parseFloat(values[2]?.trim() || "0"),
             description: values[3]?.trim() || "",
             verified: false,
           };
         });
 
-      setPaymentRows(prev => [...prev, ...newRows]);
+      if (paymentType === "bank") {
+        setBankPaymentRows(prev => [...prev, ...newRows]);
+      } else {
+        setMobilePaymentRows(prev => [...prev, ...newRows]);
+      }
+      
       toast({
         title: "CSV Uploaded",
         description: `Added ${newRows.length} payment rows from CSV`,
@@ -174,8 +218,12 @@ const BulkPayments = () => {
     reader.readAsText(file);
   };
 
-  const verifyAllPayments = () => {
-    setPaymentRows(prev => prev.map(row => ({ ...row, verified: true })));
+  const verifyAllPayments = (type: "bank" | "mobile") => {
+    if (type === "bank") {
+      setBankPaymentRows(prev => prev.map(row => ({ ...row, verified: true })));
+    } else {
+      setMobilePaymentRows(prev => prev.map(row => ({ ...row, verified: true })));
+    }
     toast({
       title: "All Payments Verified",
       description: "All payment rows have been verified",
@@ -183,7 +231,10 @@ const BulkPayments = () => {
   };
 
   const initiatePayments = () => {
-    const unverifiedRows = paymentRows.filter(row => !row.verified);
+    const currentRows = paymentType === "bank" ? bankPaymentRows : mobilePaymentRows;
+    const filledRows = currentRows.filter(row => row.recipientName && row.amount > 0);
+    const unverifiedRows = filledRows.filter(row => !row.verified);
+    
     if (unverifiedRows.length > 0) {
       toast({
         title: "Verification Required",
@@ -195,16 +246,36 @@ const BulkPayments = () => {
 
     toast({
       title: "Payments Initiated",
-      description: `Bulk payment with ${paymentRows.length} recipients has been submitted for approval`,
+      description: `${paymentType === "bank" ? "Bank" : "Mobile"} bulk payment with ${filledRows.length} recipients has been submitted for approval`,
     });
     
     // Reset form
-    setPaymentRows([]);
+    if (paymentType === "bank") {
+      setBankPaymentRows(Array.from({ length: 10 }, (_, index) => ({
+        id: `bank-row-${index + 1}`,
+        recipientName: "",
+        recipientAccount: "",
+        amount: 0,
+        description: "",
+        verified: false,
+      })));
+    } else {
+      setMobilePaymentRows(Array.from({ length: 10 }, (_, index) => ({
+        id: `mobile-row-${index + 1}`,
+        recipientName: "",
+        phoneNumber: "+256",
+        amount: 0,
+        description: "",
+        verified: false,
+      })));
+    }
     setBulkDescription("");
     setActiveTab("overview");
   };
 
-  const totalAmount = paymentRows.reduce((sum, row) => sum + row.amount, 0);
+  const currentRows = paymentType === "bank" ? bankPaymentRows : mobilePaymentRows;
+  const filledRows = currentRows.filter(row => row.recipientName && row.amount > 0);
+  const totalAmount = filledRows.reduce((sum, row) => sum + row.amount, 0);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -332,6 +403,26 @@ const BulkPayments = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
+                <Label>Payment Type</Label>
+                <div className="flex gap-2">
+                  <Button
+                    variant={paymentType === "bank" ? "default" : "outline"}
+                    onClick={() => setPaymentType("bank")}
+                    className="flex-1"
+                  >
+                    Bank Transfer
+                  </Button>
+                  <Button
+                    variant={paymentType === "mobile" ? "default" : "outline"}
+                    onClick={() => setPaymentType("mobile")}
+                    className="flex-1"
+                  >
+                    Mobile Money
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="bulk-description">Payment Description</Label>
                 <Textarea
                   id="bulk-description"
@@ -342,7 +433,7 @@ const BulkPayments = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button onClick={addPaymentRow} variant="outline" className="flex items-center gap-2">
+                <Button onClick={() => addPaymentRow(paymentType)} variant="outline" className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
                   Add Payment Row
                 </Button>
@@ -360,22 +451,22 @@ const BulkPayments = () => {
                   </Button>
                 </div>
 
-                {paymentRows.length > 0 && (
-                  <Button onClick={verifyAllPayments} variant="outline" className="flex items-center gap-2">
+                {filledRows.length > 0 && (
+                  <Button onClick={() => verifyAllPayments(paymentType)} variant="outline" className="flex items-center gap-2">
                     <Check className="h-4 w-4" />
                     Verify All
                   </Button>
                 )}
               </div>
 
-              {paymentRows.length > 0 && (
+              {currentRows.length > 0 && (
                 <div className="space-y-4">
                   <div className="rounded-md border">
                     <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead>Recipient Name</TableHead>
-                          <TableHead>Account Number</TableHead>
+                          <TableHead>{paymentType === "bank" ? "Account Number" : "Phone Number"}</TableHead>
                           <TableHead>Amount (UGX)</TableHead>
                           <TableHead>Description</TableHead>
                           <TableHead>Status</TableHead>
@@ -383,21 +474,26 @@ const BulkPayments = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {paymentRows.map((row) => (
+                        {currentRows.map((row) => (
                           <TableRow key={row.id}>
                             <TableCell>
                               <Input
                                 value={row.recipientName}
-                                onChange={(e) => updatePaymentRow(row.id, "recipientName", e.target.value)}
+                                onChange={(e) => updatePaymentRow(paymentType, row.id, "recipientName", e.target.value)}
                                 placeholder="Recipient name"
                                 className="min-w-32"
                               />
                             </TableCell>
                             <TableCell>
                               <Input
-                                value={row.recipientAccount}
-                                onChange={(e) => updatePaymentRow(row.id, "recipientAccount", e.target.value)}
-                                placeholder="Account number"
+                                value={paymentType === "bank" ? row.recipientAccount || "" : row.phoneNumber || ""}
+                                onChange={(e) => updatePaymentRow(
+                                  paymentType, 
+                                  row.id, 
+                                  paymentType === "bank" ? "recipientAccount" : "phoneNumber", 
+                                  e.target.value
+                                )}
+                                placeholder={paymentType === "bank" ? "Account number" : "Phone number"}
                                 className="min-w-32"
                               />
                             </TableCell>
@@ -405,7 +501,7 @@ const BulkPayments = () => {
                               <Input
                                 type="number"
                                 value={row.amount}
-                                onChange={(e) => updatePaymentRow(row.id, "amount", parseFloat(e.target.value) || 0)}
+                                onChange={(e) => updatePaymentRow(paymentType, row.id, "amount", parseFloat(e.target.value) || 0)}
                                 placeholder="0"
                                 className="min-w-24"
                               />
@@ -413,7 +509,7 @@ const BulkPayments = () => {
                             <TableCell>
                               <Input
                                 value={row.description}
-                                onChange={(e) => updatePaymentRow(row.id, "description", e.target.value)}
+                                onChange={(e) => updatePaymentRow(paymentType, row.id, "description", e.target.value)}
                                 placeholder="Payment description"
                                 className="min-w-32"
                               />
@@ -437,7 +533,7 @@ const BulkPayments = () => {
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => verifyPaymentRow(row.id)}
+                                    onClick={() => verifyPaymentRow(paymentType, row.id)}
                                     className="h-8 w-8 p-0"
                                   >
                                     <Check className="h-3 w-3" />
@@ -446,7 +542,7 @@ const BulkPayments = () => {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => removePaymentRow(row.id)}
+                                  onClick={() => removePaymentRow(paymentType, row.id)}
                                   className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
                                 >
                                   <Trash2 className="h-3 w-3" />
@@ -461,8 +557,9 @@ const BulkPayments = () => {
 
                   <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
                     <div>
-                      <p className="text-sm font-medium">Total Recipients: {paymentRows.length}</p>
+                      <p className="text-sm font-medium">Total Recipients: {filledRows.length}</p>
                       <p className="text-lg font-bold">Total Amount: UGX {totalAmount.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">Payment Type: {paymentType === "bank" ? "Bank Transfer" : "Mobile Money"}</p>
                     </div>
                     <Button onClick={initiatePayments} className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
