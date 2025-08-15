@@ -3,13 +3,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
-import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, ArrowUpRight, ArrowDownRight, Building, Phone } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 const OrgDashboard = () => {
   const {
     user,
     hasPermission
   } = useAuth();
+  const { toast } = useToast();
+  const [sendToBankOpen, setSendToBankOpen] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [bankTransferData, setBankTransferData] = useState({
+    amount: "",
+    bankAccount: "",
+    description: ""
+  });
+  const [withdrawData, setWithdrawData] = useState({
+    amount: "",
+    phoneNumber: "+256",
+    description: ""
+  });
   const dashboardData = {
     totalCollections: 45600000,
     walletBalance: 12300000,
@@ -80,6 +98,43 @@ const OrgDashboard = () => {
         return Activity;
     }
   };
+
+  const handleSendToBank = () => {
+    if (!bankTransferData.amount || !bankTransferData.bankAccount) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Bank Transfer Initiated",
+      description: `Transfer of UGX ${parseFloat(bankTransferData.amount).toLocaleString()} has been submitted for processing`,
+    });
+    setBankTransferData({ amount: "", bankAccount: "", description: "" });
+    setSendToBankOpen(false);
+  };
+
+  const handleWithdraw = () => {
+    if (!withdrawData.amount || !withdrawData.phoneNumber) {
+      toast({
+        title: "Missing Information", 
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Withdrawal Initiated",
+      description: `Withdrawal of UGX ${parseFloat(withdrawData.amount).toLocaleString()} to ${withdrawData.phoneNumber} has been submitted`,
+    });
+    setWithdrawData({ amount: "", phoneNumber: "+256", description: "" });
+    setWithdrawOpen(false);
+  };
+
   return <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -121,6 +176,114 @@ const OrgDashboard = () => {
               <TrendingDown className="h-3 w-3 text-red-500" />
               <span className="text-red-500">-2.1%</span>
               <span>from last week</span>
+            </div>
+            <div className="flex gap-2 mt-3">
+              <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="flex-1">
+                    <Building className="h-3 w-3 mr-1" />
+                    Send to Bank
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Send to Bank</DialogTitle>
+                    <DialogDescription>
+                      Transfer funds from wallet to bank account
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="bank-amount">Amount (UGX)</Label>
+                      <Input
+                        id="bank-amount"
+                        type="number"
+                        placeholder="Enter amount"
+                        value={bankTransferData.amount}
+                        onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bank-account">Bank Account</Label>
+                      <Select 
+                        value={bankTransferData.bankAccount} 
+                        onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select bank account" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
+                          <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
+                          <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bank-description">Description</Label>
+                      <Input
+                        id="bank-description"
+                        placeholder="Transfer description"
+                        value={bankTransferData.description}
+                        onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
+                      />
+                    </div>
+                    <Button onClick={handleSendToBank} className="w-full">
+                      Send to Bank
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="flex-1">
+                    <Phone className="h-3 w-3 mr-1" />
+                    Withdraw
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Withdraw by Phone</DialogTitle>
+                    <DialogDescription>
+                      Send money to mobile money account
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="withdraw-amount">Amount (UGX)</Label>
+                      <Input
+                        id="withdraw-amount"
+                        type="number"
+                        placeholder="Enter amount"
+                        value={withdrawData.amount}
+                        onChange={(e) => setWithdrawData({...withdrawData, amount: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="withdraw-phone">Phone Number</Label>
+                      <Input
+                        id="withdraw-phone"
+                        placeholder="+256701234567"
+                        value={withdrawData.phoneNumber}
+                        onChange={(e) => setWithdrawData({...withdrawData, phoneNumber: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="withdraw-description">Description</Label>
+                      <Input
+                        id="withdraw-description"
+                        placeholder="Withdrawal description"
+                        value={withdrawData.description}
+                        onChange={(e) => setWithdrawData({...withdrawData, description: e.target.value})}
+                      />
+                    </div>
+                    <Button onClick={handleWithdraw} className="w-full">
+                      Withdraw
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </CardContent>
         </Card>

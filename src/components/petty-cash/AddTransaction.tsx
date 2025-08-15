@@ -120,19 +120,19 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
           className="flex items-center gap-2"
         >
           <Wallet className="h-4 w-4" />
-          Request Cash Addition
+          Fund Petty Cash
         </Button>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>
-            {transactionType === "expense" ? "Request Expense Approval" : "Request Cash Addition"}
+            {transactionType === "expense" ? "Request Expense Approval" : "Fund Petty Cash"}
           </CardTitle>
           <CardDescription>
             {transactionType === "expense" 
               ? "Submit expense request for organization admin approval" 
-              : "Request money to be added to the petty cash fund"
+              : "Request funds to be added to the petty cash fund"
             }
           </CardDescription>
         </CardHeader>
@@ -267,7 +267,7 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
             )}
             
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Submitting..." : `Submit ${transactionType === "expense" ? "Expense" : "Addition"} Request`}
+              {isLoading ? "Submitting..." : `Submit ${transactionType === "expense" ? "Expense" : "Funding"} Request`}
             </Button>
           </form>
         </CardContent>
