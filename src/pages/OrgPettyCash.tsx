@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet, Send, DollarSign, Plus } from "lucide-react";
+import { Wallet, Send, DollarSign, Plus, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import AddTransaction from "@/components/petty-cash/AddTransaction";
@@ -11,7 +11,7 @@ import PettyCashOverview from "@/components/petty-cash/PettyCashOverview";
 import PettyCashReconciliation from "@/components/petty-cash/PettyCashReconciliation";
 import PendingApprovals from "@/components/petty-cash/PendingApprovals";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 const PettyCash = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") as string || "overview";
@@ -44,17 +44,22 @@ const PettyCash = () => {
           </p>
         </div>
         
-        {/* Quick Action Buttons */}
-        <div className="flex flex-wrap gap-2">
-          {hasPermission("access_bulk_payments")}
-          
-          {hasPermission("access_collections")}
-          
-          <Button variant="default" onClick={() => setActiveTab("add")} className="flex items-center space-x-2">
-            <Plus className="h-4 w-4" />
-            <span>Add Transaction</span>
-          </Button>
-        </div>
+                  {/* Quick Action Buttons */}
+          <div className="flex flex-wrap gap-2">
+            {hasPermission("view_department_reports") && (
+              <Button variant="outline" asChild>
+                <Link to="/org/reports?tab=petty-cash" className="flex items-center space-x-2">
+                  <FileText className="h-4 w-4" />
+                  <span>View Petty Cash Report</span>
+                </Link>
+              </Button>
+            )}
+            
+            <Button variant="default" onClick={() => setActiveTab("add")} className="flex items-center space-x-2">
+              <Plus className="h-4 w-4" />
+              <span>Add Transaction</span>
+            </Button>
+          </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={val => {
