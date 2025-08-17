@@ -174,12 +174,12 @@ const OrgDashboard = () => {
               <span className="text-red-500">-2.1%</span>
               <span>from last week</span>
             </div>
-            <div className="flex gap-2 mt-3">
+            <div className="flex flex-col sm:flex-row gap-2 mt-3">
               <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="default" className="flex-1 bg-primary hover:bg-primary/90">
+                  <Button size="sm" variant="default" className="w-full sm:flex-1 bg-primary hover:bg-primary/90 text-xs">
                     <Building className="h-3 w-3 mr-1" />
-                    Send to Bank
+                    <span className="truncate">Send to Bank</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
@@ -235,9 +235,9 @@ const OrgDashboard = () => {
 
               <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="flex-1">
+                  <Button size="sm" variant="outline" className="w-full sm:flex-1 text-xs">
                     <Phone className="h-3 w-3 mr-1" />
-                    Withdraw
+                    <span className="truncate">Withdraw</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
