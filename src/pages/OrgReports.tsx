@@ -32,11 +32,15 @@ import {
 import PettyCashReport from "@/components/reports/PettyCashReport";
 import BulkPaymentsReport from "@/components/reports/BulkPaymentsReport";
 import CollectionsReport from "@/components/reports/CollectionsReport";
+import { useSearchParams } from "react-router-dom";
 
 const OrgReports = () => {
   const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState("30");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = (searchParams.get("tab") as string) || "overview";
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   // Sample data
   const monthlyExpenses = [
@@ -166,7 +170,7 @@ const OrgReports = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="space-y-4">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-7 h-auto gap-1 sm:gap-0">
           <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
           <TabsTrigger value="categories" className="text-xs sm:text-sm">Categories</TabsTrigger>

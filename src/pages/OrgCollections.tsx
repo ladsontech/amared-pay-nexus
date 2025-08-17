@@ -10,10 +10,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Plus, Search, Filter, Download, Smartphone, Copy, QrCode, Share, Link as LinkIcon, Building, Phone, Eye, History } from "lucide-react";
+import { Plus, Search, Filter, Download, Smartphone, Copy, QrCode, Share, Link as LinkIcon, Building, Phone, Eye, History, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import PaymentLinkForm from "@/components/PaymentLinkForm";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Collection {
   id: string;
@@ -74,6 +76,7 @@ const Collections = () => {
     description: ""
   });
   const { toast } = useToast();
+  const { hasPermission } = useAuth();
 
   useEffect(() => {
     fetchCollections();
@@ -318,6 +321,15 @@ const Collections = () => {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
+            {/** Only show if user can view reports **/}
+            {hasPermission("view_department_reports") && (
+              <Button variant="outline" asChild>
+                <Link to="/org/reports?tab=collections" className="flex items-center space-x-2">
+                  <FileText className="h-4 w-4" />
+                  <span>View Collections Report</span>
+                </Link>
+              </Button>
+            )}
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" className="flex items-center justify-center space-x-2 w-full sm:w-auto">

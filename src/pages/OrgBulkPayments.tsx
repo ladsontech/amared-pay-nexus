@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Search, Filter, Download, Eye, CreditCard, Upload, Trash2, Check, AlertCircle, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
@@ -311,6 +312,16 @@ const BulkPayments = () => {
           <p className="text-sm sm:text-base text-muted-foreground">
             Manage and monitor your bulk payment transactions
           </p>
+        </div>
+        <div className="flex gap-2">
+          {hasPermission("view_department_reports") && (
+            <Button variant="outline" asChild>
+              <Link to="/org/reports?tab=bulk-payments" className="flex items-center space-x-2">
+                <FileText className="h-4 w-4" />
+                <span>View Bulk Payments Report</span>
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
 
