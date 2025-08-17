@@ -29,6 +29,9 @@ import {
   Calendar,
   FileText
 } from "lucide-react";
+import PettyCashReport from "@/components/reports/PettyCashReport";
+import BulkPaymentsReport from "@/components/reports/BulkPaymentsReport";
+import CollectionsReport from "@/components/reports/CollectionsReport";
 
 const OrgReports = () => {
   const { user } = useAuth();
@@ -164,11 +167,14 @@ const OrgReports = () => {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 sm:gap-0">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-7 h-auto gap-1 sm:gap-0">
           <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
           <TabsTrigger value="categories" className="text-xs sm:text-sm">Categories</TabsTrigger>
           <TabsTrigger value="departments" className="text-xs sm:text-sm">Departments</TabsTrigger>
           <TabsTrigger value="detailed" className="text-xs sm:text-sm">Detailed</TabsTrigger>
+          <TabsTrigger value="petty-cash" className="text-xs sm:text-sm">Petty Cash</TabsTrigger>
+          <TabsTrigger value="bulk-payments" className="text-xs sm:text-sm">Bulk Payments</TabsTrigger>
+          <TabsTrigger value="collections" className="text-xs sm:text-sm">Collections</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -392,6 +398,18 @@ const OrgReports = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="petty-cash">
+          <PettyCashReport />
+        </TabsContent>
+
+        <TabsContent value="bulk-payments">
+          <BulkPaymentsReport />
+        </TabsContent>
+
+        <TabsContent value="collections">
+          <CollectionsReport />
         </TabsContent>
       </Tabs>
     </div>
