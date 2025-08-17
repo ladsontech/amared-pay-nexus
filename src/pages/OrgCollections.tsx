@@ -703,24 +703,28 @@ const Collections = () => {
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground">{link.paymentReason}</p>
-                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                        <div>
-                          <p className="text-muted-foreground text-xs">Amount</p>
-                          <p className="font-medium">UGX {link.amount.toLocaleString()}</p>
+                                              <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 text-sm">
+                          <div>
+                            <p className="text-muted-foreground text-xs">Amount</p>
+                            <p className="font-medium">UGX {link.amount.toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground text-xs">Total Payees</p>
+                            <p className="font-medium">{link.totalPayees}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground text-xs">Successful</p>
+                            <p className="font-medium text-green-600">{link.successfulPayments}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground text-xs">Unique Payers</p>
+                            <p className="font-medium">{Array.from(new Set(link.paymentHistory.filter((p) => p.status === "completed").map((p) => p.phoneNumber))).length}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground text-xs">Pending</p>
+                            <p className="font-medium text-yellow-600">{link.pendingPayments}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-muted-foreground text-xs">Total Payees</p>
-                          <p className="font-medium">{link.totalPayees}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground text-xs">Successful</p>
-                          <p className="font-medium text-green-600">{link.successfulPayments}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground text-xs">Pending</p>
-                          <p className="font-medium text-yellow-600">{link.pendingPayments}</p>
-                        </div>
-                      </div>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2">
                       <Button
