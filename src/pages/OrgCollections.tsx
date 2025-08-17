@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Plus, Search, Filter, Download, Smartphone, Copy, QrCode, Share, Link as LinkIcon, Building, Phone, Eye, History, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import PaymentLinkForm from "@/components/PaymentLinkForm";
+const PaymentLinkForm = lazy(() => import("@/components/PaymentLinkForm"));
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -397,7 +397,9 @@ const Collections = () => {
                   </SheetDescription>
                 </SheetHeader>
                 <div className="mt-6">
-                  <PaymentLinkForm onSuccess={fetchPaymentLinks} />
+                  <Suspense fallback={<div className="text-sm text-muted-foreground">Loading form...</div>}>
+                    <PaymentLinkForm onSuccess={fetchPaymentLinks} />
+                  </Suspense>
                 </div>
               </SheetContent>
             </Sheet>
@@ -570,6 +572,17 @@ const Collections = () => {
                       </DialogContent>
                     </Dialog>
                   </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Payments via Links</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {paymentLinks.reduce((sum, link) => sum + link.successfulPayments, 0)}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Successful payments</p>
                 </CardContent>
               </Card>
             </>
