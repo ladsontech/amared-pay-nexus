@@ -177,7 +177,7 @@ const OrgDashboard = () => {
             <div className="flex gap-2 mt-3">
               <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="flex-1">
+                  <Button size="sm" variant="default" className="flex-1 bg-primary hover:bg-primary/90">
                     <Building className="h-3 w-3 mr-1" />
                     Send to Bank
                   </Button>

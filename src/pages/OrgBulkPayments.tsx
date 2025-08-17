@@ -101,7 +101,7 @@ const BulkPayments = () => {
       return Array.from({ length: 10 }, (_, index) => ({
         id: `${type}-row-${index + 1}`,
         recipientName: "",
-        ...(type === "bank" ? { recipientAccount: "" } : { phoneNumber: "+256", mobileProvider: "Unknown" }),
+        ...(type === "bank" ? { recipientAccount: "" } : { phoneNumber: "+256", mobileProvider: "Unknown" as const }),
         amount: 0,
         description: "",
         verified: false,
@@ -217,7 +217,7 @@ const BulkPayments = () => {
             recipientName: values[0]?.trim() || "",
             ...(type === "bank" 
               ? { recipientAccount: values[1]?.trim() || "" }
-              : { phoneNumber: values[1]?.trim() || "+256", mobileProvider: detectMobileProvider(values[1]?.trim() || "+256") }
+              : { phoneNumber: values[1]?.trim() || "+256", mobileProvider: detectMobileProvider(values[1]?.trim() || "+256") as "MTN" | "Airtel" | "Unknown" }
             ),
             amount: parseFloat(values[2]?.trim() || "0"),
             description: values[3]?.trim() || "",
@@ -294,7 +294,7 @@ const BulkPayments = () => {
         id: `mobile-${Date.now()}-${i}`,
         recipientName: '',
         phoneNumber: '+256',
-        mobileProvider: 'Unknown',
+        mobileProvider: 'Unknown' as const,
         amount: 0,
         description: '',
         verified: false,
@@ -326,12 +326,12 @@ const BulkPayments = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 sm:gap-0">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-          <TabsTrigger value="bank" className="text-xs sm:text-sm">Bank Payments</TabsTrigger>
-          <TabsTrigger value="mobile" className="text-xs sm:text-sm">Mobile Payments</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 sm:gap-0 p-1">
+          <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 py-1.5">Overview</TabsTrigger>
+          <TabsTrigger value="bank" className="text-xs sm:text-sm px-2 py-1.5">Bank Payments</TabsTrigger>
+          <TabsTrigger value="mobile" className="text-xs sm:text-sm px-2 py-1.5">Mobile Payments</TabsTrigger>
           {hasPermission("approve_bulk_payments") && (
-            <TabsTrigger value="approvals" className="text-xs sm:text-sm">Approvals</TabsTrigger>
+            <TabsTrigger value="approvals" className="text-xs sm:text-sm px-2 py-1.5">Approvals</TabsTrigger>
           )}
         </TabsList>
 
@@ -378,7 +378,7 @@ const BulkPayments = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredPayments.map((payment) => (
-                <Card key={payment.id} className="hover:shadow-lg transition-shadow">
+                <Card key={payment.id} className="hover:shadow-lg transition-all duration-200 hover:scale-[1.02] shadow-md border-0 bg-gradient-to-br from-card to-card/80">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base sm:text-lg">{payment.id}</CardTitle>
@@ -429,14 +429,15 @@ const BulkPayments = () => {
         </TabsContent>
 
         <TabsContent value="bank" className="space-y-4">
-          <Card>
+          <Card className="shadow-md border-0 bg-gradient-to-br from-card to-card/80">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <span>Bank Bulk Payments</span>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button variant="outline" size="sm" onClick={() => setBankPaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `bank-new-${Date.now()}-${i}`, recipientName: '', recipientAccount: '', amount: 0, description: '', verified: false }))])}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add 5 Rows
+                    <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Add 5 Rows</span>
+                    <span className="sm:hidden">Add 5</span>
                   </Button>
                   <input
                     type="file"
@@ -447,8 +448,9 @@ const BulkPayments = () => {
                   />
                   <label htmlFor="bank-csv-upload">
                     <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload CSV
+                      <Upload className="h-4 w-4 mr-1 sm:mr-2" />
+                      <span className="hidden sm:inline">Upload CSV</span>
+                      <span className="sm:hidden">CSV</span>
                     </Button>
                   </label>
                 </div>
@@ -556,7 +558,7 @@ const BulkPayments = () => {
                   </Table>
                 </div>
 
-                <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-muted/50 rounded-lg">
                   <div>
                     <p className="text-sm text-muted-foreground">
                       Total recipients: {bankPaymentRows.filter(row => row.recipientName && row.amount > 0).length}
@@ -565,13 +567,14 @@ const BulkPayments = () => {
                       Total amount: UGX {bankPaymentRows.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
                     </p>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => verifyAllRows("bank")}>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <Button variant="outline" onClick={() => verifyAllRows("bank")} className="w-full sm:w-auto">
                       Verify All
                     </Button>
                     <Button 
                       onClick={() => handleSubmitBulkPayment("bank")}
                       disabled={bankPaymentRows.filter(row => row.recipientName && row.amount > 0).length === 0}
+                      className="w-full sm:w-auto"
                     >
                       Submit Bank Payments
                     </Button>
@@ -583,14 +586,15 @@ const BulkPayments = () => {
         </TabsContent>
 
         <TabsContent value="mobile" className="space-y-4">
-          <Card>
+          <Card className="shadow-md border-0 bg-gradient-to-br from-card to-card/80">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <span>Mobile Money Bulk Payments</span>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setMobilePaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `mobile-new-${Date.now()}-${i}`, recipientName: '', phoneNumber: '+256', mobileProvider: 'Unknown', amount: 0, description: '', verified: false }))])}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add 5 Rows
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setMobilePaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `mobile-new-${Date.now()}-${i}`, recipientName: '', phoneNumber: '+256', mobileProvider: 'Unknown' as const, amount: 0, description: '', verified: false }))])}>
+                    <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Add 5 Rows</span>
+                    <span className="sm:hidden">Add 5</span>
                   </Button>
                   <input
                     type="file"
@@ -601,8 +605,9 @@ const BulkPayments = () => {
                   />
                   <label htmlFor="mobile-csv-upload">
                     <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload CSV
+                      <Upload className="h-4 w-4 mr-1 sm:mr-2" />
+                      <span className="hidden sm:inline">Upload CSV</span>
+                      <span className="sm:hidden">CSV</span>
                     </Button>
                   </label>
                 </div>
@@ -720,7 +725,7 @@ const BulkPayments = () => {
                   </Table>
                 </div>
 
-                <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-muted/50 rounded-lg">
                   <div>
                     <p className="text-sm text-muted-foreground">
                       Total recipients: {mobilePaymentRows.filter(row => row.recipientName && row.amount > 0).length}
@@ -729,13 +734,14 @@ const BulkPayments = () => {
                       Total amount: UGX {mobilePaymentRows.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
                     </p>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => verifyAllRows("mobile")}>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <Button variant="outline" onClick={() => verifyAllRows("mobile")} className="w-full sm:w-auto">
                       Verify All
                     </Button>
                     <Button 
                       onClick={() => handleSubmitBulkPayment("mobile")}
                       disabled={mobilePaymentRows.filter(row => row.recipientName && row.amount > 0).length === 0}
+                      className="w-full sm:w-auto"
                     >
                       Submit Mobile Payments
                     </Button>
