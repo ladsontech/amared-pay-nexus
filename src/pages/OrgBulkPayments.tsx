@@ -28,6 +28,7 @@ interface PaymentRow {
   recipientName: string;
   recipientAccount?: string;
   phoneNumber?: string;
+  mobileProvider?: "MTN" | "Airtel" | "Unknown";
   amount: number;
   description: string;
   verified: boolean;
@@ -99,7 +100,7 @@ const BulkPayments = () => {
       return Array.from({ length: 10 }, (_, index) => ({
         id: `${type}-row-${index + 1}`,
         recipientName: "",
-        ...(type === "bank" ? { recipientAccount: "" } : { phoneNumber: "+256" }),
+        ...(type === "bank" ? { recipientAccount: "" } : { phoneNumber: "+256", mobileProvider: "Unknown" }),
         amount: 0,
         description: "",
         verified: false,
@@ -123,6 +124,26 @@ const BulkPayments = () => {
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const normalizeUgPhone = (input: string) => {
+    const digits = (input || '').replace(/\D/g, '');
+    if (digits.startsWith('256')) {
+      return '0' + digits.slice(3);
+    }
+    if (digits.startsWith('0')) {
+      return digits;
+    }
+    return '';
+  };
+
+  const detectMobileProvider = (input: string): "MTN" | "Airtel" | "Unknown" => {
+    const local = normalizeUgPhone(input);
+    if (!local) return "Unknown";
+    if (local.startsWith('0705')) return "Airtel";
+    if (local.startsWith('070')) return "Airtel";
+    if (local.startsWith('076') || local.startsWith('077') || local.startsWith('078') || local.startsWith('079')) return "MTN";
+    return "Unknown";
   };
 
   const filteredPayments = payments.filter(
@@ -159,6 +180,24 @@ const BulkPayments = () => {
     });
   };
 
+  const verifyAllRows = (type: "bank" | "mobile") => {
+    if (type === "bank") {
+      setBankPaymentRows(prev => prev.map(row => {
+        const canVerify = Boolean(row.recipientName && row.recipientAccount);
+        return canVerify ? { ...row, verified: true } : row;
+      }));
+    } else {
+      setMobilePaymentRows(prev => prev.map(row => {
+        const canVerify = Boolean(row.recipientName && row.phoneNumber);
+        return canVerify ? { ...row, verified: true } : row;
+      }));
+    }
+    toast({
+      title: "Verification Complete",
+      description: "All eligible rows have been marked as verified.",
+    });
+  };
+
   const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>, type: "bank" | "mobile") => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -177,7 +216,7 @@ const BulkPayments = () => {
             recipientName: values[0]?.trim() || "",
             ...(type === "bank" 
               ? { recipientAccount: values[1]?.trim() || "" }
-              : { phoneNumber: values[1]?.trim() || "+256" }
+              : { phoneNumber: values[1]?.trim() || "+256", mobileProvider: detectMobileProvider(values[1]?.trim() || "+256") }
             ),
             amount: parseFloat(values[2]?.trim() || "0"),
             description: values[3]?.trim() || "",
@@ -254,6 +293,7 @@ const BulkPayments = () => {
         id: `mobile-${Date.now()}-${i}`,
         recipientName: '',
         phoneNumber: '+256',
+        mobileProvider: 'Unknown',
         amount: 0,
         description: '',
         verified: false,
@@ -514,12 +554,17 @@ const BulkPayments = () => {
                       Total amount: UGX {bankPaymentRows.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
                     </p>
                   </div>
-                  <Button 
-                    onClick={() => handleSubmitBulkPayment("bank")}
-                    disabled={bankPaymentRows.filter(row => row.recipientName && row.amount > 0).length === 0}
-                  >
-                    Submit Bank Payments
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => verifyAllRows("bank")}>
+                      Verify All
+                    </Button>
+                    <Button 
+                      onClick={() => handleSubmitBulkPayment("bank")}
+                      disabled={bankPaymentRows.filter(row => row.recipientName && row.amount > 0).length === 0}
+                    >
+                      Submit Bank Payments
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -532,7 +577,7 @@ const BulkPayments = () => {
               <CardTitle className="flex items-center justify-between">
                 <span>Mobile Money Bulk Payments</span>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setMobilePaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `mobile-new-${Date.now()}-${i}`, recipientName: '', phoneNumber: '+256', amount: 0, description: '', verified: false }))])}>
+                  <Button variant="outline" size="sm" onClick={() => setMobilePaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `mobile-new-${Date.now()}-${i}`, recipientName: '', phoneNumber: '+256', mobileProvider: 'Unknown', amount: 0, description: '', verified: false }))])}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add 5 Rows
                   </Button>
@@ -573,6 +618,7 @@ const BulkPayments = () => {
                       <TableRow>
                         <TableHead>Recipient Name</TableHead>
                         <TableHead>Phone Number</TableHead>
+                        <TableHead>Provider</TableHead>
                         <TableHead>Amount (UGX)</TableHead>
                         <TableHead>Description</TableHead>
                         <TableHead>Status</TableHead>
@@ -593,8 +639,17 @@ const BulkPayments = () => {
                             <Input
                               placeholder="+256701234567"
                               value={row.phoneNumber || '+256'}
-                              onChange={(e) => updatePaymentRow("mobile", row.id, "phoneNumber", e.target.value)}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                updatePaymentRow("mobile", row.id, "phoneNumber", value);
+                                updatePaymentRow("mobile", row.id, "mobileProvider", detectMobileProvider(value));
+                              }}
                             />
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={row.mobileProvider === "MTN" ? "bg-yellow-100 text-yellow-800" : row.mobileProvider === "Airtel" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"}>
+                              {row.mobileProvider || "Unknown"}
+                            </Badge>
                           </TableCell>
                           <TableCell>
                             <Input
@@ -663,12 +718,17 @@ const BulkPayments = () => {
                       Total amount: UGX {mobilePaymentRows.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
                     </p>
                   </div>
-                  <Button 
-                    onClick={() => handleSubmitBulkPayment("mobile")}
-                    disabled={mobilePaymentRows.filter(row => row.recipientName && row.amount > 0).length === 0}
-                  >
-                    Submit Mobile Payments
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => verifyAllRows("mobile")}>
+                      Verify All
+                    </Button>
+                    <Button 
+                      onClick={() => handleSubmitBulkPayment("mobile")}
+                      disabled={mobilePaymentRows.filter(row => row.recipientName && row.amount > 0).length === 0}
+                    >
+                      Submit Mobile Payments
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>
