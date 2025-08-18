@@ -74,21 +74,21 @@ const MobileActionFab = () => {
   return (
     <>
       {/* Mobile FAB - Only visible on small screens */}
-      <div className="fixed bottom-20 right-4 z-40 md:hidden">
+      <div className="fixed bottom-18 right-3 z-40 md:hidden">
         {/* Action buttons */}
         {isOpen && (
-          <div className="flex flex-col gap-2 mb-3">
+          <div className="flex flex-col gap-2 mb-2">
             {filteredActions.map((action) => (
               <div key={action.path} className="flex items-center gap-2">
-                <span className="bg-background text-foreground px-3 py-1 rounded-full text-xs shadow-lg border">
+                <span className="bg-background text-foreground px-2.5 py-0.5 rounded-full text-[10px] shadow-lg border">
                   {action.label}
                 </span>
                 <Button
                   size="sm"
-                  className="h-10 w-10 rounded-full shadow-lg"
+                  className="h-9 w-9 rounded-full shadow-lg"
                   onClick={() => handleActionClick(action.path)}
                 >
-                  <action.icon className="h-4 w-4" />
+                  <action.icon className="h-3.5 w-3.5" />
                 </Button>
               </div>
             ))}
@@ -98,10 +98,10 @@ const MobileActionFab = () => {
         {/* Main FAB button */}
         <Button
           size="lg"
-          className="h-14 w-14 rounded-full shadow-lg"
+          className="h-12 w-12 rounded-full shadow-lg"
           onClick={() => setIsOpen(!isOpen)}
         >
-          {isOpen ? <X className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
+          {isOpen ? <X className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
         </Button>
       </div>
 

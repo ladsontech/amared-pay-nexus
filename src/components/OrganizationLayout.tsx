@@ -42,10 +42,10 @@ const OrganizationLayout = () => {
         <div className="flex-1 flex flex-col">
           {/* Header */}
           <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-14 items-center justify-between px-4">
+            <div className="container flex h-12 sm:h-14 items-center justify-between px-3 sm:px-4">
               <div className="flex items-center gap-2 sm:gap-3">
                 <SidebarTrigger className="md:ml-0" />
-                <img src="/images/Almaredpay_logo.png" alt="Almared Pay logo" className="h-14 w-auto object-contain" />
+                <img src="/images/Almaredpay_logo.png" alt="Almared Pay logo" className="h-10 sm:h-14 w-auto object-contain" />
               </div>
 
               <div className="flex items-center gap-2">
@@ -85,7 +85,7 @@ const OrganizationLayout = () => {
 
           {/* Main Content */}
           <main className="flex-1 pb-16 md:pb-0">
-            <div className="container py-3 sm:py-4 md:py-6 px-4">
+            <div className="container py-2 sm:py-4 md:py-6 px-3 sm:px-4">
               <Outlet />
             </div>
           </main>

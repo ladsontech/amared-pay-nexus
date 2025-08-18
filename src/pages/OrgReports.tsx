@@ -81,16 +81,16 @@ const OrgReports = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Reports & Analytics</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
+          <h1 className="text-lg sm:text-2xl md:text-3xl font-bold">Reports & Analytics</h1>
+          <p className="text-xs sm:text-base text-muted-foreground">
             Comprehensive financial insights for your department
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-full sm:w-40">
+            <SelectTrigger className="w-full sm:w-40 h-8 text-[11px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -100,7 +100,7 @@ const OrgReports = () => {
               <SelectItem value="365">Last year</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" className="w-full sm:w-auto">
+          <Button variant="outline" className="w-full sm:w-auto h-8 text-[11px]">
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
@@ -115,8 +115,8 @@ const OrgReports = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">UGX {(summaryStats.totalExpenses / 1000000).toFixed(1)}M</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">UGX {(summaryStats.totalExpenses / 1000000).toFixed(1)}M</div>
+            <div className="flex items-center space-x-1 text-[11px] sm:text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3 text-green-500" />
               <span className="text-green-500">+{summaryStats.monthlyChange}%</span>
               <span>from last month</span>
@@ -130,8 +130,8 @@ const OrgReports = () => {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{summaryStats.totalTransactions}</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">{summaryStats.totalTransactions}</div>
+            <div className="flex items-center space-x-1 text-[11px] sm:text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3 text-green-500" />
               <span className="text-green-500">+8.2%</span>
               <span>from last month</span>
@@ -145,8 +145,8 @@ const OrgReports = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">UGX {summaryStats.averageTransaction.toLocaleString()}</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">UGX {summaryStats.averageTransaction.toLocaleString()}</div>
+            <div className="flex items-center space-x-1 text-[11px] sm:text-xs text-muted-foreground">
               <TrendingDown className="h-3 w-3 text-red-500" />
               <span className="text-red-500">-2.1%</span>
               <span>from last month</span>
@@ -160,8 +160,8 @@ const OrgReports = () => {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">64%</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">64%</div>
+            <div className="flex items-center space-x-1 text-[11px] sm:text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3 text-green-500" />
               <span className="text-green-500">On track</span>
               <span>for monthly budget</span>
@@ -170,15 +170,15 @@ const OrgReports = () => {
         </Card>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="space-y-4">
+      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="space-y-3 sm:space-y-4">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-7 h-auto gap-1 sm:gap-0">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-          <TabsTrigger value="categories" className="text-xs sm:text-sm">Categories</TabsTrigger>
-          <TabsTrigger value="departments" className="text-xs sm:text-sm">Departments</TabsTrigger>
-          <TabsTrigger value="detailed" className="text-xs sm:text-sm">Detailed</TabsTrigger>
-          <TabsTrigger value="petty-cash" className="text-xs sm:text-sm">Petty Cash</TabsTrigger>
-          <TabsTrigger value="bulk-payments" className="text-xs sm:text-sm">Bulk Payments</TabsTrigger>
-          <TabsTrigger value="collections" className="text-xs sm:text-sm">Collections</TabsTrigger>
+          <TabsTrigger value="overview" className="text-[11px] sm:text-sm py-2">Overview</TabsTrigger>
+          <TabsTrigger value="categories" className="text-[11px] sm:text-sm py-2">Categories</TabsTrigger>
+          <TabsTrigger value="departments" className="text-[11px] sm:text-sm py-2">Departments</TabsTrigger>
+          <TabsTrigger value="detailed" className="text-[11px] sm:text-sm py-2">Detailed</TabsTrigger>
+          <TabsTrigger value="petty-cash" className="text-[11px] sm:text-sm py-2">Petty Cash</TabsTrigger>
+          <TabsTrigger value="bulk-payments" className="text-[11px] sm:text-sm py-2">Bulk Payments</TabsTrigger>
+          <TabsTrigger value="collections" className="text-[11px] sm:text-sm py-2">Collections</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">

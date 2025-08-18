@@ -312,11 +312,11 @@ const Collections = () => {
   );
 
   return (
-      <div className="space-y-4 md:space-y-6">
-        <div className="flex flex-col space-y-4">
+      <div className="space-y-3 md:space-y-5">
+        <div className="flex flex-col space-y-3">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Collections & Payment Links</h1>
-            <p className="text-sm md:text-base text-muted-foreground">
+            <h1 className="text-xl md:text-3xl font-bold">Collections & Payment Links</h1>
+            <p className="text-xs md:text-base text-muted-foreground">
               Manage mobile money collections and payment links (UGX only)
             </p>
           </div>
@@ -332,7 +332,7 @@ const Collections = () => {
             )}
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" className="flex items-center justify-center space-x-2 w-full sm:w-auto">
+                <Button variant="outline" className="flex items-center justify-center space-x-2 w-full sm:w-auto h-8 text-[11px]">
                   <Plus className="h-4 w-4" />
                   <span className="hidden sm:inline">Initiate Collection</span>
                   <span className="sm:hidden">Collection</span>
@@ -383,7 +383,7 @@ const Collections = () => {
 
             <Sheet>
               <SheetTrigger asChild>
-                <Button className="flex items-center justify-center space-x-2 w-full sm:w-auto">
+                <Button className="flex items-center justify-center space-x-2 w-full sm:w-auto h-8 text-[11px]">
                   <LinkIcon className="h-4 w-4" />
                   <span className="hidden sm:inline">Create Payment Link</span>
                   <span className="sm:hidden">Payment Link</span>

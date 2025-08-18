@@ -67,7 +67,7 @@ const DashboardLayout = ({
   const user = authService.getCurrentUser();
   return <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="fixed md:static top-0 left-0 right-0 z-50 bg-white border-b border-border px-2 sm:px-4 lg:px-6 h-16 flex items-center justify-between shadow-sm">
+      <header className="fixed md:static top-0 left-0 right-0 z-50 bg-white border-b border-border px-2 sm:px-4 lg:px-6 h-14 sm:h-16 flex items-center justify-between shadow-sm">
         
 
         
@@ -93,7 +93,7 @@ const DashboardLayout = ({
       </header>
 
       
-      <div className="flex pt-16 md:pt-0">
+      <div className="flex pt-14 md:pt-0">
         {/* Sidebar */}
         
 
@@ -101,7 +101,7 @@ const DashboardLayout = ({
         {sidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
         {/* Main Content */}
-        <main className="flex-1 p-3 sm:p-4 md:p-6 pb-20 md:pb-6">
+        <main className="flex-1 p-2 sm:p-3 md:p-5 pb-20 md:pb-6">
           {children || <Outlet />}
         </main>
       </div>

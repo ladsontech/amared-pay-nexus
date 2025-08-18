@@ -58,7 +58,7 @@ const MobileBottomNav = () => {
   return (
     <>
       <nav className="mobile-nav">
-        <div className="flex justify-around items-center h-16">
+        <div className="flex justify-around items-center h-14">
           {navItems.map((item) => (
             <Link
               key={item.path}
@@ -67,8 +67,8 @@ const MobileBottomNav = () => {
                 location.pathname === item.path ? "active" : ""
               }`}
             >
-              <item.icon className="h-5 w-5 mb-1" />
-              <span className="text-xs">{item.label}</span>
+              <item.icon className="h-4 w-4 mb-1" />
+              <span className="text-[10px]">{item.label}</span>
             </Link>
           ))}
           

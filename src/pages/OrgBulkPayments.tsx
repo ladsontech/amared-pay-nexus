@@ -305,11 +305,11 @@ const BulkPayments = () => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-3 sm:space-y-5">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Bulk Payments</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
+          <h1 className="text-lg sm:text-2xl md:text-3xl font-bold">Bulk Payments</h1>
+          <p className="text-xs sm:text-base text-muted-foreground">
             Manage and monitor your bulk payment transactions
           </p>
         </div>
@@ -327,16 +327,16 @@ const BulkPayments = () => {
 
       <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 sm:gap-0">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-          <TabsTrigger value="bank" className="text-xs sm:text-sm">Bank Payments</TabsTrigger>
-          <TabsTrigger value="mobile" className="text-xs sm:text-sm">Mobile Payments</TabsTrigger>
+          <TabsTrigger value="overview" className="text-[11px] sm:text-sm py-2">Overview</TabsTrigger>
+          <TabsTrigger value="bank" className="text-[11px] sm:text-sm py-2">Bank Payments</TabsTrigger>
+          <TabsTrigger value="mobile" className="text-[11px] sm:text-sm py-2">Mobile Payments</TabsTrigger>
           {hasPermission("approve_bulk_payments") && (
-            <TabsTrigger value="approvals" className="text-xs sm:text-sm">Approvals</TabsTrigger>
+            <TabsTrigger value="approvals" className="text-[11px] sm:text-sm py-2">Approvals</TabsTrigger>
           )}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
@@ -347,11 +347,11 @@ const BulkPayments = () => {
               />
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <Button variant="outline" size="sm" className="h-8 text-[11px] sm:text-sm">
                 <Filter className="h-4 w-4 mr-2" />
                 Filter
               </Button>
-              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <Button variant="outline" size="sm" className="h-8 text-[11px] sm:text-sm">
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>

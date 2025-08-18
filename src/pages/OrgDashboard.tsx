@@ -135,26 +135,26 @@ const OrgDashboard = () => {
     setWithdrawOpen(false);
   };
 
-  return <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+  return <div className="space-y-3 sm:space-y-5">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Dashboard</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
+          <h1 className="text-lg sm:text-2xl md:text-3xl font-bold">Dashboard</h1>
+          <p className="text-xs sm:text-base text-muted-foreground">
             Welcome back, {user?.name}! Here's your organization overview.
           </p>
         </div>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
             <CardTitle className="text-sm font-medium">Total Collections</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M</div>
+            <div className="flex items-center space-x-1 text-[10px] sm:text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3 text-green-500" />
               <span className="text-green-500">+12.5%</span>
               <span>from last month</span>
@@ -163,13 +163,13 @@ const OrgDashboard = () => {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
             <CardTitle className="text-sm font-medium">Wallet Balance</CardTitle>
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M</div>
+            <div className="flex items-center space-x-1 text-[10px] sm:text-xs text-muted-foreground">
               <TrendingDown className="h-3 w-3 text-red-500" />
               <span className="text-red-500">-2.1%</span>
               <span>from last week</span>
@@ -177,7 +177,7 @@ const OrgDashboard = () => {
             <div className="flex gap-2 mt-3">
               <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="flex-1">
+                  <Button size="sm" variant="outline" className="flex-1 h-8">
                     <Building className="h-3 w-3 mr-1" />
                     Send to Bank
                   </Button>
@@ -235,7 +235,7 @@ const OrgDashboard = () => {
 
               <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="flex-1">
+                  <Button size="sm" variant="outline" className="flex-1 h-8">
                     <Phone className="h-3 w-3 mr-1" />
                     Withdraw
                   </Button>
@@ -292,8 +292,8 @@ const OrgDashboard = () => {
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K</div>
+            <div className="flex items-center space-x-1 text-[10px] sm:text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3 text-green-500" />
               <span className="text-green-500">+5.2%</span>
               <span>from last week</span>
@@ -302,13 +302,13 @@ const OrgDashboard = () => {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
             <CardTitle className="text-sm font-medium">Monthly Transactions</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardData.monthlyTransactions}</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">{dashboardData.monthlyTransactions}</div>
+            <div className="flex items-center space-x-1 text-[10px] sm:text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3 text-green-500" />
               <span className="text-green-500">+18.1%</span>
               <span>from last month</span>
@@ -318,23 +318,23 @@ const OrgDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-5">
         {/* Recent Transactions */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Recent Transactions</CardTitle>
+            <CardTitle className="text-base sm:text-lg">Recent Transactions</CardTitle>
             <CardDescription>Latest financial activities in your organization</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {dashboardData.recentTransactions.map(transaction => {
               const StatusIcon = getStatusIcon(transaction.status);
-              return <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
+              return <div key={transaction.id} className="flex items-center justify-between p-2.5 border rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <StatusIcon className="h-4 w-4 text-muted-foreground" />
+                      <StatusIcon className="h-3.5 w-3.5 text-muted-foreground" />
                       <div>
                         <p className="font-medium">{transaction.type}</p>
-                        <p className="text-sm text-muted-foreground">{transaction.date}</p>
+                        <p className="text-xs text-muted-foreground">{transaction.date}</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -413,18 +413,18 @@ const OrgDashboard = () => {
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {hasPermission('access_petty_cash') && <Button variant="outline" size="sm" className="w-full justify-start">
+              {hasPermission('access_petty_cash') && <Button variant="outline" size="sm" className="w-full justify-start h-8">
                   <Wallet className="h-4 w-4 mr-2" />
                   Fund Petty Cash
                 </Button>}
-              {hasPermission('access_bulk_payments') && <Button variant="outline" size="sm" className="w-full justify-start">
+              {hasPermission('access_bulk_payments') && <Button variant="outline" size="sm" className="w-full justify-start h-8">
                   <ArrowUpRight className="h-4 w-4 mr-2" />
                   New Bulk Payment
                 </Button>}
-              {hasPermission('request_funding') && <Button variant="outline" size="sm" className="w-full justify-start">
+              {hasPermission('request_funding') && <Button variant="outline" size="sm" className="w-full justify-start h-8">
                   <ArrowDownRight className="h-4 w-4 mr-2" />
                   Request Funding
                 </Button>}
