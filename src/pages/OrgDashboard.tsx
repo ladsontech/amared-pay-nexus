@@ -28,7 +28,8 @@ import {
   Calendar,
   BarChart3,
   Plus,
-  ChevronRight
+  ChevronRight,
+  X
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -37,6 +38,7 @@ const OrgDashboard = () => {
   const { toast } = useToast();
   const [sendToBankOpen, setSendToBankOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [bankTransferData, setBankTransferData] = useState({
     amount: "",
     bankAccount: "",
@@ -377,8 +379,13 @@ const OrgDashboard = () => {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-slate-900">Quick Actions</h3>
-            <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-slate-500 hover:text-slate-700">
-              <ChevronRight className="h-3 w-3" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-6 w-6 p-0 text-slate-500 hover:text-slate-700"
+              onClick={() => setQuickActionsOpen(true)}
+            >
+              <Plus className="h-3 w-3" />
             </Button>
           </div>
           <div className="grid grid-cols-4 gap-3">
@@ -697,6 +704,162 @@ const OrgDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Quick Actions Modal */}
+      <Dialog open={quickActionsOpen} onOpenChange={setQuickActionsOpen}>
+        <DialogContent className="sm:max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-lg font-semibold text-slate-900">All Quick Actions</DialogTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0 text-slate-500 hover:text-slate-700"
+                onClick={() => setQuickActionsOpen(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <DialogDescription className="text-sm text-slate-600">
+              Access all available actions and features
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Financial Actions */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-200 pb-2">Financial Management</h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {hasPermission('access_petty_cash') && (
+                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-purple-50 hover:bg-purple-100 transition-colors border border-purple-200/50">
+                    <div className="p-3 rounded-xl bg-purple-100">
+                      <Wallet className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-medium text-slate-900 block">Petty Cash</span>
+                      <span className="text-xs text-slate-600">Manage small expenses</span>
+                    </div>
+                  </button>
+                )}
+                
+                {hasPermission('access_bulk_payments') && (
+                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors border border-blue-200/50">
+                    <div className="p-3 rounded-xl bg-blue-100">
+                      <Send className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-medium text-slate-900 block">Bulk Payments</span>
+                      <span className="text-xs text-slate-600">Send multiple payments</span>
+                    </div>
+                  </button>
+                )}
+                
+                {hasPermission('access_collections') && (
+                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 transition-colors border border-emerald-200/50">
+                    <div className="p-3 rounded-xl bg-emerald-100">
+                      <DollarSign className="h-5 w-5 text-emerald-600" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-medium text-slate-900 block">Collections</span>
+                      <span className="text-xs text-slate-600">Receive payments</span>
+                    </div>
+                  </button>
+                )}
+                
+                {hasPermission('access_bank_deposits') && (
+                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 transition-colors border border-indigo-200/50">
+                    <div className="p-3 rounded-xl bg-indigo-100">
+                      <Banknote className="h-5 w-5 text-indigo-600" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-medium text-slate-900 block">Bank Deposits</span>
+                      <span className="text-xs text-slate-600">Send to bank accounts</span>
+                    </div>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Administrative Actions */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-200 pb-2">Administration</h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {hasPermission('approve_transactions') && (
+                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-amber-50 hover:bg-amber-100 transition-colors border border-amber-200/50">
+                    <div className="p-3 rounded-xl bg-amber-100">
+                      <CheckCircle className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-medium text-slate-900 block">Approvals</span>
+                      <span className="text-xs text-slate-600">Review requests</span>
+                    </div>
+                  </button>
+                )}
+                
+                {hasPermission('manage_team') && (
+                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-200/50">
+                    <div className="p-3 rounded-xl bg-slate-100">
+                      <Users className="h-5 w-5 text-slate-600" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-medium text-slate-900 block">Team Management</span>
+                      <span className="text-xs text-slate-600">Manage staff & roles</span>
+                    </div>
+                  </button>
+                )}
+                
+                {hasPermission('view_department_reports') && (
+                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-orange-50 hover:bg-orange-100 transition-colors border border-orange-200/50">
+                    <div className="p-3 rounded-xl bg-orange-100">
+                      <BarChart3 className="h-5 w-5 text-orange-600" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-medium text-slate-900 block">Reports</span>
+                      <span className="text-xs text-slate-600">View analytics</span>
+                    </div>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Access Actions */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-200 pb-2">Quick Access</h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-green-50 hover:bg-green-100 transition-colors border border-green-200/50">
+                  <div className="p-3 rounded-xl bg-green-100">
+                    <Activity className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div className="text-center">
+                    <span className="text-sm font-medium text-slate-900 block">Transactions</span>
+                    <span className="text-xs text-slate-600">View all activity</span>
+                  </div>
+                </button>
+                
+                <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-cyan-50 hover:bg-cyan-100 transition-colors border border-cyan-200/50">
+                  <div className="p-3 rounded-xl bg-cyan-100">
+                    <Target className="h-5 w-5 text-cyan-600" />
+                  </div>
+                  <div className="text-center">
+                    <span className="text-sm font-medium text-slate-900 block">Goals</span>
+                    <span className="text-xs text-slate-600">Set targets</span>
+                  </div>
+                </button>
+                
+                <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-pink-50 hover:bg-pink-100 transition-colors border border-pink-200/50">
+                  <div className="p-3 rounded-xl bg-pink-100">
+                    <Calendar className="h-5 w-5 text-pink-600" />
+                  </div>
+                  <div className="text-center">
+                    <span className="text-sm font-medium text-slate-900 block">Schedule</span>
+                    <span className="text-xs text-slate-600">Plan activities</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
