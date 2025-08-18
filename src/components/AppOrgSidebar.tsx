@@ -11,9 +11,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Home, Wallet, Send, DollarSign, BarChart3, Settings, CheckCircle, Building } from "lucide-react";
 import NewActionButton from "./NewActionButton";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type NavItem = { title: string; url: string; icon: React.ComponentType<{ className?: string }>; permission?: Permission };
 
@@ -29,10 +31,18 @@ const orgItems: NavItem[] = [
 
 export default function AppOrgSidebar() {
   const { hasPermission } = useAuth();
+  const { setOpenMobile } = useSidebar();
+  const isMobile = useIsMobile();
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
 
   const items = orgItems.filter((i) => !i.permission || hasPermission(i.permission));
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <Sidebar className="w-60 border-r border-slate-200/60 bg-white/95 backdrop-blur-sm" collapsible="icon">
@@ -58,7 +68,7 @@ export default function AppOrgSidebar() {
                     isActive={isActive(item.url)}
                     className="hover:bg-slate-100 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 data-[active=true]:border-r-2 data-[active=true]:border-blue-500"
                   >
-                    <NavLink to={item.url} end>
+                    <NavLink to={item.url} end onClick={handleNavClick}>
                       <item.icon className="mr-3 h-4 w-4" />
                       <span className="font-medium">{item.title}</span>
                     </NavLink>

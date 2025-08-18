@@ -180,18 +180,18 @@ const OrgDashboard = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto p-1">
       {/* Header Section */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-            <BarChart3 className="h-6 w-6 text-white" />
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+            <BarChart3 className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
               Dashboard
             </h1>
-            <p className="text-slate-600">
+            <p className="text-sm text-slate-600">
               Welcome back, <span className="font-semibold text-slate-800">{user?.name}</span>! Here's your organization overview.
             </p>
           </div>
@@ -483,58 +483,58 @@ const OrgDashboard = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Recent Transactions - Enhanced */}
-        <Card className="xl:col-span-2 border-0 shadow-xl bg-gradient-to-br from-white to-slate-50/50">
-          <CardHeader className="border-b border-slate-100 bg-white/80 backdrop-blur-sm">
+        <Card className="xl:col-span-2 border-0 shadow-lg bg-gradient-to-br from-white to-slate-50/50">
+          <CardHeader className="border-b border-slate-100 bg-white/80 backdrop-blur-sm pb-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-slate-100">
-                  <Activity className="h-5 w-5 text-slate-600" />
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-slate-100">
+                  <Activity className="h-4 w-4 text-slate-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-slate-900">Recent Transactions</CardTitle>
-                  <CardDescription className="text-slate-600">Latest financial activities in your organization</CardDescription>
+                  <CardTitle className="text-lg font-semibold text-slate-900">Recent Transactions</CardTitle>
+                  <CardDescription className="text-xs text-slate-600">Latest financial activities in your organization</CardDescription>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
+              <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50 h-7 text-xs">
                 View All
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
+          <CardContent className="p-4">
+            <div className="space-y-3">
               {dashboardData.recentTransactions.map((transaction, index) => {
                 const StatusIcon = getStatusIcon(transaction.status);
                 const TransactionIcon = getTransactionIcon(transaction.type);
                 
                 return (
-                  <div key={transaction.id} className="group flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-md transition-all duration-200 bg-white/60 hover:bg-white">
-                    <div className="flex items-center gap-4">
+                  <div key={transaction.id} className="group flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-slate-200 hover:shadow-md transition-all duration-200 bg-white/60 hover:bg-white">
+                    <div className="flex items-center gap-3">
                       <div className="relative">
-                        <div className="p-3 rounded-xl bg-slate-50 group-hover:bg-slate-100 transition-colors">
-                          <TransactionIcon className="h-5 w-5 text-slate-600" />
+                        <div className="p-2 rounded-lg bg-slate-50 group-hover:bg-slate-100 transition-colors">
+                          <TransactionIcon className="h-4 w-4 text-slate-600" />
                         </div>
-                        <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-white shadow-sm">
-                          <StatusIcon className="h-3 w-3 text-slate-500" />
+                        <div className="absolute -bottom-1 -right-1 p-0.5 rounded-full bg-white shadow-sm">
+                          <StatusIcon className="h-2.5 w-2.5 text-slate-500" />
                         </div>
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-0.5">
                         <div className="flex items-center gap-2">
-                          <p className="font-semibold text-slate-900">{transaction.type}</p>
-                          <Badge variant="outline" className={`${getStatusColor(transaction.status)} text-xs`}>
+                          <p className="font-semibold text-sm text-slate-900">{transaction.type}</p>
+                          <Badge variant="outline" className={`${getStatusColor(transaction.status)} text-xs px-1.5 py-0.5`}>
                             {transaction.status}
                           </Badge>
                         </div>
-                        <p className="text-sm text-slate-600">{transaction.description}</p>
+                        <p className="text-xs text-slate-600 line-clamp-1">{transaction.description}</p>
                         <p className="text-xs text-slate-500 flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
+                          <Calendar className="h-2.5 w-2.5" />
                           {transaction.date}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-lg text-slate-900">
+                      <p className="font-bold text-sm text-slate-900">
                         UGX {transaction.amount.toLocaleString()}
                       </p>
                     </div>
@@ -546,42 +546,42 @@ const OrgDashboard = () => {
         </Card>
 
         {/* Side Panel */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Pending Approvals - Enhanced */}
           {hasPermission('approve_transactions') && (
-            <Card className="border-0 shadow-xl bg-gradient-to-br from-amber-50 to-amber-100/50">
-              <CardHeader className="border-b border-amber-100 bg-white/80 backdrop-blur-sm">
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-amber-50 to-amber-100/50">
+              <CardHeader className="border-b border-amber-100 bg-white/80 backdrop-blur-sm pb-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-amber-100">
-                      <Clock className="h-5 w-5 text-amber-600" />
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-amber-100">
+                      <Clock className="h-4 w-4 text-amber-600" />
                     </div>
-                    <CardTitle className="text-lg font-semibold text-slate-900">Pending Approvals</CardTitle>
+                    <CardTitle className="text-md font-semibold text-slate-900">Pending Approvals</CardTitle>
                   </div>
-                  <Badge className="bg-amber-500 text-white shadow-sm">
+                  <Badge className="bg-amber-500 text-white shadow-sm text-xs">
                     {dashboardData.pendingApprovals}
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 rounded-lg bg-white/60 border border-amber-100">
+              <CardContent className="p-4 space-y-3">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center p-2 rounded-lg bg-white/60 border border-amber-100">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                      <span className="text-sm font-medium text-slate-700">Transaction Requests</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                      <span className="text-xs font-medium text-slate-700">Transaction Requests</span>
                     </div>
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">5</Badge>
+                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-xs">5</Badge>
                   </div>
-                  <div className="flex justify-between items-center p-3 rounded-lg bg-white/60 border border-amber-100">
+                  <div className="flex justify-between items-center p-2 rounded-lg bg-white/60 border border-amber-100">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                      <span className="text-sm font-medium text-slate-700">Funding Requests</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                      <span className="text-xs font-medium text-slate-700">Funding Requests</span>
                     </div>
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">3</Badge>
+                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-xs">3</Badge>
                   </div>
                 </div>
-                <Button className="w-full bg-amber-600 hover:bg-amber-700 shadow-sm">
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                <Button className="w-full bg-amber-600 hover:bg-amber-700 shadow-sm h-8 text-xs">
+                  <CheckCircle className="h-3 w-3 mr-2" />
                   Review All
                 </Button>
               </CardContent>
@@ -590,38 +590,38 @@ const OrgDashboard = () => {
 
           {/* Team Metrics - Enhanced */}
           {hasPermission('manage_team') && (
-            <Card className="border-0 shadow-xl bg-gradient-to-br from-indigo-50 to-indigo-100/50">
-              <CardHeader className="border-b border-indigo-100 bg-white/80 backdrop-blur-sm">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-indigo-100">
-                    <Users className="h-5 w-5 text-indigo-600" />
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100/50">
+              <CardHeader className="border-b border-indigo-100 bg-white/80 backdrop-blur-sm pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-indigo-100">
+                    <Users className="h-4 w-4 text-indigo-600" />
                   </div>
-                  <CardTitle className="text-lg font-semibold text-slate-900">Team Overview</CardTitle>
+                  <CardTitle className="text-md font-semibold text-slate-900">Team Overview</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 rounded-lg bg-white/60 border border-indigo-100">
-                    <div className="text-2xl font-bold text-slate-900">{dashboardData.teamMetrics.totalStaff}</div>
+              <CardContent className="p-4 space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center p-2 rounded-lg bg-white/60 border border-indigo-100">
+                    <div className="text-lg font-bold text-slate-900">{dashboardData.teamMetrics.totalStaff}</div>
                     <div className="text-xs text-slate-600">Total Staff</div>
                   </div>
-                  <div className="text-center p-3 rounded-lg bg-white/60 border border-indigo-100">
-                    <div className="text-2xl font-bold text-emerald-600">{dashboardData.teamMetrics.activeStaff}</div>
+                  <div className="text-center p-2 rounded-lg bg-white/60 border border-indigo-100">
+                    <div className="text-lg font-bold text-emerald-600">{dashboardData.teamMetrics.activeStaff}</div>
                     <div className="text-xs text-slate-600">Active Today</div>
                   </div>
                 </div>
                 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-slate-700">Monthly Budget</span>
-                    <span className="text-sm font-bold text-slate-900">
+                    <span className="text-xs font-medium text-slate-700">Monthly Budget</span>
+                    <span className="text-xs font-bold text-slate-900">
                       {Math.round(dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100)}%
                     </span>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <Progress 
                       value={dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100} 
-                      className="h-3 bg-slate-100"
+                      className="h-2 bg-slate-100"
                     />
                     <div className="flex justify-between text-xs text-slate-600">
                       <span>UGX {(dashboardData.teamMetrics.budgetUsed / 1000000).toFixed(1)}M used</span>
@@ -634,51 +634,51 @@ const OrgDashboard = () => {
           )}
 
           {/* Quick Actions - Enhanced */}
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-slate-50 to-slate-100/50">
-            <CardHeader className="border-b border-slate-100 bg-white/80 backdrop-blur-sm">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-slate-100">
-                  <Target className="h-5 w-5 text-slate-600" />
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-slate-50 to-slate-100/50">
+            <CardHeader className="border-b border-slate-100 bg-white/80 backdrop-blur-sm pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-slate-100">
+                  <Target className="h-4 w-4 text-slate-600" />
                 </div>
-                <CardTitle className="text-lg font-semibold text-slate-900">Quick Actions</CardTitle>
+                <CardTitle className="text-md font-semibold text-slate-900">Quick Actions</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-6 space-y-3">
+            <CardContent className="p-4 space-y-2">
               {hasPermission('access_petty_cash') && (
-                <Button variant="outline" className="w-full justify-start h-12 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-purple-100">
-                      <Wallet className="h-4 w-4 text-purple-600" />
+                <Button variant="outline" className="w-full justify-start h-10 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-purple-100">
+                      <Wallet className="h-3 w-3 text-purple-600" />
                     </div>
                     <span className="font-medium">Fund Petty Cash</span>
                   </div>
                 </Button>
               )}
               {hasPermission('access_bulk_payments') && (
-                <Button variant="outline" className="w-full justify-start h-12 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-blue-100">
-                      <Send className="h-4 w-4 text-blue-600" />
+                <Button variant="outline" className="w-full justify-start h-10 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-blue-100">
+                      <Send className="h-3 w-3 text-blue-600" />
                     </div>
                     <span className="font-medium">New Bulk Payment</span>
                   </div>
                 </Button>
               )}
               {hasPermission('access_collections') && (
-                <Button variant="outline" className="w-full justify-start h-12 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-emerald-100">
-                      <DollarSign className="h-4 w-4 text-emerald-600" />
+                <Button variant="outline" className="w-full justify-start h-10 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-emerald-100">
+                      <DollarSign className="h-3 w-3 text-emerald-600" />
                     </div>
                     <span className="font-medium">New Collection</span>
                   </div>
                 </Button>
               )}
               {hasPermission('access_bank_deposits') && (
-                <Button variant="outline" className="w-full justify-start h-12 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-indigo-100">
-                      <Banknote className="h-4 w-4 text-indigo-600" />
+                <Button variant="outline" className="w-full justify-start h-10 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-indigo-100">
+                      <Banknote className="h-3 w-3 text-indigo-600" />
                     </div>
                     <span className="font-medium">Bank Deposit</span>
                   </div>
