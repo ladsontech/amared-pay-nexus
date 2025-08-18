@@ -11,6 +11,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Home, Wallet, Send, DollarSign, BarChart3, Settings, CheckCircle, Building } from "lucide-react";
 import NewActionButton from "./NewActionButton";
@@ -30,6 +31,7 @@ const orgItems: NavItem[] = [
 export default function AppOrgSidebar() {
   const { hasPermission } = useAuth();
   const location = useLocation();
+  const { isMobile, setOpenMobile } = useSidebar();
   const isActive = (path: string) => location.pathname === path;
 
   const items = orgItems.filter((i) => !i.permission || hasPermission(i.permission));
@@ -52,7 +54,13 @@ export default function AppOrgSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url} end>
+                    <NavLink
+                      to={item.url}
+                      end
+                      onClick={() => {
+                        if (isMobile) setOpenMobile(false);
+                      }}
+                    >
                       <item.icon className="mr-2 h-4 w-4" />
                       <span>{item.title}</span>
                     </NavLink>

@@ -11,10 +11,12 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Plus, Wallet, Send, DollarSign, Banknote, CheckCircle } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const NewActionButton = () => {
   const { hasPermission } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const quickActions = [
     {
@@ -65,6 +67,19 @@ const NewActionButton = () => {
 
   if (availableActions.length === 0) {
     return null;
+  }
+
+  if (isMobile) {
+    return (
+      <div className="grid grid-cols-2 gap-2">
+        {availableActions.map((action) => (
+          <Button key={action.label} variant="outline" size="sm" onClick={action.action} className="justify-start">
+            <action.icon className="h-4 w-4 mr-2" />
+            <span className="text-xs line-clamp-1">{action.label}</span>
+          </Button>
+        ))}
+      </div>
+    );
   }
 
   return (
