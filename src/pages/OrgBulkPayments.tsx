@@ -15,6 +15,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
 
+// Add shared bank names used for selection
+const BANK_NAMES = [
+  "Stanbic Bank",
+  "Centenary Bank",
+  "DFCU Bank",
+  "Equity Bank",
+];
+
 interface BulkPayment {
   id: string;
   amount: number;
@@ -28,6 +36,8 @@ interface PaymentRow {
   id: string;
   recipientName: string;
   recipientAccount?: string;
+  // Bank name for bank payments
+  bankName?: string;
   phoneNumber?: string;
   mobileProvider?: "MTN" | "Airtel" | "Unknown";
   amount: number;
@@ -101,7 +111,9 @@ const BulkPayments = () => {
       return Array.from({ length: 10 }, (_, index) => ({
         id: `${type}-row-${index + 1}`,
         recipientName: "",
-        ...(type === "bank" ? { recipientAccount: "" } : { phoneNumber: "+256", mobileProvider: "Unknown" as const }),
+        ...(type === "bank"
+          ? { recipientAccount: "", bankName: "" }
+          : { phoneNumber: "+256", mobileProvider: "Unknown" as const }),
         amount: 0,
         description: "",
         verified: false,
@@ -141,8 +153,9 @@ const BulkPayments = () => {
   const detectMobileProvider = (input: string): "MTN" | "Airtel" | "Unknown" => {
     const local = normalizeUgPhone(input);
     if (!local) return "Unknown";
-    if (local.startsWith('0705')) return "Airtel";
-    if (local.startsWith('070')) return "Airtel";
+    // Airtel prefixes: 070, 075
+    if (local.startsWith('070') || local.startsWith('075')) return "Airtel";
+    // MTN prefixes: 076, 077, 078, 079
     if (local.startsWith('076') || local.startsWith('077') || local.startsWith('078') || local.startsWith('079')) return "MTN";
     return "Unknown";
   };
@@ -216,7 +229,7 @@ const BulkPayments = () => {
             id: `csv-${Date.now()}-${index}`,
             recipientName: values[0]?.trim() || "",
             ...(type === "bank" 
-              ? { recipientAccount: values[1]?.trim() || "" }
+              ? { recipientAccount: values[1]?.trim() || "", bankName: "" }
               : { phoneNumber: values[1]?.trim() || "+256", mobileProvider: detectMobileProvider(values[1]?.trim() || "+256") as "MTN" | "Airtel" | "Unknown" }
             ),
             amount: parseFloat(values[2]?.trim() || "0"),
@@ -285,6 +298,7 @@ const BulkPayments = () => {
         id: `bank-${Date.now()}-${i}`,
         recipientName: '',
         recipientAccount: '',
+        bankName: '',
         amount: 0,
         description: '',
         verified: false,
@@ -434,7 +448,7 @@ const BulkPayments = () => {
               <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <span>Bank Bulk Payments</span>
                 <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setBankPaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `bank-new-${Date.now()}-${i}`, recipientName: '', recipientAccount: '', amount: 0, description: '', verified: false }))])}>
+                  <Button variant="outline" size="sm" onClick={() => setBankPaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `bank-new-${Date.now()}-${i}`, recipientName: '', recipientAccount: '', bankName: '', amount: 0, description: '', verified: false }))])}>
                     <Plus className="h-4 w-4 mr-1 sm:mr-2" />
                     <span className="hidden sm:inline">Add 5 Rows</span>
                     <span className="sm:hidden">Add 5</span>
@@ -477,6 +491,7 @@ const BulkPayments = () => {
                       <TableHeader>
                         <TableRow>
                           <TableHead className="min-w-[150px]">Recipient Name</TableHead>
+                          <TableHead className="min-w-[160px]">Bank Name</TableHead>
                           <TableHead className="min-w-[180px]">Bank Account</TableHead>
                           <TableHead className="min-w-[120px]">Amount (UGX)</TableHead>
                           <TableHead className="min-w-[150px]">Description</TableHead>
@@ -493,6 +508,21 @@ const BulkPayments = () => {
                               value={row.recipientName}
                               onChange={(e) => updatePaymentRow("bank", row.id, "recipientName", e.target.value)}
                             />
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              value={row.bankName || ''}
+                              onValueChange={(value) => updatePaymentRow("bank", row.id, "bankName", value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select bank" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {BANK_NAMES.map(name => (
+                                  <SelectItem key={name} value={name}>{name}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </TableCell>
                           <TableCell>
                             <Input
