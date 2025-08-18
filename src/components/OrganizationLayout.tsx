@@ -34,40 +34,41 @@ const OrganizationLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-background flex w-full">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50 flex w-full">
         {/* Fixed Sidebar */}
         <AppOrgSidebar />
 
         {/* Content */}
         <div className="flex-1 flex flex-col">
           {/* Header */}
-          <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <header className="sticky top-0 z-50 w-full border-b border-slate-200/60 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/80 shadow-sm">
             <div className="container flex h-14 items-center justify-between px-4">
               <div className="flex items-center gap-2 sm:gap-3">
                 <SidebarTrigger className="md:ml-0" />
-                <img src="/images/Almaredpay_logo.png" alt="Almared Pay logo" className="h-14 w-auto object-contain" />
+                <img src="/images/Almaredpay_logo.png" alt="Almared Pay logo" className="h-12 w-auto object-contain" />
               </div>
 
               <div className="flex items-center gap-2">
-
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-slate-100">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={user?.avatar} alt={user?.name} />
-                        <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
+                          {user?.name?.charAt(0)}
+                        </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuContent className="w-56 bg-white/95 backdrop-blur-sm border-slate-200" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{user?.name}</p>
-                        <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                        <p className="text-sm font-semibold leading-none text-slate-900">{user?.name}</p>
+                        <p className="text-xs leading-none text-slate-600">{user?.email}</p>
                         {user?.department && (
-                          <p className="text-xs leading-none text-muted-foreground">{user.department}</p>
+                          <p className="text-xs leading-none text-slate-500">{user.department}</p>
                         )}
-                        <Badge variant={getRoleBadgeVariant(user?.role || "")} className="w-fit capitalize">
+                        <Badge variant={getRoleBadgeVariant(user?.role || "")} className="w-fit capitalize mt-1">
                           {user?.role}
                         </Badge>
                       </div>
@@ -84,8 +85,8 @@ const OrganizationLayout = () => {
           </header>
 
           {/* Main Content */}
-          <main className="flex-1 pb-16 md:pb-0">
-            <div className="container py-3 sm:py-4 md:py-6 px-4">
+          <main className="flex-1 pb-16 md:pb-0 bg-gradient-to-br from-slate-50/50 to-white/50">
+            <div className="container py-6 sm:py-8 px-4 sm:px-6">
               <Outlet />
             </div>
           </main>

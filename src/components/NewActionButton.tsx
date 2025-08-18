@@ -70,18 +70,26 @@ const NewActionButton = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="flex items-center space-x-2">
+        <Button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200">
           <Plus className="h-4 w-4" />
-          <span>New</span>
+          <span className="font-semibold">New Action</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-64 bg-white/95 backdrop-blur-sm border-slate-200 shadow-xl">
+        <DropdownMenuLabel className="text-slate-700 font-semibold">Quick Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {availableActions.map((action) => (
-          <DropdownMenuItem key={action.label} onClick={action.action}>
-            <action.icon className="mr-2 h-4 w-4" />
-            <span>{action.label}</span>
+          <DropdownMenuItem 
+            key={action.label} 
+            onClick={action.action}
+            className="hover:bg-slate-50 focus:bg-slate-50 cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-1 rounded-md bg-slate-100">
+                <action.icon className="h-4 w-4 text-slate-600" />
+              </div>
+              <span className="font-medium text-slate-700">{action.label}</span>
+            </div>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

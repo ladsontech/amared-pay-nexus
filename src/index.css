@@ -7,10 +7,10 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 0 0% 98%;
     --foreground: 210 50% 15%;
 
-    --card: 0 0% 100%;
+    --card: 0 0% 99%;
     --card-foreground: 210 50% 15%;
 
     --popover: 0 0% 100%;
@@ -19,13 +19,13 @@
     --primary: 210 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 30% 96%;
+    --secondary: 210 20% 95%;
     --secondary-foreground: 210 50% 15%;
 
-    --muted: 210 20% 96%;
+    --muted: 210 15% 94%;
     --muted-foreground: 210 30% 45%;
 
-    --accent: 210 80% 92%;
+    --accent: 210 60% 90%;
     --accent-foreground: 210 100% 25%;
 
     --destructive: 0 84.2% 60.2%;
@@ -37,18 +37,19 @@
 
     --radius: 0.5rem;
 
-    --sidebar-background: 210 15% 98%;
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 210 50% 20%;
     --sidebar-primary: 210 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 30% 94%;
+    --sidebar-accent: 210 20% 96%;
     --sidebar-accent-foreground: 210 50% 15%;
-    --sidebar-border: 210 30% 88%;
+    --sidebar-border: 210 20% 92%;
     --sidebar-ring: 210 100% 50%;
 
     /* Financial theme gradients */
     --financial-gradient: linear-gradient(135deg, hsl(210, 100%, 50%) 0%, hsl(210, 80%, 60%) 100%);
-    --trust-gradient: linear-gradient(135deg, hsl(210, 60%, 95%) 0%, hsl(210, 40%, 98%) 100%);
+    --trust-gradient: linear-gradient(135deg, hsl(210, 60%, 98%) 0%, hsl(210, 40%, 99%) 100%);
+    --glass-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
   }
 
   .dark {
@@ -98,6 +99,8 @@
 
   body {
     @apply bg-background text-foreground;
+    background: linear-gradient(135deg, hsl(210, 60%, 98%) 0%, hsl(210, 40%, 99%) 100%);
+    min-height: 100vh;
   }
 
   .financial-gradient {
@@ -106,6 +109,24 @@
 
   .trust-gradient {
     background: var(--trust-gradient);
+  }
+
+  .glass-gradient {
+    background: var(--glass-gradient);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Enhanced card shadows */
+  .card-shadow-soft {
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 4px 16px -4px rgba(0, 0, 0, 0.05);
+  }
+
+  .card-shadow-medium {
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 8px 24px -4px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-shadow-strong {
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.12), 0 16px 48px -8px rgba(0, 0, 0, 0.12);
   }
 }
 

@@ -8,13 +8,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
-import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, ArrowUpRight, ArrowDownRight, Building, Phone } from "lucide-react";
+import { 
+  DollarSign, 
+  Wallet, 
+  TrendingUp, 
+  TrendingDown, 
+  Activity, 
+  Users, 
+  CheckCircle, 
+  Clock, 
+  AlertCircle, 
+  ArrowUpRight, 
+  ArrowDownRight, 
+  Building, 
+  Phone,
+  Send,
+  Banknote,
+  Target,
+  Calendar,
+  BarChart3
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
 const OrgDashboard = () => {
-  const {
-    user,
-    hasPermission
-  } = useAuth();
+  const { user, hasPermission } = useAuth();
   const { toast } = useToast();
   const [sendToBankOpen, setSendToBankOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
@@ -28,43 +45,55 @@ const OrgDashboard = () => {
     phoneNumber: "+256",
     description: ""
   });
+
   const dashboardData = {
     totalCollections: 45600000,
     walletBalance: 12300000,
     pettyCashBalance: 850000,
     monthlyTransactions: 1247,
     pendingApprovals: 8,
-    recentTransactions: [{
-      id: '1',
-      type: 'Petty Cash',
-      amount: 125000,
-      status: 'approved',
-      date: '2024-01-20'
-    }, {
-      id: '2',
-      type: 'Bulk Payment',
-      amount: 2500000,
-      status: 'pending',
-      date: '2024-01-20'
-    }, {
-      id: '3',
-      type: 'Collection',
-      amount: 850000,
-      status: 'completed',
-      date: '2024-01-19'
-    }, {
-      id: '4',
-      type: 'Petty Cash',
-      amount: 75000,
-      status: 'rejected',
-      date: '2024-01-19'
-    }, {
-      id: '5',
-      type: 'Bulk Payment',
-      amount: 1200000,
-      status: 'completed',
-      date: '2024-01-18'
-    }],
+    recentTransactions: [
+      {
+        id: '1',
+        type: 'Petty Cash',
+        amount: 125000,
+        status: 'approved',
+        date: '2024-01-20',
+        description: 'Office supplies purchase'
+      },
+      {
+        id: '2',
+        type: 'Bulk Payment',
+        amount: 2500000,
+        status: 'pending',
+        date: '2024-01-20',
+        description: 'Monthly salary disbursement'
+      },
+      {
+        id: '3',
+        type: 'Collection',
+        amount: 850000,
+        status: 'completed',
+        date: '2024-01-19',
+        description: 'Client payment received'
+      },
+      {
+        id: '4',
+        type: 'Petty Cash',
+        amount: 75000,
+        status: 'rejected',
+        date: '2024-01-19',
+        description: 'Travel expense claim'
+      },
+      {
+        id: '5',
+        type: 'Bulk Payment',
+        amount: 1200000,
+        status: 'completed',
+        date: '2024-01-18',
+        description: 'Vendor payments Q1'
+      }
+    ],
     teamMetrics: {
       totalStaff: 12,
       activeStaff: 9,
@@ -72,19 +101,21 @@ const OrgDashboard = () => {
       budgetUsed: 3200000
     }
   };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
       case 'completed':
-        return 'text-green-600 bg-green-50';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
       case 'pending':
-        return 'text-orange-600 bg-orange-50';
+        return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'rejected':
-        return 'text-red-600 bg-red-50';
+        return 'bg-red-50 text-red-700 border-red-200';
       default:
-        return 'text-gray-600 bg-gray-50';
+        return 'bg-slate-50 text-slate-700 border-slate-200';
     }
   };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved':
@@ -94,6 +125,19 @@ const OrgDashboard = () => {
         return Clock;
       case 'rejected':
         return AlertCircle;
+      default:
+        return Activity;
+    }
+  };
+
+  const getTransactionIcon = (type: string) => {
+    switch (type) {
+      case 'Petty Cash':
+        return Wallet;
+      case 'Bulk Payment':
+        return Send;
+      case 'Collection':
+        return DollarSign;
       default:
         return Activity;
     }
@@ -135,56 +179,90 @@ const OrgDashboard = () => {
     setWithdrawOpen(false);
   };
 
-  return <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Dashboard</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Welcome back, {user?.name}! Here's your organization overview.
-          </p>
+  return (
+    <div className="space-y-8 max-w-7xl mx-auto">
+      {/* Header Section */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+            <BarChart3 className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+              Dashboard
+            </h1>
+            <p className="text-slate-600">
+              Welcome back, <span className="font-semibold text-slate-800">{user?.name}</span>! Here's your organization overview.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Collections</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+      {/* Key Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Total Collections */}
+        <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-emerald-100/50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="p-2 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
+                <DollarSign className="h-5 w-5 text-emerald-600" />
+              </div>
+              <Badge variant="outline" className="bg-white/80 text-emerald-700 border-emerald-200">
+                +12.5%
+              </Badge>
+            </div>
+            <CardTitle className="text-sm font-medium text-slate-600">Total Collections</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-              <TrendingUp className="h-3 w-3 text-green-500" />
-              <span className="text-green-500">+12.5%</span>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold text-slate-900 mb-1">
+              UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M
+            </div>
+            <div className="flex items-center gap-1 text-xs text-emerald-600">
+              <TrendingUp className="h-3 w-3" />
               <span>from last month</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Wallet Balance</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-              <TrendingDown className="h-3 w-3 text-red-500" />
-              <span className="text-red-500">-2.1%</span>
-              <span>from last week</span>
+        {/* Wallet Balance */}
+        <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100/50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="p-2 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
+                <Wallet className="h-5 w-5 text-blue-600" />
+              </div>
+              <Badge variant="outline" className="bg-white/80 text-red-700 border-red-200">
+                -2.1%
+              </Badge>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 mt-3">
+            <CardTitle className="text-sm font-medium text-slate-600">Wallet Balance</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-4">
+            <div>
+              <div className="text-2xl font-bold text-slate-900 mb-1">
+                UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M
+              </div>
+              <div className="flex items-center gap-1 text-xs text-red-600">
+                <TrendingDown className="h-3 w-3" />
+                <span>from last week</span>
+              </div>
+            </div>
+            
+            {/* Action Buttons - Fixed Layout */}
+            <div className="grid grid-cols-2 gap-2">
               <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="default" className="w-full sm:flex-1 bg-primary hover:bg-primary/90 text-xs">
+                  <Button size="sm" className="h-8 text-xs bg-blue-600 hover:bg-blue-700 shadow-sm">
                     <Building className="h-3 w-3 mr-1" />
-                    <span className="truncate">Send to Bank</span>
+                    Bank
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Send to Bank</DialogTitle>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Building className="h-5 w-5 text-blue-600" />
+                      Send to Bank
+                    </DialogTitle>
                     <DialogDescription>
                       Transfer funds from wallet to bank account
                     </DialogDescription>
@@ -235,14 +313,17 @@ const OrgDashboard = () => {
 
               <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="w-full sm:flex-1 text-xs">
+                  <Button size="sm" variant="outline" className="h-8 text-xs border-blue-200 hover:bg-blue-50">
                     <Phone className="h-3 w-3 mr-1" />
-                    <span className="truncate">Withdraw</span>
+                    Withdraw
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Withdraw by Phone</DialogTitle>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Phone className="h-5 w-5 text-blue-600" />
+                      Withdraw by Phone
+                    </DialogTitle>
                     <DialogDescription>
                       Send money to mobile money account
                     </DialogDescription>
@@ -286,152 +367,263 @@ const OrgDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Petty Cash Balance</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
+        {/* Petty Cash Balance */}
+        <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-purple-50 to-purple-100/50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="p-2 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
+                <Wallet className="h-5 w-5 text-purple-600" />
+              </div>
+              <Badge variant="outline" className="bg-white/80 text-emerald-700 border-emerald-200">
+                +5.2%
+              </Badge>
+            </div>
+            <CardTitle className="text-sm font-medium text-slate-600">Petty Cash Balance</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-              <TrendingUp className="h-3 w-3 text-green-500" />
-              <span className="text-green-500">+5.2%</span>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold text-slate-900 mb-1">
+              UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K
+            </div>
+            <div className="flex items-center gap-1 text-xs text-emerald-600">
+              <TrendingUp className="h-3 w-3" />
               <span>from last week</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Transactions</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+        {/* Monthly Transactions */}
+        <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-orange-50 to-orange-100/50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="p-2 rounded-lg bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors">
+                <Activity className="h-5 w-5 text-orange-600" />
+              </div>
+              <Badge variant="outline" className="bg-white/80 text-emerald-700 border-emerald-200">
+                +18.1%
+              </Badge>
+            </div>
+            <CardTitle className="text-sm font-medium text-slate-600">Monthly Transactions</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardData.monthlyTransactions}</div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-              <TrendingUp className="h-3 w-3 text-green-500" />
-              <span className="text-green-500">+18.1%</span>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold text-slate-900 mb-1">
+              {dashboardData.monthlyTransactions}
+            </div>
+            <div className="flex items-center gap-1 text-xs text-emerald-600">
+              <TrendingUp className="h-3 w-3" />
               <span>from last month</span>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Recent Transactions */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Recent Transactions</CardTitle>
-            <CardDescription>Latest financial activities in your organization</CardDescription>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        {/* Recent Transactions - Enhanced */}
+        <Card className="xl:col-span-2 border-0 shadow-xl bg-gradient-to-br from-white to-slate-50/50">
+          <CardHeader className="border-b border-slate-100 bg-white/80 backdrop-blur-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-slate-100">
+                  <Activity className="h-5 w-5 text-slate-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-slate-900">Recent Transactions</CardTitle>
+                  <CardDescription className="text-slate-600">Latest financial activities in your organization</CardDescription>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
+                View All
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <div className="space-y-4">
-              {dashboardData.recentTransactions.map(transaction => {
-              const StatusIcon = getStatusIcon(transaction.status);
-              return <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <StatusIcon className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="font-medium">{transaction.type}</p>
-                        <p className="text-sm text-muted-foreground">{transaction.date}</p>
+              {dashboardData.recentTransactions.map((transaction, index) => {
+                const StatusIcon = getStatusIcon(transaction.status);
+                const TransactionIcon = getTransactionIcon(transaction.type);
+                
+                return (
+                  <div key={transaction.id} className="group flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-md transition-all duration-200 bg-white/60 hover:bg-white">
+                    <div className="flex items-center gap-4">
+                      <div className="relative">
+                        <div className="p-3 rounded-xl bg-slate-50 group-hover:bg-slate-100 transition-colors">
+                          <TransactionIcon className="h-5 w-5 text-slate-600" />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-white shadow-sm">
+                          <StatusIcon className="h-3 w-3 text-slate-500" />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-slate-900">{transaction.type}</p>
+                          <Badge variant="outline" className={`${getStatusColor(transaction.status)} text-xs`}>
+                            {transaction.status}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-slate-600">{transaction.description}</p>
+                        <p className="text-xs text-slate-500 flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {transaction.date}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">UGX {transaction.amount.toLocaleString()}</p>
-                      <Badge variant="outline" className={getStatusColor(transaction.status)}>
-                        {transaction.status}
-                      </Badge>
+                      <p className="font-bold text-lg text-slate-900">
+                        UGX {transaction.amount.toLocaleString()}
+                      </p>
                     </div>
-                  </div>;
-            })}
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
 
         {/* Side Panel */}
         <div className="space-y-6">
-          {/* Pending Approvals - Only for managers */}
-          {hasPermission('approve_transactions') && <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  Pending Approvals
-                  <Badge variant="secondary">{dashboardData.pendingApprovals}</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Transaction Requests</span>
-                    <span className="text-sm font-medium">5</span>
+          {/* Pending Approvals - Enhanced */}
+          {hasPermission('approve_transactions') && (
+            <Card className="border-0 shadow-xl bg-gradient-to-br from-amber-50 to-amber-100/50">
+              <CardHeader className="border-b border-amber-100 bg-white/80 backdrop-blur-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-amber-100">
+                      <Clock className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <CardTitle className="text-lg font-semibold text-slate-900">Pending Approvals</CardTitle>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Funding Requests</span>
-                    <span className="text-sm font-medium">3</span>
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full mt-3">
-                    Review All
-                  </Button>
+                  <Badge className="bg-amber-500 text-white shadow-sm">
+                    {dashboardData.pendingApprovals}
+                  </Badge>
                 </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 rounded-lg bg-white/60 border border-amber-100">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                      <span className="text-sm font-medium text-slate-700">Transaction Requests</span>
+                    </div>
+                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">5</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-3 rounded-lg bg-white/60 border border-amber-100">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                      <span className="text-sm font-medium text-slate-700">Funding Requests</span>
+                    </div>
+                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">3</Badge>
+                  </div>
+                </div>
+                <Button className="w-full bg-amber-600 hover:bg-amber-700 shadow-sm">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Review All
+                </Button>
               </CardContent>
-            </Card>}
+            </Card>
+          )}
 
-          {/* Team Metrics - Only for managers */}
-          {hasPermission('manage_team') && <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Team Overview
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Total Staff</span>
-                  <span className="text-sm font-medium">{dashboardData.teamMetrics.totalStaff}</span>
+          {/* Team Metrics - Enhanced */}
+          {hasPermission('manage_team') && (
+            <Card className="border-0 shadow-xl bg-gradient-to-br from-indigo-50 to-indigo-100/50">
+              <CardHeader className="border-b border-indigo-100 bg-white/80 backdrop-blur-sm">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-indigo-100">
+                    <Users className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  <CardTitle className="text-lg font-semibold text-slate-900">Team Overview</CardTitle>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Active Today</span>
-                  <span className="text-sm font-medium">{dashboardData.teamMetrics.activeStaff}</span>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 rounded-lg bg-white/60 border border-indigo-100">
+                    <div className="text-2xl font-bold text-slate-900">{dashboardData.teamMetrics.totalStaff}</div>
+                    <div className="text-xs text-slate-600">Total Staff</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-white/60 border border-indigo-100">
+                    <div className="text-2xl font-bold text-emerald-600">{dashboardData.teamMetrics.activeStaff}</div>
+                    <div className="text-xs text-slate-600">Active Today</div>
+                  </div>
                 </div>
                 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm">Monthly Budget</span>
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium text-slate-700">Monthly Budget</span>
+                    <span className="text-sm font-bold text-slate-900">
                       {Math.round(dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100)}%
                     </span>
                   </div>
-                  <Progress value={dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100} className="h-2" />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>UGX {(dashboardData.teamMetrics.budgetUsed / 1000000).toFixed(1)}M used</span>
-                    <span>UGX {(dashboardData.teamMetrics.monthlyBudget / 1000000).toFixed(1)}M total</span>
+                  <div className="space-y-2">
+                    <Progress 
+                      value={dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100} 
+                      className="h-3 bg-slate-100"
+                    />
+                    <div className="flex justify-between text-xs text-slate-600">
+                      <span>UGX {(dashboardData.teamMetrics.budgetUsed / 1000000).toFixed(1)}M used</span>
+                      <span>UGX {(dashboardData.teamMetrics.monthlyBudget / 1000000).toFixed(1)}M total</span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
-            </Card>}
+            </Card>
+          )}
 
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+          {/* Quick Actions - Enhanced */}
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-slate-50 to-slate-100/50">
+            <CardHeader className="border-b border-slate-100 bg-white/80 backdrop-blur-sm">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-slate-100">
+                  <Target className="h-5 w-5 text-slate-600" />
+                </div>
+                <CardTitle className="text-lg font-semibold text-slate-900">Quick Actions</CardTitle>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-2">
-              {hasPermission('access_petty_cash') && <Button variant="outline" size="sm" className="w-full justify-start">
-                  <Wallet className="h-4 w-4 mr-2" />
-                  Fund Petty Cash
-                </Button>}
-              {hasPermission('access_bulk_payments') && <Button variant="outline" size="sm" className="w-full justify-start">
-                  <ArrowUpRight className="h-4 w-4 mr-2" />
-                  New Bulk Payment
-                </Button>}
-              {hasPermission('request_funding') && <Button variant="outline" size="sm" className="w-full justify-start">
-                  <ArrowDownRight className="h-4 w-4 mr-2" />
-                  Request Funding
-                </Button>}
+            <CardContent className="p-6 space-y-3">
+              {hasPermission('access_petty_cash') && (
+                <Button variant="outline" className="w-full justify-start h-12 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-purple-100">
+                      <Wallet className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <span className="font-medium">Fund Petty Cash</span>
+                  </div>
+                </Button>
+              )}
+              {hasPermission('access_bulk_payments') && (
+                <Button variant="outline" className="w-full justify-start h-12 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-blue-100">
+                      <Send className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <span className="font-medium">New Bulk Payment</span>
+                  </div>
+                </Button>
+              )}
+              {hasPermission('access_collections') && (
+                <Button variant="outline" className="w-full justify-start h-12 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-emerald-100">
+                      <DollarSign className="h-4 w-4 text-emerald-600" />
+                    </div>
+                    <span className="font-medium">New Collection</span>
+                  </div>
+                </Button>
+              )}
+              {hasPermission('access_bank_deposits') && (
+                <Button variant="outline" className="w-full justify-start h-12 border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-indigo-100">
+                      <Banknote className="h-4 w-4 text-indigo-600" />
+                    </div>
+                    <span className="font-medium">Bank Deposit</span>
+                  </div>
+                </Button>
+              )}
             </CardContent>
           </Card>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default OrgDashboard;

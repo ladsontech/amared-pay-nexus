@@ -35,26 +35,32 @@ export default function AppOrgSidebar() {
   const items = orgItems.filter((i) => !i.permission || hasPermission(i.permission));
 
   return (
-    <Sidebar className="w-60" collapsible="icon">
+    <Sidebar className="w-60 border-r border-slate-200/60 bg-white/95 backdrop-blur-sm" collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
             <div className="flex items-center gap-2 px-1">
-              <Building className="h-4 w-4 text-primary" />
-              <span>Organization</span>
+              <div className="p-1 rounded-md bg-blue-100">
+                <Building className="h-4 w-4 text-blue-600" />
+              </div>
+              <span className="font-semibold text-slate-700">Organization</span>
             </div>
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <div className="px-2 pb-2">
+            <div className="px-2 pb-3">
               <NewActionButton />
             </div>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                  <SidebarMenuButton 
+                    asChild 
+                    isActive={isActive(item.url)}
+                    className="hover:bg-slate-100 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 data-[active=true]:border-r-2 data-[active=true]:border-blue-500"
+                  >
                     <NavLink to={item.url} end>
-                      <item.icon className="mr-2 h-4 w-4" />
-                      <span>{item.title}</span>
+                      <item.icon className="mr-3 h-4 w-4" />
+                      <span className="font-medium">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

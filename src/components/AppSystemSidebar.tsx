@@ -15,23 +15,29 @@ export default function AppSystemSidebar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <Sidebar className="w-60" collapsible="icon">
+    <Sidebar className="w-60 border-r border-slate-200/60 bg-white/95 backdrop-blur-sm" collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
             <div className="flex items-center gap-2 px-1">
-              <Shield className="h-4 w-4 text-primary" />
-              <span>System Admin</span>
+              <div className="p-1 rounded-md bg-red-100">
+                <Shield className="h-4 w-4 text-red-600" />
+              </div>
+              <span className="font-semibold text-slate-700">System Admin</span>
             </div>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {adminItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                  <SidebarMenuButton 
+                    asChild 
+                    isActive={isActive(item.url)}
+                    className="hover:bg-slate-100 data-[active=true]:bg-red-50 data-[active=true]:text-red-700 data-[active=true]:border-r-2 data-[active=true]:border-red-500"
+                  >
                     <NavLink to={item.url} end>
-                      <item.icon className="mr-2 h-4 w-4" />
-                      <span>{item.title}</span>
+                      <item.icon className="mr-3 h-4 w-4" />
+                      <span className="font-medium">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
