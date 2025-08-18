@@ -185,7 +185,7 @@ const OrgDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50 pb-24 md:pb-0">
       {/* Mobile-First Header */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
         <div className="px-4 py-3 sm:px-6 sm:py-4">
@@ -376,55 +376,6 @@ const OrgDashboard = () => {
           </Card>
         </div>
 
-        {/* Quick Actions Bar - Mobile-First */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-slate-900">Quick Actions</h3>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-6 w-6 p-0 text-slate-500 hover:text-slate-700"
-              onClick={() => setQuickActionsOpen(true)}
-            >
-              <Plus className="h-3 w-3" />
-            </Button>
-          </div>
-          <div className="grid grid-cols-4 gap-3">
-            {hasPermission('access_petty_cash') && (
-              <button className="flex flex-col items-center gap-2 p-2 rounded-xl bg-purple-50 hover:bg-purple-100 transition-colors">
-                <div className="p-2 rounded-lg bg-purple-100">
-                  <Wallet className="h-4 w-4 text-purple-600" />
-                </div>
-                <span className="text-xs font-medium text-slate-700">Petty Cash</span>
-              </button>
-            )}
-            {hasPermission('access_bulk_payments') && (
-              <button className="flex flex-col items-center gap-2 p-2 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
-                <div className="p-2 rounded-lg bg-blue-100">
-                  <Send className="h-4 w-4 text-blue-600" />
-                </div>
-                <span className="text-xs font-medium text-slate-700">Bulk Pay</span>
-              </button>
-            )}
-            {hasPermission('access_collections') && (
-              <button className="flex flex-col items-center gap-2 p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 transition-colors">
-                <div className="p-2 rounded-lg bg-emerald-100">
-                  <DollarSign className="h-4 w-4 text-emerald-600" />
-                </div>
-                <span className="text-xs font-medium text-slate-700">Collect</span>
-              </button>
-            )}
-            {hasPermission('access_bank_deposits') && (
-              <button className="flex flex-col items-center gap-2 p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 transition-colors">
-                <div className="p-2 rounded-lg bg-indigo-100">
-                  <Banknote className="h-4 w-4 text-indigo-600" />
-                </div>
-                <span className="text-xs font-medium text-slate-700">Deposit</span>
-              </button>
-            )}
-              </div>
-            </div>
-            
         {/* Main Content Grid - Mobile-First */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Recent Transactions - Compact Mobile */}
