@@ -32,6 +32,7 @@ import {
   X
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 const OrgDashboard = () => {
   const { user, hasPermission } = useAuth();
@@ -331,7 +332,7 @@ const OrgDashboard = () => {
                 <div className="p-1.5 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
                   <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
                 </div>
-                <Badge className="bg-white/80 text-emerald-700 border-emerald-200 text-xs px-1.5 py-0.5">
+                <Badge className="bg-white/80 text-white border-purple-200 text-xs px-1.5 py-0.5 bg-purple-500/90">
                   +5.2%
                 </Badge>
               </div>
@@ -340,7 +341,7 @@ const OrgDashboard = () => {
                 <p className="text-sm sm:text-base font-bold text-slate-900">
                   UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K
                 </p>
-                <div className="flex items-center gap-1 text-xs text-emerald-600">
+                <div className="flex items-center gap-1 text-xs text-white bg-purple-500/80 rounded-full px-2 py-1 w-fit">
                   <TrendingUp className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">from last week</span>
                   <span className="sm:hidden">+5.2%</span>
@@ -356,7 +357,7 @@ const OrgDashboard = () => {
                 <div className="p-1.5 rounded-lg bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors">
                   <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
                 </div>
-                <Badge className="bg-white/80 text-emerald-700 border-emerald-200 text-xs px-1.5 py-0.5">
+                <Badge className="bg-white/80 text-white border-orange-200 text-xs px-1.5 py-0.5 bg-orange-500/90">
                   +18.1%
                 </Badge>
               </div>
@@ -365,7 +366,7 @@ const OrgDashboard = () => {
                 <p className="text-sm sm:text-base font-bold text-slate-900">
                   {dashboardData.monthlyTransactions}
                 </p>
-                <div className="flex items-center gap-1 text-xs text-emerald-600">
+                <div className="flex items-center gap-1 text-xs text-white bg-orange-500/80 rounded-full px-2 py-1 w-fit">
                   <TrendingUp className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">from last month</span>
                   <span className="sm:hidden">+18.1%</span>
@@ -938,6 +939,7 @@ const OrgDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+      <MobileBottomNav />
     </div>
   );
 };
