@@ -192,80 +192,80 @@ const OrgDashboard = () => {
             <div className="flex items-center gap-3">
               <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                 <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
+          </div>
+          <div>
                 <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                  Dashboard
-                </h1>
+              Dashboard
+            </h1>
                 <p className="text-xs sm:text-sm text-slate-600 hidden sm:block">
                   Welcome back, <span className="font-semibold text-slate-800">{user?.name}</span>!
-                </p>
-              </div>
-            </div>
-            
+            </p>
+          </div>
+        </div>
+
             {/* Mobile Deposit Button */}
-            <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
-              <DialogTrigger asChild>
+          <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
+            <DialogTrigger asChild>
                 <Button size="sm" className="bg-blue-600 hover:bg-blue-700 shadow-lg h-8 sm:h-9 px-3 sm:px-4">
                   <Building className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                   <span className="text-xs sm:text-sm">Deposit</span>
-                </Button>
-              </DialogTrigger>
+              </Button>
+            </DialogTrigger>
               <DialogContent className="sm:max-w-md mx-4">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Building className="h-5 w-5 text-blue-600" />
-                    Select Bank for Deposit
-                  </DialogTitle>
-                  <DialogDescription>
-                    Choose bank account and transfer amount
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="bank-amount">Amount (UGX)</Label>
-                    <Input
-                      id="bank-amount"
-                      type="number"
-                      placeholder="Enter amount"
-                      value={bankTransferData.amount}
-                      onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bank-account">Select Bank Account</Label>
-                    <Select 
-                      value={bankTransferData.bankAccount} 
-                      onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose your bank" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
-                        <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
-                        <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
-                        <SelectItem value="equity-6789">Equity Bank - ***6789</SelectItem>
-                        <SelectItem value="bank-of-africa-1234">Bank of Africa - ***1234</SelectItem>
-                        <SelectItem value="crane-bank-5678">Crane Bank - ***5678</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bank-description">Description</Label>
-                    <Input
-                      id="bank-description"
-                      placeholder="Transfer description"
-                      value={bankTransferData.description}
-                      onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
-                    />
-                  </div>
-                  <Button onClick={handleSendToBank} className="w-full">
-                    Confirm Deposit
-                  </Button>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Building className="h-5 w-5 text-blue-600" />
+                  Select Bank for Deposit
+                </DialogTitle>
+                <DialogDescription>
+                  Choose bank account and transfer amount
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="bank-amount">Amount (UGX)</Label>
+                  <Input
+                    id="bank-amount"
+                    type="number"
+                    placeholder="Enter amount"
+                    value={bankTransferData.amount}
+                    onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
+                  />
                 </div>
-              </DialogContent>
-            </Dialog>
+                <div className="space-y-2">
+                  <Label htmlFor="bank-account">Select Bank Account</Label>
+                  <Select 
+                    value={bankTransferData.bankAccount} 
+                    onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose your bank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
+                      <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
+                      <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
+                      <SelectItem value="equity-6789">Equity Bank - ***6789</SelectItem>
+                      <SelectItem value="bank-of-africa-1234">Bank of Africa - ***1234</SelectItem>
+                      <SelectItem value="crane-bank-5678">Crane Bank - ***5678</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bank-description">Description</Label>
+                  <Input
+                    id="bank-description"
+                    placeholder="Transfer description"
+                    value={bankTransferData.description}
+                    onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
+                  />
+                </div>
+                <Button onClick={handleSendToBank} className="w-full">
+                  Confirm Deposit
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
           </div>
         </div>
       </div>
@@ -274,46 +274,46 @@ const OrgDashboard = () => {
       <div className="px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
         {/* Key Metrics - Compact Mobile Grid */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          {/* Total Collections */}
+        {/* Total Collections */}
           <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-emerald-50 to-emerald-100/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
+              <div className="p-1.5 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
                   <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
-                </div>
-                <Badge className="bg-white/80 text-emerald-700 border-emerald-200 text-xs px-1.5 py-0.5">
-                  +12.5%
-                </Badge>
               </div>
+                <Badge className="bg-white/80 text-emerald-700 border-emerald-200 text-xs px-1.5 py-0.5">
+                +12.5%
+              </Badge>
+            </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-600">Collections</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">
-                  UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M
+              UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M
                 </p>
                 <div className="flex items-center gap-1 text-xs text-emerald-600">
                   <TrendingUp className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">from last month</span>
                   <span className="sm:hidden">+12.5%</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Wallet Balance */}
+        {/* Wallet Balance */}
           <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
+              <div className="p-1.5 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
                   <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
-                </div>
-                <Badge className="bg-white/80 text-red-700 border-red-200 text-xs px-1.5 py-0.5">
-                  -2.1%
-                </Badge>
               </div>
+                <Badge className="bg-white/80 text-red-700 border-red-200 text-xs px-1.5 py-0.5">
+                -2.1%
+              </Badge>
+            </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-600">Wallet</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">
-                  UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M
+                UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M
                 </p>
                 <div className="flex items-center gap-1 text-xs text-red-600">
                   <TrendingDown className="h-2.5 w-2.5" />
@@ -421,9 +421,9 @@ const OrgDashboard = () => {
                 <span className="text-xs font-medium text-slate-700">Deposit</span>
               </button>
             )}
-          </div>
-        </div>
-
+              </div>
+            </div>
+            
         {/* Main Content Grid - Mobile-First */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Recent Transactions - Compact Mobile */}
@@ -591,269 +591,347 @@ const OrgDashboard = () => {
                     <Button size="sm" className="w-full h-8 bg-blue-600 hover:bg-blue-700 shadow-sm text-xs">
                       <Building className="h-3 w-3 mr-2" />
                       Send to Bank
-                    </Button>
-                  </DialogTrigger>
+                  </Button>
+                </DialogTrigger>
                   <DialogContent className="sm:max-w-md mx-4">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2">
-                        <Building className="h-5 w-5 text-blue-600" />
-                        Send to Bank
-                      </DialogTitle>
-                      <DialogDescription>
-                        Transfer funds from wallet to bank account
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="wallet-bank-amount">Amount (UGX)</Label>
-                        <Input
-                          id="wallet-bank-amount"
-                          type="number"
-                          placeholder="Enter amount"
-                          value={bankTransferData.amount}
-                          onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="wallet-bank-account">Bank Account</Label>
-                        <Select 
-                          value={bankTransferData.bankAccount} 
-                          onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select bank account" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
-                            <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
-                            <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
-                            <SelectItem value="equity-6789">Equity Bank - ***6789</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="wallet-bank-description">Description</Label>
-                        <Input
-                          id="wallet-bank-description"
-                          placeholder="Transfer description"
-                          value={bankTransferData.description}
-                          onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
-                        />
-                      </div>
-                      <Button onClick={handleSendToBank} className="w-full">
-                        Send to Bank
-                      </Button>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Building className="h-5 w-5 text-blue-600" />
+                      Send to Bank
+                    </DialogTitle>
+                    <DialogDescription>
+                      Transfer funds from wallet to bank account
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="wallet-bank-amount">Amount (UGX)</Label>
+                      <Input
+                        id="wallet-bank-amount"
+                        type="number"
+                        placeholder="Enter amount"
+                        value={bankTransferData.amount}
+                        onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
+                      />
                     </div>
-                  </DialogContent>
-                </Dialog>
+                    <div className="space-y-2">
+                      <Label htmlFor="wallet-bank-account">Bank Account</Label>
+                      <Select 
+                        value={bankTransferData.bankAccount} 
+                        onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select bank account" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
+                          <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
+                          <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
+                          <SelectItem value="equity-6789">Equity Bank - ***6789</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="wallet-bank-description">Description</Label>
+                      <Input
+                        id="wallet-bank-description"
+                        placeholder="Transfer description"
+                        value={bankTransferData.description}
+                        onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
+                      />
+                    </div>
+                    <Button onClick={handleSendToBank} className="w-full">
+                      Send to Bank
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
-                <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
-                  <DialogTrigger asChild>
+              <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
+                <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="w-full h-8 border-blue-200 hover:bg-blue-50 text-xs">
                       <Phone className="h-3 w-3 mr-2" />
                       Withdraw by Phone
-                    </Button>
-                  </DialogTrigger>
+                  </Button>
+                </DialogTrigger>
                   <DialogContent className="sm:max-w-md mx-4">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2">
-                        <Phone className="h-5 w-5 text-blue-600" />
-                        Withdraw by Phone
-                      </DialogTitle>
-                      <DialogDescription>
-                        Send money to mobile money account
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="wallet-withdraw-amount">Amount (UGX)</Label>
-                        <Input
-                          id="wallet-withdraw-amount"
-                          type="number"
-                          placeholder="Enter amount"
-                          value={withdrawData.amount}
-                          onChange={(e) => setWithdrawData({...withdrawData, amount: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="wallet-withdraw-phone">Phone Number</Label>
-                        <Input
-                          id="wallet-withdraw-phone"
-                          placeholder="+256701234567"
-                          value={withdrawData.phoneNumber}
-                          onChange={(e) => setWithdrawData({...withdrawData, phoneNumber: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="wallet-withdraw-description">Description</Label>
-                        <Input
-                          id="wallet-withdraw-description"
-                          placeholder="Withdrawal description"
-                          value={withdrawData.description}
-                          onChange={(e) => setWithdrawData({...withdrawData, description: e.target.value})}
-                        />
-                      </div>
-                      <Button onClick={handleWithdraw} className="w-full">
-                        Withdraw
-                      </Button>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Phone className="h-5 w-5 text-blue-600" />
+                      Withdraw by Phone
+                    </DialogTitle>
+                    <DialogDescription>
+                      Send money to mobile money account
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="wallet-withdraw-amount">Amount (UGX)</Label>
+                      <Input
+                        id="wallet-withdraw-amount"
+                        type="number"
+                        placeholder="Enter amount"
+                        value={withdrawData.amount}
+                        onChange={(e) => setWithdrawData({...withdrawData, amount: e.target.value})}
+                      />
                     </div>
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="wallet-withdraw-phone">Phone Number</Label>
+                      <Input
+                        id="wallet-withdraw-phone"
+                        placeholder="+256701234567"
+                        value={withdrawData.phoneNumber}
+                        onChange={(e) => setWithdrawData({...withdrawData, phoneNumber: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="wallet-withdraw-description">Description</Label>
+                      <Input
+                        id="wallet-withdraw-description"
+                        placeholder="Withdrawal description"
+                        value={withdrawData.description}
+                        onChange={(e) => setWithdrawData({...withdrawData, description: e.target.value})}
+                      />
+                    </div>
+                    <Button onClick={handleWithdraw} className="w-full">
+                      Withdraw
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+          </CardContent>
+        </Card>
+            </div>
+            </div>
       </div>
 
       {/* Quick Actions Modal */}
       <Dialog open={quickActionsOpen} onOpenChange={setQuickActionsOpen}>
-        <DialogContent className="sm:max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="pb-4">
+        <DialogContent className="sm:max-w-4xl mx-4 max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-0 shadow-2xl">
+          <DialogHeader className="pb-6">
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-lg font-semibold text-slate-900">All Quick Actions</DialogTitle>
+              <DialogTitle className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                Quick Actions Hub
+              </DialogTitle>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-8 w-8 p-0 text-slate-500 hover:text-slate-700"
+                className="h-10 w-10 p-0 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full"
                 onClick={() => setQuickActionsOpen(false)}
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
               </Button>
             </div>
             <DialogDescription className="text-sm text-slate-600">
-              Access all available actions and features
+              Access all available actions and features in one organized place
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Financial Actions */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-200 pb-2">Financial Management</h4>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-slate-800 border-b border-slate-200/60 pb-3">
+                💰 Financial Management
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {hasPermission('access_petty_cash') && (
-                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-purple-50 hover:bg-purple-100 transition-colors border border-purple-200/50">
-                    <div className="p-3 rounded-xl bg-purple-100">
-                      <Wallet className="h-5 w-5 text-purple-600" />
+                  <button className="group relative overflow-hidden bg-gradient-to-br from-purple-50/80 to-purple-100/60 hover:from-purple-100/90 hover:to-purple-200/80 backdrop-blur-sm border border-purple-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-purple-300/60">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 group-hover:from-purple-200 group-hover:to-purple-300 transition-all duration-300 shadow-sm">
+                        <Wallet className="h-6 w-6 text-purple-600" />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-sm font-semibold text-slate-800 block group-hover:text-purple-700 transition-colors">
+                          Petty Cash
+                        </span>
+                        <span className="text-xs text-slate-600 group-hover:text-slate-700 transition-colors">
+                          Manage expenses
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <span className="text-sm font-medium text-slate-900 block">Petty Cash</span>
-                      <span className="text-xs text-slate-600">Manage small expenses</span>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   </button>
                 )}
                 
                 {hasPermission('access_bulk_payments') && (
-                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors border border-blue-200/50">
-                    <div className="p-3 rounded-xl bg-blue-100">
-                      <Send className="h-5 w-5 text-blue-600" />
+                  <button className="group relative overflow-hidden bg-gradient-to-br from-blue-50/80 to-blue-100/60 hover:from-blue-100/90 hover:to-blue-200/80 backdrop-blur-sm border border-blue-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-blue-300/60">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-300 shadow-sm">
+                        <Send className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-sm font-semibold text-slate-800 block group-hover:text-blue-700 transition-colors">
+                          Bulk Payments
+                        </span>
+                        <span className="text-xs text-slate-600 group-hover:text-slate-700 transition-colors">
+                          Send multiple payments
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <span className="text-sm font-medium text-slate-900 block">Bulk Payments</span>
-                      <span className="text-xs text-slate-600">Send multiple payments</span>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   </button>
                 )}
                 
                 {hasPermission('access_collections') && (
-                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 transition-colors border border-emerald-200/50">
-                    <div className="p-3 rounded-xl bg-emerald-100">
-                      <DollarSign className="h-5 w-5 text-emerald-600" />
+                  <button className="group relative overflow-hidden bg-gradient-to-br from-emerald-50/80 to-emerald-100/60 hover:from-emerald-100/90 hover:to-emerald-200/80 backdrop-blur-sm border border-emerald-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-emerald-300/60">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200 group-hover:from-emerald-200 group-hover:to-emerald-300 transition-all duration-300 shadow-sm">
+                        <DollarSign className="h-6 w-6 text-emerald-600" />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-sm font-semibold text-slate-800 block group-hover:text-emerald-700 transition-colors">
+                          Collections
+                        </span>
+                        <span className="text-xs text-slate-600 group-hover:text-slate-700 transition-colors">
+                          Receive payments
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <span className="text-sm font-medium text-slate-900 block">Collections</span>
-                      <span className="text-xs text-slate-600">Receive payments</span>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   </button>
                 )}
                 
                 {hasPermission('access_bank_deposits') && (
-                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 transition-colors border border-indigo-200/50">
-                    <div className="p-3 rounded-xl bg-indigo-100">
-                      <Banknote className="h-5 w-5 text-indigo-600" />
+                  <button className="group relative overflow-hidden bg-gradient-to-br from-indigo-50/80 to-indigo-100/60 hover:from-indigo-100/90 hover:to-indigo-200/80 backdrop-blur-sm border border-indigo-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-indigo-300/60">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-indigo-200 group-hover:from-indigo-200 group-hover:to-indigo-300 transition-all duration-300 shadow-sm">
+                        <Banknote className="h-6 w-6 text-indigo-600" />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-sm font-semibold text-slate-800 block group-hover:text-indigo-700 transition-colors">
+                          Bank Deposits
+                        </span>
+                        <span className="text-xs text-slate-600 group-hover:text-slate-700 transition-colors">
+                          Send to bank
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <span className="text-sm font-medium text-slate-900 block">Bank Deposits</span>
-                      <span className="text-xs text-slate-600">Send to bank accounts</span>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   </button>
                 )}
               </div>
             </div>
 
             {/* Administrative Actions */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-200 pb-2">Administration</h4>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-slate-800 border-b border-slate-200/60 pb-3">
+                ⚙️ Administration
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {hasPermission('approve_transactions') && (
-                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-amber-50 hover:bg-amber-100 transition-colors border border-amber-200/50">
-                    <div className="p-3 rounded-xl bg-amber-100">
-                      <CheckCircle className="h-5 w-5 text-amber-600" />
+                  <button className="group relative overflow-hidden bg-gradient-to-br from-amber-50/80 to-amber-100/60 hover:from-amber-100/90 hover:to-amber-200/80 backdrop-blur-sm border border-amber-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-amber-300/60">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 group-hover:from-amber-200 group-hover:to-amber-300 transition-all duration-300 shadow-sm">
+                        <CheckCircle className="h-6 w-6 text-amber-600" />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-sm font-semibold text-slate-800 block group-hover:text-amber-700 transition-colors">
+                          Approvals
+                        </span>
+                        <span className="text-xs text-slate-600 group-hover:text-slate-700 transition-colors">
+                          Review requests
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <span className="text-sm font-medium text-slate-900 block">Approvals</span>
-                      <span className="text-xs text-slate-600">Review requests</span>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   </button>
                 )}
                 
                 {hasPermission('manage_team') && (
-                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-200/50">
-                    <div className="p-3 rounded-xl bg-slate-100">
-                      <Users className="h-5 w-5 text-slate-600" />
+                  <button className="group relative overflow-hidden bg-gradient-to-br from-slate-50/80 to-slate-100/60 hover:from-slate-100/90 hover:to-slate-200/80 backdrop-blur-sm border border-slate-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-slate-300/60">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 group-hover:from-slate-200 group-hover:to-slate-300 transition-all duration-300 shadow-sm">
+                        <Users className="h-6 w-6 text-slate-600" />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-sm font-semibold text-slate-800 block group-hover:text-slate-700 transition-colors">
+                          Team Management
+                        </span>
+                        <span className="text-xs text-slate-600 group-hover:text-slate-700 transition-colors">
+                          Manage staff
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <span className="text-sm font-medium text-slate-900 block">Team Management</span>
-                      <span className="text-xs text-slate-600">Manage staff & roles</span>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   </button>
                 )}
                 
                 {hasPermission('view_department_reports') && (
-                  <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-orange-50 hover:bg-orange-100 transition-colors border border-orange-200/50">
-                    <div className="p-3 rounded-xl bg-orange-100">
-                      <BarChart3 className="h-5 w-5 text-orange-600" />
+                  <button className="group relative overflow-hidden bg-gradient-to-br from-orange-50/80 to-orange-100/60 hover:from-orange-100/90 hover:to-orange-200/80 backdrop-blur-sm border border-orange-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-orange-300/60">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 group-hover:from-orange-200 group-hover:to-orange-300 transition-all duration-300 shadow-sm">
+                        <BarChart3 className="h-6 w-6 text-orange-600" />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-sm font-semibold text-slate-800 block group-hover:text-orange-700 transition-colors">
+                          Reports
+                        </span>
+                        <span className="text-xs text-slate-600 group-hover:text-slate-700 transition-colors">
+                          View analytics
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <span className="text-sm font-medium text-slate-900 block">Reports</span>
-                      <span className="text-xs text-slate-600">View analytics</span>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   </button>
                 )}
               </div>
             </div>
 
             {/* Quick Access Actions */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-200 pb-2">Quick Access</h4>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-green-50 hover:bg-green-100 transition-colors border border-green-200/50">
-                  <div className="p-3 rounded-xl bg-green-100">
-                    <Activity className="h-5 w-5 text-green-600" />
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-slate-800 border-b border-slate-200/60 pb-3">
+                🚀 Quick Access
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                <button className="group relative overflow-hidden bg-gradient-to-br from-green-50/80 to-green-100/60 hover:from-green-100/90 hover:to-green-200/80 backdrop-blur-sm border border-green-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-green-300/60">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-green-100 to-green-200 group-hover:from-green-200 group-hover:to-green-300 transition-all duration-300 shadow-sm">
+                      <Activity className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-semibold text-slate-800 block group-hover:text-green-700 transition-colors">
+                        Transactions
+                      </span>
+                      <span className="text-xs text-slate-600 group-hover:text-slate-700 transition-colors">
+                        View activity
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <span className="text-sm font-medium text-slate-900 block">Transactions</span>
-                    <span className="text-xs text-slate-600">View all activity</span>
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 </button>
                 
-                <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-cyan-50 hover:bg-cyan-100 transition-colors border border-cyan-200/50">
-                  <div className="p-3 rounded-xl bg-cyan-100">
-                    <Target className="h-5 w-5 text-cyan-600" />
+                <button className="group relative overflow-hidden bg-gradient-to-br from-cyan-50/80 to-cyan-100/60 hover:from-cyan-100/90 hover:to-cyan-200/80 backdrop-blur-sm border border-cyan-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-cyan-300/60">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-cyan-100 to-cyan-200 group-hover:from-cyan-200 group-hover:to-cyan-300 transition-all duration-300 shadow-sm">
+                      <Target className="h-6 w-6 text-cyan-600" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-semibold text-slate-800 block group-hover:text-cyan-700 transition-colors">
+                        Goals
+                      </span>
+                      <span className="text-xs text-slate-600 group-hover:text-slate-700 transition-colors">
+                        Set targets
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <span className="text-sm font-medium text-slate-900 block">Goals</span>
-                    <span className="text-xs text-slate-600">Set targets</span>
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 </button>
                 
-                <button className="flex flex-col items-center gap-3 p-4 rounded-xl bg-pink-50 hover:bg-pink-100 transition-colors border border-pink-200/50">
-                  <div className="p-3 rounded-xl bg-pink-100">
-                    <Calendar className="h-5 w-5 text-pink-600" />
+                <button className="group relative overflow-hidden bg-gradient-to-br from-pink-50/80 to-pink-100/60 hover:from-pink-100/90 hover:to-pink-200/80 backdrop-blur-sm border border-pink-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-pink-300/60">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-pink-100 to-pink-200 group-hover:from-pink-200 group-hover:to-pink-300 transition-all duration-300 shadow-sm">
+                      <Calendar className="h-6 w-6 text-pink-600" />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-sm font-semibold text-slate-800 block group-hover:text-pink-700 transition-colors">
+                        Schedule
+                      </span>
+                      <span className="text-xs text-slate-600 group-hover:text-slate-700 transition-colors">
+                        Plan activities
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <span className="text-sm font-medium text-slate-900 block">Schedule</span>
-                    <span className="text-xs text-slate-600">Plan activities</span>
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 </button>
               </div>
             </div>
