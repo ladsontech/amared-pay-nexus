@@ -300,29 +300,29 @@ const OrgDashboard = () => {
         </Card>
 
         {/* Wallet Balance */}
-          <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
-            <CardContent className="p-3 sm:p-4">
-              <div className="flex items-center justify-between mb-2">
+        <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center justify-between mb-2">
               <div className="p-1.5 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
-                  <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               </div>
-                <Badge className="bg-white/80 text-red-700 border-red-200 text-xs px-1.5 py-0.5">
+              <Badge className="bg-white/80 text-white border-blue-200 text-xs px-1.5 py-0.5 bg-blue-500/90">
                 -2.1%
               </Badge>
             </div>
-              <div className="space-y-1">
-                <p className="text-xs font-medium text-slate-600">Wallet</p>
-                <p className="text-sm sm:text-base font-bold text-slate-900">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-slate-600">Wallet</p>
+              <p className="text-sm sm:text-base font-bold text-slate-900">
                 UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M
-                </p>
-                <div className="flex items-center gap-1 text-xs text-red-600">
-                  <TrendingDown className="h-2.5 w-2.5" />
-                  <span className="hidden sm:inline">from last week</span>
-                  <span className="sm:hidden">-2.1%</span>
-                </div>
+              </p>
+              <div className="flex items-center gap-1 text-xs text-white bg-blue-500/80 rounded-full px-2 py-1 w-fit">
+                <TrendingDown className="h-2.5 w-2.5" />
+                <span className="hidden sm:inline">from last week</span>
+                <span className="sm:hidden">-2.1%</span>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
           {/* Petty Cash Balance */}
           <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-purple-50 to-purple-100/50">
