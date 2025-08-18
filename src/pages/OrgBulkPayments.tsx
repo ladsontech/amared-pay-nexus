@@ -140,7 +140,7 @@ const BulkPayments = () => {
   const detectMobileProvider = (input: string): "MTN" | "Airtel" | "Unknown" => {
     const local = normalizeUgPhone(input);
     if (!local) return "Unknown";
-    if (local.startsWith('0705')) return "Airtel";
+    if (local.startsWith('075')) return "Airtel";
     if (local.startsWith('070')) return "Airtel";
     if (local.startsWith('076') || local.startsWith('077') || local.startsWith('078') || local.startsWith('079')) return "MTN";
     return "Unknown";
