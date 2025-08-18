@@ -470,20 +470,21 @@ const BulkPayments = () => {
                     onChange={(e) => setBulkDescription(e.target.value)}
                   />
                 </div>
-                
-                <div className="border rounded-lg overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Recipient Name</TableHead>
-                        <TableHead>Bank Account</TableHead>
-                        <TableHead>Amount (UGX)</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                 
+                <div className="border rounded-lg">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="min-w-[150px]">Recipient Name</TableHead>
+                          <TableHead className="min-w-[180px]">Bank Account</TableHead>
+                          <TableHead className="min-w-[120px]">Amount (UGX)</TableHead>
+                          <TableHead className="min-w-[150px]">Description</TableHead>
+                          <TableHead className="min-w-[100px]">Status</TableHead>
+                          <TableHead className="min-w-[120px]">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
                       {bankPaymentRows.map((row, index) => (
                         <TableRow key={row.id}>
                           <TableCell>
@@ -554,8 +555,9 @@ const BulkPayments = () => {
                           </TableCell>
                         </TableRow>
                       ))}
-                    </TableBody>
-                  </Table>
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-muted/50 rounded-lg">
@@ -627,21 +629,22 @@ const BulkPayments = () => {
                     onChange={(e) => setBulkDescription(e.target.value)}
                   />
                 </div>
-                
-                <div className="border rounded-lg overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Recipient Name</TableHead>
-                        <TableHead>Phone Number</TableHead>
-                        <TableHead>Provider</TableHead>
-                        <TableHead>Amount (UGX)</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                 
+                <div className="border rounded-lg">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="min-w-[150px]">Recipient Name</TableHead>
+                          <TableHead className="min-w-[130px]">Phone Number</TableHead>
+                          <TableHead className="min-w-[100px]">Provider</TableHead>
+                          <TableHead className="min-w-[120px]">Amount (UGX)</TableHead>
+                          <TableHead className="min-w-[150px]">Description</TableHead>
+                          <TableHead className="min-w-[100px]">Status</TableHead>
+                          <TableHead className="min-w-[120px]">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
                       {mobilePaymentRows.map((row, index) => (
                         <TableRow key={row.id}>
                           <TableCell>
@@ -721,8 +724,9 @@ const BulkPayments = () => {
                           </TableCell>
                         </TableRow>
                       ))}
-                    </TableBody>
-                  </Table>
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-muted/50 rounded-lg">

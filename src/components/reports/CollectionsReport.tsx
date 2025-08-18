@@ -166,7 +166,7 @@ const CollectionsReport = () => {
       </Card>
 
       <div className="rounded-md border overflow-x-auto">
-        <Table>
+        <Table className="min-w-[700px]">
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>

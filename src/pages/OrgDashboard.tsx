@@ -182,7 +182,7 @@ const OrgDashboard = () => {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* Header Section */}
-      <div className="space-y-2">
+      <div className="space-y-4">
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
             <BarChart3 className="h-6 w-6 text-white" />
@@ -196,25 +196,91 @@ const OrgDashboard = () => {
             </p>
           </div>
         </div>
+
+        {/* Top Deposit to Bank Button */}
+        <div className="flex justify-end">
+          <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-blue-600 hover:bg-blue-700 shadow-lg">
+                <Building className="h-4 w-4 mr-2" />
+                Deposit to Bank
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Building className="h-5 w-5 text-blue-600" />
+                  Select Bank for Deposit
+                </DialogTitle>
+                <DialogDescription>
+                  Choose bank account and transfer amount
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="bank-amount">Amount (UGX)</Label>
+                  <Input
+                    id="bank-amount"
+                    type="number"
+                    placeholder="Enter amount"
+                    value={bankTransferData.amount}
+                    onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bank-account">Select Bank Account</Label>
+                  <Select 
+                    value={bankTransferData.bankAccount} 
+                    onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose your bank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
+                      <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
+                      <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
+                      <SelectItem value="equity-6789">Equity Bank - ***6789</SelectItem>
+                      <SelectItem value="bank-of-africa-1234">Bank of Africa - ***1234</SelectItem>
+                      <SelectItem value="crane-bank-5678">Crane Bank - ***5678</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bank-description">Description</Label>
+                  <Input
+                    id="bank-description"
+                    placeholder="Transfer description"
+                    value={bankTransferData.description}
+                    onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
+                  />
+                </div>
+                <Button onClick={handleSendToBank} className="w-full">
+                  Confirm Deposit
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Collections */}
         <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-emerald-100/50">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <div className="p-2 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
-                <DollarSign className="h-5 w-5 text-emerald-600" />
+              <div className="p-1.5 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
+                <DollarSign className="h-4 w-4 text-emerald-600" />
               </div>
-              <Badge variant="outline" className="bg-white/80 text-emerald-700 border-emerald-200">
+              <Badge variant="outline" className="bg-white/80 text-emerald-700 border-emerald-200 text-xs">
                 +12.5%
               </Badge>
             </div>
-            <CardTitle className="text-sm font-medium text-slate-600">Total Collections</CardTitle>
+            <CardTitle className="text-xs font-medium text-slate-600">Total Collections</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-slate-900 mb-1">
+          <CardContent className="pt-0 pb-3">
+            <div className="text-xl font-bold text-slate-900 mb-1">
               UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M
             </div>
             <div className="flex items-center gap-1 text-xs text-emerald-600">
@@ -226,20 +292,20 @@ const OrgDashboard = () => {
 
         {/* Wallet Balance */}
         <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100/50">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <div className="p-2 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
-                <Wallet className="h-5 w-5 text-blue-600" />
+              <div className="p-1.5 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
+                <Wallet className="h-4 w-4 text-blue-600" />
               </div>
-              <Badge variant="outline" className="bg-white/80 text-red-700 border-red-200">
+              <Badge variant="outline" className="bg-white/80 text-red-700 border-red-200 text-xs">
                 -2.1%
               </Badge>
             </div>
-            <CardTitle className="text-sm font-medium text-slate-600">Wallet Balance</CardTitle>
+            <CardTitle className="text-xs font-medium text-slate-600">Wallet Balance</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0 space-y-4">
+          <CardContent className="pt-0 pb-3 space-y-3">
             <div>
-              <div className="text-2xl font-bold text-slate-900 mb-1">
+              <div className="text-xl font-bold text-slate-900 mb-1">
                 UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M
               </div>
               <div className="flex items-center gap-1 text-xs text-red-600">
@@ -248,11 +314,11 @@ const OrgDashboard = () => {
               </div>
             </div>
             
-            {/* Action Buttons - Fixed Layout */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* Action Buttons - Compact Layout */}
+            <div className="grid grid-cols-2 gap-1.5">
               <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" className="h-8 text-xs bg-blue-600 hover:bg-blue-700 shadow-sm">
+                  <Button size="sm" className="h-7 text-xs px-2 bg-blue-600 hover:bg-blue-700 shadow-sm">
                     <Building className="h-3 w-3 mr-1" />
                     Bank
                   </Button>
@@ -269,9 +335,9 @@ const OrgDashboard = () => {
                   </DialogHeader>
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="bank-amount">Amount (UGX)</Label>
+                      <Label htmlFor="wallet-bank-amount">Amount (UGX)</Label>
                       <Input
-                        id="bank-amount"
+                        id="wallet-bank-amount"
                         type="number"
                         placeholder="Enter amount"
                         value={bankTransferData.amount}
@@ -279,7 +345,7 @@ const OrgDashboard = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="bank-account">Bank Account</Label>
+                      <Label htmlFor="wallet-bank-account">Bank Account</Label>
                       <Select 
                         value={bankTransferData.bankAccount} 
                         onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
@@ -296,9 +362,9 @@ const OrgDashboard = () => {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="bank-description">Description</Label>
+                      <Label htmlFor="wallet-bank-description">Description</Label>
                       <Input
-                        id="bank-description"
+                        id="wallet-bank-description"
                         placeholder="Transfer description"
                         value={bankTransferData.description}
                         onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
@@ -313,7 +379,7 @@ const OrgDashboard = () => {
 
               <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="h-8 text-xs border-blue-200 hover:bg-blue-50">
+                  <Button size="sm" variant="outline" className="h-7 text-xs px-2 border-blue-200 hover:bg-blue-50">
                     <Phone className="h-3 w-3 mr-1" />
                     Withdraw
                   </Button>
@@ -330,9 +396,9 @@ const OrgDashboard = () => {
                   </DialogHeader>
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="withdraw-amount">Amount (UGX)</Label>
+                      <Label htmlFor="wallet-withdraw-amount">Amount (UGX)</Label>
                       <Input
-                        id="withdraw-amount"
+                        id="wallet-withdraw-amount"
                         type="number"
                         placeholder="Enter amount"
                         value={withdrawData.amount}
@@ -340,18 +406,18 @@ const OrgDashboard = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="withdraw-phone">Phone Number</Label>
+                      <Label htmlFor="wallet-withdraw-phone">Phone Number</Label>
                       <Input
-                        id="withdraw-phone"
+                        id="wallet-withdraw-phone"
                         placeholder="+256701234567"
                         value={withdrawData.phoneNumber}
                         onChange={(e) => setWithdrawData({...withdrawData, phoneNumber: e.target.value})}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="withdraw-description">Description</Label>
+                      <Label htmlFor="wallet-withdraw-description">Description</Label>
                       <Input
-                        id="withdraw-description"
+                        id="wallet-withdraw-description"
                         placeholder="Withdrawal description"
                         value={withdrawData.description}
                         onChange={(e) => setWithdrawData({...withdrawData, description: e.target.value})}
@@ -369,19 +435,19 @@ const OrgDashboard = () => {
 
         {/* Petty Cash Balance */}
         <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-purple-50 to-purple-100/50">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <div className="p-2 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
-                <Wallet className="h-5 w-5 text-purple-600" />
+              <div className="p-1.5 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
+                <Wallet className="h-4 w-4 text-purple-600" />
               </div>
-              <Badge variant="outline" className="bg-white/80 text-emerald-700 border-emerald-200">
+              <Badge variant="outline" className="bg-white/80 text-emerald-700 border-emerald-200 text-xs">
                 +5.2%
               </Badge>
             </div>
-            <CardTitle className="text-sm font-medium text-slate-600">Petty Cash Balance</CardTitle>
+            <CardTitle className="text-xs font-medium text-slate-600">Petty Cash Balance</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-slate-900 mb-1">
+          <CardContent className="pt-0 pb-3">
+            <div className="text-xl font-bold text-slate-900 mb-1">
               UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K
             </div>
             <div className="flex items-center gap-1 text-xs text-emerald-600">
@@ -393,19 +459,19 @@ const OrgDashboard = () => {
 
         {/* Monthly Transactions */}
         <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-orange-50 to-orange-100/50">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <div className="p-2 rounded-lg bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors">
-                <Activity className="h-5 w-5 text-orange-600" />
+              <div className="p-1.5 rounded-lg bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors">
+                <Activity className="h-4 w-4 text-orange-600" />
               </div>
-              <Badge variant="outline" className="bg-white/80 text-emerald-700 border-emerald-200">
+              <Badge variant="outline" className="bg-white/80 text-emerald-700 border-emerald-200 text-xs">
                 +18.1%
               </Badge>
             </div>
-            <CardTitle className="text-sm font-medium text-slate-600">Monthly Transactions</CardTitle>
+            <CardTitle className="text-xs font-medium text-slate-600">Monthly Transactions</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-slate-900 mb-1">
+          <CardContent className="pt-0 pb-3">
+            <div className="text-xl font-bold text-slate-900 mb-1">
               {dashboardData.monthlyTransactions}
             </div>
             <div className="flex items-center gap-1 text-xs text-emerald-600">
