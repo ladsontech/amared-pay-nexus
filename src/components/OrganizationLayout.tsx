@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Building, LogOut } from "lucide-react";
 
-import MobileActionFab from "./MobileActionFab";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppOrgSidebar from "./AppOrgSidebar";
 
@@ -92,8 +91,7 @@ const OrganizationLayout = () => {
           </main>
         </div>
 
-        {/* Mobile FAB */}
-        <MobileActionFab />
+        {/* Mobile FAB removed */}
       </div>
     </SidebarProvider>
   );

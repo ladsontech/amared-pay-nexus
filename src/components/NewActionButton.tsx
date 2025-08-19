@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,8 +17,9 @@ import { useSidebar } from "@/components/ui/sidebar";
 const NewActionButton = () => {
   const { hasPermission } = useAuth();
   const navigate = useNavigate();
-  const { state, isMobile } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const isCollapsed = !isMobile && state === "collapsed";
+  const [open, setOpen] = useState(false);
 
   const quickActions = [
     {
@@ -71,8 +72,14 @@ const NewActionButton = () => {
     return null;
   }
 
+  const handleSelect = (run: () => void) => {
+    setOpen(false);
+    if (isMobile) setOpenMobile(false);
+    run();
+  };
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       {isCollapsed ? (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -98,7 +105,7 @@ const NewActionButton = () => {
         {availableActions.map((action) => (
           <DropdownMenuItem 
             key={action.label} 
-            onClick={action.action}
+            onSelect={() => handleSelect(action.action)}
             className="hover:bg-slate-50 focus:bg-slate-50 cursor-pointer"
           >
             <div className="flex items-center gap-3">
