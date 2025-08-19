@@ -100,7 +100,13 @@ const Dashboard = () => {
                 <card.icon className={`h-3 w-3 sm:h-4 sm:w-4 ${card.color}`} />
               </CardHeader>
               <CardContent>
-                <div className="text-base sm:text-lg lg:text-xl xl:text-2xl font-bold">{card.value}</div>
+                <div className="text-base sm:text-lg lg:text-xl xl:text-2xl font-bold">
+                  {card.title === "Growth" ? (
+                    <span className="hidden sm:inline">{card.value}</span>
+                  ) : (
+                    card.value
+                  )}
+                </div>
                 <CardDescription className="text-xs">
                   {card.description}
                 </CardDescription>

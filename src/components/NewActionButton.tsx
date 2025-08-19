@@ -11,10 +11,14 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Plus, Wallet, Send, DollarSign, Banknote, CheckCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useSidebar } from "@/components/ui/sidebar";
 
 const NewActionButton = () => {
   const { hasPermission } = useAuth();
   const navigate = useNavigate();
+  const { state, isMobile } = useSidebar();
+  const isCollapsed = !isMobile && state === "collapsed";
 
   const quickActions = [
     {
@@ -69,12 +73,25 @@ const NewActionButton = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200">
-          <Plus className="h-4 w-4" />
-          <span className="font-semibold">New Action</span>
-        </Button>
-      </DropdownMenuTrigger>
+      {isCollapsed ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon" aria-label="New Action">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="right" align="center">New Action</TooltipContent>
+        </Tooltip>
+      ) : (
+        <DropdownMenuTrigger asChild>
+          <Button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200">
+            <Plus className="h-4 w-4" />
+            <span className="font-semibold">New Action</span>
+          </Button>
+        </DropdownMenuTrigger>
+      )}
       <DropdownMenuContent align="end" className="w-64 bg-white/95 backdrop-blur-sm border-slate-200 shadow-xl">
         <DropdownMenuLabel className="text-slate-700 font-semibold">Quick Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
