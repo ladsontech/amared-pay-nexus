@@ -8,35 +8,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
-import { 
-  DollarSign, 
-  Wallet, 
-  TrendingUp, 
-  TrendingDown, 
-  Activity, 
-  Users, 
-  CheckCircle, 
-  Clock, 
-  AlertCircle, 
-  ArrowUpRight, 
-  ArrowDownRight, 
-  Building, 
-  Phone,
-  Send,
-  Banknote,
-  Target,
-  Calendar,
-  BarChart3,
-  Plus,
-  ChevronRight,
-  X
-} from "lucide-react";
+import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, ArrowUpRight, ArrowDownRight, Building, Phone, Send, Banknote, Target, Calendar, BarChart3, Plus, ChevronRight, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import MobileBottomNav from "@/components/MobileBottomNav";
-
 const OrgDashboard = () => {
-  const { user, hasPermission } = useAuth();
-  const { toast } = useToast();
+  const {
+    user,
+    hasPermission
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [sendToBankOpen, setSendToBankOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
@@ -50,55 +32,48 @@ const OrgDashboard = () => {
     phoneNumber: "+256",
     description: ""
   });
-
   const dashboardData = {
     totalCollections: 45600000,
     walletBalance: 12300000,
     pettyCashBalance: 850000,
     monthlyTransactions: 1247,
     pendingApprovals: 8,
-    recentTransactions: [
-      {
-        id: '1',
-        type: 'Petty Cash',
-        amount: 125000,
-        status: 'approved',
-        date: '2024-01-20',
-        description: 'Office supplies purchase'
-      },
-      {
-        id: '2',
-        type: 'Bulk Payment',
-        amount: 2500000,
-        status: 'pending',
-        date: '2024-01-20',
-        description: 'Monthly salary disbursement'
-      },
-      {
-        id: '3',
-        type: 'Collection',
-        amount: 850000,
-        status: 'completed',
-        date: '2024-01-19',
-        description: 'Client payment received'
-      },
-      {
-        id: '4',
-        type: 'Petty Cash',
-        amount: 75000,
-        status: 'rejected',
-        date: '2024-01-19',
-        description: 'Travel expense claim'
-      },
-      {
-        id: '5',
-        type: 'Bulk Payment',
-        amount: 1200000,
-        status: 'completed',
-        date: '2024-01-18',
-        description: 'Vendor payments Q1'
-      }
-    ],
+    recentTransactions: [{
+      id: '1',
+      type: 'Petty Cash',
+      amount: 125000,
+      status: 'approved',
+      date: '2024-01-20',
+      description: 'Office supplies purchase'
+    }, {
+      id: '2',
+      type: 'Bulk Payment',
+      amount: 2500000,
+      status: 'pending',
+      date: '2024-01-20',
+      description: 'Monthly salary disbursement'
+    }, {
+      id: '3',
+      type: 'Collection',
+      amount: 850000,
+      status: 'completed',
+      date: '2024-01-19',
+      description: 'Client payment received'
+    }, {
+      id: '4',
+      type: 'Petty Cash',
+      amount: 75000,
+      status: 'rejected',
+      date: '2024-01-19',
+      description: 'Travel expense claim'
+    }, {
+      id: '5',
+      type: 'Bulk Payment',
+      amount: 1200000,
+      status: 'completed',
+      date: '2024-01-18',
+      description: 'Vendor payments Q1'
+    }],
     teamMetrics: {
       totalStaff: 12,
       activeStaff: 9,
@@ -106,7 +81,6 @@ const OrgDashboard = () => {
       budgetUsed: 3200000
     }
   };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
@@ -120,7 +94,6 @@ const OrgDashboard = () => {
         return 'bg-slate-50 text-slate-700 border-slate-200';
     }
   };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved':
@@ -134,7 +107,6 @@ const OrgDashboard = () => {
         return Activity;
     }
   };
-
   const getTransactionIcon = (type: string) => {
     switch (type) {
       case 'Petty Cash':
@@ -147,45 +119,47 @@ const OrgDashboard = () => {
         return Activity;
     }
   };
-
   const handleSendToBank = () => {
     if (!bankTransferData.amount || !bankTransferData.bankAccount) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     toast({
       title: "Bank Transfer Initiated",
-      description: `Transfer of UGX ${parseFloat(bankTransferData.amount).toLocaleString()} has been submitted for processing`,
+      description: `Transfer of UGX ${parseFloat(bankTransferData.amount).toLocaleString()} has been submitted for processing`
     });
-    setBankTransferData({ amount: "", bankAccount: "", description: "" });
+    setBankTransferData({
+      amount: "",
+      bankAccount: "",
+      description: ""
+    });
     setSendToBankOpen(false);
   };
-
   const handleWithdraw = () => {
     if (!withdrawData.amount || !withdrawData.phoneNumber) {
       toast({
-        title: "Missing Information", 
+        title: "Missing Information",
         description: "Please fill in all required fields",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     toast({
       title: "Withdrawal Initiated",
-      description: `Withdrawal of UGX ${parseFloat(withdrawData.amount).toLocaleString()} to ${withdrawData.phoneNumber} has been submitted`,
+      description: `Withdrawal of UGX ${parseFloat(withdrawData.amount).toLocaleString()} to ${withdrawData.phoneNumber} has been submitted`
     });
-    setWithdrawData({ amount: "", phoneNumber: "+256", description: "" });
+    setWithdrawData({
+      amount: "",
+      phoneNumber: "+256",
+      description: ""
+    });
     setWithdrawOpen(false);
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50 pb-24 md:pb-0">
+  return <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50 pb-24 md:pb-0">
       {/* Mobile-First Header */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
         <div className="px-4 py-3 sm:px-6 sm:py-4">
@@ -225,20 +199,17 @@ const OrgDashboard = () => {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="bank-amount">Amount (UGX)</Label>
-                  <Input
-                    id="bank-amount"
-                    type="number"
-                    placeholder="Enter amount"
-                    value={bankTransferData.amount}
-                    onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
-                  />
+                  <Input id="bank-amount" type="number" placeholder="Enter amount" value={bankTransferData.amount} onChange={e => setBankTransferData({
+                    ...bankTransferData,
+                    amount: e.target.value
+                  })} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bank-account">Select Bank Account</Label>
-                  <Select 
-                    value={bankTransferData.bankAccount} 
-                    onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
-                  >
+                  <Select value={bankTransferData.bankAccount} onValueChange={value => setBankTransferData({
+                    ...bankTransferData,
+                    bankAccount: value
+                  })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Choose your bank" />
                     </SelectTrigger>
@@ -254,12 +225,10 @@ const OrgDashboard = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bank-description">Description</Label>
-                  <Input
-                    id="bank-description"
-                    placeholder="Transfer description"
-                    value={bankTransferData.description}
-                    onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
-                  />
+                  <Input id="bank-description" placeholder="Transfer description" value={bankTransferData.description} onChange={e => setBankTransferData({
+                    ...bankTransferData,
+                    description: e.target.value
+                  })} />
                 </div>
                 <Button onClick={handleSendToBank} className="w-full">
                   Confirm Deposit
@@ -282,9 +251,7 @@ const OrgDashboard = () => {
               <div className="p-1.5 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
                   <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
               </div>
-                <Badge className="bg-white/80 text-emerald-700 border-emerald-200 text-xs px-1.5 py-0.5 hidden sm:inline">
-                  +12.5%
-                </Badge>
+                
             </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-600">Collections</p>
@@ -399,11 +366,9 @@ const OrgDashboard = () => {
             <CardContent className="p-3 sm:p-4">
               <div className="space-y-2 sm:space-y-3">
                 {dashboardData.recentTransactions.slice(0, 4).map((transaction, index) => {
-                  const StatusIcon = getStatusIcon(transaction.status);
-                  const TransactionIcon = getTransactionIcon(transaction.type);
-                  
-                  return (
-                    <div key={transaction.id} className="group flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200 bg-slate-50/50 hover:bg-white">
+                const StatusIcon = getStatusIcon(transaction.status);
+                const TransactionIcon = getTransactionIcon(transaction.type);
+                return <div key={transaction.id} className="group flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200 bg-slate-50/50 hover:bg-white">
                       <div className="flex items-center gap-2.5 sm:gap-3">
                         <div className="relative">
                           <div className="p-1.5 sm:p-2 rounded-lg bg-white group-hover:bg-slate-50 transition-colors">
@@ -432,9 +397,8 @@ const OrgDashboard = () => {
                           UGX {transaction.amount.toLocaleString()}
                         </p>
                       </div>
-                    </div>
-                  );
-                })}
+                    </div>;
+              })}
               </div>
             </CardContent>
           </Card>
@@ -442,8 +406,7 @@ const OrgDashboard = () => {
           {/* Side Panel - Compact Mobile */}
           <div className="space-y-4 sm:space-y-6">
             {/* Pending Approvals - Compact */}
-            {hasPermission('approve_transactions') && (
-              <Card className="border-0 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/50">
+            {hasPermission('approve_transactions') && <Card className="border-0 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/50">
                 <CardHeader className="border-b border-amber-100 pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -479,12 +442,10 @@ const OrgDashboard = () => {
                     Review All
                   </Button>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
 
             {/* Team Metrics - Compact */}
-            {hasPermission('manage_team') && (
-              <Card className="border-0 shadow-sm bg-gradient-to-br from-indigo-50 to-indigo-100/50">
+            {hasPermission('manage_team') && <Card className="border-0 shadow-sm bg-gradient-to-br from-indigo-50 to-indigo-100/50">
                 <CardHeader className="border-b border-indigo-100 pb-3">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-lg bg-indigo-100">
@@ -513,10 +474,7 @@ const OrgDashboard = () => {
                       </span>
                     </div>
                     <div className="space-y-1">
-                      <Progress 
-                        value={dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100} 
-                        className="h-2 bg-slate-100"
-                      />
+                      <Progress value={dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100} className="h-2 bg-slate-100" />
                       <div className="flex justify-between text-xs text-slate-600">
                         <span>UGX {(dashboardData.teamMetrics.budgetUsed / 1000000).toFixed(1)}M</span>
                         <span>UGX {(dashboardData.teamMetrics.monthlyBudget / 1000000).toFixed(1)}M</span>
@@ -524,8 +482,7 @@ const OrgDashboard = () => {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
 
             {/* Wallet Actions - Compact */}
             <Card className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
@@ -558,20 +515,17 @@ const OrgDashboard = () => {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="wallet-bank-amount">Amount (UGX)</Label>
-                      <Input
-                        id="wallet-bank-amount"
-                        type="number"
-                        placeholder="Enter amount"
-                        value={bankTransferData.amount}
-                        onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
-                      />
+                      <Input id="wallet-bank-amount" type="number" placeholder="Enter amount" value={bankTransferData.amount} onChange={e => setBankTransferData({
+                        ...bankTransferData,
+                        amount: e.target.value
+                      })} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="wallet-bank-account">Bank Account</Label>
-                      <Select 
-                        value={bankTransferData.bankAccount} 
-                        onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
-                      >
+                      <Select value={bankTransferData.bankAccount} onValueChange={value => setBankTransferData({
+                        ...bankTransferData,
+                        bankAccount: value
+                      })}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select bank account" />
                         </SelectTrigger>
@@ -585,12 +539,10 @@ const OrgDashboard = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="wallet-bank-description">Description</Label>
-                      <Input
-                        id="wallet-bank-description"
-                        placeholder="Transfer description"
-                        value={bankTransferData.description}
-                        onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
-                      />
+                      <Input id="wallet-bank-description" placeholder="Transfer description" value={bankTransferData.description} onChange={e => setBankTransferData({
+                        ...bankTransferData,
+                        description: e.target.value
+                      })} />
                     </div>
                     <Button onClick={handleSendToBank} className="w-full">
                       Send to Bank
@@ -619,31 +571,24 @@ const OrgDashboard = () => {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="wallet-withdraw-amount">Amount (UGX)</Label>
-                      <Input
-                        id="wallet-withdraw-amount"
-                        type="number"
-                        placeholder="Enter amount"
-                        value={withdrawData.amount}
-                        onChange={(e) => setWithdrawData({...withdrawData, amount: e.target.value})}
-                      />
+                      <Input id="wallet-withdraw-amount" type="number" placeholder="Enter amount" value={withdrawData.amount} onChange={e => setWithdrawData({
+                        ...withdrawData,
+                        amount: e.target.value
+                      })} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="wallet-withdraw-phone">Phone Number</Label>
-                      <Input
-                        id="wallet-withdraw-phone"
-                        placeholder="+256701234567"
-                        value={withdrawData.phoneNumber}
-                        onChange={(e) => setWithdrawData({...withdrawData, phoneNumber: e.target.value})}
-                      />
+                      <Input id="wallet-withdraw-phone" placeholder="+256701234567" value={withdrawData.phoneNumber} onChange={e => setWithdrawData({
+                        ...withdrawData,
+                        phoneNumber: e.target.value
+                      })} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="wallet-withdraw-description">Description</Label>
-                      <Input
-                        id="wallet-withdraw-description"
-                        placeholder="Withdrawal description"
-                        value={withdrawData.description}
-                        onChange={(e) => setWithdrawData({...withdrawData, description: e.target.value})}
-                      />
+                      <Input id="wallet-withdraw-description" placeholder="Withdrawal description" value={withdrawData.description} onChange={e => setWithdrawData({
+                        ...withdrawData,
+                        description: e.target.value
+                      })} />
                     </div>
                     <Button onClick={handleWithdraw} className="w-full">
                       Withdraw
@@ -665,12 +610,7 @@ const OrgDashboard = () => {
               <DialogTitle className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
                 Quick Actions Hub
               </DialogTitle>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-10 w-10 p-0 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full"
-                onClick={() => setQuickActionsOpen(false)}
-              >
+              <Button variant="ghost" size="sm" className="h-10 w-10 p-0 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full" onClick={() => setQuickActionsOpen(false)}>
                 <X className="h-5 w-5" />
               </Button>
             </div>
@@ -686,8 +626,7 @@ const OrgDashboard = () => {
                 💰 Financial Management
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {hasPermission('access_petty_cash') && (
-                  <button className="group relative overflow-hidden bg-gradient-to-br from-purple-50/80 to-purple-100/60 hover:from-purple-100/90 hover:to-purple-200/80 backdrop-blur-sm border border-purple-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-purple-300/60">
+                {hasPermission('access_petty_cash') && <button className="group relative overflow-hidden bg-gradient-to-br from-purple-50/80 to-purple-100/60 hover:from-purple-100/90 hover:to-purple-200/80 backdrop-blur-sm border border-purple-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-purple-300/60">
                     <div className="flex flex-col items-center gap-4">
                       <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 group-hover:from-purple-200 group-hover:to-purple-300 transition-all duration-300 shadow-sm">
                         <Wallet className="h-6 w-6 text-purple-600" />
@@ -702,11 +641,9 @@ const OrgDashboard = () => {
                       </div>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                  </button>
-                )}
+                  </button>}
                 
-                {hasPermission('access_bulk_payments') && (
-                  <button className="group relative overflow-hidden bg-gradient-to-br from-blue-50/80 to-blue-100/60 hover:from-blue-100/90 hover:to-blue-200/80 backdrop-blur-sm border border-blue-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-blue-300/60">
+                {hasPermission('access_bulk_payments') && <button className="group relative overflow-hidden bg-gradient-to-br from-blue-50/80 to-blue-100/60 hover:from-blue-100/90 hover:to-blue-200/80 backdrop-blur-sm border border-blue-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-blue-300/60">
                     <div className="flex flex-col items-center gap-4">
                       <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-300 shadow-sm">
                         <Send className="h-6 w-6 text-blue-600" />
@@ -721,11 +658,9 @@ const OrgDashboard = () => {
                       </div>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                  </button>
-                )}
+                  </button>}
                 
-                {hasPermission('access_collections') && (
-                  <button className="group relative overflow-hidden bg-gradient-to-br from-emerald-50/80 to-emerald-100/60 hover:from-emerald-100/90 hover:to-emerald-200/80 backdrop-blur-sm border border-emerald-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-emerald-300/60">
+                {hasPermission('access_collections') && <button className="group relative overflow-hidden bg-gradient-to-br from-emerald-50/80 to-emerald-100/60 hover:from-emerald-100/90 hover:to-emerald-200/80 backdrop-blur-sm border border-emerald-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-emerald-300/60">
                     <div className="flex flex-col items-center gap-4">
                       <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200 group-hover:from-emerald-200 group-hover:to-emerald-300 transition-all duration-300 shadow-sm">
                         <DollarSign className="h-6 w-6 text-emerald-600" />
@@ -740,11 +675,9 @@ const OrgDashboard = () => {
                       </div>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                  </button>
-                )}
+                  </button>}
                 
-                {hasPermission('access_bank_deposits') && (
-                  <button className="group relative overflow-hidden bg-gradient-to-br from-indigo-50/80 to-indigo-100/60 hover:from-indigo-100/90 hover:to-indigo-200/80 backdrop-blur-sm border border-indigo-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-indigo-300/60">
+                {hasPermission('access_bank_deposits') && <button className="group relative overflow-hidden bg-gradient-to-br from-indigo-50/80 to-indigo-100/60 hover:from-indigo-100/90 hover:to-indigo-200/80 backdrop-blur-sm border border-indigo-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-indigo-300/60">
                     <div className="flex flex-col items-center gap-4">
                       <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-indigo-200 group-hover:from-indigo-200 group-hover:to-indigo-300 transition-all duration-300 shadow-sm">
                         <Banknote className="h-6 w-6 text-indigo-600" />
@@ -759,8 +692,7 @@ const OrgDashboard = () => {
                       </div>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                  </button>
-                )}
+                  </button>}
               </div>
             </div>
 
@@ -770,8 +702,7 @@ const OrgDashboard = () => {
                 ⚙️ Administration
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {hasPermission('approve_transactions') && (
-                  <button className="group relative overflow-hidden bg-gradient-to-br from-amber-50/80 to-amber-100/60 hover:from-amber-100/90 hover:to-amber-200/80 backdrop-blur-sm border border-amber-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-amber-300/60">
+                {hasPermission('approve_transactions') && <button className="group relative overflow-hidden bg-gradient-to-br from-amber-50/80 to-amber-100/60 hover:from-amber-100/90 hover:to-amber-200/80 backdrop-blur-sm border border-amber-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-amber-300/60">
                     <div className="flex flex-col items-center gap-4">
                       <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 group-hover:from-amber-200 group-hover:to-amber-300 transition-all duration-300 shadow-sm">
                         <CheckCircle className="h-6 w-6 text-amber-600" />
@@ -786,11 +717,9 @@ const OrgDashboard = () => {
                       </div>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                  </button>
-                )}
+                  </button>}
                 
-                {hasPermission('manage_team') && (
-                  <button className="group relative overflow-hidden bg-gradient-to-br from-slate-50/80 to-slate-100/60 hover:from-slate-100/90 hover:to-slate-200/80 backdrop-blur-sm border border-slate-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-slate-300/60">
+                {hasPermission('manage_team') && <button className="group relative overflow-hidden bg-gradient-to-br from-slate-50/80 to-slate-100/60 hover:from-slate-100/90 hover:to-slate-200/80 backdrop-blur-sm border border-slate-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-slate-300/60">
                     <div className="flex flex-col items-center gap-4">
                       <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 group-hover:from-slate-200 group-hover:to-slate-300 transition-all duration-300 shadow-sm">
                         <Users className="h-6 w-6 text-slate-600" />
@@ -805,11 +734,9 @@ const OrgDashboard = () => {
                       </div>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                  </button>
-                )}
+                  </button>}
                 
-                {hasPermission('view_department_reports') && (
-                  <button className="group relative overflow-hidden bg-gradient-to-br from-orange-50/80 to-orange-100/60 hover:from-orange-100/90 hover:to-orange-200/80 backdrop-blur-sm border border-orange-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-orange-300/60">
+                {hasPermission('view_department_reports') && <button className="group relative overflow-hidden bg-gradient-to-br from-orange-50/80 to-orange-100/60 hover:from-orange-100/90 hover:to-orange-200/80 backdrop-blur-sm border border-orange-200/40 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-orange-300/60">
                     <div className="flex flex-col items-center gap-4">
                       <div className="p-4 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 group-hover:from-orange-200 group-hover:to-orange-300 transition-all duration-300 shadow-sm">
                         <BarChart3 className="h-6 w-6 text-orange-600" />
@@ -824,8 +751,7 @@ const OrgDashboard = () => {
                       </div>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                  </button>
-                )}
+                  </button>}
               </div>
             </div>
 
@@ -891,8 +817,6 @@ const OrgDashboard = () => {
         </DialogContent>
       </Dialog>
       <MobileBottomNav />
-    </div>
-  );
+    </div>;
 };
-
 export default OrgDashboard;
