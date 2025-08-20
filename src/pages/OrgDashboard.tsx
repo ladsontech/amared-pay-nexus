@@ -245,20 +245,20 @@ const OrgDashboard = () => {
         {/* Key Metrics - Compact Mobile Grid */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {/* Total Collections */}
-          <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-emerald-50 to-emerald-100/50">
+          <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-              <div className="p-1.5 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
-                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
+              <div className="p-1.5 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
+                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               </div>
                 
             </div>
               <div className="space-y-1">
-                <p className="text-xs font-medium text-slate-600">Collections</p>
+                <p className="text-xs font-medium text-slate-700">Collections</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">
               UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M
                 </p>
-                <div className="flex items-center gap-1 text-xs text-emerald-600">
+                <div className="flex items-center gap-1 text-xs text-blue-700">
                   <TrendingUp className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">from last month</span>
                   <span className="sm:hidden hidden">+12.5%</span>
@@ -277,11 +277,11 @@ const OrgDashboard = () => {
               
             </div>
             <div className="space-y-1">
-              <p className="text-xs font-medium text-slate-600">Wallet</p>
+              <p className="text-xs font-medium text-slate-700">Wallet</p>
               <p className="text-sm sm:text-base font-bold text-slate-900">
                 UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M
               </p>
-              <div className="flex items-center gap-1 text-xs text-white bg-blue-500/80 rounded-full px-2 py-1 w-fit">
+              <div className="flex items-center gap-1 text-xs text-slate-700 bg-blue-100 rounded-full px-2 py-1 w-fit">
                 <TrendingDown className="h-2.5 w-2.5" />
                 <span className="hidden sm:inline">from last week</span>
                 <span className="sm:hidden hidden">-2.1%</span>
@@ -291,20 +291,20 @@ const OrgDashboard = () => {
         </Card>
 
           {/* Petty Cash Balance */}
-          <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-purple-50 to-purple-100/50">
+          <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
-                  <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
+                <div className="p-1.5 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
+                  <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                 </div>
                 
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-medium text-slate-600">Petty Cash</p>
+                <p className="text-xs font-medium text-slate-700">Petty Cash</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">
                   UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K
                 </p>
-                <div className="flex items-center gap-1 text-xs text-white bg-purple-500/80 rounded-full px-2 py-1 w-fit">
+                <div className="flex items-center gap-1 text-xs text-slate-700 bg-blue-100 rounded-full px-2 py-1 w-fit">
                   <TrendingUp className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">from last week</span>
                   <span className="sm:hidden hidden">+5.2%</span>
@@ -314,20 +314,20 @@ const OrgDashboard = () => {
           </Card>
 
           {/* Monthly Transactions */}
-          <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-orange-50 to-orange-100/50">
+          <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors">
-                  <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
+                <div className="p-1.5 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
+                  <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                 </div>
                 
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-medium text-slate-600">Transactions</p>
+                <p className="text-xs font-medium text-slate-700">Transactions</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">
                   {dashboardData.monthlyTransactions}
                 </p>
-                <div className="flex items-center gap-1 text-xs text-white bg-orange-500/80 rounded-full px-2 py-1 w-fit">
+                <div className="flex items-center gap-1 text-xs text-slate-700 bg-blue-100 rounded-full px-2 py-1 w-fit">
                   <TrendingUp className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">from last month</span>
                   <span className="sm:hidden hidden">+18.1%</span>
