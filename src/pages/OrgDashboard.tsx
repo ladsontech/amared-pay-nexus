@@ -362,14 +362,14 @@ const OrgDashboard = () => {
                 {dashboardData.recentTransactions.slice(0, 4).map((transaction, index) => {
                 const StatusIcon = getStatusIcon(transaction.status);
                 const TransactionIcon = getTransactionIcon(transaction.type);
-                return <div key={transaction.id} className="group flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200 bg-slate-50/50 hover:bg-white">
+                return <div key={transaction.id} className="group flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-blue-100 hover:border-blue-200 hover:shadow-sm transition-all duration-200 bg-blue-50/50 hover:bg-blue-100/50">
                       <div className="flex items-center gap-2.5 sm:gap-3">
                         <div className="relative">
-                          <div className="p-1.5 sm:p-2 rounded-lg bg-white group-hover:bg-slate-50 transition-colors">
-                            <TransactionIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-600" />
+                          <div className="p-1.5 sm:p-2 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                            <TransactionIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-700" />
                           </div>
                           <div className="absolute -bottom-0.5 -right-0.5 p-0.5 rounded-full bg-white shadow-sm">
-                            <StatusIcon className="h-2 w-2 text-slate-500" />
+                            <StatusIcon className="h-2 w-2 text-slate-600" />
                           </div>
                         </div>
                         <div className="space-y-0.5 min-w-0 flex-1">
@@ -379,8 +379,8 @@ const OrgDashboard = () => {
                               {transaction.status}
                             </Badge>
                           </div>
-                          <p className="text-xs text-slate-600 line-clamp-1">{transaction.description}</p>
-                          <p className="text-xs text-slate-500 flex items-center gap-1">
+                          <p className="text-xs text-slate-700 line-clamp-1">{transaction.description}</p>
+                          <p className="text-xs text-slate-600 flex items-center gap-1">
                             <Calendar className="h-2.5 w-2.5" />
                             {transaction.date}
                           </p>
