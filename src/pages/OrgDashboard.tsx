@@ -274,9 +274,7 @@ const OrgDashboard = () => {
               <div className="p-1.5 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
                 <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               </div>
-              <Badge className="bg-white/80 text-white border-blue-200 text-xs px-1.5 py-0.5 bg-blue-500/90 hidden sm:inline">
-                -2.1%
-              </Badge>
+              
             </div>
             <div className="space-y-1">
               <p className="text-xs font-medium text-slate-600">Wallet</p>
@@ -299,9 +297,7 @@ const OrgDashboard = () => {
                 <div className="p-1.5 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
                   <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
                 </div>
-                <Badge className="bg-white/80 text-white border-purple-200 text-xs px-1.5 py-0.5 bg-purple-500/90 hidden sm:inline">
-                  +5.2%
-                </Badge>
+                
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-600">Petty Cash</p>
@@ -324,9 +320,7 @@ const OrgDashboard = () => {
                 <div className="p-1.5 rounded-lg bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors">
                   <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
                 </div>
-                <Badge className="bg-white/80 text-white border-orange-200 text-xs px-1.5 py-0.5 bg-orange-500/90 hidden sm:inline">
-                  +18.1%
-                </Badge>
+                
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-600">Transactions</p>
