@@ -81,7 +81,7 @@ const MobileBottomNav = () => {
   };
 
   const filteredNavItems = navItems.filter(item => 
-    !item.permission || hasPermission(item.permission as any)
+    !item.permission || hasPermission(item.permission)
   );
 
   return (
