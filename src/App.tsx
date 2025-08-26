@@ -29,6 +29,7 @@ const OrgReports = lazy(() => import("./pages/OrgReports"));
 const OrgSettings = lazy(() => import("./pages/OrgSettings"));
 const Unauthorized = lazy(() => import("./pages/Unauthorized"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const TestAuth = lazy(() => import("./pages/TestAuth"));
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/test-auth" element={<TestAuth />} />
 
         {/* System Admin Routes */}
         <Route path="/system" element={

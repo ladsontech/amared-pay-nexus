@@ -1,11 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthState, Permission } from '@/types/auth';
 import { demoUsers } from '@/data/demoData';
+import { authService } from '@/services/authService';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   loginAsUser: (userId: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message: string }>;
+  refreshToken: () => Promise<{ access: string; refresh: string }>;
+  verifyToken: (token: string) => Promise<boolean>;
   hasPermission: (permission: Permission) => boolean;
   hasAnyPermission: (permissions: Permission[]) => boolean;
   isRole: (role: string) => boolean;
@@ -69,27 +73,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (email: string, password: string) => {
-    // Find user by email
-    const user = demoUsers.find(u => u.email === email);
-    if (user && password === 'password') {
+    try {
+      const response = await authService.login({ email, password });
+      
+      // Convert LoginResponse to User type
+      const user: User = {
+        id: response.username || 'unknown',
+        name: response.username || 'Unknown User',
+        email: response.email,
+        role: 'staff', // Default role, should come from API response
+        organizationId: 'default-org',
+        organization: {
+          id: 'default-org',
+          name: 'Default Organization',
+          description: 'Default organization',
+          industry: 'Finance'
+        },
+        permissions: ['access_petty_cash', 'access_bulk_payments', 'access_collections'],
+        position: 'Staff Member'
+      };
+      
       localStorage.setItem('user', JSON.stringify(user));
       setAuthState({
         user,
         isAuthenticated: true,
         loading: false,
       });
-    } else {
+    } catch (error) {
+      console.error("Login error:", error);
       throw new Error('Invalid credentials');
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('user');
+  const logout = async () => {
+    await authService.logout();
     setAuthState({
       user: null,
       isAuthenticated: false,
       loading: false,
     });
+  };
+
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    const response = await authService.changePassword({ 
+      current_password: currentPassword, 
+      new_password: newPassword 
+    });
+    return response;
+  };
+
+  const refreshToken = async () => {
+    const tokens = await authService.refreshToken();
+    return tokens;
+  };
+
+  const verifyToken = async (token: string) => {
+    const isValid = await authService.verifyToken(token);
+    return isValid;
   };
 
   const hasPermission = (permission: Permission): boolean => {
@@ -111,6 +151,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         loginAsUser,
         logout,
+        changePassword,
+        refreshToken,
+        verifyToken,
         hasPermission,
         hasAnyPermission,
         isRole,
