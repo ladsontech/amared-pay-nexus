@@ -63,10 +63,10 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <Button 
-              onClick={() => navigate('/admin-dashboard')} 
+              onClick={() => navigate('/system/analytics')} 
               className="w-full"
             >
-              Go to Admin Dashboard
+              Go to Admin Dashboard (Demo)
             </Button>
           </CardContent>
         </Card>

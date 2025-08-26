@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Filter, Users, Building, Wallet, Edit, MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Plus, Search, Filter, Users, Building, Wallet, Edit, MoreHorizontal, CreditCard, Ban, Trash2, CheckCircle2 } from "lucide-react";
 import AdminDashboardLayout from "@/components/AdminDashboardLayout";
 import { useToast } from "@/hooks/use-toast";
 
@@ -24,6 +27,10 @@ const AdminOrganizations = () => {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState<null | Organization>(null);
+  const [topUpOpen, setTopUpOpen] = useState<null | Organization>(null);
+  const [confirmDelete, setConfirmDelete] = useState<null | Organization>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -113,6 +120,51 @@ const AdminOrganizations = () => {
       org.adminName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleCreateOrganization = (data: Partial<Organization>) => {
+    const newOrg: Organization = {
+      id: data.id || `ORG${(organizations.length + 1).toString().padStart(3, "0")}`,
+      name: data.name || "New Organization",
+      email: data.email || "contact@example.com",
+      status: (data.status as Organization["status"]) || "inactive",
+      walletBalance: Number(data.walletBalance) || 0,
+      members: Number(data.members) || 0,
+      createdAt: new Date().toISOString(),
+      adminName: data.adminName || "Admin User",
+      phone: data.phone || "+256700000000",
+    };
+    setOrganizations(prev => [newOrg, ...prev]);
+    setCreateOpen(false);
+    toast({ title: "Organization created", description: `${newOrg.name} added` });
+  };
+
+  const handleUpdateOrganization = (id: string, updates: Partial<Organization>) => {
+    setOrganizations(prev => prev.map(org => org.id === id ? { ...org, ...updates } : org));
+    setEditOpen(null);
+    toast({ title: "Organization updated" });
+  };
+
+  const handleToggleStatus = (org: Organization) => {
+    const nextStatus: Organization["status"] = org.status === "active" ? "suspended" : "active";
+    setOrganizations(prev => prev.map(o => o.id === org.id ? { ...o, status: nextStatus } : o));
+    toast({ title: `Status changed`, description: `${org.name} is now ${nextStatus}` });
+  };
+
+  const handleTopUp = (orgId: string, amount: number) => {
+    if (!amount || amount <= 0) {
+      toast({ title: "Invalid amount", variant: "destructive" });
+      return;
+    }
+    setOrganizations(prev => prev.map(o => o.id === orgId ? { ...o, walletBalance: o.walletBalance + amount } : o));
+    setTopUpOpen(null);
+    toast({ title: "Wallet topped up", description: `UGX ${amount.toLocaleString()}` });
+  };
+
+  const handleDelete = (orgId: string) => {
+    setOrganizations(prev => prev.filter(o => o.id !== orgId));
+    setConfirmDelete(null);
+    toast({ title: "Organization deleted" });
+  };
+
   return (
     <AdminDashboardLayout>
       <div className="space-y-6">
@@ -123,7 +175,7 @@ const AdminOrganizations = () => {
               Manage all organizations in the system
             </p>
           </div>
-          <Button className="flex items-center space-x-2">
+          <Button className="flex items-center space-x-2" onClick={() => setCreateOpen(true)}>
             <Plus className="h-4 w-4" />
             <span>Add Organization</span>
           </Button>
@@ -251,13 +303,33 @@ const AdminOrganizations = () => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => setEditOpen(org)}>
                         <Edit className="h-4 w-4 mr-1" />
                         Manage
                       </Button>
-                      <Button variant="outline" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setTopUpOpen(org)}>
+                            <CreditCard className="h-4 w-4 mr-2" /> Top up wallet
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleToggleStatus(org)}>
+                            {org.status === "active" ? (
+                              <Ban className="h-4 w-4 mr-2" />
+                            ) : (
+                              <CheckCircle2 className="h-4 w-4 mr-2" />
+                            )}
+                            {org.status === "active" ? "Suspend" : "Activate"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600" onClick={() => setConfirmDelete(org)}>
+                            <Trash2 className="h-4 w-4 mr-2" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </CardContent>
@@ -266,8 +338,153 @@ const AdminOrganizations = () => {
           </div>
         )}
       </div>
+    {/* Create Organization Dialog */}
+    <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create Organization</DialogTitle>
+          <DialogDescription>Set up a new tenant organization.</DialogDescription>
+        </DialogHeader>
+        <OrgForm onSubmit={handleCreateOrganization} onCancel={() => setCreateOpen(false)} submitLabel="Create" />
+      </DialogContent>
+    </Dialog>
+
+    {/* Edit Dialog */}
+    <Dialog open={!!editOpen} onOpenChange={(o) => !o && setEditOpen(null)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Organization</DialogTitle>
+          <DialogDescription>Update organization details.</DialogDescription>
+        </DialogHeader>
+        {editOpen && (
+          <OrgForm
+            initial={editOpen}
+            onSubmit={(data) => handleUpdateOrganization(editOpen.id, data)}
+            onCancel={() => setEditOpen(null)}
+            submitLabel="Save changes"
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+
+    {/* Top-up Dialog */}
+    <Dialog open={!!topUpOpen} onOpenChange={(o) => !o && setTopUpOpen(null)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Top up wallet</DialogTitle>
+          <DialogDescription>Increase organization wallet balance.</DialogDescription>
+        </DialogHeader>
+        {topUpOpen && (
+          <TopUpForm
+            org={topUpOpen}
+            onSubmit={(amount) => handleTopUp(topUpOpen.id, amount)}
+            onCancel={() => setTopUpOpen(null)}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+
+    {/* Delete Confirm */}
+    <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete organization?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently remove the organization and its demo data.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={() => setConfirmDelete(null)}>Cancel</AlertDialogCancel>
+          {confirmDelete && (
+            <AlertDialogAction onClick={() => handleDelete(confirmDelete.id)} className="bg-red-600 hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          )}
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
     </AdminDashboardLayout>
   );
 };
 
 export default AdminOrganizations;
+
+// ----- Forms -----
+interface OrgFormProps {
+  initial?: Partial<Organization>;
+  submitLabel: string;
+  onSubmit: (data: Partial<Organization>) => void;
+  onCancel: () => void;
+}
+
+const OrgForm = ({ initial, submitLabel, onSubmit, onCancel }: OrgFormProps) => {
+  const [form, setForm] = useState<Partial<Organization>>({
+    id: initial?.id || "",
+    name: initial?.name || "",
+    email: initial?.email || "",
+    adminName: initial?.adminName || "",
+    phone: initial?.phone || "",
+    status: initial?.status || "active",
+    walletBalance: initial?.walletBalance ?? 0,
+    members: initial?.members ?? 0,
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="text-sm">Name</label>
+          <Input value={form.name as string} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        </div>
+        <div>
+          <label className="text-sm">Email</label>
+          <Input value={form.email as string} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        </div>
+        <div>
+          <label className="text-sm">Admin name</label>
+          <Input value={form.adminName as string} onChange={(e) => setForm({ ...form, adminName: e.target.value })} />
+        </div>
+        <div>
+          <label className="text-sm">Phone</label>
+          <Input value={form.phone as string} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+        </div>
+        <div>
+          <label className="text-sm">Members</label>
+          <Input type="number" value={String(form.members ?? 0)} onChange={(e) => setForm({ ...form, members: Number(e.target.value) })} />
+        </div>
+        <div>
+          <label className="text-sm">Initial Wallet (UGX)</label>
+          <Input type="number" value={String(form.walletBalance ?? 0)} onChange={(e) => setForm({ ...form, walletBalance: Number(e.target.value) })} />
+        </div>
+      </div>
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button onClick={() => onSubmit(form)}>{submitLabel}</Button>
+      </DialogFooter>
+    </div>
+  );
+};
+
+interface TopUpFormProps {
+  org: Organization;
+  onSubmit: (amount: number) => void;
+  onCancel: () => void;
+}
+
+const TopUpForm = ({ org, onSubmit, onCancel }: TopUpFormProps) => {
+  const [amount, setAmount] = useState<number>(50000);
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">Current balance: UGX {org.walletBalance.toLocaleString()}</p>
+      <div>
+        <label className="text-sm">Amount (UGX)</label>
+        <Input type="number" value={String(amount)} onChange={(e) => setAmount(Number(e.target.value))} />
+      </div>
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button onClick={() => onSubmit(amount)}>Top up</Button>
+      </DialogFooter>
+    </div>
+  );
+};

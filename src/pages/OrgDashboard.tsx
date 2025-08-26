@@ -108,14 +108,15 @@ const OrgDashboard = () => {
   };
 
   const getStatusColor = (status: string) => {
+    // Restrict palette to blue and neutral for the demo
     switch (status) {
       case 'approved':
       case 'completed':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'pending':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
+        return 'bg-slate-50 text-slate-700 border-slate-200';
       case 'rejected':
-        return 'bg-red-50 text-red-700 border-red-200';
+        return 'bg-slate-100 text-slate-700 border-slate-200';
       default:
         return 'bg-slate-50 text-slate-700 border-slate-200';
     }
@@ -185,17 +186,17 @@ const OrgDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50 pb-24 md:pb-0">
+    <div className="min-h-screen bg-white pb-24 md:pb-0">
       {/* Mobile-First Header */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
         <div className="px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg">
                 <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </div>
           <div>
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900">
               Dashboard
             </h1>
                 <p className="text-xs sm:text-sm text-slate-600 hidden sm:block">
@@ -276,13 +277,13 @@ const OrgDashboard = () => {
         {/* Key Metrics - Compact Mobile Grid */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {/* Total Collections */}
-          <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-emerald-50 to-emerald-100/50">
+          <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-              <div className="p-1.5 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
-                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
+              <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               </div>
-                <Badge className="bg-white/80 text-emerald-700 border-emerald-200 text-xs px-1.5 py-0.5 hidden sm:inline">
+                <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">
                   +12.5%
                 </Badge>
             </div>
@@ -291,7 +292,7 @@ const OrgDashboard = () => {
                 <p className="text-sm sm:text-base font-bold text-slate-900">
               UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M
                 </p>
-                <div className="flex items-center gap-1 text-xs text-emerald-600">
+                <div className="flex items-center gap-1 text-xs text-blue-600">
                   <TrendingUp className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">from last month</span>
                   <span className="sm:hidden hidden">+12.5%</span>
@@ -301,22 +302,20 @@ const OrgDashboard = () => {
         </Card>
 
         {/* Wallet Balance */}
-        <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
+        <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between mb-2">
-              <div className="p-1.5 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
+              <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
                 <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               </div>
-              <Badge className="bg-white/80 text-white border-blue-200 text-xs px-1.5 py-0.5 bg-blue-500/90 hidden sm:inline">
-                -2.1%
-              </Badge>
+              <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">-2.1%</Badge>
             </div>
             <div className="space-y-1">
               <p className="text-xs font-medium text-slate-600">Wallet</p>
               <p className="text-sm sm:text-base font-bold text-slate-900">
                 UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M
               </p>
-              <div className="flex items-center gap-1 text-xs text-white bg-blue-500/80 rounded-full px-2 py-1 w-fit">
+              <div className="flex items-center gap-1 text-xs text-blue-700 bg-blue-50 rounded-full px-2 py-1 w-fit">
                 <TrendingDown className="h-2.5 w-2.5" />
                 <span className="hidden sm:inline">from last week</span>
                 <span className="sm:hidden hidden">-2.1%</span>
@@ -326,22 +325,20 @@ const OrgDashboard = () => {
         </Card>
 
           {/* Petty Cash Balance */}
-          <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-purple-50 to-purple-100/50">
+          <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
-                  <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
+                <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                  <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                 </div>
-                <Badge className="bg-white/80 text-white border-purple-200 text-xs px-1.5 py-0.5 bg-purple-500/90 hidden sm:inline">
-                  +5.2%
-                </Badge>
+                <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">+5.2%</Badge>
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-600">Petty Cash</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">
                   UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K
                 </p>
-                <div className="flex items-center gap-1 text-xs text-white bg-purple-500/80 rounded-full px-2 py-1 w-fit">
+                <div className="flex items-center gap-1 text-xs text-blue-700 bg-blue-50 rounded-full px-2 py-1 w-fit">
                   <TrendingUp className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">from last week</span>
                   <span className="sm:hidden hidden">+5.2%</span>
@@ -351,22 +348,20 @@ const OrgDashboard = () => {
           </Card>
 
           {/* Monthly Transactions */}
-          <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm bg-gradient-to-br from-orange-50 to-orange-100/50">
+          <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors">
-                  <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
+                <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                  <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                 </div>
-                <Badge className="bg-white/80 text-white border-orange-200 text-xs px-1.5 py-0.5 bg-orange-500/90 hidden sm:inline">
-                  +18.1%
-                </Badge>
+                <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">+18.1%</Badge>
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-600">Transactions</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">
                   {dashboardData.monthlyTransactions}
                 </p>
-                <div className="flex items-center gap-1 text-xs text-white bg-orange-500/80 rounded-full px-2 py-1 w-fit">
+                <div className="flex items-center gap-1 text-xs text-blue-700 bg-blue-50 rounded-full px-2 py-1 w-fit">
                   <TrendingUp className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">from last month</span>
                   <span className="sm:hidden hidden">+18.1%</span>
@@ -379,7 +374,7 @@ const OrgDashboard = () => {
         {/* Main Content Grid - Mobile-First */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Recent Transactions - Compact Mobile */}
-          <Card className="lg:col-span-2 border-0 shadow-sm bg-white">
+          <Card className="lg:col-span-2 border border-slate-100 shadow-sm bg-white">
             <CardHeader className="border-b border-slate-100 pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -443,38 +438,38 @@ const OrgDashboard = () => {
           <div className="space-y-4 sm:space-y-6">
             {/* Pending Approvals - Compact */}
             {hasPermission('approve_transactions') && (
-              <Card className="border-0 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/50">
-                <CardHeader className="border-b border-amber-100 pb-3">
+              <Card className="border border-slate-100 shadow-sm bg-white">
+                <CardHeader className="border-b border-slate-100 pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-amber-100">
-                        <Clock className="h-4 w-4 text-amber-600" />
+                      <div className="p-1.5 rounded-lg bg-blue-50">
+                        <Clock className="h-4 w-4 text-blue-600" />
                       </div>
                       <CardTitle className="text-sm font-semibold text-slate-900">Pending Approvals</CardTitle>
                     </div>
-                    <Badge className="bg-amber-500 text-white shadow-sm text-xs">
+                    <Badge className="bg-blue-600 text-white shadow-sm text-xs">
                       {dashboardData.pendingApprovals}
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
                   <div className="space-y-1.5 sm:space-y-2">
-                    <div className="flex justify-between items-center p-2 rounded-lg bg-white/60 border border-amber-100">
+                    <div className="flex justify-between items-center p-2 rounded-lg bg-white/60 border border-slate-100">
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
                         <span className="text-xs font-medium text-slate-700">Transactions</span>
                       </div>
-                      <Badge className="bg-amber-50 text-amber-700 border-amber-200 text-xs">5</Badge>
+                      <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-xs">5</Badge>
                     </div>
-                    <div className="flex justify-between items-center p-2 rounded-lg bg-white/60 border border-amber-100">
+                    <div className="flex justify-between items-center p-2 rounded-lg bg-white/60 border border-slate-100">
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
                         <span className="text-xs font-medium text-slate-700">Funding</span>
                       </div>
-                      <Badge className="bg-amber-50 text-amber-700 border-amber-200 text-xs">3</Badge>
+                      <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-xs">3</Badge>
                     </div>
                   </div>
-                  <Button className="w-full bg-amber-600 hover:bg-amber-700 shadow-sm h-7 sm:h-8 text-xs">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 shadow-sm h-7 sm:h-8 text-xs">
                     <CheckCircle className="h-3 w-3 mr-2" />
                     Review All
                   </Button>
@@ -528,10 +523,10 @@ const OrgDashboard = () => {
             )}
 
             {/* Wallet Actions - Compact */}
-            <Card className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
-              <CardHeader className="border-b border-blue-100 pb-3">
+            <Card className="border border-slate-100 shadow-sm bg-white">
+              <CardHeader className="border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-blue-100">
+                  <div className="p-1.5 rounded-lg bg-blue-50">
                     <Wallet className="h-4 w-4 text-blue-600" />
                   </div>
                   <CardTitle className="text-sm font-semibold text-slate-900">Wallet Actions</CardTitle>
@@ -601,7 +596,7 @@ const OrgDashboard = () => {
 
               <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                 <DialogTrigger asChild>
-                    <Button size="sm" variant="outline" className="w-full h-8 border-blue-200 hover:bg-blue-50 text-xs">
+                    <Button size="sm" variant="outline" className="w-full h-8 border-slate-200 hover:bg-slate-50 text-xs">
                       <Phone className="h-3 w-3 mr-2" />
                       Withdraw by Phone
                   </Button>
