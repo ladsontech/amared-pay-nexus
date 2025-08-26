@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
+import GroupedPaymentHistory from "@/components/bulk-payments/GroupedPaymentHistory";
 
 // Add shared bank names used for selection
 const BANK_NAMES = [
@@ -57,6 +58,60 @@ const BulkPayments = () => {
   const [mobilePaymentRows, setMobilePaymentRows] = useState<PaymentRow[]>([]);
   const [bulkDescription, setBulkDescription] = useState("");
   const { toast } = useToast();
+
+  // Mock grouped payment history data
+  const groupedPayments = [
+    {
+      id: "GP001",
+      title: "Monthly Salary Payment",
+      date: "2024-01-15",
+      totalAmount: 25000000,
+      totalRecipients: 150,
+      successCount: 145,
+      failedCount: 3,
+      pendingCount: 2,
+      status: "partial" as const,
+      details: [
+        { id: "D001", recipientName: "John Doe", amount: 500000, status: "success" as const, account: "1234567890" },
+        { id: "D002", recipientName: "Jane Smith", amount: 480000, status: "success" as const, account: "0987654321" },
+        { id: "D003", recipientName: "Bob Wilson", amount: 520000, status: "failed" as const, account: "1122334455", errorMessage: "Insufficient funds" },
+        { id: "D004", recipientName: "Alice Brown", amount: 490000, status: "pending" as const, account: "5566778899" },
+        { id: "D005", recipientName: "Charlie Davis", amount: 510000, status: "success" as const, account: "9988776655" },
+      ]
+    },
+    {
+      id: "GP002", 
+      title: "Vendor Payments Q1",
+      date: "2024-01-10",
+      totalAmount: 15000000,
+      totalRecipients: 75,
+      successCount: 75,
+      failedCount: 0,
+      pendingCount: 0,
+      status: "completed" as const,
+      details: [
+        { id: "D006", recipientName: "Tech Solutions Ltd", amount: 2000000, status: "success" as const, account: "1111222233" },
+        { id: "D007", recipientName: "Office Supplies Co", amount: 850000, status: "success" as const, account: "4444555566" },
+        { id: "D008", recipientName: "Cleaning Services", amount: 450000, status: "success" as const, account: "7777888899" },
+      ]
+    },
+    {
+      id: "GP003",
+      title: "Commission Payments",
+      date: "2024-01-08", 
+      totalAmount: 8500000,
+      totalRecipients: 120,
+      successCount: 95,
+      failedCount: 15,
+      pendingCount: 10,
+      status: "partial" as const,
+      details: [
+        { id: "D009", recipientName: "Sales Agent 1", amount: 150000, status: "success" as const, phoneNumber: "+256701234567" },
+        { id: "D010", recipientName: "Sales Agent 2", amount: 125000, status: "failed" as const, phoneNumber: "+256709876543", errorMessage: "Invalid phone number" },
+        { id: "D011", recipientName: "Sales Agent 3", amount: 175000, status: "pending" as const, phoneNumber: "+256705555555" },
+      ]
+    }
+  ];
 
   useEffect(() => {
     // Simulate fetching bulk payments
@@ -354,7 +409,7 @@ const BulkPayments = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search payments..."
+                placeholder="Search payment groups..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -373,63 +428,33 @@ const BulkPayments = () => {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <Card key={i} className="animate-pulse">
+                <Card key={i} className="animate-pulse border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
                   <CardHeader>
-                    <div className="h-4 bg-muted rounded w-1/2"></div>
-                    <div className="h-3 bg-muted rounded w-3/4"></div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="h-3 bg-muted rounded"></div>
-                      <div className="h-3 bg-muted rounded w-2/3"></div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-4 w-4 bg-muted rounded"></div>
+                        <div className="h-8 w-8 bg-muted rounded-lg"></div>
+                        <div>
+                          <div className="h-4 bg-muted rounded w-32 mb-2"></div>
+                          <div className="h-3 bg-muted rounded w-24"></div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="h-6 bg-muted rounded w-16 mb-2"></div>
+                        <div className="h-4 bg-muted rounded w-20"></div>
+                      </div>
                     </div>
-                  </CardContent>
+                  </CardHeader>
                 </Card>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {filteredPayments.map((payment) => (
-                <Card key={payment.id} className="hover:shadow-lg transition-all duration-200 hover:scale-[1.02] shadow-md border-0 bg-gradient-to-br from-card to-card/80">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-base sm:text-lg">{payment.id}</CardTitle>
-                      <Badge className={getStatusColor(payment.status)}>
-                        {payment.status}
-                      </Badge>
-                    </div>
-                    <CardDescription className="text-sm">{payment.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-xs sm:text-sm text-muted-foreground">Amount</span>
-                        <span className="text-sm sm:text-base font-medium">UGX {payment.amount.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-xs sm:text-sm text-muted-foreground">Recipients</span>
-                        <span className="text-sm sm:text-base font-medium">{payment.recipients}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-xs sm:text-sm text-muted-foreground">Created</span>
-                        <span className="text-sm sm:text-base font-medium">
-                          {new Date(payment.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <Button variant="outline" size="sm" className="w-full mt-4 text-xs sm:text-sm">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View Details
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <GroupedPaymentHistory payments={groupedPayments} />
           )}
 
-          {filteredPayments.length === 0 && !isLoading && (
+          {groupedPayments.length === 0 && !isLoading && (
             <Card>
               <CardContent className="text-center py-8 sm:py-12">
                 <div className="text-muted-foreground">
