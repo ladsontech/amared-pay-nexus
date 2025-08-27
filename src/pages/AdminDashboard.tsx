@@ -47,42 +47,42 @@ const AdminDashboard = () => {
       value: stats.totalOrganizations.toString(),
       icon: Building,
       description: "Registered organizations",
-      color: "text-blue-600"
+      color: "text-slate-500"
     },
     {
       title: "Active Organizations",
       value: stats.activeOrganizations.toString(),
       icon: Activity,
       description: "Currently active",
-      color: "text-blue-600"
+      color: "text-slate-500"
     },
     {
       title: "Total Users",
       value: stats.totalUsers.toString(),
       icon: Users,
       description: "Across all organizations",
-      color: "text-blue-600"
+      color: "text-slate-500"
     },
     {
       title: "System Wallet Balance",
       value: `UGX ${stats.totalWalletBalance.toLocaleString()}`,
       icon: DollarSign,
       description: "Total across all orgs",
-      color: "text-blue-600"
+      color: "text-slate-500"
     },
     {
       title: "Monthly Transactions",
       value: stats.monthlyTransactions.toString(),
       icon: TrendingUp,
       description: "This month",
-      color: "text-blue-600"
+      color: "text-slate-500"
     },
     {
       title: "System Alerts",
       value: stats.systemAlerts.toString(),
       icon: AlertTriangle,
       description: "Requires attention",
-      color: "text-blue-600"
+      color: "text-slate-500"
     }
   ];
 
