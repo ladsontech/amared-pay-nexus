@@ -330,7 +330,7 @@ const BulkPayments = () => {
         <div className="flex gap-2">
           {hasPermission("view_department_reports") && (
             <Button variant="outline" asChild>
-              <Link to="/org/reports?tab=bulk-payments" className="flex items-center space-x-2">
+              <Link to="/org/reports/bulk-payments" className="flex items-center space-x-2">
                 <FileText className="h-4 w-4" />
                 <span>View Bulk Payments Report</span>
               </Link>

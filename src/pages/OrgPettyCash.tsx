@@ -48,7 +48,7 @@ const PettyCash = () => {
           <div className="flex flex-wrap gap-2">
             {hasPermission("view_department_reports") && (
               <Button variant="outline" asChild>
-                <Link to="/org/reports?tab=petty-cash" className="flex items-center space-x-2">
+                <Link to="/org/reports/petty-cash" className="flex items-center space-x-2">
                   <FileText className="h-4 w-4" />
                   <span>View Petty Cash Report</span>
                 </Link>
