@@ -13,7 +13,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Home, Wallet, Send, DollarSign, BarChart3, Settings, CheckCircle, Building } from "lucide-react";
+import { Home, Wallet, Send, DollarSign, BarChart3, Settings, CheckCircle, Building, Users } from "lucide-react";
 import NewActionButton from "./NewActionButton";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -26,6 +26,7 @@ const orgItems: NavItem[] = [
   { title: "Collections", url: "/org/collections", icon: DollarSign, permission: "access_collections" },
   { title: "Approvals", url: "/org/approvals", icon: CheckCircle, permission: "approve_transactions" },
   { title: "Reports", url: "/org/reports", icon: BarChart3, permission: "view_department_reports" },
+  { title: "Users", url: "/org/users", icon: Users, permission: "manage_team" },
   { title: "Settings", url: "/org/settings", icon: Settings },
 ];
 
