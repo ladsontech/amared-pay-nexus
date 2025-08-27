@@ -35,7 +35,7 @@ const PettyCash = () => {
       description: "Collection of UGX 250,000 has been successfully recorded"
     });
   };
-  return <div className="space-y-4 sm:space-y-6">
+  return <div className="space-y-4 sm:space-y-6 pb-24 md:pb-0">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Petty Cash Management</h1>
@@ -70,7 +70,7 @@ const PettyCash = () => {
         return p;
       });
     }} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto gap-1 sm:gap-0">
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto gap-1 sm:gap-0 overflow-x-auto">
           <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
           <TabsTrigger value="add" className="text-xs sm:text-sm">Add Transaction</TabsTrigger>
           <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
