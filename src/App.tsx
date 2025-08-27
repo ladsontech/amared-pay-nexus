@@ -30,6 +30,7 @@ const OrgPettyCashReport = lazy(() => import("./pages/OrgPettyCashReport"));
 const OrgBulkPaymentsReport = lazy(() => import("./pages/OrgBulkPaymentsReport"));
 const OrgCollectionsReport = lazy(() => import("./pages/OrgCollectionsReport"));
 const OrgSettings = lazy(() => import("./pages/OrgSettings"));
+const OrgUsers = lazy(() => import("./pages/OrgUsers"));
 const Unauthorized = lazy(() => import("./pages/Unauthorized"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -121,6 +122,11 @@ const AppRoutes = () => {
           <Route path="reports/collections" element={
             <ProtectedRoute requiredPermissions={['view_department_reports']}>
               <OrgCollectionsReport />
+            </ProtectedRoute>
+          } />
+          <Route path="users" element={
+            <ProtectedRoute requiredPermissions={['manage_team']}>
+              <OrgUsers />
             </ProtectedRoute>
           } />
           <Route path="settings" element={<OrgSettings />} />
