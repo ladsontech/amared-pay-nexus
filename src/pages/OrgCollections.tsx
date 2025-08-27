@@ -313,12 +313,10 @@ const Collections = () => {
 
   return (
       <div className="space-y-4 md:space-y-6">
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-3">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Collections & Payment Links</h1>
-            <p className="text-sm md:text-base text-muted-foreground">
-              Manage mobile money collections and payment links (UGX only)
-            </p>
+            <h1 className="text-xl md:text-2xl font-semibold text-slate-900">Collections & Payment Links</h1>
+            <p className="text-sm text-muted-foreground">Manage mobile money collections and payment links (UGX only)</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
             {/** Only show if user can view reports **/}
@@ -434,32 +432,32 @@ const Collections = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {activeTab === "collections" ? (
             <>
-              <Card>
+              <Card className="border border-slate-100 bg-white">
                 <CardHeader>
-                  <CardTitle className="text-lg">Total Collections</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">Total Collections</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{collections.length}</div>
+                  <div className="text-xl sm:text-2xl font-bold">{collections.length}</div>
                   <p className="text-sm text-muted-foreground">All time</p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="border border-slate-100 bg-white">
                 <CardHeader>
-                  <CardTitle className="text-lg">Successful</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">Successful</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-xl sm:text-2xl font-bold text-green-600">
                     {collections.filter(c => c.status === "successful").length}
                   </div>
                   <p className="text-sm text-muted-foreground">Completed collections</p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="border border-slate-100 bg-white">
                 <CardHeader>
-                  <CardTitle className="text-lg">Total Amount</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">Total Amount</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-xl sm:text-2xl font-bold">
                     UGX {collections.reduce((sum, c) => sum + c.amount, 0).toLocaleString()}
                   </div>
                   <p className="text-sm text-muted-foreground">Total collected</p>

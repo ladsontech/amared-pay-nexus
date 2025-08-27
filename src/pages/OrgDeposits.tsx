@@ -11,6 +11,7 @@ import { Banknote, Search, Filter, Download, Eye, Plus, AlertCircle, Check, File
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
+import PageHeader from "@/components/PageHeader";
 
 interface BankDeposit {
   id: string;
@@ -346,20 +347,16 @@ const OrgDeposits = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Bank Deposits</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Manage and track your bank deposit transactions
-            </p>
-          </div>
-          <div className="w-full sm:w-auto">
+        <PageHeader 
+          title="Bank Deposits" 
+          subtitle="Manage and track your bank deposit transactions"
+          rightSlot={(
             <Button onClick={() => { setActiveTab("create"); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', 'create'); return p; }); }} className="w-full sm:w-auto">
               <Banknote className="h-4 w-4 mr-2" />
               Deposit to Bank
             </Button>
-          </div>
-        </div>
+          )}
+        />
 
       <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 h-auto gap-1 sm:gap-0">

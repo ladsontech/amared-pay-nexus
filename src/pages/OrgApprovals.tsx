@@ -19,6 +19,7 @@ import {
   Calendar
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import PageHeader from "@/components/PageHeader";
 
 const OrgApprovals = () => {
   const { toast } = useToast();
@@ -112,28 +113,26 @@ const OrgApprovals = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Approvals</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Review and approve pending transactions and funding requests
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search requests..."
-              className="pl-10 w-full sm:w-64"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <PageHeader 
+        title="Approvals"
+        subtitle="Review and approve pending transactions and funding requests"
+        rightSlot={(
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:flex-none">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search requests..."
+                className="pl-10 w-full sm:w-64"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Button variant="outline" size="icon" className="w-full sm:w-auto">
+              <Filter className="h-4 w-4" />
+            </Button>
           </div>
-          <Button variant="outline" size="icon" className="w-full sm:w-auto">
-            <Filter className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+        )}
+      />
 
       <Tabs defaultValue="transactions" className="space-y-4">
         <TabsList className="grid w-full grid-cols-2 h-auto">

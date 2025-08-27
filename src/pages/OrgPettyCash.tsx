@@ -38,10 +38,8 @@ const PettyCash = () => {
   return <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Petty Cash Management</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Manage petty cash transactions and requests
-          </p>
+          <h1 className="text-xl md:text-2xl font-semibold text-slate-900">Petty Cash Management</h1>
+          <p className="text-sm text-muted-foreground">Manage petty cash transactions and requests</p>
         </div>
         
                   {/* Quick Action Buttons */}

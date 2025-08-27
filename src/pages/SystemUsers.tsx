@@ -198,10 +198,8 @@ const AdminSystemUsers = () => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">System Users</h1>
-            <p className="text-muted-foreground">
-              Manage all users across the system
-            </p>
+            <h1 className="text-xl md:text-2xl font-semibold text-slate-900">System Users</h1>
+            <p className="text-sm text-muted-foreground">Manage all users across the system</p>
           </div>
           <div className="flex gap-2">
             <Button className="flex items-center space-x-2">
@@ -220,7 +218,7 @@ const AdminSystemUsers = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <Card>
+          <Card className="border border-slate-100 bg-white">
             <CardHeader>
               <CardTitle className="text-lg">Total Users</CardTitle>
             </CardHeader>
@@ -229,7 +227,7 @@ const AdminSystemUsers = () => {
               <p className="text-sm text-muted-foreground">System wide</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border border-slate-100 bg-white">
             <CardHeader>
               <CardTitle className="text-lg">Active Users</CardTitle>
             </CardHeader>
@@ -240,7 +238,7 @@ const AdminSystemUsers = () => {
               <p className="text-sm text-muted-foreground">Currently active</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border border-slate-100 bg-white">
             <CardHeader>
               <CardTitle className="text-lg">Admins</CardTitle>
             </CardHeader>
@@ -251,7 +249,7 @@ const AdminSystemUsers = () => {
               <p className="text-sm text-muted-foreground">Admin level access</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border border-slate-100 bg-white">
             <CardHeader>
               <CardTitle className="text-lg">Organizations</CardTitle>
             </CardHeader>
@@ -301,7 +299,7 @@ const AdminSystemUsers = () => {
         ) : (
           <div className="space-y-4">
             {filteredUsers.map((user) => (
-              <Card key={user.id} className="hover:shadow-lg transition-shadow">
+              <Card key={user.id} className="border border-slate-100 bg-white">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">

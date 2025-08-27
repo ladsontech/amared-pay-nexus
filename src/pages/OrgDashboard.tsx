@@ -102,142 +102,87 @@ const OrgDashboard = () => {
 
   return (
     <div className="min-h-screen bg-white pb-24 md:pb-0">
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
-        <div className="px-4 py-3 sm:px-6 sm:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg">
-                <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900">Dashboard</h1>
-                <p className="text-xs sm:text-sm text-slate-600 hidden sm:block">Welcome back, <span className="font-semibold text-slate-800">{user?.name}</span>!</p>
-              </div>
+      <div className="px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-blue-600 flex items-center justify-center">
+              <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </div>
-
-            <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 shadow-lg h-8 sm:h-9 px-3 sm:px-4">
-                  <Building className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                  <span className="text-xs sm:text-sm">Deposit</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md mx-4">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Building className="h-5 w-5 text-blue-600" />
-                    Select Bank for Deposit
-                  </DialogTitle>
-                  <DialogDescription>Choose bank account and transfer amount</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="bank-amount">Amount (UGX)</Label>
-                    <Input id="bank-amount" type="number" placeholder="Enter amount" value={bankTransferData.amount} onChange={(e) => setBankTransferData({ ...bankTransferData, amount: e.target.value })} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bank-account">Select Bank Account</Label>
-                    <Select value={bankTransferData.bankAccount} onValueChange={(value) => setBankTransferData({ ...bankTransferData, bankAccount: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose your bank" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
-                        <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
-                        <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
-                        <SelectItem value="equity-6789">Equity Bank - ***6789</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bank-description">Description</Label>
-                    <Input id="bank-description" placeholder="Transfer description" value={bankTransferData.description} onChange={(e) => setBankTransferData({ ...bankTransferData, description: e.target.value })} />
-                  </div>
-                  <Button onClick={handleSendToBank} className="w-full">Confirm Deposit</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <div>
+              <h1 className="text-xl md:text-2xl font-semibold text-slate-900">Dashboard</h1>
+              <p className="text-sm text-slate-600 hidden sm:block">Welcome back, <span className="font-medium text-slate-800">{user?.name}</span></p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
+          <Card className="border border-slate-100 bg-white">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                <div className="p-1.5 rounded-lg bg-blue-50">
                   <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                 </div>
-                <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">+12.5%</Badge>
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-700">Collections</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M</p>
-                <div className="flex items-center gap-1 text-xs text-blue-600">
-                  <TrendingUp className="h-2.5 w-2.5" />
-                  <span className="hidden sm:inline">from last month</span>
-                  <span className="sm:hidden hidden">+12.5%</span>
+                <div className="flex items-center gap-1 text-xs text-slate-500">
+                  <TrendingUp className="h-2.5 w-2.5 text-blue-600" />
+                  <span className="hidden sm:inline">From last month</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
+          <Card className="border border-slate-100 bg-white">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                <div className="p-1.5 rounded-lg bg-blue-50">
                   <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                 </div>
-                <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">-2.1%</Badge>
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-700">Wallet</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M</p>
-                <div className="flex items-center gap-1 text-xs text-blue-700 bg-blue-50 rounded-full px-2 py-1 w-fit">
-                  <TrendingDown className="h-2.5 w-2.5" />
-                  <span className="hidden sm:inline">from last week</span>
-                  <span className="sm:hidden hidden">-2.1%</span>
+                <div className="flex items-center gap-1 text-xs text-slate-500">
+                  <TrendingDown className="h-2.5 w-2.5 text-blue-600" />
+                  <span className="hidden sm:inline">From last week</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
+          <Card className="border border-slate-100 bg-white">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                <div className="p-1.5 rounded-lg bg-blue-50">
                   <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                 </div>
-                <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">+5.2%</Badge>
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-700">Petty Cash</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K</p>
-                <div className="flex items-center gap-1 text-xs text-blue-700 bg-blue-50 rounded-full px-2 py-1 w-fit">
-                  <TrendingUp className="h-2.5 w-2.5" />
-                  <span className="hidden sm:inline">from last week</span>
-                  <span className="sm:hidden hidden">+5.2%</span>
+                <div className="flex items-center gap-1 text-xs text-slate-500">
+                  <TrendingUp className="h-2.5 w-2.5 text-blue-600" />
+                  <span className="hidden sm:inline">From last week</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
+          <Card className="border border-slate-100 bg-white">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                <div className="p-1.5 rounded-lg bg-blue-50">
                   <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                 </div>
-                <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">+18.1%</Badge>
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-700">Transactions</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">{dashboardData.monthlyTransactions}</p>
-                <div className="flex items-center gap-1 text-xs text-blue-700 bg-blue-50 rounded-full px-2 py-1 w-fit">
-                  <TrendingUp className="h-2.5 w-2.5" />
-                  <span className="hidden sm:inline">from last month</span>
-                  <span className="sm:hidden hidden">+18.1%</span>
+                <div className="flex items-center gap-1 text-xs text-slate-500">
+                  <TrendingUp className="h-2.5 w-2.5 text-blue-600" />
+                  <span className="hidden sm:inline">From last month</span>
                 </div>
               </div>
             </CardContent>
@@ -245,7 +190,7 @@ const OrgDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          <Card className="lg:col-span-2 border border-slate-100 shadow-sm bg-white">
+          <Card className="lg:col-span-2 border border-slate-100 bg-white">
             <CardHeader className="border-b border-slate-100 pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -257,7 +202,7 @@ const OrgDashboard = () => {
                     <CardDescription className="text-xs text-slate-600 hidden sm:block">Latest financial activities</CardDescription>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm" className="h-7 text-xs text-slate-600 hover:text-slate-800">View All</Button>
+                <Button variant="ghost" size="sm" className="h-7 text-xs text-slate-600 hover:text-slate-800">View all</Button>
               </div>
             </CardHeader>
             <CardContent className="p-3 sm:p-4">
@@ -266,7 +211,7 @@ const OrgDashboard = () => {
                   const StatusIcon = getStatusIcon(transaction.status);
                   const TransactionIcon = getTransactionIcon(transaction.type);
                   return (
-                    <div key={transaction.id} className="group flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200 bg-slate-50/50 hover:bg-white">
+                    <div key={transaction.id} className="group flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-slate-100 bg-white">
                       <div className="flex items-center gap-2.5 sm:gap-3">
                         <div className="relative">
                           <div className="p-1.5 sm:p-2 rounded-lg bg-white group-hover:bg-slate-50 transition-colors">

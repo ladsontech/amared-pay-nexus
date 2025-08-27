@@ -221,7 +221,7 @@ const BulkPayments = () => {
       payment.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const updatePaymentRow = (type: "bank" | "mobile", id: string, field: keyof PaymentRow, value: any) => {
+  const updatePaymentRow = (type: "bank" | "mobile", id: string, field: keyof PaymentRow, value: PaymentRow[keyof PaymentRow]) => {
     const updateFunction = (prev: PaymentRow[]) => prev.map(row => 
       row.id === id ? { ...row, [field]: value } : row
     );
@@ -377,10 +377,8 @@ const BulkPayments = () => {
     <div className="space-y-4 sm:space-y-6 pb-24 md:pb-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Bulk Payments</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Manage and monitor your bulk payment transactions
-          </p>
+          <h1 className="text-xl md:text-2xl font-semibold text-slate-900">Bulk Payments</h1>
+          <p className="text-sm text-muted-foreground">Manage and monitor your bulk payment transactions</p>
         </div>
         <div className="flex gap-2">
           {hasPermission("view_department_reports") && (
@@ -430,7 +428,7 @@ const BulkPayments = () => {
           {isLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <Card key={i} className="animate-pulse border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
+                <Card key={i} className="animate-pulse border border-slate-100 bg-white">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -468,7 +466,7 @@ const BulkPayments = () => {
         </TabsContent>
 
         <TabsContent value="bank" className="space-y-4">
-          <Card className="shadow-md border-0 bg-gradient-to-br from-card to-card/80">
+          <Card className="border border-slate-100 bg-white">
             <CardHeader>
               <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <span>Bank Bulk Payments</span>
@@ -643,7 +641,7 @@ const BulkPayments = () => {
         </TabsContent>
 
         <TabsContent value="mobile" className="space-y-4">
-          <Card className="shadow-md border-0 bg-gradient-to-br from-card to-card/80">
+          <Card className="border border-slate-100 bg-white">
             <CardHeader>
               <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <span>Mobile Money Bulk Payments</span>

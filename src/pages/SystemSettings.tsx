@@ -43,10 +43,8 @@ const SystemSettings = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">System Settings</h1>
-          <p className="text-muted-foreground">
-            Configure global system settings and preferences
-          </p>
+          <h1 className="text-xl md:text-2xl font-semibold text-slate-900">System Settings</h1>
+          <p className="text-sm text-muted-foreground">Configure global system settings and preferences</p>
         </div>
         <Button onClick={handleSave}>
           <Save className="h-4 w-4 mr-2" />

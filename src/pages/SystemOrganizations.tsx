@@ -170,10 +170,8 @@ const AdminOrganizations = () => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">System Organizations</h1>
-            <p className="text-muted-foreground">
-              Manage all organizations in the system
-            </p>
+            <h1 className="text-xl md:text-2xl font-semibold text-slate-900">System Organizations</h1>
+            <p className="text-sm text-muted-foreground">Manage all organizations in the system</p>
           </div>
           <Button className="flex items-center space-x-2" onClick={() => setCreateOpen(true)}>
             <Plus className="h-4 w-4" />
@@ -182,7 +180,7 @@ const AdminOrganizations = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <Card>
+          <Card className="border border-slate-100 bg-white">
             <CardHeader>
               <CardTitle className="text-lg">Total Organizations</CardTitle>
             </CardHeader>
@@ -191,7 +189,7 @@ const AdminOrganizations = () => {
               <p className="text-sm text-muted-foreground">Registered</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border border-slate-100 bg-white">
             <CardHeader>
               <CardTitle className="text-lg">Active</CardTitle>
             </CardHeader>
@@ -202,7 +200,7 @@ const AdminOrganizations = () => {
               <p className="text-sm text-muted-foreground">Currently active</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border border-slate-100 bg-white">
             <CardHeader>
               <CardTitle className="text-lg">Total Balance</CardTitle>
             </CardHeader>
@@ -213,7 +211,7 @@ const AdminOrganizations = () => {
               <p className="text-sm text-muted-foreground">System wide</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border border-slate-100 bg-white">
             <CardHeader>
               <CardTitle className="text-lg">Total Users</CardTitle>
             </CardHeader>
@@ -263,7 +261,7 @@ const AdminOrganizations = () => {
         ) : (
           <div className="space-y-4">
             {filteredOrganizations.map((org) => (
-              <Card key={org.id} className="hover:shadow-lg transition-shadow">
+              <Card key={org.id} className="border border-slate-100 bg-white">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">

@@ -30,10 +30,12 @@ export interface TokenVerifyRequest {
 
 class AuthService {
   private getAuthHeaders() {
-    return {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer demo_token`
-    };
+    const accessToken = localStorage.getItem("access_token") || localStorage.getItem("auth_token");
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+    return headers;
   }
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
@@ -107,6 +109,16 @@ class AuthService {
   }
 
   async logout(): Promise<void> {
+    // Attempt backend logout if available (non-blocking)
+    try {
+      await fetch(`${API_BASE_URL}/auth/logout/`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+      });
+    } catch (e) {
+      // Ignore network/logout endpoint errors
+    }
+
     // Clear local storage
     localStorage.removeItem("auth_token");
     localStorage.removeItem("access_token");
@@ -195,24 +207,22 @@ class AuthService {
       return true; // Token is valid
     } catch (error) {
       console.error("Token verify API error:", error);
-      // Fallback to demo mode - always return true
-      return true;
+      return false;
     }
   }
 
   isAuthenticated(): boolean {
-    // Always return true for demo purposes
-    return true;
+    const accessToken = localStorage.getItem("access_token") || localStorage.getItem("auth_token");
+    return Boolean(accessToken);
   }
 
   getCurrentUser() {
-    // Return mock user data for demo
-    return {
-      username: "Demo User",
-      email: "demo@example.com",
-      name: "Demo User",
-      organization: "Demo Organization"
-    };
+    try {
+      const stored = localStorage.getItem("user");
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
   }
 }
 

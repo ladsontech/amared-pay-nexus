@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    // Simulate loading user from localStorage or API
+    // Load user from localStorage
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
@@ -76,20 +76,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await authService.login({ email, password });
       
-      // Convert LoginResponse to User type
+      // Build user object from API response or sensible defaults
+      type ApiLogin = Partial<User> & { permissions?: Permission[]; role?: import('@/types/auth').UserRole } & { organization_id?: string; organization?: string };
+      const api = response as ApiLogin;
+      const apiPermissions = api.permissions;
+      const apiRole = api.role;
+      const organizationId = api.organizationId || api.organization_id || 'default-org';
+      const organizationName = api.organization?.name || api.organization || 'Default Organization';
+
       const user: User = {
         id: response.username || 'unknown',
         name: response.username || 'Unknown User',
         email: response.email,
-        role: 'staff', // Default role, should come from API response
-        organizationId: 'default-org',
+        role: apiRole ?? 'staff',
+        organizationId,
         organization: {
-          id: 'default-org',
-          name: 'Default Organization',
-          description: 'Default organization',
+          id: organizationId,
+          name: organizationName,
+          description: organizationName,
           industry: 'Finance'
         },
-        permissions: ['access_petty_cash', 'access_bulk_payments', 'access_collections'],
+        permissions: apiPermissions && apiPermissions.length > 0 ? apiPermissions : ['access_petty_cash', 'access_bulk_payments', 'access_collections'],
         position: 'Staff Member'
       };
       
