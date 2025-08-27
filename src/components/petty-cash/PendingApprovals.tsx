@@ -96,29 +96,20 @@ const PendingApprovals = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "approved":
-        return "bg-green-100 text-green-800";
-      case "rejected":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  const getStatusColor = (_status: string) => {
+    return "bg-blue-100 text-blue-800";
   };
 
   const pendingRequests = requests.filter(req => req.status === "pending");
 
   return (
-    <Card>
+    <Card className="bg-blue-50 border border-blue-200">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Clock className="h-5 w-5" />
           Pending Approvals ({pendingRequests.length})
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-blue-700">
           Review and approve petty cash requests from your organization members
         </CardDescription>
       </CardHeader>
@@ -137,7 +128,7 @@ const PendingApprovals = () => {
         ) : (
           <div className="space-y-4">
             {pendingRequests.map((request) => (
-              <Card key={request.id} className="border-l-4 border-l-yellow-500">
+              <Card key={request.id} className="bg-blue-50 border border-blue-200">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="space-y-2 flex-1">

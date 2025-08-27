@@ -12,6 +12,16 @@ import { Plus, UserCircle, Search, ShieldCheck, Pencil, Trash2 } from "lucide-re
 import { Permission, User, rolePermissions } from "@/types/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { demoUsers } from "@/data/demoData";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog";
 
 type OrgUser = User;
 
@@ -26,6 +36,10 @@ export default function OrgUsers() {
   const [users, setUsers] = useState<OrgUser[]>([]);
   const [open, setOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<OrgUser | null>(null);
+  const [confirmDeleteUser, setConfirmDeleteUser] = useState<OrgUser | null>(null);
+  const [verifyOrgName, setVerifyOrgName] = useState("");
+  const [verifyEmail, setVerifyEmail] = useState("");
+  const [verifyPhrase, setVerifyPhrase] = useState("");
 
   const isManager = currentUser?.permissions?.includes("manage_team");
 
@@ -167,7 +181,7 @@ export default function OrgUsers() {
                         onSave={handleAddOrUpdate}
                       />
                     </Dialog>
-                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700" onClick={() => handleDelete(u.id)}>
+                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700" onClick={() => setConfirmDeleteUser(u)}>
                       <Trash2 className="h-4 w-4 mr-1" /> Remove
                     </Button>
                   </div>
@@ -177,6 +191,70 @@ export default function OrgUsers() {
           </Card>
         ))}
       </div>
+      {/* Secure Delete Verification */}
+      <AlertDialog open={!!confirmDeleteUser} onOpenChange={(o) => { if (!o) { setConfirmDeleteUser(null); setVerifyOrgName(""); setVerifyEmail(""); setVerifyPhrase(""); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm user removal</AlertDialogTitle>
+            <AlertDialogDescription>
+              Please complete all verification steps to permanently remove this user.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm font-medium mb-1">Step 1: Type your organization name</p>
+              <Input
+                placeholder={currentUser?.organization?.name || "Organization name"}
+                value={verifyOrgName}
+                onChange={(e) => setVerifyOrgName(e.target.value)}
+              />
+            </div>
+            <div>
+              <p className="text-sm font-medium mb-1">Step 2: Type the email of the user to be removed</p>
+              <Input
+                placeholder={confirmDeleteUser?.email || "user@example.com"}
+                value={verifyEmail}
+                onChange={(e) => setVerifyEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <p className="text-sm font-medium mb-1">Step 3: Type DELETE to confirm</p>
+              <Input
+                placeholder="Type DELETE"
+                value={verifyPhrase}
+                onChange={(e) => setVerifyPhrase(e.target.value)}
+              />
+            </div>
+            <div className="rounded-md border p-3 text-sm bg-blue-50 border-blue-200 text-blue-800">
+              This action is irreversible. The user and their demo data will be removed from your organization.
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => { setConfirmDeleteUser(null); setVerifyOrgName(""); setVerifyEmail(""); setVerifyPhrase(""); }}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              disabled={
+                !confirmDeleteUser ||
+                !currentUser?.organization?.name ||
+                verifyOrgName.trim() !== (currentUser?.organization?.name || "") ||
+                verifyEmail.trim().toLowerCase() !== (confirmDeleteUser?.email.toLowerCase() || "") ||
+                verifyPhrase.trim().toUpperCase() !== "DELETE"
+              }
+              onClick={() => {
+                if (confirmDeleteUser) {
+                  handleDelete(confirmDeleteUser.id);
+                }
+                setConfirmDeleteUser(null);
+                setVerifyOrgName("");
+                setVerifyEmail("");
+                setVerifyPhrase("");
+              }}
+            >
+              Permanently Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

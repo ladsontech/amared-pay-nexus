@@ -219,7 +219,7 @@ const TransactionHistory = () => {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-blue-50 border border-blue-200">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -227,7 +227,7 @@ const TransactionHistory = () => {
                 <Calendar className="h-5 w-5" />
                 Transaction History
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-blue-700">
                 View and filter all petty cash transactions
               </CardDescription>
             </div>
