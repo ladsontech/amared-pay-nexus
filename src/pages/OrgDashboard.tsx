@@ -112,11 +112,11 @@ const OrgDashboard = () => {
     switch (status) {
       case 'approved':
       case 'completed':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
+        return 'bg-slate-50 text-slate-700 border-slate-200';
       case 'pending':
         return 'bg-slate-50 text-slate-700 border-slate-200';
       case 'rejected':
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-slate-50 text-slate-700 border-slate-200';
       default:
         return 'bg-slate-50 text-slate-700 border-slate-200';
     }
@@ -280,12 +280,10 @@ const OrgDashboard = () => {
           <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-              <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
-                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+              <div className="p-1.5 rounded-lg bg-slate-100 group-hover:bg-slate-200 transition-colors">
+                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-slate-600" />
               </div>
-                <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">
-                  +12.5%
-                </Badge>
+                
             </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-600">Collections</p>
@@ -305,20 +303,19 @@ const OrgDashboard = () => {
         <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-center justify-between mb-2">
-              <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
-                <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+              <div className="p-1.5 rounded-lg bg-slate-100 group-hover:bg-slate-200 transition-colors">
+                <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-slate-600" />
               </div>
-              <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">-2.1%</Badge>
+              
             </div>
             <div className="space-y-1">
               <p className="text-xs font-medium text-slate-600">Wallet</p>
               <p className="text-sm sm:text-base font-bold text-slate-900">
                 UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M
               </p>
-              <div className="flex items-center gap-1 text-xs text-blue-700 bg-blue-50 rounded-full px-2 py-1 w-fit">
+              <div className="flex items-center gap-1 text-xs text-slate-600 bg-slate-100 rounded-full px-2 py-1 w-fit">
                 <TrendingDown className="h-2.5 w-2.5" />
                 <span className="hidden sm:inline">from last week</span>
-                <span className="sm:hidden hidden">-2.1%</span>
               </div>
             </div>
           </CardContent>
@@ -328,20 +325,19 @@ const OrgDashboard = () => {
           <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
-                  <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                <div className="p-1.5 rounded-lg bg-slate-100 group-hover:bg-slate-200 transition-colors">
+                  <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-slate-600" />
                 </div>
-                <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">+5.2%</Badge>
+                
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-600">Petty Cash</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">
                   UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K
                 </p>
-                <div className="flex items-center gap-1 text-xs text-blue-700 bg-blue-50 rounded-full px-2 py-1 w-fit">
+                <div className="flex items-center gap-1 text-xs text-slate-600 bg-slate-100 rounded-full px-2 py-1 w-fit">
                   <TrendingUp className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">from last week</span>
-                  <span className="sm:hidden hidden">+5.2%</span>
                 </div>
               </div>
             </CardContent>
@@ -351,20 +347,19 @@ const OrgDashboard = () => {
           <Card className="group hover:shadow-lg transition-all duration-200 border border-slate-100 shadow-sm bg-white">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="p-1.5 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
-                  <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                <div className="p-1.5 rounded-lg bg-slate-100 group-hover:bg-slate-200 transition-colors">
+                  <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-slate-600" />
                 </div>
-                <Badge className="bg-white/80 text-slate-700 border-slate-200 text-xs px-1.5 py-0.5 hidden sm:inline">+18.1%</Badge>
+                
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-slate-600">Transactions</p>
                 <p className="text-sm sm:text-base font-bold text-slate-900">
                   {dashboardData.monthlyTransactions}
                 </p>
-                <div className="flex items-center gap-1 text-xs text-blue-700 bg-blue-50 rounded-full px-2 py-1 w-fit">
+                <div className="flex items-center gap-1 text-xs text-slate-600 bg-slate-100 rounded-full px-2 py-1 w-fit">
                   <TrendingUp className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">from last month</span>
-                  <span className="sm:hidden hidden">+18.1%</span>
                 </div>
               </div>
             </CardContent>
@@ -447,7 +442,7 @@ const OrgDashboard = () => {
                       </div>
                       <CardTitle className="text-sm font-semibold text-slate-900">Pending Approvals</CardTitle>
                     </div>
-                    <Badge className="bg-blue-600 text-white shadow-sm text-xs">
+                    <Badge className="text-xs">
                       {dashboardData.pendingApprovals}
                     </Badge>
                   </div>
@@ -456,20 +451,20 @@ const OrgDashboard = () => {
                   <div className="space-y-1.5 sm:space-y-2">
                     <div className="flex justify-between items-center p-2 rounded-lg bg-white/60 border border-slate-100">
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
                         <span className="text-xs font-medium text-slate-700">Transactions</span>
                       </div>
-                      <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-xs">5</Badge>
+                      <Badge className="text-xs">5</Badge>
                     </div>
                     <div className="flex justify-between items-center p-2 rounded-lg bg-white/60 border border-slate-100">
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
                         <span className="text-xs font-medium text-slate-700">Funding</span>
                       </div>
-                      <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-xs">3</Badge>
+                      <Badge className="text-xs">3</Badge>
                     </div>
                   </div>
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 shadow-sm h-7 sm:h-8 text-xs">
+                  <Button className="w-full h-7 sm:h-8 text-xs">
                     <CheckCircle className="h-3 w-3 mr-2" />
                     Review All
                   </Button>

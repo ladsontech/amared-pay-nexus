@@ -55,28 +55,28 @@ const OrganizationDashboard = () => {
       value: orgStats.totalPayments.toString(),
       icon: CreditCard,
       description: "This month",
-      color: "text-purple-600"
+      color: "text-slate-500"
     },
     {
       title: "Successful",
       value: orgStats.successfulTransactions.toString(),
       icon: TrendingUp,
       description: "Completed transactions",
-      color: "text-emerald-600"
+      color: "text-slate-500"
     },
     {
       title: "Pending",
       value: orgStats.pendingTransactions.toString(),
       icon: Activity,
       description: "Awaiting processing",
-      color: "text-orange-600"
+      color: "text-slate-500"
     },
     {
       title: "Sub-Admins",
       value: orgStats.subAdmins.toString(),
       icon: Users,
       description: "Active team members",
-      color: "text-cyan-600"
+      color: "text-slate-500"
     }
   ];
 

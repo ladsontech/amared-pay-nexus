@@ -44,37 +44,31 @@ const Dashboard = () => {
     value: stats.totalPayments.toLocaleString(),
     icon: CreditCard,
     description: "All-time bulk payments",
-    color: "text-blue-600"
+    color: "text-slate-500"
   }, {
     title: "Total Amount",
     value: `UGX ${stats.totalAmount.toLocaleString()}`,
     icon: DollarSign,
     description: "Total processed amount",
-    color: "text-green-600"
+    color: "text-slate-500"
   }, {
     title: "Successful",
     value: stats.successfulTransactions.toLocaleString(),
     icon: TrendingUp,
     description: "Completed transactions",
-    color: "text-emerald-600"
+    color: "text-slate-500"
   }, {
     title: "Pending",
     value: stats.pendingTransactions.toLocaleString(),
     icon: Activity,
     description: "Processing transactions",
-    color: "text-orange-600"
+    color: "text-slate-500"
   }, {
     title: "Organizations",
     value: stats.organizations.toLocaleString(),
     icon: Users,
     description: "Active organizations",
-    color: "text-purple-600"
-  }, {
-    title: "Growth",
-    value: `+${stats.monthlyGrowth}%`,
-    icon: TrendingUp,
-    description: "Monthly growth rate",
-    color: "text-cyan-600"
+    color: "text-slate-500"
   }];
   return <DashboardLayout>
       <div className="space-y-4 sm:space-y-6">
@@ -92,7 +86,7 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
-          {statCards.map((card, index) => <Card key={index} className="hover:shadow-md transition-shadow">
+          {statCards.map((card, index) => <Card key={index} className="hover:shadow-md transition-shadow border border-slate-100">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-xs sm:text-sm font-medium">
                   {card.title}
@@ -100,13 +94,7 @@ const Dashboard = () => {
                 <card.icon className={`h-3 w-3 sm:h-4 sm:w-4 ${card.color}`} />
               </CardHeader>
               <CardContent>
-                <div className="text-base sm:text-lg lg:text-xl xl:text-2xl font-bold">
-                  {card.title === "Growth" ? (
-                    <span className="hidden sm:inline">{card.value}</span>
-                  ) : (
-                    card.value
-                  )}
-                </div>
+                <div className="text-base sm:text-lg lg:text-xl xl:text-2xl font-bold text-slate-900">{card.value}</div>
                 <CardDescription className="text-xs">
                   {card.description}
                 </CardDescription>
