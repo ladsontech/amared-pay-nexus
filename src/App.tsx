@@ -26,6 +26,9 @@ const OrgCollections = lazy(() => import("./pages/OrgCollections"));
 const OrgDeposits = lazy(() => import("./pages/OrgDeposits"));
 const OrgApprovals = lazy(() => import("./pages/OrgApprovals"));
 const OrgReports = lazy(() => import("./pages/OrgReports"));
+const OrgPettyCashReport = lazy(() => import("./pages/OrgPettyCashReport"));
+const OrgBulkPaymentsReport = lazy(() => import("./pages/OrgBulkPaymentsReport"));
+const OrgCollectionsReport = lazy(() => import("./pages/OrgCollectionsReport"));
 const OrgSettings = lazy(() => import("./pages/OrgSettings"));
 const Unauthorized = lazy(() => import("./pages/Unauthorized"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -103,6 +106,21 @@ const AppRoutes = () => {
           <Route path="reports" element={
             <ProtectedRoute requiredPermissions={['view_department_reports']}>
               <OrgReports />
+            </ProtectedRoute>
+          } />
+          <Route path="reports/petty-cash" element={
+            <ProtectedRoute requiredPermissions={['view_department_reports']}>
+              <OrgPettyCashReport />
+            </ProtectedRoute>
+          } />
+          <Route path="reports/bulk-payments" element={
+            <ProtectedRoute requiredPermissions={['view_department_reports']}>
+              <OrgBulkPaymentsReport />
+            </ProtectedRoute>
+          } />
+          <Route path="reports/collections" element={
+            <ProtectedRoute requiredPermissions={['view_department_reports']}>
+              <OrgCollectionsReport />
             </ProtectedRoute>
           } />
           <Route path="settings" element={<OrgSettings />} />

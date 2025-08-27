@@ -324,7 +324,7 @@ const Collections = () => {
             {/** Only show if user can view reports **/}
             {hasPermission("view_department_reports") && (
               <Button variant="outline" asChild>
-                <Link to="/org/reports?tab=collections" className="flex items-center space-x-2">
+                <Link to="/org/reports/collections" className="flex items-center space-x-2">
                   <FileText className="h-4 w-4" />
                   <span>View Collections Report</span>
                 </Link>
