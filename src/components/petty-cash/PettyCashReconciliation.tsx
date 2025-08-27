@@ -60,7 +60,7 @@ const PettyCashReconciliation = ({ currentBalance }: PettyCashReconciliationProp
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-blue-50 border border-blue-200">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calculator className="h-5 w-5" />
@@ -148,7 +148,7 @@ const PettyCashReconciliation = ({ currentBalance }: PettyCashReconciliationProp
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-blue-50 border border-blue-200">
         <CardHeader>
           <CardTitle>Reconciliation History</CardTitle>
           <CardDescription>Recent reconciliation records</CardDescription>

@@ -125,7 +125,7 @@ const BulkPaymentApprovals = () => {
         </h3>
         
         {pendingPayments.length === 0 ? (
-          <Card>
+          <Card className="bg-blue-50 border border-blue-200">
             <CardContent className="flex items-center justify-center py-8">
               <p className="text-muted-foreground">No pending bulk payment approvals</p>
             </CardContent>
@@ -133,7 +133,7 @@ const BulkPaymentApprovals = () => {
         ) : (
           <div className="grid grid-cols-1 gap-4">
             {pendingPayments.map((payment) => (
-              <Card key={payment.id} className="border-l-4 border-l-orange-500">
+              <Card key={payment.id} className="bg-blue-50 border border-blue-200">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
@@ -200,7 +200,7 @@ const BulkPaymentApprovals = () => {
           <h3 className="text-lg font-semibold mb-4">Recent Processed Payments</h3>
           <div className="grid grid-cols-1 gap-4">
             {processedPayments.map((payment) => (
-              <Card key={payment.id} className="opacity-75">
+              <Card key={payment.id} className="opacity-75 bg-blue-50 border border-blue-200">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">

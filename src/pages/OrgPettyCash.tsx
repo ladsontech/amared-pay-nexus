@@ -83,13 +83,13 @@ const PettyCash = () => {
         </TabsContent>
 
         <TabsContent value="add" className="space-y-4">
-          <Card>
+          <Card className="bg-blue-50 border border-blue-200">
             <CardHeader>
               <div className="flex items-center space-x-2">
-                <Wallet className="h-5 w-5 text-primary" />
+                <Wallet className="h-5 w-5 text-blue-600" />
                 <CardTitle className="text-lg sm:text-xl">Add New Transaction</CardTitle>
               </div>
-              <CardDescription className="text-sm">
+              <CardDescription className="text-sm text-blue-700">
                 Submit a new petty cash request for approval
               </CardDescription>
             </CardHeader>
