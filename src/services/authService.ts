@@ -1,4 +1,5 @@
-const API_BASE_URL = (import.meta as any)?.env?.VITE_API_BASE_URL || "https://bulksrv.almaredagencyuganda.com";
+import { API_CONFIG } from './api-config';
+import { apiClient } from './apiClient';
 import { rolePermissions } from '@/types/auth';
 
 export interface LoginRequest {
@@ -72,7 +73,7 @@ class AuthService {
     const identity = credentials.username || credentials.email;
     const headers = this.getBasicHeadersFromCredentials(identity, credentials.password);
 
-    const response = await fetch(`${API_BASE_URL}/auth/login/`, {
+    const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.login}`, {
       method: "POST",
       headers,
       body: JSON.stringify(
@@ -134,7 +135,7 @@ class AuthService {
   async logout(): Promise<void> {
     try {
       // Try GET logout
-      await fetch(`${API_BASE_URL}/auth/logout/`, {
+      await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.logout}`, {
         method: "GET",
         headers: this.getBasicHeaders()
       });
@@ -142,7 +143,7 @@ class AuthService {
 
     try {
       // Fallback POST logout
-      await fetch(`${API_BASE_URL}/auth/logout/`, {
+      await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.logout}`, {
         method: "POST",
         headers: this.getBasicHeaders()
       });
@@ -158,7 +159,7 @@ class AuthService {
 
   async changePassword(passwordData: ChangePasswordRequest): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/password/change`, {
+      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.changePassword}`, {
         method: "POST",
         headers: this.getBasicHeaders(),
         body: JSON.stringify(passwordData)
@@ -177,7 +178,7 @@ class AuthService {
   async refreshToken(): Promise<{ access: string; refresh: string }> {
     const refresh = localStorage.getItem("refresh_token") || "";
     const body: TokenRefreshRequest = { refresh };
-    const response = await fetch(`${API_BASE_URL}/auth/token/refresh/`, {
+    const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.refresh}`, {
       method: "POST",
       headers: this.getBasicHeaders(),
       body: JSON.stringify(body)
@@ -199,7 +200,7 @@ class AuthService {
 
   async verifyToken(token: string): Promise<boolean> {
     const body: TokenVerifyRequest = { token };
-    const response = await fetch(`${API_BASE_URL}/auth/token/verify/`, {
+    const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.verify}`, {
       method: "POST",
       headers: this.getBasicHeaders(),
       body: JSON.stringify(body)
