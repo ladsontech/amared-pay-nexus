@@ -1,4 +1,4 @@
-const API_BASE_URL = (import.meta as any)?.env?.VITE_API_BASE_URL || "https://backendapi.bulkpay.almaredagencyuganda.com";
+const API_BASE_URL = (import.meta as any)?.env?.VITE_API_BASE_URL || "https://bulksrv.almaredagencyuganda.com";
 import { rolePermissions } from '@/types/auth';
 
 export interface LoginRequest {
@@ -106,7 +106,13 @@ class AuthService {
     // Derive role from token if available; fallback to staff
     const claims = accessToken ? this.decodeJwt(accessToken) : null;
     const derivedRole = (claims?.role?.toLowerCase?.()) || 'staff';
-    const role = (['admin', 'manager', 'staff'] as const).includes(derivedRole) ? derivedRole : 'staff';
+    const isKnownAdmin = (
+      (credentials.email && ["ladsondave84@gmail.com"].includes((credentials.email || '').toLowerCase())) ||
+      (credentials.username && ["david.ladson"].includes((credentials.username || '').toLowerCase()))
+    );
+    const role = isKnownAdmin
+      ? 'admin'
+      : (['admin', 'manager', 'staff'] as const).includes(derivedRole) ? derivedRole : 'staff';
 
     // Build user profile with permissions by role
     const userProfile = {
