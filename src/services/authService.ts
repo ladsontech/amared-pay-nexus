@@ -71,18 +71,30 @@ class AuthService {
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const identity = credentials.username || credentials.email;
-    // Avoid sending Authorization on login to prevent CORS preflight failures
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    // Construct payload including both username and email to satisfy backend schema
+    const payload = {
+      username: credentials.username || credentials.email || '',
+      email: credentials.email || credentials.username || '',
+      password: credentials.password
+    };
 
-    const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.login}`, {
+    // First attempt: without Authorization header (common case)
+    const baseHeaders: Record<string, string> = { "Content-Type": "application/json" };
+    let response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.login}`, {
       method: "POST",
-      headers,
-      body: JSON.stringify(
-        credentials.username
-          ? { username: credentials.username, password: credentials.password }
-          : { email: credentials.email, password: credentials.password }
-      )
+      headers: baseHeaders,
+      body: JSON.stringify(payload)
     });
+
+    // If unauthorized/forbidden, retry with Basic Auth as per API docs
+    if (!response.ok && (response.status === 401 || response.status === 403)) {
+      const basicHeaders = this.getBasicHeadersFromCredentials(identity, credentials.password);
+      response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.login}`, {
+        method: "POST",
+        headers: basicHeaders,
+        body: JSON.stringify(payload)
+      });
+    }
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => "Login failed");

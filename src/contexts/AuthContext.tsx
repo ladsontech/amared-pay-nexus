@@ -73,9 +73,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (identity: string, password: string) => {
-    // Accept either email or username for login
+    // Accept either email or username for login, send both fields to satisfy backend
     const isEmail = identity.includes('@');
-    await authService.login(isEmail ? { email: identity, password } : { username: identity, email: '', password });
+    await authService.login(
+      isEmail
+        ? { email: identity, username: identity.split('@')[0], password }
+        : { username: identity, email: identity, password }
+    );
     const raw = localStorage.getItem('user');
     if (!raw) throw new Error('Login succeeded but user profile missing');
     const user: User = JSON.parse(raw);
