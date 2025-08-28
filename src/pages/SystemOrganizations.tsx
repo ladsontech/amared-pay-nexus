@@ -8,7 +8,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Plus, Search, Filter, Users, Building, Wallet, Edit, MoreHorizontal, CreditCard, Ban, Trash2, CheckCircle2 } from "lucide-react";
-import AdminDashboardLayout from "@/components/AdminDashboardLayout";
 import { useToast } from "@/hooks/use-toast";
 
 interface Organization {
@@ -166,7 +165,7 @@ const AdminOrganizations = () => {
   };
 
   return (
-    <AdminDashboardLayout>
+    <>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -404,7 +403,7 @@ const AdminOrganizations = () => {
       </AlertDialogContent>
     </AlertDialog>
 
-    </AdminDashboardLayout>
+    </>
   );
 };
 
