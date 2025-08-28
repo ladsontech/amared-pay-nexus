@@ -71,7 +71,8 @@ class AuthService {
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const identity = credentials.username || credentials.email;
-    const headers = this.getBasicHeadersFromCredentials(identity, credentials.password);
+    // Avoid sending Authorization on login to prevent CORS preflight failures
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
 
     const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.login}`, {
       method: "POST",
