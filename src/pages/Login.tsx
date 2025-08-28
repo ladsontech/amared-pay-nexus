@@ -16,7 +16,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login } = useAuth();
+  const { login, loginAsUser } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,10 +41,11 @@ const Login = () => {
     }
   };
 
-  const handleDirectLogin = async (userEmail: string) => {
+  const handleDirectLogin = async (userId: string) => {
     setIsLoading(true);
     try {
-      await login(userEmail, 'password');
+      // Use demo login path on the side via context helper
+      loginAsUser(userId);
       toast({
         title: "Login Successful",
         description: "Welcome to Amared Pay!",
