@@ -4,7 +4,7 @@ import { demoUsers } from '@/data/demoData';
 import { authService } from '@/services/authService';
 
 interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<void>;
+  login: (identity: string, password: string) => Promise<void>;
   loginAsUser: (userId: string) => void;
   logout: () => Promise<void>;
   changePassword: (current_password: string, new_password: string) => Promise<{ success: boolean; message: string }>;
@@ -72,9 +72,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = async (email: string, password: string) => {
-    // Real login against BulkPay API
-    await authService.login({ email, password });
+  const login = async (identity: string, password: string) => {
+    // Accept either email or username for login
+    const isEmail = identity.includes('@');
+    await authService.login(isEmail ? { email: identity, password } : { username: identity, email: '', password });
     const raw = localStorage.getItem('user');
     if (!raw) throw new Error('Login succeeded but user profile missing');
     const user: User = JSON.parse(raw);

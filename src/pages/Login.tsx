@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/authService";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [identity, setIdentity] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +24,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      await login(identity, password);
       const currentUser = authService.getCurrentUser();
       const role = currentUser?.role;
       const redirectPath = role === 'admin' ? '/admin/dashboard' : role === 'manager' ? '/manager/dashboard' : '/staff/dashboard';
@@ -66,15 +66,15 @@ const Login = () => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="identity">Email or Username</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="identity"
+                  type="text"
+                  placeholder="Enter your email or username"
+                  value={identity}
+                  onChange={(e) => setIdentity(e.target.value)}
                   className="pl-10"
                   required
                 />
