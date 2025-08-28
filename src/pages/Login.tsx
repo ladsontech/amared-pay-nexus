@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,6 +108,12 @@ const Login = () => {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            Not ready to sign in?{' '}
+            <Link to="/" className="text-primary underline-offset-4 hover:underline">
+              Explore the demo
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
