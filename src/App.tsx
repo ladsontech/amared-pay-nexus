@@ -58,6 +58,23 @@ const AppRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
 
+        {/* Role Dashboard Aliases */}
+        <Route path="/admin/dashboard" element={
+          <ProtectedRoute requiredRole="admin">
+            <Navigate to="/system/analytics" replace />
+          </ProtectedRoute>
+        } />
+        <Route path="/manager/dashboard" element={
+          <ProtectedRoute requiredRole="manager">
+            <Navigate to="/org/dashboard" replace />
+          </ProtectedRoute>
+        } />
+        <Route path="/staff/dashboard" element={
+          <ProtectedRoute requiredRole="staff">
+            <Navigate to="/org/dashboard" replace />
+          </ProtectedRoute>
+        } />
+
         {/* System Admin Routes */}
         <Route path="/system" element={
           <ProtectedRoute requiredRole="admin">
@@ -135,16 +152,18 @@ const AppRoutes = () => {
         {/* Redirect authenticated users to appropriate dashboard */}
         <Route path="/dashboard" element={
           isAuthenticated ? (
-            user?.role === 'admin' ? 
-              <Navigate to="/system/analytics" replace /> : 
-              <Navigate to="/org/dashboard" replace />
+            user?.role === 'admin' ?
+              <Navigate to="/admin/dashboard" replace /> :
+              (user?.role === 'manager' ?
+                <Navigate to="/manager/dashboard" replace /> :
+                <Navigate to="/staff/dashboard" replace />)
           ) : (
             <Navigate to="/login" replace />
           )
         } />
 
         {/* Legacy routes - redirect to new structure */}
-        <Route path="/admin-dashboard" element={<Navigate to="/system/analytics" replace />} />
+        <Route path="/admin-dashboard" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin-organizations" element={<Navigate to="/system/organizations" replace />} />
         <Route path="/admin-system-users" element={<Navigate to="/system/users" replace />} />
         <Route path="/admin-analytics" element={<Navigate to="/system/analytics" replace />} />
