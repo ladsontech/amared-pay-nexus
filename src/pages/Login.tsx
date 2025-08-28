@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,12 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Eye, EyeOff, Mail, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { authService } from "@/services/authService";
 
 const Login = () => {
   const [identity, setIdentity] = useState("");
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,17 +23,12 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Prefer explicit fields if provided; fallback to single identity input
-      const chosenIdentity = email || username || identity;
-      await login(chosenIdentity, password);
-      const currentUser = authService.getCurrentUser();
-      const role = currentUser?.role;
-      const redirectPath = role === 'admin' ? '/admin/dashboard' : role === 'manager' ? '/manager/dashboard' : '/staff/dashboard';
+      await login(identity, password);
       toast({
         title: "Login Successful",
         description: "Welcome to Amared Pay!",
       });
-      navigate(redirectPath);
+      navigate('/dashboard');
     } catch (error) {
       console.error("Login error:", error);
       toast({
@@ -64,44 +56,25 @@ const Login = () => {
           </div>
           <CardTitle className="text-xl sm:text-2xl text-primary">Welcome Back</CardTitle>
           <CardDescription className="text-sm sm:text-base">
-            Sign in to your account to access the bulk payment system
+            Sign in to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="identity">Email or Username</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email (optional)"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="identity"
+                  type="text"
+                  placeholder="Enter your email or username"
+                  value={identity}
+                  onChange={(e) => setIdentity(e.target.value)}
                   className="pl-10"
+                  required
                 />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Enter your username (optional)"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="identity">Email or Username</Label>
-              <Input
-                id="identity"
-                type="text"
-                placeholder="Or type either one here"
-                value={identity}
-                onChange={(e) => setIdentity(e.target.value)}
-              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -131,36 +104,10 @@ const Login = () => {
                 </Button>
               </div>
             </div>
-            <div className="flex items-center justify-between">
-              <Link
-                to="/forgot-password"
-                className="text-sm text-primary hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
-          
-          {/* Single login only - role-based redirect after login */}
-
-          <div className="mt-6 text-center space-y-3">
-            <Button 
-              onClick={() => navigate('/')} 
-              variant="secondary" 
-              className="w-full"
-            >
-              Try Demo Organizations
-            </Button>
-            <p className="text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Link to="/register" className="text-primary hover:underline">
-                Contact admin to create account
-              </Link>
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
