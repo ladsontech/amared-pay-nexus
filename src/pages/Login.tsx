@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff, Mail, Shield, User, UserCheck, Crown } from "lucide-react";
+import { Eye, EyeOff, Mail, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { authService } from "@/services/authService";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -16,7 +17,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login, loginAsUser } = useAuth();
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,11 +25,14 @@ const Login = () => {
 
     try {
       await login(email, password);
+      const currentUser = authService.getCurrentUser();
+      const role = currentUser?.role;
+      const redirectPath = role === 'admin' ? '/admin/dashboard' : role === 'manager' ? '/manager/dashboard' : '/staff/dashboard';
       toast({
         title: "Login Successful",
         description: "Welcome to Amared Pay!",
       });
-      navigate("/dashboard");
+      navigate(redirectPath);
     } catch (error) {
       console.error("Login error:", error);
       toast({
@@ -41,27 +45,7 @@ const Login = () => {
     }
   };
 
-  const handleDirectLogin = async (userId: string) => {
-    setIsLoading(true);
-    try {
-      // Use demo login path on the side via context helper
-      loginAsUser(userId);
-      toast({
-        title: "Login Successful",
-        description: "Welcome to Amared Pay!",
-      });
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Login error:", error);
-      toast({
-        title: "Login Failed", 
-        description: "Failed to login",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Single login flow only; test/dummy buttons removed
 
   return (
     <div className="min-h-screen trust-gradient flex items-center justify-center p-4">
@@ -137,39 +121,7 @@ const Login = () => {
             </Button>
           </form>
           
-          {/* Testing Login Buttons */}
-          <div className="mt-6 space-y-3">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-3">Quick Login for Testing:</p>
-            </div>
-            <Button 
-              onClick={() => handleDirectLogin('admin@almaredpay.com')} 
-              disabled={isLoading}
-              variant="outline" 
-              className="w-full"
-            >
-              <Crown className="w-4 h-4 mr-2" />
-              Login as Admin
-            </Button>
-            <Button 
-              onClick={() => handleDirectLogin('manager@organization.com')} 
-              disabled={isLoading}
-              variant="outline" 
-              className="w-full"
-            >
-              <UserCheck className="w-4 h-4 mr-2" />
-              Login as Manager
-            </Button>
-            <Button 
-              onClick={() => handleDirectLogin('staff@organization.com')} 
-              disabled={isLoading}
-              variant="outline" 
-              className="w-full"
-            >
-              <User className="w-4 h-4 mr-2" />
-              Login as Staff
-            </Button>
-          </div>
+          {/* Single login only - role-based redirect after login */}
 
           <div className="mt-6 text-center space-y-3">
             <Button 

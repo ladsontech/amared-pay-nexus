@@ -1,4 +1,5 @@
-const API_BASE_URL = "https://backendapi.bulkpay.almaredagencyuganda.com";
+const API_BASE_URL = (import.meta as any)?.env?.VITE_API_BASE_URL || "https://backendapi.bulkpay.almaredagencyuganda.com";
+import { rolePermissions } from '@/types/auth';
 
 export interface LoginRequest {
   username?: string;
@@ -28,6 +29,17 @@ export interface TokenVerifyRequest {
 }
 
 class AuthService {
+  private decodeJwt(token: string): any | null {
+    try {
+      const [, payload] = token.split('.');
+      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = atob(normalized.padEnd(normalized.length + (4 - (normalized.length % 4)) % 4, '='));
+      return JSON.parse(decoded);
+    } catch {
+      return null;
+    }
+  }
+
   private encodeBase64(input: string) {
     try {
       return btoa(input);
@@ -91,25 +103,28 @@ class AuthService {
     const basic = this.encodeBase64(`${identity}:${credentials.password}`);
     localStorage.setItem("basic_auth", basic);
 
-    // Construct a minimal user profile for now
+    // Derive role from token if available; fallback to staff
+    const claims = accessToken ? this.decodeJwt(accessToken) : null;
+    const derivedRole = (claims?.role?.toLowerCase?.()) || 'staff';
+    const role = (['admin', 'manager', 'staff'] as const).includes(derivedRole) ? derivedRole : 'staff';
+
+    // Build user profile with permissions by role
     const userProfile = {
       id: data.email || identity,
-      name: data.username || identity,
-      email: data.email || credentials.email,
-      role: 'manager',
-      organizationId: 'default-org',
+      name: claims?.name || data.username || identity,
+      email: claims?.email || data.email || credentials.email,
+      role,
+      organizationId: claims?.organizationId || 'default-org',
       organization: {
-        id: 'default-org',
-        name: 'Organization',
+        id: claims?.organizationId || 'default-org',
+        name: claims?.organizationName || 'Organization',
         description: '',
         industry: ''
       },
-      position: 'Member',
-      permissions: [
-        'access_petty_cash',
-        'access_bulk_payments',
-        'access_collections'
-      ]
+      position: claims?.position || 'Member',
+      permissions: Array.isArray(claims?.permissions) && claims.permissions.length > 0
+        ? claims.permissions
+        : rolePermissions[role as keyof typeof rolePermissions]
     } as any;
     localStorage.setItem("user", JSON.stringify(userProfile));
 
