@@ -75,11 +75,11 @@ class AuthService {
     const response = await fetch(`${API_BASE_URL}/auth/login/`, {
       method: "POST",
       headers,
-      body: JSON.stringify({
-        username: credentials.username,
-        email: credentials.email,
-        password: credentials.password
-      })
+      body: JSON.stringify(
+        credentials.username
+          ? { username: credentials.username, password: credentials.password }
+          : { email: credentials.email, password: credentials.password }
+      )
     });
 
     if (!response.ok) {
@@ -106,13 +106,7 @@ class AuthService {
     // Derive role from token if available; fallback to staff
     const claims = accessToken ? this.decodeJwt(accessToken) : null;
     const derivedRole = (claims?.role?.toLowerCase?.()) || 'staff';
-    const isKnownAdmin = (
-      (credentials.email && ["ladsondave84@gmail.com"].includes((credentials.email || '').toLowerCase())) ||
-      (credentials.username && ["david.ladson"].includes((credentials.username || '').toLowerCase()))
-    );
-    const role = isKnownAdmin
-      ? 'admin'
-      : (['admin', 'manager', 'staff'] as const).includes(derivedRole) ? derivedRole : 'staff';
+    const role = (['admin', 'manager', 'staff'] as const).includes(derivedRole) ? derivedRole : 'staff';
 
     // Build user profile with permissions by role
     const userProfile = {
