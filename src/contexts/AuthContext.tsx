@@ -1,11 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthState, Permission } from '@/types/auth';
 import { demoUsers } from '@/data/demoData';
+import { authService } from '@/services/authService';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   loginAsUser: (userId: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
+  changePassword: (current_password: string, new_password: string) => Promise<{ success: boolean; message: string }>;
+  refreshToken: () => Promise<{ access: string; refresh: string }>;
+  verifyToken: (token: string) => Promise<boolean>;
   hasPermission: (permission: Permission) => boolean;
   hasAnyPermission: (permissions: Permission[]) => boolean;
   isRole: (role: string) => boolean;
@@ -29,7 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    // Simulate loading user from localStorage or API
+    // Load user from localStorage or API
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
@@ -69,28 +73,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (email: string, password: string) => {
-    // Find user by email
-    const user = demoUsers.find(u => u.email === email);
-    if (user && password === 'password') {
-      localStorage.setItem('user', JSON.stringify(user));
-      setAuthState({
-        user,
-        isAuthenticated: true,
-        loading: false,
-      });
-    } else {
-      throw new Error('Invalid credentials');
-    }
+    // Real login against BulkPay API
+    await authService.login({ email, password });
+    const raw = localStorage.getItem('user');
+    if (!raw) throw new Error('Login succeeded but user profile missing');
+    const user: User = JSON.parse(raw);
+    setAuthState({ user, isAuthenticated: true, loading: false });
   };
 
-  const logout = () => {
-    localStorage.removeItem('user');
-    setAuthState({
-      user: null,
-      isAuthenticated: false,
-      loading: false,
-    });
+  const logout = async () => {
+    await authService.logout();
+    setAuthState({ user: null, isAuthenticated: false, loading: false });
   };
+
+  const changePassword = (current_password: string, new_password: string) => {
+    return authService.changePassword({ current_password, new_password });
+  };
+
+  const refreshToken = () => authService.refreshToken();
+
+  const verifyToken = (token: string) => authService.verifyToken(token);
 
   const hasPermission = (permission: Permission): boolean => {
     return authState.user?.permissions?.includes(permission) || false;
@@ -111,6 +113,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         loginAsUser,
         logout,
+        changePassword,
+        refreshToken,
+        verifyToken,
         hasPermission,
         hasAnyPermission,
         isRole,
