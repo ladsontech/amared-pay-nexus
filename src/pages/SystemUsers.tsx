@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Filter, UserCircle, Mail, Phone, Building, Shield, Wallet } from "lucide-react";
-import AdminDashboardLayout from "@/components/AdminDashboardLayout";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -194,7 +193,7 @@ const AdminSystemUsers = () => {
   const filteredUsers = getFilteredUsers();
 
   return (
-    <AdminDashboardLayout>
+    <>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -373,7 +372,7 @@ const AdminSystemUsers = () => {
           </div>
         )}
       </div>
-    </AdminDashboardLayout>
+    </>
   );
 };
 

@@ -19,6 +19,7 @@ const SystemAnalytics = lazy(() => import("./pages/SystemAnalytics"));
 const SystemOrganizations = lazy(() => import("./pages/SystemOrganizations"));
 const SystemUsers = lazy(() => import("./pages/SystemUsers"));
 const SystemSettings = lazy(() => import("./pages/SystemSettings"));
+const SystemAlerts = lazy(() => import("./pages/SystemAlerts"));
 const OrgDashboard = lazy(() => import("./pages/OrgDashboard"));
 const OrgPettyCash = lazy(() => import("./pages/OrgPettyCash"));
 const OrgBulkPayments = lazy(() => import("./pages/OrgBulkPayments"));
@@ -85,6 +86,7 @@ const AppRoutes = () => {
           <Route path="analytics" element={<SystemAnalytics />} />
           <Route path="organizations" element={<SystemOrganizations />} />
           <Route path="users" element={<SystemUsers />} />
+          <Route path="alerts" element={<SystemAlerts />} />
           <Route path="settings" element={<SystemSettings />} />
         </Route>
 
@@ -167,6 +169,7 @@ const AppRoutes = () => {
         <Route path="/admin-organizations" element={<Navigate to="/system/organizations" replace />} />
         <Route path="/admin-system-users" element={<Navigate to="/system/users" replace />} />
         <Route path="/admin-analytics" element={<Navigate to="/system/analytics" replace />} />
+        <Route path="/admin-system-alerts" element={<Navigate to="/system/alerts" replace />} />
         <Route path="/org-dashboard" element={<Navigate to="/org/dashboard" replace />} />
         <Route path="/bulk-payments" element={<Navigate to="/org/bulk-payments" replace />} />
         <Route path="/collections" element={<Navigate to="/org/collections" replace />} />

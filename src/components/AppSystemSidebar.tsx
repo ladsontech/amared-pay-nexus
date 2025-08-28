@@ -1,12 +1,13 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { BarChart3, Building2, Users, Settings, Shield } from "lucide-react";
+import { BarChart3, Building2, Users, Settings, Shield, AlertTriangle } from "lucide-react";
 
 const adminItems = [
   { title: "Analytics", url: "/system/analytics", icon: BarChart3 },
   { title: "Organizations", url: "/system/organizations", icon: Building2 },
   { title: "Users", url: "/system/users", icon: Users },
+  { title: "Alerts", url: "/system/alerts", icon: AlertTriangle },
   { title: "Settings", url: "/system/settings", icon: Settings },
 ];
 

@@ -36,12 +36,12 @@ const AdminDashboardLayout = ({ children }: AdminDashboardLayoutProps) => {
   };
 
   const adminMenuItems = [
-    { icon: Home, label: "Admin Dashboard", path: "/admin-dashboard" },
-    { icon: Building, label: "Organizations", path: "/admin-organizations" },
-    { icon: Users, label: "System Users", path: "/admin-system-users" },
-    { icon: TrendingUp, label: "Analytics", path: "/admin-analytics" },
-    { icon: AlertTriangle, label: "System Alerts", path: "/admin-system-alerts" },
-    { icon: Settings, label: "Settings", path: "/admin-settings" }
+    { icon: Home, label: "Admin Dashboard", path: "/system/analytics" },
+    { icon: Building, label: "Organizations", path: "/system/organizations" },
+    { icon: Users, label: "System Users", path: "/system/users" },
+    { icon: TrendingUp, label: "Analytics", path: "/system/analytics" },
+    { icon: AlertTriangle, label: "System Alerts", path: "/system/alerts" },
+    { icon: Settings, label: "Settings", path: "/system/settings" }
   ];
 
   const user = authService.getCurrentUser();
@@ -54,7 +54,7 @@ const AdminDashboardLayout = ({ children }: AdminDashboardLayoutProps) => {
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
-          <Link to="/admin-dashboard" className="flex items-center justify-start">
+          <Link to="/system/analytics" className="flex items-center justify-start">
             <img 
               src="/images/Almaredpay_logo.png" 
               alt="Logo" 
