@@ -15,7 +15,12 @@ const Index = () => {
 
   const handleUserLogin = (user: DemoUser) => {
     loginAsUser(user.id);
-    navigate('/org/dashboard');
+    // Navigate based on user role
+    if (user.role === 'admin') {
+      navigate('/system/analytics');
+    } else {
+      navigate('/org/dashboard');
+    }
   };
 
   const getRoleIcon = (role: string) => {

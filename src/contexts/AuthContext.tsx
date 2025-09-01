@@ -63,6 +63,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginAsUser = (userId: string) => {
     const user = demoUsers.find(u => u.id === userId);
     if (user) {
+      // Store auth token for demo user
+      localStorage.setItem('auth_token', `demo-token-${userId}`);
+      localStorage.setItem('access_token', `demo-token-${userId}`);
       localStorage.setItem('user', JSON.stringify(user));
       setAuthState({
         user,

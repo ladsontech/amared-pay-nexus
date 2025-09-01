@@ -62,21 +62,6 @@ const AppRoutes = () => {
         <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* Role Dashboard Aliases */}
-        <Route path="/admin/dashboard" element={
-          <ProtectedRoute requiredRole="admin">
-            <Navigate to="/system/analytics" replace />
-          </ProtectedRoute>
-        } />
-        <Route path="/manager/dashboard" element={
-          <ProtectedRoute requiredRole="manager">
-            <Navigate to="/org/dashboard" replace />
-          </ProtectedRoute>
-        } />
-        <Route path="/staff/dashboard" element={
-          <ProtectedRoute requiredRole="staff">
-            <Navigate to="/org/dashboard" replace />
-          </ProtectedRoute>
-        } />
 
         {/* System Admin Routes */}
         <Route path="/system" element={
@@ -157,10 +142,10 @@ const AppRoutes = () => {
         <Route path="/dashboard" element={
           isAuthenticated ? (
             user?.role === 'admin' ?
-              <Navigate to="/admin/dashboard" replace /> :
+              <Navigate to="/system/analytics" replace /> :
               (user?.role === 'manager' ?
-                <Navigate to="/manager/dashboard" replace /> :
-                <Navigate to="/staff/dashboard" replace />)
+                <Navigate to="/org/dashboard" replace /> :
+                <Navigate to="/org/dashboard" replace />)
           ) : (
             <Navigate to="/login" replace />
           )
