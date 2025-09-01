@@ -51,23 +51,46 @@ const Index = () => {
         </div>
 
         {/* Admin Access */}
-        <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+        <Card className="bg-gradient-to-r from-red-50 to-red-100/80 border-red-200/60 shadow-lg hover:shadow-xl transition-all duration-300">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <Shield className="h-6 w-6 text-primary" />
+              <div className="p-2 rounded-lg bg-red-100">
+                <Shield className="h-5 w-5 text-red-600" />
+              </div>
               <CardTitle className="text-xl">System Administrator</CardTitle>
             </div>
             <CardDescription>
-              Access the main admin dashboard for system-wide management and analytics.
+              Access the system admin dashboard for comprehensive platform management, analytics, and organization oversight.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button 
-              onClick={() => navigate('/system/analytics')} 
-              className="w-full"
-            >
-              Go to Admin Dashboard (Demo)
-            </Button>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  <span className="text-muted-foreground">System Analytics</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  <span className="text-muted-foreground">Organization Management</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  <span className="text-muted-foreground">User Administration</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  <span className="text-muted-foreground">System Alerts</span>
+                </div>
+              </div>
+              <Button 
+                onClick={() => navigate('/system/analytics')} 
+                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-md hover:shadow-lg"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Enter System Admin Dashboard
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
