@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { TrendingUp, TrendingDown, DollarSign, Users, Building, Activity, Download, Calendar, Shield, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Users, Building, Activity, Download, Calendar, Shield, AlertTriangle, CheckCircle, Clock, BarChart3, Zap, Globe } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const SystemAnalytics = () => {
@@ -80,21 +80,26 @@ const SystemAnalytics = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-red-100 to-red-200 shadow-lg">
+              <BarChart3 className="h-8 w-8 text-red-600" />
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
             System Analytics Dashboard
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Comprehensive platform overview and performance metrics
+            </h1>
+          </div>
+          <p className="text-lg text-slate-600 font-medium">
+            Real-time platform insights and performance monitoring
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="border-red-200 text-red-700 hover:bg-red-50">
+        <div className="flex gap-3">
+          <Button variant="outline" className="border-red-200 text-red-700 hover:bg-red-50 shadow-md">
             <Calendar className="h-4 w-4 mr-2" />
             Last 30 days
           </Button>
-          <Button variant="outline" size="sm" className="border-red-200 text-red-700 hover:bg-red-50">
+          <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg">
             <Download className="h-4 w-4 mr-2" />
             Export Report
           </Button>
@@ -103,66 +108,90 @@ const SystemAnalytics = () => {
 
       {/* Key Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-800">Total Transactions</CardTitle>
-            <div className="p-2 bg-blue-100 rounded-lg">
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-50 via-blue-50/80 to-blue-100/60 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <div>
+              <CardTitle className="text-sm font-bold text-blue-800 mb-1">Total Transactions</CardTitle>
+              <CardDescription className="text-blue-600 text-xs">All-time platform activity</CardDescription>
+            </div>
+            <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl shadow-md">
               <Activity className="h-4 w-4 text-blue-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-900">{systemStats.totalTransactions.toLocaleString()}</div>
-            <div className="flex items-center space-x-1 text-xs text-blue-700 mt-1">
-              <TrendingUp className="h-3 w-3" />
-              <span>+12.5% from last month</span>
+            <div className="text-3xl font-bold text-blue-900 mb-2">{systemStats.totalTransactions.toLocaleString()}</div>
+            <div className="flex items-center space-x-2 text-sm">
+              <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                <TrendingUp className="h-3 w-3" />
+                <span className="font-semibold">+12.5%</span>
+              </div>
+              <span className="text-blue-600 text-xs">vs last month</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-emerald-100/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-emerald-800">Total Volume</CardTitle>
-            <div className="p-2 bg-emerald-100 rounded-lg">
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-emerald-50 via-emerald-50/80 to-emerald-100/60 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <div>
+              <CardTitle className="text-sm font-bold text-emerald-800 mb-1">Total Volume</CardTitle>
+              <CardDescription className="text-emerald-600 text-xs">Financial throughput</CardDescription>
+            </div>
+            <div className="p-3 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-xl shadow-md">
               <DollarSign className="h-4 w-4 text-emerald-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-900">UGX {(systemStats.totalAmount / 1000000).toFixed(1)}M</div>
-            <div className="flex items-center space-x-1 text-xs text-emerald-700 mt-1">
-              <TrendingUp className="h-3 w-3" />
-              <span>+18.2% from last month</span>
+            <div className="text-3xl font-bold text-emerald-900 mb-2">UGX {(systemStats.totalAmount / 1000000).toFixed(1)}M</div>
+            <div className="flex items-center space-x-2 text-sm">
+              <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                <TrendingUp className="h-3 w-3" />
+                <span className="font-semibold">+18.2%</span>
+              </div>
+              <span className="text-emerald-600 text-xs">vs last month</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-purple-100/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-800">Active Organizations</CardTitle>
-            <div className="p-2 bg-purple-100 rounded-lg">
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-purple-50 via-purple-50/80 to-purple-100/60 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <div>
+              <CardTitle className="text-sm font-bold text-purple-800 mb-1">Active Organizations</CardTitle>
+              <CardDescription className="text-purple-600 text-xs">Platform participants</CardDescription>
+            </div>
+            <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl shadow-md">
               <Building className="h-4 w-4 text-purple-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-900">{systemStats.activeOrganizations}</div>
-            <div className="flex items-center space-x-1 text-xs text-purple-700 mt-1">
-              <TrendingUp className="h-3 w-3" />
-              <span>+4 this month</span>
+            <div className="text-3xl font-bold text-purple-900 mb-2">{systemStats.activeOrganizations}</div>
+            <div className="flex items-center space-x-2 text-sm">
+              <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                <TrendingUp className="h-3 w-3" />
+                <span className="font-semibold">+4</span>
+              </div>
+              <span className="text-purple-600 text-xs">this month</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-orange-50 to-orange-100/50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-800">Total Users</CardTitle>
-            <div className="p-2 bg-orange-100 rounded-lg">
+        <Card className="border-0 shadow-xl bg-gradient-to-br from-orange-50 via-orange-50/80 to-orange-100/60 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <div>
+              <CardTitle className="text-sm font-bold text-orange-800 mb-1">Total Users</CardTitle>
+              <CardDescription className="text-orange-600 text-xs">Platform user base</CardDescription>
+            </div>
+            <div className="p-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl shadow-md">
               <Users className="h-4 w-4 text-orange-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-900">{systemStats.totalUsers}</div>
-            <div className="flex items-center space-x-1 text-xs text-orange-700 mt-1">
-              <TrendingUp className="h-3 w-3" />
-              <span>+23 this month</span>
+            <div className="text-3xl font-bold text-orange-900 mb-2">{systemStats.totalUsers}</div>
+            <div className="flex items-center space-x-2 text-sm">
+              <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                <TrendingUp className="h-3 w-3" />
+                <span className="font-semibold">+23</span>
+              </div>
+              <span className="text-orange-600 text-xs">this month</span>
             </div>
           </CardContent>
         </Card>
@@ -170,24 +199,27 @@ const SystemAnalytics = () => {
 
       {/* System Health & Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 border-0 shadow-lg">
+        <Card className="lg:col-span-2 border-0 shadow-xl bg-white">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-xl font-semibold">Transaction Volume Trend</CardTitle>
-                <CardDescription>Monthly transaction patterns and growth</CardDescription>
+                <CardTitle className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                  <Zap className="h-6 w-6 text-blue-600" />
+                  Transaction Volume Trend
+                </CardTitle>
+                <CardDescription className="text-slate-600 font-medium">Monthly transaction patterns and growth analysis</CardDescription>
               </div>
-              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              <Badge className="bg-blue-100 text-blue-800 border-blue-300 px-3 py-2 font-semibold">
                 7-day average: 2.1K transactions
               </Badge>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <ResponsiveContainer width="100%" height={350}>
               <LineChart data={transactionData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
-                <YAxis stroke="#64748b" fontSize={12} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" stroke="#475569" fontSize={12} fontWeight={500} />
+                <YAxis stroke="#475569" fontSize={12} fontWeight={500} />
                 <Tooltip 
                   formatter={(value, name) => [
                     name === 'amount' ? `UGX ${(Number(value) / 1000000).toFixed(1)}M` : value,
@@ -195,13 +227,14 @@ const SystemAnalytics = () => {
                   ]}
                   contentStyle={{ 
                     backgroundColor: 'white', 
-                    border: '1px solid #e2e8f0', 
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    border: '1px solid #cbd5e1', 
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+                    fontWeight: 500
                   }}
                 />
-                <Line type="monotone" dataKey="transactions" stroke="#3b82f6" strokeWidth={3} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }} />
-                <Line type="monotone" dataKey="amount" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }} />
+                <Line type="monotone" dataKey="transactions" stroke="#3b82f6" strokeWidth={4} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 6 }} />
+                <Line type="monotone" dataKey="amount" stroke="#10b981" strokeWidth={4} dot={{ fill: '#10b981', strokeWidth: 2, r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -209,88 +242,89 @@ const SystemAnalytics = () => {
 
         <div className="space-y-6">
           {/* System Health */}
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-slate-50 to-slate-100/50">
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 via-green-50/80 to-green-100/60">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <div className="p-1.5 bg-green-100 rounded-lg">
-                  <Shield className="h-4 w-4 text-green-600" />
+              <CardTitle className="text-xl font-bold flex items-center gap-3 text-green-800">
+                <div className="p-2 bg-gradient-to-br from-green-100 to-green-200 rounded-xl shadow-md">
+                  <Shield className="h-5 w-5 text-green-600" />
                 </div>
                 System Health
               </CardTitle>
-              <CardDescription>Real-time system performance</CardDescription>
+              <CardDescription className="text-green-700 font-medium">Real-time performance monitoring</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
+            <CardContent className="space-y-5">
+              <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Uptime</span>
-                  <Badge className="bg-green-100 text-green-800 border-green-200">
+                  <span className="text-sm font-bold text-green-800">System Uptime</span>
+                  <Badge className="bg-green-200 text-green-800 border-green-300 font-bold">
                     {systemStats.systemUptime}%
                   </Badge>
                 </div>
-                <Progress value={systemStats.systemUptime} className="h-2" />
+                <Progress value={systemStats.systemUptime} className="h-3 bg-green-100" />
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Response Time</span>
-                  <Badge variant="outline" className="text-blue-700">
+                  <span className="text-sm font-bold text-green-800">Avg Response Time</span>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-300 font-bold">
                     {systemStats.averageResponseTime}ms
                   </Badge>
                 </div>
-                <Progress value={75} className="h-2" />
+                <Progress value={75} className="h-3 bg-green-100" />
               </div>
 
-              <div className="pt-2 border-t">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Active Sessions</span>
-                  <span className="text-sm font-bold">127</span>
+              <div className="pt-4 border-t border-green-200 space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-bold text-green-800">Active Sessions</span>
+                  <span className="text-sm font-bold text-green-900">127</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Database Status</span>
-                  <Badge className="bg-green-100 text-green-800">Optimal</Badge>
+                  <span className="text-sm font-bold text-green-800">Database Status</span>
+                  <Badge className="bg-green-200 text-green-800 border-green-300 font-bold">Optimal</Badge>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Recent Alerts */}
-          <Card className="border-0 shadow-lg">
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-red-50 via-red-50/80 to-red-100/60">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                  <div className="p-1.5 bg-red-100 rounded-lg">
-                    <AlertTriangle className="h-4 w-4 text-red-600" />
+                <CardTitle className="text-xl font-bold flex items-center gap-3 text-red-800">
+                  <div className="p-2 bg-gradient-to-br from-red-100 to-red-200 rounded-xl shadow-md">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
                   </div>
                   System Alerts
                 </CardTitle>
-                <Badge variant="outline" className="bg-red-50 text-red-700">
+                <Badge className="bg-red-200 text-red-800 border-red-300 font-bold">
                   {systemStats.criticalAlerts} critical
                 </Badge>
               </div>
+              <CardDescription className="text-red-700 font-medium">Recent system notifications</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            <CardContent className="pt-4">
+              <div className="space-y-4">
                 {recentAlerts.map((alert) => {
                   const SeverityIcon = getSeverityIcon(alert.severity);
                   return (
-                    <div key={alert.id} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-                      <div className={`p-1 rounded-full ${alert.severity === 'high' ? 'bg-red-100' : alert.severity === 'medium' ? 'bg-yellow-100' : 'bg-blue-100'}`}>
-                        <SeverityIcon className={`h-3 w-3 ${alert.severity === 'high' ? 'text-red-600' : alert.severity === 'medium' ? 'text-yellow-600' : 'text-blue-600'}`} />
+                    <div key={alert.id} className="flex items-start gap-4 p-4 rounded-xl bg-white/80 hover:bg-white transition-all duration-200 border border-red-100 shadow-sm hover:shadow-md">
+                      <div className={`p-2 rounded-xl shadow-sm ${alert.severity === 'high' ? 'bg-red-100' : alert.severity === 'medium' ? 'bg-yellow-100' : 'bg-blue-100'}`}>
+                        <SeverityIcon className={`h-4 w-4 ${alert.severity === 'high' ? 'text-red-600' : alert.severity === 'medium' ? 'text-yellow-600' : 'text-blue-600'}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge className={getSeverityColor(alert.severity)} variant="outline">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge className={`${getSeverityColor(alert.severity)} font-semibold`}>
                             {alert.severity}
                           </Badge>
-                          <span className="text-xs text-muted-foreground">{alert.time}</span>
+                          <span className="text-xs text-slate-500 font-medium">{alert.time}</span>
                         </div>
-                        <p className="text-sm font-medium text-slate-900 line-clamp-2">{alert.message}</p>
+                        <p className="text-sm font-semibold text-slate-800 line-clamp-2">{alert.message}</p>
                       </div>
                     </div>
                   );
                 })}
               </div>
-              <Button variant="outline" size="sm" className="w-full mt-4">
+              <Button variant="outline" className="w-full mt-6 border-red-200 text-red-700 hover:bg-red-50 font-semibold">
                 View All Alerts
               </Button>
             </CardContent>
@@ -300,12 +334,15 @@ const SystemAnalytics = () => {
 
       {/* Transaction Categories & Organization Growth */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-0 shadow-lg">
+        <Card className="border-0 shadow-xl bg-white">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">Transaction Distribution</CardTitle>
-            <CardDescription>Breakdown by transaction type and volume</CardDescription>
+            <CardTitle className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+              <Globe className="h-6 w-6 text-indigo-600" />
+              Transaction Distribution
+            </CardTitle>
+            <CardDescription className="text-slate-600 font-medium">Breakdown by transaction type and volume</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
@@ -324,19 +361,19 @@ const SystemAnalytics = () => {
                   <Tooltip formatter={(value) => [`${value}%`, 'Percentage']} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {categoryData.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between">
+                  <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
                     <div className="flex items-center space-x-2">
                       <div 
-                        className="w-3 h-3 rounded-full" 
+                        className="w-4 h-4 rounded-full shadow-sm" 
                         style={{ backgroundColor: item.color }}
                       ></div>
-                      <span className="text-sm font-medium">{item.name}</span>
+                      <span className="text-sm font-semibold text-slate-800">{item.name}</span>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-bold">{item.value}%</div>
-                      <div className="text-xs text-muted-foreground">UGX {(item.amount / 1000000).toFixed(1)}M</div>
+                      <div className="text-sm font-bold text-slate-800">{item.value}%</div>
+                      <div className="text-xs text-slate-600 font-medium">UGX {(item.amount / 1000000).toFixed(1)}M</div>
                     </div>
                   </div>
                 ))}
@@ -345,27 +382,31 @@ const SystemAnalytics = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-lg">
+        <Card className="border-0 shadow-xl bg-white">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">Platform Growth</CardTitle>
-            <CardDescription>Organizations and user acquisition trends</CardDescription>
+            <CardTitle className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+              <TrendingUp className="h-6 w-6 text-emerald-600" />
+              Platform Growth
+            </CardTitle>
+            <CardDescription className="text-slate-600 font-medium">Organizations and user acquisition trends</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={organizationGrowth}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
-                <YAxis stroke="#64748b" fontSize={12} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" stroke="#475569" fontSize={12} fontWeight={500} />
+                <YAxis stroke="#475569" fontSize={12} fontWeight={500} />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: 'white', 
-                    border: '1px solid #e2e8f0', 
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    border: '1px solid #cbd5e1', 
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+                    fontWeight: 500
                   }}
                 />
-                <Bar dataKey="organizations" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="users" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="organizations" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="users" fill="#06b6d4" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -373,47 +414,55 @@ const SystemAnalytics = () => {
       </div>
 
       {/* Top Organizations */}
-      <Card className="border-0 shadow-lg">
+      <Card className="border-0 shadow-xl bg-white">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-xl font-semibold">Top Performing Organizations</CardTitle>
-              <CardDescription>Organizations ranked by transaction volume and growth</CardDescription>
+              <CardTitle className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                <Building className="h-6 w-6 text-purple-600" />
+                Top Performing Organizations
+              </CardTitle>
+              <CardDescription className="text-slate-600 font-medium">Organizations ranked by transaction volume and growth</CardDescription>
             </div>
-            <Button variant="outline" size="sm">View All Organizations</Button>
+            <Button variant="outline" className="border-purple-200 text-purple-700 hover:bg-purple-50 font-semibold">
+              View All Organizations
+            </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="pt-6">
+          <div className="space-y-5">
             {topOrganizations.map((org, index) => (
-              <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 hover:from-slate-100 hover:to-slate-200/50 transition-all duration-200 border border-slate-200/50">
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
+              <div key={index} className="flex items-center justify-between p-5 rounded-2xl bg-gradient-to-r from-slate-50 to-slate-100/80 hover:from-slate-100 hover:to-slate-200/80 transition-all duration-300 border border-slate-200/60 shadow-md hover:shadow-lg transform hover:scale-[1.01]">
+                <div className="flex items-center space-x-5">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white font-bold shadow-lg text-lg">
                     #{index + 1}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900">{org.name}</h3>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>{org.transactions} transactions</span>
+                    <h3 className="font-bold text-lg text-slate-900 mb-1">{org.name}</h3>
+                    <div className="flex items-center gap-4 text-sm text-slate-600">
+                      <span className="font-medium">{org.transactions} transactions</span>
                       <span>•</span>
-                      <span>{org.users} users</span>
-                      <Badge className="bg-green-100 text-green-800 border-green-200">
+                      <span className="font-medium">{org.users} users</span>
+                      <Badge className="bg-green-200 text-green-800 border-green-300 font-semibold">
                         {org.status}
                       </Badge>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-lg text-slate-900">UGX {(org.amount / 1000000).toFixed(1)}M</p>
-                  <div className="flex items-center justify-end space-x-1">
+                  <p className="font-bold text-xl text-slate-900 mb-1">UGX {(org.amount / 1000000).toFixed(1)}M</p>
+                  <div className="flex items-center justify-end space-x-2">
                     {org.growth > 0 ? (
-                      <TrendingUp className="h-4 w-4 text-green-500" />
+                      <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                        <TrendingUp className="h-3 w-3" />
+                        <span className="text-xs font-bold">+{org.growth}%</span>
+                      </div>
                     ) : (
-                      <TrendingDown className="h-4 w-4 text-red-500" />
+                      <div className="flex items-center gap-1 bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                        <TrendingDown className="h-3 w-3" />
+                        <span className="text-xs font-bold">{org.growth}%</span>
+                      </div>
                     )}
-                    <span className={`text-sm font-medium ${org.growth > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {org.growth > 0 ? '+' : ''}{org.growth}%
-                    </span>
                   </div>
                 </div>
               </div>

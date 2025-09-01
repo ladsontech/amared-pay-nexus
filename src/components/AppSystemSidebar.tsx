@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { BarChart3, Building2, Users, Settings, Shield, AlertTriangle } from "lucide-react";
+import { BarChart3, Building2, Users, Settings, Shield, AlertTriangle, Crown } from "lucide-react";
 
 const adminItems = [
   { title: "Analytics", url: "/system/analytics", icon: BarChart3 },
@@ -16,15 +16,15 @@ export default function AppSystemSidebar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <Sidebar className="w-60 border-r border-slate-200/60 bg-white/95 backdrop-blur-sm" collapsible="icon">
+    <Sidebar className="w-64 border-r border-red-200/60 bg-gradient-to-b from-red-50/80 to-white/95 backdrop-blur-sm" collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
-            <div className="flex items-center gap-2 px-1">
-              <div className="p-1 rounded-md bg-red-100">
-                <Shield className="h-4 w-4 text-red-600" />
+            <div className="flex items-center gap-3 px-2 py-1">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-red-100 to-red-200 shadow-md">
+                <Crown className="h-4 w-4 text-red-600" />
               </div>
-              <span className="font-semibold text-slate-700">System Admin</span>
+              <span className="font-bold text-red-800">System Admin</span>
             </div>
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -34,11 +34,11 @@ export default function AppSystemSidebar() {
                   <SidebarMenuButton 
                     asChild 
                     isActive={isActive(item.url)}
-                    className="hover:bg-slate-100 data-[active=true]:bg-red-50 data-[active=true]:text-red-700 data-[active=true]:border-r-2 data-[active=true]:border-red-500"
+                    className="hover:bg-red-50 data-[active=true]:bg-red-100 data-[active=true]:text-red-700 data-[active=true]:border-r-3 data-[active=true]:border-red-500 data-[active=true]:font-bold transition-all duration-200"
                   >
                     <NavLink to={item.url} end>
-                      <item.icon className="mr-3 h-4 w-4" />
-                      <span className="font-medium">{item.title}</span>
+                      <item.icon className="mr-3 h-5 w-5" />
+                      <span className="font-semibold">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
