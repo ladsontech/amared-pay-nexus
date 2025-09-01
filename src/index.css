@@ -132,23 +132,6 @@
 
 /* Mobile bottom navigation styles */
 @layer components {
-  .mobile-nav {
-    @apply fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border md:hidden;
-    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
-
-  .mobile-nav-item {
-    @apply flex flex-col items-center justify-center py-2 px-1 text-xs text-muted-foreground transition-colors;
-  }
-
-  .mobile-nav-item.active {
-    @apply text-primary;
-  }
-
-  .mobile-nav-item:hover {
-    @apply text-primary;
-  }
-
   /* Utility classes for better mobile responsiveness */
   .line-clamp-1 {
     overflow: hidden;
