@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Eye, EyeOff, Mail, Shield, User, Building, 
   CheckCircle2, XCircle, Loader2, AlertCircle 
@@ -48,6 +49,29 @@ const AuthTest = () => {
     wallet_currency: 1,
     wallet_pin: '1234'
   });
+
+  // User creation test states
+  const [subAdminData, setSubAdminData] = useState({
+    first_name: 'Jane',
+    last_name: 'Smith',
+    email: 'jane.smith@example.com',
+    phone_number: '+256701234567',
+    username: 'janesmith',
+    password: 'password123'
+  });
+
+  const [staffData, setStaffData] = useState({
+    first_name: 'Bob',
+    last_name: 'Wilson',
+    email: 'bob.wilson@example.com',
+    phone_number: '+256789012345',
+    username: 'bobwilson',
+    password: 'password123',
+    organization: '',
+    role: 'member' as const
+  });
+
+  const [organizations, setOrganizations] = useState<Array<{id: string; name: string}>>([]);
 
   const testEndpoint = async (name: string, testFn: () => Promise<any>) => {
     setLoading(name);
@@ -380,6 +404,192 @@ const AuthTest = () => {
         </TabsContent>
 
         <TabsContent value="users" className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Create Sub Admin Test */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Create Sub Admin
+                </CardTitle>
+                <CardDescription>Test POST /sub_admin/</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>First Name</Label>
+                    <Input
+                      value={subAdminData.first_name}
+                      onChange={(e) => setSubAdminData(prev => ({ ...prev, first_name: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label>Last Name</Label>
+                    <Input
+                      value={subAdminData.last_name}
+                      onChange={(e) => setSubAdminData(prev => ({ ...prev, last_name: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Email</Label>
+                  <Input
+                    type="email"
+                    value={subAdminData.email}
+                    onChange={(e) => setSubAdminData(prev => ({ ...prev, email: e.target.value }))}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Phone Number</Label>
+                    <Input
+                      value={subAdminData.phone_number}
+                      onChange={(e) => setSubAdminData(prev => ({ ...prev, phone_number: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label>Username</Label>
+                    <Input
+                      value={subAdminData.username}
+                      onChange={(e) => setSubAdminData(prev => ({ ...prev, username: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Password</Label>
+                  <Input
+                    type="password"
+                    value={subAdminData.password}
+                    onChange={(e) => setSubAdminData(prev => ({ ...prev, password: e.target.value }))}
+                  />
+                </div>
+                <Button 
+                  onClick={() => testEndpoint('Create Sub Admin', () => userService.createSubAdmin(subAdminData))}
+                  disabled={loading === 'Create Sub Admin'}
+                  className="w-full"
+                >
+                  {loading === 'Create Sub Admin' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Create Sub Admin
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Create Staff Test */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Add Organization Staff
+                </CardTitle>
+                <CardDescription>Test POST /organizations/add_staff/</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>First Name</Label>
+                    <Input
+                      value={staffData.first_name}
+                      onChange={(e) => setStaffData(prev => ({ ...prev, first_name: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label>Last Name</Label>
+                    <Input
+                      value={staffData.last_name}
+                      onChange={(e) => setStaffData(prev => ({ ...prev, last_name: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Email</Label>
+                  <Input
+                    type="email"
+                    value={staffData.email}
+                    onChange={(e) => setStaffData(prev => ({ ...prev, email: e.target.value }))}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Phone Number</Label>
+                    <Input
+                      value={staffData.phone_number}
+                      onChange={(e) => setStaffData(prev => ({ ...prev, phone_number: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label>Username</Label>
+                    <Input
+                      value={staffData.username}
+                      onChange={(e) => setStaffData(prev => ({ ...prev, username: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Password</Label>
+                  <Input
+                    type="password"
+                    value={staffData.password}
+                    onChange={(e) => setStaffData(prev => ({ ...prev, password: e.target.value }))}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Organization</Label>
+                    <Select 
+                      value={staffData.organization} 
+                      onValueChange={(value) => setStaffData(prev => ({ ...prev, organization: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select organization" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {organizations.map(org => (
+                          <SelectItem key={org.id} value={org.id}>{org.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2 w-full"
+                      onClick={() => testEndpoint('Load Organizations', async () => {
+                        const orgs = await organizationService.listOrganizations();
+                        setOrganizations(orgs.map(org => ({ id: org.id, name: org.name })));
+                        return orgs;
+                      })}
+                    >
+                      Load Organizations
+                    </Button>
+                  </div>
+                  <div>
+                    <Label>Role</Label>
+                    <Select 
+                      value={staffData.role} 
+                      onValueChange={(value) => setStaffData(prev => ({ ...prev, role: value as any }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="member">Member</SelectItem>
+                        <SelectItem value="manager">Manager</SelectItem>
+                        <SelectItem value="owner">Owner</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => testEndpoint('Add Staff', () => organizationService.addStaff(staffData))}
+                  disabled={loading === 'Add Staff'}
+                  className="w-full"
+                >
+                  {loading === 'Add Staff' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Add Staff Member
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
           <div className="grid grid-cols-3 gap-4">
             <Button 
               onClick={() => testEndpoint('List Users', () => userService.listUsers())}

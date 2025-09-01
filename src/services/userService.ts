@@ -18,35 +18,134 @@ export interface CreateSubAdminRequest {
   password: string;
 }
 
+export interface UpdateSubAdminRequest {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone_number?: string;
+  username?: string;
+}
+
+export interface UserResponse {
+  id: string;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone_number?: string;
+  is_active: boolean;
+  date_joined: string;
+  last_login?: string;
+  role?: string;
+  organization?: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface SubAdminResponse {
+  id: string;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  is_active: boolean;
+  date_joined: string;
+  last_login?: string;
+}
+
 class UserService {
-  listUsers<T = any>(query?: UserQuery) {
-    return apiClient.get<T>(API_CONFIG.endpoints.user.list, query);
+  async listUsers(query?: UserQuery): Promise<UserResponse[]> {
+    try {
+      const response = await apiClient.get<{ results?: UserResponse[]; data?: UserResponse[] } | UserResponse[]>(
+        API_CONFIG.endpoints.user.list, 
+        query
+      );
+      
+      // Handle different response formats
+      if (Array.isArray(response)) {
+        return response;
+      } else if (response.results) {
+        return response.results;
+      } else if (response.data) {
+        return response.data;
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+      throw new Error('Failed to fetch users');
+    }
   }
 
-  getUser<T = any>(id: string) {
-    return apiClient.get<T>(API_CONFIG.endpoints.user.detail(id));
+  async getUser(id: string): Promise<UserResponse> {
+    try {
+      return await apiClient.get<UserResponse>(API_CONFIG.endpoints.user.detail(id));
+    } catch (error) {
+      console.error(`Failed to fetch user ${id}:`, error);
+      throw new Error(`Failed to fetch user ${id}`);
+    }
   }
 
-  createSubAdmin<T = any>(payload: CreateSubAdminRequest) {
-    return apiClient.post<T>(API_CONFIG.endpoints.subAdmin.create, payload);
+  async createSubAdmin(payload: CreateSubAdminRequest): Promise<SubAdminResponse> {
+    try {
+      return await apiClient.post<SubAdminResponse>(API_CONFIG.endpoints.subAdmin.create, payload);
+    } catch (error) {
+      console.error('Failed to create sub admin:', error);
+      throw new Error('Failed to create sub admin');
+    }
   }
 
-  listSubAdmins<T = any>(query?: QueryParams) {
-    return apiClient.get<T>(API_CONFIG.endpoints.subAdmin.list, query);
+  async listSubAdmins(query?: QueryParams): Promise<SubAdminResponse[]> {
+    try {
+      const response = await apiClient.get<{ results?: SubAdminResponse[]; data?: SubAdminResponse[] } | SubAdminResponse[]>(
+        API_CONFIG.endpoints.subAdmin.list, 
+        query
+      );
+      
+      // Handle different response formats
+      if (Array.isArray(response)) {
+        return response;
+      } else if (response.results) {
+        return response.results;
+      } else if (response.data) {
+        return response.data;
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Failed to fetch sub admins:', error);
+      throw new Error('Failed to fetch sub admins');
+    }
   }
 
-  getSubAdmin<T = any>(id: string) {
-    return apiClient.get<T>(API_CONFIG.endpoints.subAdmin.detail(id));
+  async getSubAdmin(id: string): Promise<SubAdminResponse> {
+    try {
+      return await apiClient.get<SubAdminResponse>(API_CONFIG.endpoints.subAdmin.detail(id));
+    } catch (error) {
+      console.error(`Failed to fetch sub admin ${id}:`, error);
+      throw new Error(`Failed to fetch sub admin ${id}`);
+    }
   }
 
-  updateSubAdmin<T = any>(id: string, payload: Partial<CreateSubAdminRequest>) {
-    return apiClient.put<T>(API_CONFIG.endpoints.subAdmin.update(id), payload);
+  async updateSubAdmin(id: string, payload: UpdateSubAdminRequest): Promise<SubAdminResponse> {
+    try {
+      return await apiClient.put<SubAdminResponse>(API_CONFIG.endpoints.subAdmin.update(id), payload);
+    } catch (error) {
+      console.error(`Failed to update sub admin ${id}:`, error);
+      throw new Error(`Failed to update sub admin ${id}`);
+    }
   }
 
-  deleteSubAdmin<T = any>(id: string) {
-    return apiClient.delete<T>(API_CONFIG.endpoints.subAdmin.delete(id));
+  async deleteSubAdmin(id: string): Promise<void> {
+    try {
+      await apiClient.delete(API_CONFIG.endpoints.subAdmin.delete(id));
+    } catch (error) {
+      console.error(`Failed to delete sub admin ${id}:`, error);
+      throw new Error(`Failed to delete sub admin ${id}`);
+    }
   }
 }
 
 export const userService = new UserService();
-

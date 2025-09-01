@@ -20,17 +20,23 @@ function buildUrl(path: string, query?: QueryParams): string {
 }
 
 function getBasicHeaders(): Record<string, string> {
-  const basic = localStorage.getItem('basic_auth');
   const headers: Record<string, string> = { 
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   };
-  if (basic) {
-    headers['Authorization'] = `Basic ${basic}`;
+  
+  // Try Bearer token first
+  const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   } else {
-    const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    // Fallback to Basic auth if available
+    const basic = localStorage.getItem('basic_auth');
+    if (basic) {
+      headers['Authorization'] = `Basic ${basic}`;
+    }
   }
+  
   return headers;
 }
 

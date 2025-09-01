@@ -14,6 +14,19 @@ export interface LoginResponse {
   token?: string;
   access?: string;
   refresh?: string;
+  user?: {
+    id: string;
+    username: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    role?: string;
+    organization?: {
+      id: string;
+      name: string;
+    };
+    permissions?: string[];
+  };
 }
 
 export interface ChangePasswordRequest {
@@ -50,29 +63,6 @@ class AuthService {
     }
   }
 
-  private getJsonHeaders() {
-    return { "Content-Type": "application/json" } as Record<string, string>;
-  }
-
-  private getBasicHeaders() {
-    const basic = localStorage.getItem("basic_auth");
-    const headers: Record<string, string> = { 
-      "Content-Type": "application/json",
-      "Accept": "application/json"
-    };
-    if (basic) headers["Authorization"] = `Basic ${basic}`;
-    return headers;
-  }
-
-  private getBasicHeadersFromCredentials(emailOrUsername: string, password: string) {
-    const basic = this.encodeBase64(`${emailOrUsername}:${password}`);
-    return {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "Authorization": `Basic ${basic}`
-    } as Record<string, string>;
-  }
-
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const identity = credentials.username || credentials.email;
     
@@ -85,43 +75,13 @@ class AuthService {
 
     console.log('Login attempt:', { identity, payload: { ...payload, password: '***' } });
 
-    // First attempt: without Authorization header (common case)
-    const baseHeaders: Record<string, string> = { 
-      "Content-Type": "application/json",
-      "Accept": "application/json"
-    };
-    
     try {
-      let response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.login}`, {
-        method: "POST",
-        headers: baseHeaders,
-        body: JSON.stringify(payload),
-        mode: 'cors'
-      });
-
-      // If unauthorized/forbidden, retry with Basic Auth as per API docs
-      if (!response.ok && (response.status === 401 || response.status === 403)) {
-        console.log('Retrying with Basic Auth...');
-        const basicHeaders = this.getBasicHeadersFromCredentials(identity, credentials.password);
-        response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.login}`, {
-          method: "POST",
-          headers: basicHeaders,
-          body: JSON.stringify(payload),
-          mode: 'cors'
-        });
-      }
-
-      if (!response.ok) {
-        const errorText = await response.text().catch(() => "Login failed");
-        console.error('Login error:', response.status, errorText);
-        throw new Error(errorText || `Login failed (${response.status})`);
-      }
-
-      const data: LoginResponse = await response.json().catch(() => ({} as LoginResponse));
-
-      // Persist tokens in a way that existing code expects
-      const accessToken = data.access || data.token || "";
-      const refreshToken = data.refresh || "";
+      const response = await apiClient.post<LoginResponse>(API_CONFIG.endpoints.auth.login, payload);
+      
+      // Handle successful login response
+      const accessToken = response.access || response.token || "";
+      const refreshToken = response.refresh || "";
+      
       if (accessToken) {
         localStorage.setItem("auth_token", accessToken);
         localStorage.setItem("access_token", accessToken);
@@ -129,36 +89,59 @@ class AuthService {
       if (refreshToken) {
         localStorage.setItem("refresh_token", refreshToken);
       }
-      // Persist Basic credential for subsequent Basic-protected endpoints in this API
-      const basic = this.encodeBase64(`${identity}:${credentials.password}`);
-      localStorage.setItem("basic_auth", basic);
 
-      // Derive role from token if available; fallback to staff
-      const claims = accessToken ? this.decodeJwt(accessToken) : null;
-      const derivedRole = (claims?.role?.toLowerCase?.()) || 'staff';
-      const role = (['admin', 'manager', 'staff'] as const).includes(derivedRole) ? derivedRole : 'staff';
+      // Build user profile from response
+      let userProfile;
+      if (response.user) {
+        // Use user data from response
+        const user = response.user;
+        const role = user.role?.toLowerCase() || 'staff';
+        const validRole = (['admin', 'manager', 'staff'] as const).includes(role as any) ? role : 'staff';
+        
+        userProfile = {
+          id: user.id,
+          name: `${user.first_name} ${user.last_name}`.trim(),
+          email: user.email,
+          role: validRole,
+          organizationId: user.organization?.id || 'default-org',
+          organization: {
+            id: user.organization?.id || 'default-org',
+            name: user.organization?.name || 'Organization',
+            description: '',
+            industry: ''
+          },
+          position: 'Member',
+          permissions: Array.isArray(user.permissions) && user.permissions.length > 0
+            ? user.permissions
+            : rolePermissions[validRole as keyof typeof rolePermissions]
+        };
+      } else {
+        // Fallback: derive from token or use defaults
+        const claims = accessToken ? this.decodeJwt(accessToken) : null;
+        const derivedRole = (claims?.role?.toLowerCase?.()) || 'staff';
+        const role = (['admin', 'manager', 'staff'] as const).includes(derivedRole) ? derivedRole : 'staff';
 
-      // Build user profile with permissions by role
-      const userProfile = {
-        id: data.email || identity,
-        name: claims?.name || data.username || identity,
-        email: claims?.email || data.email || credentials.email,
-        role,
-        organizationId: claims?.organizationId || 'default-org',
-        organization: {
-          id: claims?.organizationId || 'default-org',
-          name: claims?.organizationName || 'Organization',
-          description: '',
-          industry: ''
-        },
-        position: claims?.position || 'Member',
-        permissions: Array.isArray(claims?.permissions) && claims.permissions.length > 0
-          ? claims.permissions
-          : rolePermissions[role as keyof typeof rolePermissions]
-      } as any;
+        userProfile = {
+          id: response.email || identity,
+          name: claims?.name || response.username || identity,
+          email: claims?.email || response.email || credentials.email,
+          role,
+          organizationId: claims?.organizationId || 'default-org',
+          organization: {
+            id: claims?.organizationId || 'default-org',
+            name: claims?.organizationName || 'Organization',
+            description: '',
+            industry: ''
+          },
+          position: claims?.position || 'Member',
+          permissions: Array.isArray(claims?.permissions) && claims.permissions.length > 0
+            ? claims.permissions
+            : rolePermissions[role as keyof typeof rolePermissions]
+        };
+      }
+
       localStorage.setItem("user", JSON.stringify(userProfile));
-
-      return data;
+      return response;
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -169,33 +152,10 @@ class AuthService {
     console.log('Logout attempt...');
     
     try {
-      // Try GET logout
-      const getResponse = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.logout}`, {
-        method: "GET",
-        headers: {
-          ...this.getBasicHeaders(),
-          "Accept": "application/json"
-        },
-        mode: 'cors'
-      });
-      console.log('GET logout response:', getResponse.status);
+      await apiClient.post(API_CONFIG.endpoints.auth.logout);
     } catch (error) {
-      console.error('GET logout failed:', error);
-    }
-
-    try {
-      // Fallback POST logout
-      const postResponse = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.logout}`, {
-        method: "POST",
-        headers: {
-          ...this.getBasicHeaders(),
-          "Accept": "application/json"
-        },
-        mode: 'cors'
-      });
-      console.log('POST logout response:', postResponse.status);
-    } catch (error) {
-      console.error('POST logout failed:', error);
+      console.error('Logout API call failed:', error);
+      // Continue with local cleanup even if API call fails
     }
 
     // Always clear local storage
@@ -212,30 +172,15 @@ class AuthService {
     console.log('Password change attempt...');
     
     try {
-      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.changePassword}`, {
-        method: "POST",
-        headers: {
-          ...this.getBasicHeaders(),
-          "Accept": "application/json"
-        },
-        body: JSON.stringify(passwordData),
-        mode: 'cors'
-      });
-      
-      console.log('Password change response:', response.status);
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: "Password change failed" }));
-        console.error('Password change error:', errorData);
-        return { success: false, message: (errorData as any).message || "Password change failed" };
-      }
-      
-      const data = await response.json().catch(() => ({ success: true, message: "Password changed successfully" }));
-      console.log('Password change success:', data);
-      return { success: !!(data as any).success, message: (data as any).message || "Password changed successfully" };
-    } catch (e) {
-      console.error('Password change exception:', e);
-      return { success: false, message: e instanceof Error ? e.message : "Password change failed" };
+      const response = await apiClient.post(API_CONFIG.endpoints.auth.changePassword, passwordData);
+      console.log('Password change success:', response);
+      return { success: true, message: "Password changed successfully" };
+    } catch (error: any) {
+      console.error('Password change failed:', error);
+      return { 
+        success: false, 
+        message: error.details?.message || error.message || "Password change failed" 
+      };
     }
   }
 
@@ -245,35 +190,26 @@ class AuthService {
     
     console.log('Token refresh attempt...');
     
-    const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.refresh}`, {
-      method: "POST",
-      headers: {
-        ...this.getBasicHeaders(),
-        "Accept": "application/json"
-      },
-      body: JSON.stringify(body),
-      mode: 'cors'
-    });
-    
-    console.log('Token refresh response:', response.status);
-    
-    if (!response.ok) {
-      const err = await response.text().catch(() => "Token refresh failed");
-      console.error('Token refresh error:', err);
-      throw new Error(err || `Token refresh failed (${response.status})`);
+    try {
+      const data = await apiClient.post<{ access: string; refresh: string }>(
+        API_CONFIG.endpoints.auth.refresh, 
+        body
+      );
+      
+      console.log('Token refresh success:', data);
+      
+      if (data?.access) {
+        localStorage.setItem("auth_token", data.access);
+        localStorage.setItem("access_token", data.access);
+      }
+      if (data?.refresh) {
+        localStorage.setItem("refresh_token", data.refresh);
+      }
+      return data;
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      throw error;
     }
-    
-    const data = await response.json();
-    console.log('Token refresh success:', data);
-    
-    if (data?.access) {
-      localStorage.setItem("auth_token", data.access);
-      localStorage.setItem("access_token", data.access);
-    }
-    if (data?.refresh) {
-      localStorage.setItem("refresh_token", data.refresh);
-    }
-    return data;
   }
 
   async verifyToken(token: string): Promise<boolean> {
@@ -282,18 +218,9 @@ class AuthService {
     console.log('Token verify attempt...');
     
     try {
-      const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.verify}`, {
-        method: "POST",
-        headers: {
-          ...this.getBasicHeaders(),
-          "Accept": "application/json"
-        },
-        body: JSON.stringify(body),
-        mode: 'cors'
-      });
-      
-      console.log('Token verify response:', response.status);
-      return response.ok;
+      await apiClient.post(API_CONFIG.endpoints.auth.verify, body);
+      console.log('Token verify success');
+      return true;
     } catch (error) {
       console.error('Token verify failed:', error);
       return false;

@@ -1,14 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Plus, Search, Filter, Users, Building, Wallet, Edit, MoreHorizontal, CreditCard, Ban, Trash2, CheckCircle2 } from "lucide-react";
+import { Plus, Search, Filter, Users, Building, Wallet, Edit, MoreHorizontal, CreditCard, Ban, Trash2, CheckCircle2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { organizationService, CreateOrganizationRequest, OrganizationResponse } from "@/services/organizationService";
 
 interface Organization {
   id: string;
@@ -20,9 +21,12 @@ interface Organization {
   createdAt: string;
   adminName: string;
   phone: string;
+  address?: string;
+  company_reg_id?: string;
+  tin?: string;
 }
 
-const AdminOrganizations = () => {
+const SystemOrganizations = () => {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -30,73 +34,72 @@ const AdminOrganizations = () => {
   const [editOpen, setEditOpen] = useState<null | Organization>(null);
   const [topUpOpen, setTopUpOpen] = useState<null | Organization>(null);
   const [confirmDelete, setConfirmDelete] = useState<null | Organization>(null);
+  const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchOrganizations = async () => {
-      try {
-        setIsLoading(true);
-        setTimeout(() => {
-          setOrganizations([
-            {
-              id: "ORG001",
-              name: "Tech Solutions Ltd",
-              email: "admin@techsolutions.com",
-              status: "active",
-              walletBalance: 125000,
-              members: 45,
-              createdAt: "2024-01-10T10:30:00Z",
-              adminName: "John Doe",
-              phone: "+256701234567"
-            },
-            {
-              id: "ORG002",
-              name: "Digital Agency Inc",
-              email: "contact@digitalagency.com",
-              status: "active",
-              walletBalance: 85000,
-              members: 28,
-              createdAt: "2024-01-08T14:20:00Z",
-              adminName: "Jane Smith",
-              phone: "+256789012345"
-            },
-            {
-              id: "ORG003",
-              name: "Startup Hub",
-              email: "info@startuphub.com",
-              status: "inactive",
-              walletBalance: 15000,
-              members: 12,
-              createdAt: "2024-01-05T09:15:00Z",
-              adminName: "Mike Johnson",
-              phone: "+256712345678"
-            },
-            {
-              id: "ORG004",
-              name: "Creative Studios",
-              email: "hello@creativestudios.com",
-              status: "suspended",
-              walletBalance: 0,
-              members: 8,
-              createdAt: "2024-01-03T15:45:00Z",
-              adminName: "Sarah Wilson",
-              phone: "+256734567890"
-            }
-          ]);
-          setIsLoading(false);
-        }, 1000);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load organizations",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-      }
-    };
-
     fetchOrganizations();
-  }, [toast]);
+  }, []);
+
+  const fetchOrganizations = async () => {
+    try {
+      setIsLoading(true);
+      const response = await organizationService.listOrganizations();
+      
+      // Transform API response to match our interface
+      const transformedOrgs: Organization[] = response.map((org: OrganizationResponse) => ({
+        id: org.id,
+        name: org.name,
+        email: org.owner?.email || '',
+        status: "active" as const, // Default to active, you might want to add status field to API
+        walletBalance: org.wallet?.balance || 0,
+        members: org.staff_count || 0,
+        createdAt: org.created_at,
+        adminName: org.owner ? `${org.owner.first_name} ${org.owner.last_name}`.trim() : '',
+        phone: org.owner?.phone_number || '',
+        address: org.address,
+        company_reg_id: org.company_reg_id,
+        tin: org.tin
+      }));
+      
+      setOrganizations(transformedOrgs);
+    } catch (error) {
+      console.error('Error fetching organizations:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load organizations. Using demo data.",
+        variant: "destructive",
+      });
+      
+      // Fallback to demo data
+      setOrganizations([
+        {
+          id: "ORG001",
+          name: "Tech Solutions Ltd",
+          email: "admin@techsolutions.com",
+          status: "active",
+          walletBalance: 125000,
+          members: 45,
+          createdAt: "2024-01-10T10:30:00Z",
+          adminName: "John Doe",
+          phone: "+256701234567"
+        },
+        {
+          id: "ORG002",
+          name: "Digital Agency Inc",
+          email: "contact@digitalagency.com",
+          status: "active",
+          walletBalance: 85000,
+          members: 28,
+          createdAt: "2024-01-08T14:20:00Z",
+          adminName: "Jane Smith",
+          phone: "+256789012345"
+        }
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -119,27 +122,69 @@ const AdminOrganizations = () => {
       org.adminName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCreateOrganization = (data: Partial<Organization>) => {
-    const newOrg: Organization = {
-      id: data.id || `ORG${(organizations.length + 1).toString().padStart(3, "0")}`,
-      name: data.name || "New Organization",
-      email: data.email || "contact@example.com",
-      status: (data.status as Organization["status"]) || "inactive",
-      walletBalance: Number(data.walletBalance) || 0,
-      members: Number(data.members) || 0,
-      createdAt: new Date().toISOString(),
-      adminName: data.adminName || "Admin User",
-      phone: data.phone || "+256700000000",
-    };
-    setOrganizations(prev => [newOrg, ...prev]);
-    setCreateOpen(false);
-    toast({ title: "Organization created", description: `${newOrg.name} added` });
+  const handleCreateOrganization = async (data: CreateOrganizationRequest) => {
+    try {
+      setIsCreating(true);
+      const response = await organizationService.createOrganization(data);
+      
+      // Add new organization to the list
+      const newOrg: Organization = {
+        id: response.id,
+        name: response.name,
+        email: data.email,
+        status: "active",
+        walletBalance: response.wallet?.balance || 0,
+        members: 1, // Owner is the first member
+        createdAt: response.created_at,
+        adminName: `${data.first_name} ${data.last_name}`.trim(),
+        phone: data.phone_number,
+        address: response.address,
+        company_reg_id: response.company_reg_id,
+        tin: response.tin
+      };
+      
+      setOrganizations(prev => [newOrg, ...prev]);
+      setCreateOpen(false);
+      toast({ 
+        title: "Organization created", 
+        description: `${newOrg.name} has been successfully created` 
+      });
+    } catch (error) {
+      console.error('Error creating organization:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create organization. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreating(false);
+    }
   };
 
-  const handleUpdateOrganization = (id: string, updates: Partial<Organization>) => {
-    setOrganizations(prev => prev.map(org => org.id === id ? { ...org, ...updates } : org));
-    setEditOpen(null);
-    toast({ title: "Organization updated" });
+  const handleUpdateOrganization = async (id: string, updates: Partial<Organization>) => {
+    try {
+      if (updates.name || updates.address || updates.company_reg_id || updates.tin) {
+        const updatePayload = {
+          name: updates.name || organizations.find(o => o.id === id)?.name || '',
+          address: updates.address || organizations.find(o => o.id === id)?.address || '',
+          company_reg_id: updates.company_reg_id || organizations.find(o => o.id === id)?.company_reg_id || '',
+          tin: updates.tin || organizations.find(o => o.id === id)?.tin || ''
+        };
+        
+        await organizationService.updateOrganization(id, updatePayload);
+      }
+      
+      setOrganizations(prev => prev.map(org => org.id === id ? { ...org, ...updates } : org));
+      setEditOpen(null);
+      toast({ title: "Organization updated" });
+    } catch (error) {
+      console.error('Error updating organization:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update organization",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleToggleStatus = (org: Organization) => {
@@ -287,6 +332,7 @@ const AdminOrganizations = () => {
                           </div>
                           <div>
                             <p><strong>Created:</strong> {new Date(org.createdAt).toLocaleDateString()}</p>
+                            {org.address && <p><strong>Address:</strong> {org.address}</p>}
                           </div>
                         </div>
                         <div className="flex items-center space-x-6 mt-3">
@@ -336,125 +382,310 @@ const AdminOrganizations = () => {
             ))}
           </div>
         )}
+
+        {filteredOrganizations.length === 0 && !isLoading && (
+          <Card>
+            <CardContent className="text-center py-12">
+              <Building className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <h3 className="text-lg font-medium mb-2">No organizations found</h3>
+              <p className="text-muted-foreground">
+                {searchTerm ? "No organizations match your search criteria." : "Create your first organization to get started."}
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
-    {/* Create Organization Dialog */}
-    <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create Organization</DialogTitle>
-          <DialogDescription>Set up a new tenant organization.</DialogDescription>
-        </DialogHeader>
-        <OrgForm onSubmit={handleCreateOrganization} onCancel={() => setCreateOpen(false)} submitLabel="Create" />
-      </DialogContent>
-    </Dialog>
 
-    {/* Edit Dialog */}
-    <Dialog open={!!editOpen} onOpenChange={(o) => !o && setEditOpen(null)}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit Organization</DialogTitle>
-          <DialogDescription>Update organization details.</DialogDescription>
-        </DialogHeader>
-        {editOpen && (
-          <OrgForm
-            initial={editOpen}
-            onSubmit={(data) => handleUpdateOrganization(editOpen.id, data)}
-            onCancel={() => setEditOpen(null)}
-            submitLabel="Save changes"
+      {/* Create Organization Dialog */}
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create New Organization</DialogTitle>
+            <DialogDescription>Set up a new organization with an admin user.</DialogDescription>
+          </DialogHeader>
+          <OrgForm 
+            onSubmit={handleCreateOrganization} 
+            onCancel={() => setCreateOpen(false)} 
+            submitLabel="Create Organization"
+            isLoading={isCreating}
           />
-        )}
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
 
-    {/* Top-up Dialog */}
-    <Dialog open={!!topUpOpen} onOpenChange={(o) => !o && setTopUpOpen(null)}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Top up wallet</DialogTitle>
-          <DialogDescription>Increase organization wallet balance.</DialogDescription>
-        </DialogHeader>
-        {topUpOpen && (
-          <TopUpForm
-            org={topUpOpen}
-            onSubmit={(amount) => handleTopUp(topUpOpen.id, amount)}
-            onCancel={() => setTopUpOpen(null)}
-          />
-        )}
-      </DialogContent>
-    </Dialog>
-
-    {/* Delete Confirm */}
-    <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete organization?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently remove the organization and its demo data.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setConfirmDelete(null)}>Cancel</AlertDialogCancel>
-          {confirmDelete && (
-            <AlertDialogAction onClick={() => handleDelete(confirmDelete.id)} className="bg-red-600 hover:bg-red-700">
-              Delete
-            </AlertDialogAction>
+      {/* Edit Dialog */}
+      <Dialog open={!!editOpen} onOpenChange={(o) => !o && setEditOpen(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Organization</DialogTitle>
+            <DialogDescription>Update organization details.</DialogDescription>
+          </DialogHeader>
+          {editOpen && (
+            <OrgEditForm
+              initial={editOpen}
+              onSubmit={(data) => handleUpdateOrganization(editOpen.id, data)}
+              onCancel={() => setEditOpen(null)}
+              submitLabel="Save changes"
+            />
           )}
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        </DialogContent>
+      </Dialog>
 
+      {/* Top-up Dialog */}
+      <Dialog open={!!topUpOpen} onOpenChange={(o) => !o && setTopUpOpen(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Top up wallet</DialogTitle>
+            <DialogDescription>Increase organization wallet balance.</DialogDescription>
+          </DialogHeader>
+          {topUpOpen && (
+            <TopUpForm
+              org={topUpOpen}
+              onSubmit={(amount) => handleTopUp(topUpOpen.id, amount)}
+              onCancel={() => setTopUpOpen(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirm */}
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete organization?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently remove the organization and all its data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setConfirmDelete(null)}>Cancel</AlertDialogCancel>
+            {confirmDelete && (
+              <AlertDialogAction onClick={() => handleDelete(confirmDelete.id)} className="bg-red-600 hover:bg-red-700">
+                Delete
+              </AlertDialogAction>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
 
-export default AdminOrganizations;
+export default SystemOrganizations;
 
 // ----- Forms -----
 interface OrgFormProps {
-  initial?: Partial<Organization>;
+  submitLabel: string;
+  onSubmit: (data: CreateOrganizationRequest) => void;
+  onCancel: () => void;
+  isLoading?: boolean;
+}
+
+const OrgForm = ({ submitLabel, onSubmit, onCancel, isLoading }: OrgFormProps) => {
+  const [form, setForm] = useState<CreateOrganizationRequest>({
+    username: "",
+    password: "",
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "+256",
+    org_name: "",
+    address: "",
+    company_reg_id: "",
+    tin: "",
+    wallet_currency: 1, // Default to UGX
+    wallet_pin: ""
+  });
+
+  const handleSubmit = () => {
+    // Validate required fields
+    if (!form.org_name || !form.email || !form.first_name || !form.last_name || !form.username || !form.password) {
+      return;
+    }
+    onSubmit(form);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <Label>Organization Name *</Label>
+          <Input 
+            value={form.org_name} 
+            onChange={(e) => setForm({ ...form, org_name: e.target.value })}
+            placeholder="Tech Solutions Ltd"
+          />
+        </div>
+        <div>
+          <Label>Address *</Label>
+          <Input 
+            value={form.address} 
+            onChange={(e) => setForm({ ...form, address: e.target.value })}
+            placeholder="123 Business Street, Kampala"
+          />
+        </div>
+        <div>
+          <Label>Company Registration ID</Label>
+          <Input 
+            value={form.company_reg_id} 
+            onChange={(e) => setForm({ ...form, company_reg_id: e.target.value })}
+            placeholder="REG123456"
+          />
+        </div>
+        <div>
+          <Label>TIN Number</Label>
+          <Input 
+            value={form.tin} 
+            onChange={(e) => setForm({ ...form, tin: e.target.value })}
+            placeholder="TIN123456789"
+          />
+        </div>
+      </div>
+
+      <div className="border-t pt-4">
+        <h3 className="text-lg font-semibold mb-3">Admin User Details</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <Label>First Name *</Label>
+            <Input 
+              value={form.first_name} 
+              onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+              placeholder="John"
+            />
+          </div>
+          <div>
+            <Label>Last Name *</Label>
+            <Input 
+              value={form.last_name} 
+              onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+              placeholder="Doe"
+            />
+          </div>
+          <div>
+            <Label>Username *</Label>
+            <Input 
+              value={form.username} 
+              onChange={(e) => setForm({ ...form, username: e.target.value })}
+              placeholder="johndoe"
+            />
+          </div>
+          <div>
+            <Label>Password *</Label>
+            <Input 
+              type="password"
+              value={form.password} 
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              placeholder="••••••••"
+            />
+          </div>
+          <div>
+            <Label>Email *</Label>
+            <Input 
+              type="email"
+              value={form.email} 
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="john@techsolutions.com"
+            />
+          </div>
+          <div>
+            <Label>Phone Number *</Label>
+            <Input 
+              value={form.phone_number} 
+              onChange={(e) => setForm({ ...form, phone_number: e.target.value })}
+              placeholder="+256701234567"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t pt-4">
+        <h3 className="text-lg font-semibold mb-3">Wallet Configuration</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <Label>Wallet Currency</Label>
+            <Input 
+              type="number"
+              value={form.wallet_currency} 
+              onChange={(e) => setForm({ ...form, wallet_currency: parseInt(e.target.value) || 1 })}
+              placeholder="1"
+            />
+            <p className="text-xs text-muted-foreground mt-1">1 = UGX, 2 = USD</p>
+          </div>
+          <div>
+            <Label>Wallet PIN *</Label>
+            <Input 
+              type="password"
+              maxLength={4}
+              value={form.wallet_pin} 
+              onChange={(e) => setForm({ ...form, wallet_pin: e.target.value })}
+              placeholder="1234"
+            />
+            <p className="text-xs text-muted-foreground mt-1">4-digit PIN for wallet access</p>
+          </div>
+        </div>
+      </div>
+
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel} disabled={isLoading}>
+          Cancel
+        </Button>
+        <Button 
+          onClick={handleSubmit} 
+          disabled={isLoading || !form.org_name || !form.email || !form.first_name || !form.last_name || !form.username || !form.password}
+        >
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {submitLabel}
+        </Button>
+      </DialogFooter>
+    </div>
+  );
+};
+
+interface OrgEditFormProps {
+  initial: Organization;
   submitLabel: string;
   onSubmit: (data: Partial<Organization>) => void;
   onCancel: () => void;
 }
 
-const OrgForm = ({ initial, submitLabel, onSubmit, onCancel }: OrgFormProps) => {
+const OrgEditForm = ({ initial, submitLabel, onSubmit, onCancel }: OrgEditFormProps) => {
   const [form, setForm] = useState<Partial<Organization>>({
-    id: initial?.id || "",
-    name: initial?.name || "",
-    email: initial?.email || "",
-    adminName: initial?.adminName || "",
-    phone: initial?.phone || "",
-    status: initial?.status || "active",
-    walletBalance: initial?.walletBalance ?? 0,
-    members: initial?.members ?? 0,
+    name: initial.name,
+    address: initial.address,
+    company_reg_id: initial.company_reg_id,
+    tin: initial.tin,
+    adminName: initial.adminName,
+    phone: initial.phone,
+    email: initial.email,
+    members: initial.members,
+    walletBalance: initial.walletBalance,
   });
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="text-sm">Name</label>
+          <Label>Organization Name</Label>
           <Input value={form.name as string} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         </div>
         <div>
-          <label className="text-sm">Email</label>
-          <Input value={form.email as string} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <Label>Address</Label>
+          <Input value={form.address as string} onChange={(e) => setForm({ ...form, address: e.target.value })} />
         </div>
         <div>
-          <label className="text-sm">Admin name</label>
+          <Label>Company Registration ID</Label>
+          <Input value={form.company_reg_id as string} onChange={(e) => setForm({ ...form, company_reg_id: e.target.value })} />
+        </div>
+        <div>
+          <Label>TIN Number</Label>
+          <Input value={form.tin as string} onChange={(e) => setForm({ ...form, tin: e.target.value })} />
+        </div>
+        <div>
+          <Label>Admin Name</Label>
           <Input value={form.adminName as string} onChange={(e) => setForm({ ...form, adminName: e.target.value })} />
         </div>
         <div>
-          <label className="text-sm">Phone</label>
+          <Label>Phone</Label>
           <Input value={form.phone as string} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-        </div>
-        <div>
-          <label className="text-sm">Members</label>
-          <Input type="number" value={String(form.members ?? 0)} onChange={(e) => setForm({ ...form, members: Number(e.target.value) })} />
-        </div>
-        <div>
-          <label className="text-sm">Initial Wallet (UGX)</label>
-          <Input type="number" value={String(form.walletBalance ?? 0)} onChange={(e) => setForm({ ...form, walletBalance: Number(e.target.value) })} />
         </div>
       </div>
       <DialogFooter>
@@ -477,7 +708,7 @@ const TopUpForm = ({ org, onSubmit, onCancel }: TopUpFormProps) => {
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">Current balance: UGX {org.walletBalance.toLocaleString()}</p>
       <div>
-        <label className="text-sm">Amount (UGX)</label>
+        <Label>Amount (UGX)</Label>
         <Input type="number" value={String(amount)} onChange={(e) => setAmount(Number(e.target.value))} />
       </div>
       <DialogFooter>

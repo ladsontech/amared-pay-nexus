@@ -96,6 +96,49 @@ export default function OrgUsers() {
     setEditingUser(null);
   };
 
+  const handleCreateStaffMember = async (payload: Partial<OrgUser>) => {
+    if (!currentUser?.organizationId || !currentUser.organization) return;
+    
+    try {
+      // If we have API integration, create via API
+      const staffPayload = {
+        username: payload.email?.split('@')[0] || '',
+        password: 'defaultPassword123', // You might want to generate this or ask user
+        first_name: payload.name?.split(' ')[0] || '',
+        last_name: payload.name?.split(' ').slice(1).join(' ') || '',
+        email: payload.email || '',
+        phone_number: '+256700000000', // Default phone
+        organization: currentUser.organizationId,
+        role: payload.role === 'manager' ? 'manager' as const : 'member' as const
+      };
+      
+      const response = await organizationService.addStaff(staffPayload);
+      
+      const newUser: OrgUser = {
+        id: response.id,
+        name: `${response.first_name} ${response.last_name}`.trim(),
+        email: response.email,
+        role: response.role === 'manager' ? 'manager' : 'staff',
+        organizationId: currentUser.organizationId,
+        organization: currentUser.organization,
+        permissions: (payload.permissions as Permission[]) || [],
+        department: payload.department || "",
+        avatar: payload.avatar,
+        position: payload.position || "",
+      };
+      
+      const next = [newUser, ...users];
+      setUsers(next);
+      persist(next);
+      setOpen(false);
+      setEditingUser(null);
+      toast({ title: "Staff member created via API" });
+    } catch (error) {
+      console.error('API creation failed, falling back to local:', error);
+      // Fallback to local creation
+      handleAddOrUpdate(payload);
+    }
+  };
   const handleDelete = (id: string) => {
     const next = users.filter(u => u.id !== id);
     setUsers(next);
