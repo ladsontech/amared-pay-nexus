@@ -296,6 +296,7 @@ const OrgDashboard = () => {
                   <span className="text-xs font-bold">+12.5%</span>
                 </div>
               </div>
+            </div>
           </CardContent>
         </Card>
 
