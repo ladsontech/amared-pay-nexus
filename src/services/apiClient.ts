@@ -21,7 +21,10 @@ function buildUrl(path: string, query?: QueryParams): string {
 
 function getBasicHeaders(): Record<string, string> {
   const basic = localStorage.getItem('basic_auth');
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  const headers: Record<string, string> = { 
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
   if (basic) {
     headers['Authorization'] = `Basic ${basic}`;
   } else {
@@ -54,35 +57,43 @@ async function handleResponse<T>(response: Response): Promise<T> {
 export const apiClient = {
   get: async <T>(path: string, query?: QueryParams): Promise<T> => {
     const url = buildUrl(path, query);
+    console.log('GET request:', url);
     const res = await fetch(url, {
       method: 'GET',
-      headers: getBasicHeaders()
+      headers: getBasicHeaders(),
+      mode: 'cors'
     });
     return handleResponse<T>(res);
   },
   post: async <T>(path: string, body?: unknown, query?: QueryParams): Promise<T> => {
     const url = buildUrl(path, query);
+    console.log('POST request:', url, body);
     const res = await fetch(url, {
       method: 'POST',
       headers: getBasicHeaders(),
-      body: body !== undefined ? JSON.stringify(body) : undefined
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      mode: 'cors'
     });
     return handleResponse<T>(res);
   },
   put: async <T>(path: string, body?: unknown, query?: QueryParams): Promise<T> => {
     const url = buildUrl(path, query);
+    console.log('PUT request:', url, body);
     const res = await fetch(url, {
       method: 'PUT',
       headers: getBasicHeaders(),
-      body: body !== undefined ? JSON.stringify(body) : undefined
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      mode: 'cors'
     });
     return handleResponse<T>(res);
   },
   delete: async <T>(path: string, query?: QueryParams): Promise<T> => {
     const url = buildUrl(path, query);
+    console.log('DELETE request:', url);
     const res = await fetch(url, {
       method: 'DELETE',
-      headers: getBasicHeaders()
+      headers: getBasicHeaders(),
+      mode: 'cors'
     });
     return handleResponse<T>(res);
   }
