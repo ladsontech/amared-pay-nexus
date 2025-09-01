@@ -174,7 +174,7 @@ const OrgDashboard = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Mobile Header */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+      <div className="md:hidden sticky top-0 z-50 bg-white border-b border-gray-100">
         <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -191,7 +191,7 @@ const OrgDashboard = () => {
       {/* Content */}
       <div className="px-4 pb-20">
         {/* Desktop View */}
-        <div className="hidden md:block">
+        <div className="hidden md:block space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             {/* Total Balance Card with Quick Actions */}
             <Card className="lg:col-span-2 bg-gradient-to-br from-blue-600 to-blue-700 text-white border-0 shadow-xl">
@@ -360,158 +360,6 @@ const OrgDashboard = () => {
               </Card>
             </div>
           </div>
-        </div>
-
-        {/* Mobile View */}
-        <div className="md:hidden">
-          {/* Balance Cards - Compact */}
-          <div className="py-4 space-y-3">
-            <div className="bg-blue-600 rounded-2xl p-4 text-white">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Wallet className="h-5 w-5" />
-                  <span className="text-sm font-medium">Total Balance</span>
-                </div>
-                <Eye className="h-4 w-4 opacity-70" />
-              </div>
-              <div className="space-y-1 mb-4">
-                <p className="text-2xl font-bold">UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M</p>
-                <div className="flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3" />
-                  <span className="text-xs">+12.5% this month</span>
-                </div>
-              </div>
-              
-              {/* Mobile Quick Actions */}
-              <div className="grid grid-cols-2 gap-2">
-                <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
-                  <DialogTrigger asChild>
-                    <Button className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs py-2">
-                      <Building className="h-3 w-3 mr-1" />
-                      Send to Bank
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="mx-4">
-                    <DialogHeader>
-                      <DialogTitle>Send to Bank</DialogTitle>
-                      <DialogDescription>Transfer funds to bank account</DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label>Amount (UGX)</Label>
-                        <Input
-                          type="number"
-                          placeholder="Enter amount"
-                          value={bankTransferData.amount}
-                          onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Bank Account</Label>
-                        <Select 
-                          value={bankTransferData.bankAccount} 
-                          onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select bank account" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
-                            <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
-                            <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Description</Label>
-                        <Input
-                          placeholder="Transfer description"
-                          value={bankTransferData.description}
-                          onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
-                        />
-                      </div>
-                      <Button onClick={handleSendToBank} className="w-full bg-blue-600 hover:bg-blue-700">
-                        Confirm Transfer
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-
-                <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
-                  <DialogTrigger asChild>
-                    <Button className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs py-2">
-                      <Phone className="h-3 w-3 mr-1" />
-                      Withdraw
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="mx-4">
-                    <DialogHeader>
-                      <DialogTitle>Withdraw by Phone</DialogTitle>
-                      <DialogDescription>Send money to mobile money account</DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label>Amount (UGX)</Label>
-                        <Input
-                          type="number"
-                          placeholder="Enter amount"
-                          value={withdrawData.amount}
-                          onChange={(e) => setWithdrawData({...withdrawData, amount: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Phone Number</Label>
-                        <Input
-                          placeholder="+256701234567"
-                          value={withdrawData.phoneNumber}
-                          onChange={(e) => setWithdrawData({...withdrawData, phoneNumber: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Description</Label>
-                        <Input
-                          placeholder="Withdrawal description"
-                          value={withdrawData.description}
-                          onChange={(e) => setWithdrawData({...withdrawData, description: e.target.value})}
-                        />
-                      </div>
-                      <Button onClick={handleWithdraw} className="w-full bg-blue-600 hover:bg-blue-700">
-                        Confirm Withdrawal
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </Card>
-
-            {/* Stats Card */}
-            <Card className="bg-white border border-gray-100 shadow-lg">
-              <CardContent className="p-6">
-                <div className="space-y-6">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Activity className="h-5 w-5 text-blue-600" />
-                      <span className="text-sm font-medium text-gray-700">Monthly Activity</span>
-                    </div>
-                    <p className="text-2xl font-bold text-black">{dashboardData.monthlyTransactions}</p>
-                    <p className="text-xs text-gray-500">Transactions this month</p>
-                  </div>
-                  
-                  {hasPermission('approve_transactions') && (
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Clock className="h-5 w-5 text-blue-600" />
-                        <span className="text-sm font-medium text-gray-700">Pending</span>
-                      </div>
-                      <p className="text-2xl font-bold text-black">{dashboardData.pendingApprovals}</p>
-                      <p className="text-xs text-gray-500">Awaiting approval</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
           {/* Desktop Other Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="bg-white border border-gray-100 shadow-lg">
@@ -568,84 +416,202 @@ const OrgDashboard = () => {
           </div>
         </div>
 
-        {/* Shared Content for Both Views */}
-        <div className="py-4">
-          {/* Stats Grid - Mobile Only */}
-          <div className="md:hidden">
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="bg-white border border-gray-100 rounded-xl p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <Activity className="h-4 w-4 text-blue-600" />
-                  <TrendingUp className="h-3 w-3 text-blue-600" />
-                </div>
-                <p className="text-lg font-bold text-black">{dashboardData.monthlyTransactions}</p>
-                <p className="text-xs text-gray-500">Transactions</p>
+        {/* Mobile View */}
+        <div className="md:hidden space-y-4">
+          {/* Balance Cards - Compact */}
+          <div className="bg-blue-600 rounded-2xl p-4 text-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Wallet className="h-5 w-5" />
+                <span className="text-sm font-medium">Total Balance</span>
               </div>
-              
-              {hasPermission('approve_transactions') && (
-                <div className="bg-white border border-gray-100 rounded-xl p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <Clock className="h-4 w-4 text-blue-600" />
-                    <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full font-medium">
-                      {dashboardData.pendingApprovals}
-                    </span>
+              <Eye className="h-4 w-4 opacity-70" />
+            </div>
+            <div className="space-y-1 mb-4">
+              <p className="text-2xl font-bold">UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M</p>
+              <div className="flex items-center gap-1">
+                <TrendingUp className="h-3 w-3" />
+                <span className="text-xs">+12.5% this month</span>
+              </div>
+            </div>
+            
+            {/* Mobile Quick Actions */}
+            <div className="grid grid-cols-2 gap-2">
+              <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs py-2">
+                    <Building className="h-3 w-3 mr-1" />
+                    Send to Bank
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="mx-4">
+                  <DialogHeader>
+                    <DialogTitle>Send to Bank</DialogTitle>
+                    <DialogDescription>Transfer funds to bank account</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Amount (UGX)</Label>
+                      <Input
+                        type="number"
+                        placeholder="Enter amount"
+                        value={bankTransferData.amount}
+                        onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Bank Account</Label>
+                      <Select 
+                        value={bankTransferData.bankAccount} 
+                        onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select bank account" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
+                          <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
+                          <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+                      <Input
+                        placeholder="Transfer description"
+                        value={bankTransferData.description}
+                        onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
+                      />
+                    </div>
+                    <Button onClick={handleSendToBank} className="w-full bg-blue-600 hover:bg-blue-700">
+                      Confirm Transfer
+                    </Button>
                   </div>
-                  <p className="text-lg font-bold text-black">Pending</p>
-                  <p className="text-xs text-gray-500">Approvals</p>
-                </div>
-              )}
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs py-2">
+                    <Phone className="h-3 w-3 mr-1" />
+                    Withdraw
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="mx-4">
+                  <DialogHeader>
+                    <DialogTitle>Withdraw by Phone</DialogTitle>
+                    <DialogDescription>Send money to mobile money account</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Amount (UGX)</Label>
+                      <Input
+                        type="number"
+                        placeholder="Enter amount"
+                        value={withdrawData.amount}
+                        onChange={(e) => setWithdrawData({...withdrawData, amount: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Phone Number</Label>
+                      <Input
+                        placeholder="+256701234567"
+                        value={withdrawData.phoneNumber}
+                        onChange={(e) => setWithdrawData({...withdrawData, phoneNumber: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+                      <Input
+                        placeholder="Withdrawal description"
+                        value={withdrawData.description}
+                        onChange={(e) => setWithdrawData({...withdrawData, description: e.target.value})}
+                      />
+                    </div>
+                    <Button onClick={handleWithdraw} className="w-full bg-blue-600 hover:bg-blue-700">
+                      Confirm Withdrawal
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 
-          {/* Recent Transactions */}
-          <div className="py-4">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-bold text-black">Recent Activity</h2>
-              <Button variant="ghost" size="sm" className="text-blue-600 font-medium">
-                View All
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white border border-gray-100 rounded-xl p-3">
+              <div className="flex items-center justify-between mb-2">
+                <Activity className="h-4 w-4 text-blue-600" />
+                <TrendingUp className="h-3 w-3 text-blue-600" />
+              </div>
+              <p className="text-lg font-bold text-black">{dashboardData.monthlyTransactions}</p>
+              <p className="text-xs text-gray-500">Transactions</p>
             </div>
             
-            <div className="space-y-2">
-              {dashboardData.recentTransactions.slice(0, 5).map((transaction) => {
-                const StatusIcon = getStatusIcon(transaction.status);
-                const TransactionIcon = getTransactionIcon(transaction.type);
-                
-                return (
-                  <div key={transaction.id} className="bg-white border border-gray-100 rounded-xl p-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
-                          <TransactionIcon className="h-4 w-4 text-blue-600" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-black truncate">{transaction.type}</p>
-                            <Badge className={`text-xs px-2 py-0.5 ${getStatusColor(transaction.status)}`}>
-                              {transaction.status}
-                            </Badge>
-                          </div>
-                          <p className="text-xs text-gray-500 truncate">{transaction.description}</p>
-                          <p className="text-xs text-gray-400">{transaction.date}</p>
-                        </div>
+            {hasPermission('approve_transactions') && (
+              <div className="bg-white border border-gray-100 rounded-xl p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <Clock className="h-4 w-4 text-blue-600" />
+                  <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full font-medium">
+                    {dashboardData.pendingApprovals}
+                  </span>
+                </div>
+                <p className="text-lg font-bold text-black">Pending</p>
+                <p className="text-xs text-gray-500">Approvals</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Shared Content for Both Views */}
+        <div className="py-4">
+          {/* Recent Transactions */}
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold text-black">Recent Activity</h2>
+            <Button variant="ghost" size="sm" className="text-blue-600 font-medium">
+              View All
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+          
+          <div className="space-y-2">
+            {dashboardData.recentTransactions.slice(0, 5).map((transaction) => {
+              const StatusIcon = getStatusIcon(transaction.status);
+              const TransactionIcon = getTransactionIcon(transaction.type);
+              
+              return (
+                <div key={transaction.id} className="bg-white border border-gray-100 rounded-xl p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
+                        <TransactionIcon className="h-4 w-4 text-blue-600" />
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm font-bold text-black">
-                          UGX {(transaction.amount / 1000).toFixed(0)}K
-                        </p>
-                        <StatusIcon className="h-3 w-3 text-gray-400 ml-auto mt-1" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium text-black truncate">{transaction.type}</p>
+                          <Badge className={`text-xs px-2 py-0.5 ${getStatusColor(transaction.status)}`}>
+                            {transaction.status}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-500 truncate">{transaction.description}</p>
+                        <p className="text-xs text-gray-400">{transaction.date}</p>
                       </div>
                     </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-black">
+                        UGX {(transaction.amount / 1000).toFixed(0)}K
+                      </p>
+                      <StatusIcon className="h-3 w-3 text-gray-400 ml-auto mt-1" />
+                    </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Team Budget Progress */}
           {hasPermission('manage_team') && (
-            <div className="py-4">
+            <div className="mt-4">
               <div className="bg-white border border-gray-100 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-base font-bold text-black">Monthly Budget</h3>
@@ -667,7 +633,7 @@ const OrgDashboard = () => {
 
           {/* Pending Approvals */}
           {hasPermission('approve_transactions') && dashboardData.pendingApprovals > 0 && (
-            <div className="py-4">
+            <div className="mt-4">
               <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
@@ -692,40 +658,9 @@ const OrgDashboard = () => {
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Review All
                 </Button>
-                </div>
               </div>
             </div>
           )}
-
-          {/* Quick Stats - Mobile Only */}
-          <div className="md:hidden py-4">
-            <h2 className="text-lg font-bold text-black mb-3">Overview</h2>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="text-center p-3">
-                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-2">
-                  <BarChart3 className="h-5 w-5 text-blue-600" />
-                </div>
-                <p className="text-lg font-bold text-black">{dashboardData.monthlyTransactions}</p>
-                <p className="text-xs text-gray-500">This Month</p>
-              </div>
-              
-              <div className="text-center p-3">
-                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-2">
-                  <TrendingUp className="h-5 w-5 text-blue-600" />
-                </div>
-                <p className="text-lg font-bold text-black">+12.5%</p>
-                <p className="text-xs text-gray-500">Growth</p>
-              </div>
-              
-              <div className="text-center p-3">
-                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-2">
-                  <Activity className="h-5 w-5 text-blue-600" />
-                </div>
-                <p className="text-lg font-bold text-black">98.5%</p>
-                <p className="text-xs text-gray-500">Success Rate</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
