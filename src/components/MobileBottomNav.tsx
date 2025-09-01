@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Home, CreditCard, Coins, Wallet, Menu, Settings, Users, UserCircle, LogOut, Send, DollarSign, Plus, CheckCircle, BarChart3 } from "lucide-react";
+import { Home, CreditCard, Coins, Wallet, Menu, Settings, Users, UserCircle, LogOut, Send, DollarSign, Plus, CheckCircle, BarChart3, Building } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
