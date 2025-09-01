@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Home, CreditCard, Coins, Wallet, Menu, Settings, Users, UserCircle, LogOut, Send, DollarSign, Plus, CheckCircle, BarChart3, Building } from "lucide-react";
+import { Home, CreditCard, Coins, Wallet, Menu, Settings, Users, UserCircle, LogOut, Send, DollarSign, Plus, CheckCircle, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,43 @@ const MobileBottomNav = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
+
+  // Calculate available nav items based on permissions
+  const navItems = [
+    { 
+      path: "/dashboard", 
+      icon: Home, 
+      label: "Home", 
+      show: true 
+    },
+    { 
+      path: "/org/petty-cash", 
+      icon: Wallet, 
+      label: "Cash", 
+      show: hasPermission('access_petty_cash') 
+    },
+    { 
+      path: "/org/bulk-payments", 
+      icon: Send, 
+      label: "Bulk", 
+      show: hasPermission('access_bulk_payments') 
+    },
+    { 
+      path: "/org/collections", 
+      icon: DollarSign, 
+      label: "Collect", 
+      show: hasPermission('access_collections') 
+    },
+    { 
+      path: "/org/deposits", 
+      icon: Building, 
+      label: "Deposits", 
+      show: hasPermission('access_bank_deposits') 
+    }
+  ];
+
+  const visibleNavItems = navItems.filter(item => item.show);
+  const gridCols = Math.min(visibleNavItems.length + 1, 6); // +1 for More button, max 6 columns
 
   const handleLogout = async () => {
     try {
@@ -47,66 +84,24 @@ const MobileBottomNav = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 md:hidden">
-      <div className="grid grid-cols-5 px-2 py-2">
-        {/* Home */}
-        <Link 
-          to="/dashboard" 
-          className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
-            location.pathname === "/dashboard" 
-              ? "text-blue-600" 
-              : "text-gray-600"
-          }`}
-        >
-          <Home className="h-5 w-5" />
-          <span className="text-xs font-medium">Home</span>
-        </Link>
-
-        {/* Petty Cash */}
-        {hasPermission('access_petty_cash') && (
+      <div className={`grid px-2 py-2`} style={{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }}>
+        {/* Dynamic Navigation Items */}
+        {visibleNavItems.map((item) => (
           <Link 
-            to="/org/petty-cash" 
+            key={item.path}
+            to={item.path} 
             className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
-              location.pathname.includes("/petty-cash") 
+              location.pathname === item.path || location.pathname.includes(item.path.split('/').pop() || '') 
                 ? "text-blue-600" 
                 : "text-gray-600"
             }`}
           >
-            <Wallet className="h-5 w-5" />
-            <span className="text-xs font-medium">Cash</span>
+            <item.icon className="h-5 w-5" />
+            <span className="text-xs font-medium">{item.label}</span>
           </Link>
-        )}
+        ))}
 
-        {/* Bulk Payments */}
-        {hasPermission('access_bulk_payments') && (
-          <Link 
-            to="/org/bulk-payments" 
-            className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
-              location.pathname.includes("/bulk-payments") 
-                ? "text-blue-600" 
-                : "text-gray-600"
-            }`}
-          >
-            <Send className="h-5 w-5" />
-            <span className="text-xs font-medium">Bulk</span>
-          </Link>
-        )}
-
-        {/* Collections */}
-        {hasPermission('access_collections') && (
-          <Link 
-            to="/org/collections" 
-            className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
-              location.pathname.includes("/collections") 
-                ? "text-blue-600" 
-                : "text-gray-600"
-            }`}
-          >
-            <DollarSign className="h-5 w-5" />
-            <span className="text-xs font-medium">Collect</span>
-          </Link>
-        )}
-
-        {/* More */}
+        {/* More Button */}
         <button 
           onClick={() => setDrawerOpen(true)}
           className="flex flex-col items-center gap-1 p-2 rounded-lg text-gray-600"

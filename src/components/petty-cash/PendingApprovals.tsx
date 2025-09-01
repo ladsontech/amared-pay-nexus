@@ -176,15 +176,15 @@ const PendingApprovals = () => {
                     <div className="flex gap-2 ml-4">
                       <Button
                         size="sm"
-                        onClick={() => handleApproval(request.id, "approve")}
-                        className="bg-green-600 hover:bg-green-700"
+                        onClick={() => handleApproval(request.id, "approve")} 
+                        className="bg-green-600 hover:bg-green-700 text-white"
                       >
                         <Check className="h-4 w-4 mr-1" />
                         Approve
                       </Button>
                       <Button
                         size="sm"
-                        variant="destructive"
+                        className="bg-red-600 hover:bg-red-700 text-white"
                         onClick={() => handleApproval(request.id, "reject")}
                       >
                         <X className="h-4 w-4 mr-1" />
