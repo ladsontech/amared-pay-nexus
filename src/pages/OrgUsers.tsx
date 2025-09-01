@@ -162,7 +162,7 @@ export default function OrgUsers() {
                     </div>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {u.permissions.map(p => (
-                        <Badge key={p} variant="secondary" className="capitalize">{p.replaceAll('_',' ')}</Badge>
+                        <Badge key={p} variant="secondary" className="capitalize">{p.replace(/_/g, ' ')}</Badge>
                       ))}
                     </div>
                   </div>
@@ -354,7 +354,7 @@ function UserForm({ user, onSave, onCancel }: { user: OrgUser | null; onSave: (p
             {allOrgPermissions.map(p => (
               <label key={p} className="flex items-center gap-2 text-sm">
                 <Checkbox checked={permissions.includes(p)} onCheckedChange={() => togglePermission(p)} />
-                <span className="capitalize">{p.replaceAll('_',' ')}</span>
+                <span className="capitalize">{p.replace(/_/g, ' ')}</span>
               </label>
             ))}
           </div>
