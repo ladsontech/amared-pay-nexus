@@ -142,7 +142,7 @@ const PettyCash = () => {
           <div className="bg-white">
             <PettyCashOverview currentBalance={currentBalance} />
           </div>
-        </TabsList>
+        </TabsContent>
 
         <TabsContent value="add" className="space-y-4 mt-6">
           <Card className="bg-white border border-gray-100">
