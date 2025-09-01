@@ -60,33 +60,39 @@ const PettyCashReconciliation = ({ currentBalance }: PettyCashReconciliationProp
 
   return (
     <div className="space-y-6">
-      <Card className="bg-blue-50 border border-blue-200">
+      {/* Mobile Header */}
+      <div className="md:hidden">
+        <h2 className="text-lg font-bold text-black mb-4">Reconciliation</h2>
+      </div>
+
+      <Card className="bg-white border border-gray-100 shadow-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="text-lg font-bold text-black flex items-center gap-2">
             <Calculator className="h-5 w-5" />
             Petty Cash Reconciliation
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-600">
             Compare physical cash count with system balance
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-4">
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h3 className="font-medium text-blue-800 mb-2">System Balance</h3>
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <h3 className="font-semibold text-black mb-2">System Balance</h3>
                 <p className="text-2xl font-bold text-blue-600">UGX {currentBalance.toLocaleString()}</p>
-                <p className="text-sm text-blue-600">As per system records</p>
+                <p className="text-sm text-gray-600">As per system records</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="physicalCount">Physical Cash Count (UGX)</Label>
+                <Label htmlFor="physicalCount" className="text-black font-medium">Physical Cash Count (UGX)</Label>
                 <Input
                   id="physicalCount"
                   type="number"
                   placeholder="Enter actual cash amount"
                   value={physicalCount}
                   onChange={(e) => setPhysicalCount(e.target.value)}
+                  className="bg-gray-50 border-gray-200"
                 />
               </div>
             </div>
@@ -124,13 +130,14 @@ const PettyCashReconciliation = ({ currentBalance }: PettyCashReconciliationProp
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="notes">Reconciliation Notes</Label>
+                <Label htmlFor="notes" className="text-black font-medium">Reconciliation Notes</Label>
                 <Textarea
                   id="notes"
                   placeholder="Add any notes about the reconciliation..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={4}
+                  className="bg-gray-50 border-gray-200"
                 />
               </div>
             </div>
@@ -139,7 +146,7 @@ const PettyCashReconciliation = ({ currentBalance }: PettyCashReconciliationProp
           <div className="border-t pt-4">
             <Button 
               onClick={handleReconciliation} 
-              className="w-full"
+              className="w-full bg-blue-600 hover:bg-blue-700"
               disabled={!physicalCount || isReconciling}
             >
               {isReconciling ? "Processing Reconciliation..." : "Complete Reconciliation"}
@@ -148,10 +155,10 @@ const PettyCashReconciliation = ({ currentBalance }: PettyCashReconciliationProp
         </CardContent>
       </Card>
 
-      <Card className="bg-blue-50 border border-blue-200">
+      <Card className="bg-white border border-gray-100 shadow-sm">
         <CardHeader>
-          <CardTitle>Reconciliation History</CardTitle>
-          <CardDescription>Recent reconciliation records</CardDescription>
+          <CardTitle className="text-lg font-bold text-black">Reconciliation History</CardTitle>
+          <CardDescription className="text-gray-600">Recent reconciliation records</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -160,10 +167,10 @@ const PettyCashReconciliation = ({ currentBalance }: PettyCashReconciliationProp
               { date: "2024-06-03", systemBalance: 148000, physicalCount: 147500, difference: -500, status: "discrepancy" },
               { date: "2024-05-27", systemBalance: 155000, physicalCount: 155000, difference: 0, status: "balanced" }
             ].map((record, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+              <div key={index} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
                 <div>
-                  <p className="font-medium">{record.date}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-semibold text-black">{record.date}</p>
+                  <p className="text-sm text-gray-600">
                     System: UGX {record.systemBalance.toLocaleString()} | 
                     Physical: UGX {record.physicalCount.toLocaleString()}
                   </p>

@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Receipt, Check, Eye, Printer, Filter } from "lucide-react";
+import { Calendar, Receipt, Check, Eye, Printer, Filter, Search } from "lucide-react";
 import TransactionDetailModal from "./TransactionDetailModal";
 
 const TransactionHistory = () => {
@@ -219,37 +219,56 @@ const TransactionHistory = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-blue-50 border border-blue-200">
+      {/* Mobile Header */}
+      <div className="md:hidden">
+        <h2 className="text-lg font-bold text-black mb-4">Transaction History</h2>
+      </div>
+
+      <Card className="bg-white border border-gray-100 shadow-sm">
         <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="text-lg font-bold text-black flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
                 Transaction History
               </CardTitle>
-              <CardDescription className="text-blue-700">
+              <CardDescription className="text-gray-600">
                 View and filter all petty cash transactions
               </CardDescription>
             </div>
-            <Button onClick={handlePrintAll} className="w-fit">
+            <Button onClick={handlePrintAll} className="w-full lg:w-fit bg-blue-600 hover:bg-blue-700">
               <Printer className="h-4 w-4 mr-2" />
               Print All
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col lg:flex-row gap-4 mb-6">
+          {/* Mobile Search */}
+          <div className="md:hidden mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search transactions..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-gray-50 border-gray-200"
+              />
+            </div>
+          </div>
+
+          {/* Desktop Filters */}
+          <div className="hidden md:flex flex-col lg:flex-row gap-4 mb-6">
             <Input
               placeholder="Search transactions, payee, or ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="lg:max-w-sm"
+              className="lg:max-w-sm bg-gray-50 border-gray-200"
             />
             <Select value={filterCategory} onValueChange={setFilterCategory}>
-              <SelectTrigger className="lg:max-w-xs">
+              <SelectTrigger className="lg:max-w-xs bg-gray-50 border-gray-200">
                 <SelectValue placeholder="Filter by category" />
               </SelectTrigger>
-              <SelectContent className="bg-white z-50">
+              <SelectContent className="bg-white">
                 <SelectItem value="all">All Categories</SelectItem>
                 {categories.map(category => (
                   <SelectItem key={category} value={category}>{category}</SelectItem>
@@ -257,10 +276,10 @@ const TransactionHistory = () => {
               </SelectContent>
             </Select>
             <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="lg:max-w-xs">
+              <SelectTrigger className="lg:max-w-xs bg-gray-50 border-gray-200">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
-              <SelectContent className="bg-white z-50">
+              <SelectContent className="bg-white">
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
@@ -268,10 +287,10 @@ const TransactionHistory = () => {
               </SelectContent>
             </Select>
             <Select value={filterDateRange} onValueChange={setFilterDateRange}>
-              <SelectTrigger className="lg:max-w-xs">
+              <SelectTrigger className="lg:max-w-xs bg-gray-50 border-gray-200">
                 <SelectValue placeholder="Filter by date" />
               </SelectTrigger>
-              <SelectContent className="bg-white z-50">
+              <SelectContent className="bg-white">
                 <SelectItem value="all">All Time</SelectItem>
                 <SelectItem value="last7days">Last 7 Days</SelectItem>
                 <SelectItem value="last30days">Last 30 Days</SelectItem>
@@ -280,8 +299,146 @@ const TransactionHistory = () => {
             </Select>
           </div>
 
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
+          {/* Mobile Filters */}
+          <div className="md:hidden grid grid-cols-2 gap-2 mb-4">
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="bg-gray-50 border-gray-200">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={filterDateRange} onValueChange={setFilterDateRange}>
+              <SelectTrigger className="bg-gray-50 border-gray-200">
+                <SelectValue placeholder="Date" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem value="all">All Time</SelectItem>
+                <SelectItem value="last7days">Last 7 Days</SelectItem>
+                <SelectItem value="last30days">Last 30 Days</SelectItem>
+                <SelectItem value="thisMonth">This Month</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Mobile Transaction List */}
+          <div className="md:hidden space-y-3">
+            {filteredTransactions.map((transaction) => (
+              <div key={transaction.id} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-black">{transaction.id}</span>
+                    {getStatusBadge(transaction.status)}
+                  </div>
+                  <span className="text-sm font-bold text-black">
+                    {transaction.type === "expense" ? "-" : "+"}UGX {transaction.amount.toLocaleString()}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-700 mb-1">{transaction.description}</p>
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>{transaction.date}</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleViewTransaction(transaction)}
+                    className="h-6 px-2 text-blue-600"
+                  >
+                    <Eye className="h-3 w-3 mr-1" />
+                    View
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table */}
+          <div className="hidden md:block">
+            <div className="rounded-lg border border-gray-200 overflow-hidden">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gray-50">
+                      <TableHead className="font-semibold text-black">Date</TableHead>
+                      <TableHead className="font-semibold text-black">ID</TableHead>
+                      <TableHead className="font-semibold text-black">Description</TableHead>
+                      <TableHead className="font-semibold text-black">Payee</TableHead>
+                      <TableHead className="font-semibold text-black">Category</TableHead>
+                      <TableHead className="font-semibold text-black">Amount</TableHead>
+                      <TableHead className="font-semibold text-black">Receipt</TableHead>
+                      <TableHead className="font-semibold text-black">Status</TableHead>
+                      <TableHead className="font-semibold text-black">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTransactions.map((transaction) => (
+                      <TableRow key={transaction.id} className="hover:bg-gray-50">
+                        <TableCell className="text-black">{transaction.date}</TableCell>
+                        <TableCell className="font-medium text-black">{transaction.id}</TableCell>
+                        <TableCell className="text-black">{transaction.description}</TableCell>
+                        <TableCell className="text-black">{transaction.payee || "-"}</TableCell>
+                        <TableCell className="text-black">{transaction.category}</TableCell>
+                        <TableCell className={transaction.type === "expense" ? "text-red-600" : "text-green-600"}>
+                          {transaction.type === "expense" ? "-" : "+"}UGX {transaction.amount.toLocaleString()}
+                        </TableCell>
+                        <TableCell>
+                          {transaction.receipt ? (
+                            <div className="flex items-center gap-1">
+                              <Receipt className="h-4 w-4" />
+                              {transaction.receipt}
+                            </div>
+                          ) : (
+                            "-"
+                          )}
+                        </TableCell>
+                        <TableCell>{getStatusBadge(transaction.status)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleViewTransaction(transaction)}
+                              className="bg-blue-600 hover:bg-blue-700 text-white border-0"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            {transaction.status === "pending" && (
+                              <Button variant="outline" size="sm" className="text-green-600 border-green-200">
+                                <Check className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </div>
+
+          {filteredTransactions.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              No transactions found matching your criteria.
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <TransactionDetailModal 
+        transaction={selectedTransaction}
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedTransaction(null);
+        }}
+      />
+    </div>
+  );
+};
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
