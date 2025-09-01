@@ -653,4 +653,6 @@ const OrgDashboard = () => {
   );
 };
 
+OrgDashboard.displayName = "OrgDashboard";
+
 export default OrgDashboard;
