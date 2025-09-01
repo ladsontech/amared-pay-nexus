@@ -15,6 +15,7 @@ const OrganizationLayout = lazy(() => import("./components/OrganizationLayout"))
 // Pages (lazy)
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
+const AuthTest = lazy(() => import("./pages/AuthTest"));
 const SystemAnalytics = lazy(() => import("./pages/SystemAnalytics"));
 const SystemOrganizations = lazy(() => import("./pages/SystemOrganizations"));
 const SystemUsers = lazy(() => import("./pages/SystemUsers"));
@@ -57,6 +58,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/auth-test" element={<AuthTest />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* Role Dashboard Aliases */}
