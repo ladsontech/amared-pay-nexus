@@ -16,6 +16,7 @@ import { Building, LogOut, Crown, User } from "lucide-react";
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppOrgSidebar from "./AppOrgSidebar";
+import MobileBottomNav from "./MobileBottomNav";
 
 const OrganizationLayout = () => {
   const { user, logout } = useAuth();
@@ -105,7 +106,8 @@ const OrganizationLayout = () => {
           </main>
         </div>
 
-        {/* Mobile FAB removed */}
+        {/* Mobile Bottom Navigation */}
+        <MobileBottomNav />
       </div>
     </SidebarProvider>
   );

@@ -34,7 +34,6 @@ import {
   Zap
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import MobileBottomNav from "@/components/MobileBottomNav";
 
 const OrgDashboard = () => {
   const { user, hasPermission } = useAuth();
@@ -649,8 +648,6 @@ const OrgDashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions Modal */}
-      <MobileBottomNav />
     </div>
   );
 };
