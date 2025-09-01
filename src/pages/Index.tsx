@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Shield, Building, User, Crown, Users, Settings, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { demoOrganizations, demoUsers } from "@/data/demoData";
-import { DemoUser } from "@/types/auth";
+import { DemoUser, Permission } from "@/types/auth";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -99,7 +99,36 @@ const Index = () => {
                 </div>
               </div>
               <Button 
-                onClick={() => navigate('/system/analytics')} 
+                onClick={() => {
+                  // Create a demo admin user for testing
+                  const demoAdmin = {
+                    id: 'demo-admin',
+                    name: 'Demo Admin',
+                    email: 'admin@demo.com',
+                    role: 'admin' as const,
+                    organizationId: 'system',
+                    organization: {
+                      id: 'system',
+                      name: 'System Administration',
+                      description: 'System level administration',
+                      industry: 'Technology'
+                    },
+                    permissions: [
+                      'system_admin',
+                      'manage_organizations', 
+                      'manage_system_users',
+                      'view_system_analytics'
+                    ] as Permission[],
+                    position: 'System Administrator'
+                  };
+                  
+                  // Store demo admin in localStorage for authentication
+                  localStorage.setItem('user', JSON.stringify(demoAdmin));
+                  localStorage.setItem('auth_token', 'demo-admin-token');
+                  
+                  // Navigate to admin dashboard
+                  navigate('/system/analytics');
+                }} 
                 className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl text-white font-semibold py-3 transform hover:scale-[1.02] transition-all duration-200"
               >
                 <Shield className="h-4 w-4 mr-2" />
