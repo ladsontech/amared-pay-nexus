@@ -103,11 +103,6 @@ const PettyCashReport = () => {
       .sort((a, b) => parseDate(b.date).getTime() - parseDate(a.date).getTime()); // Most recent first
   }, [fromDate, toDate, statusFilter, categoryFilter, search]);
 
-  // Calculate balances for filtered transactions
-  const transactionsWithBalances = useMemo(() => {
-    return calculateRunningBalances(filtered, openingBalance);
-  }, [filtered, openingBalance]);
-
   const openingBalance = useMemo(() => {
     const before = pettyCashTransactions
       .filter((t) => parseDate(t.date).getTime() < parseDate(fromDate).getTime())
@@ -116,6 +111,11 @@ const PettyCashReport = () => {
     const expenses = before.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
     return pettyCashStartingFloat + additions - expenses;
   }, [fromDate, statusFilter]);
+
+  // Calculate balances for filtered transactions
+  const transactionsWithBalances = useMemo(() => {
+    return calculateRunningBalances(filtered, openingBalance);
+  }, [filtered, openingBalance]);
 
   const inflows = useMemo(() => filtered.filter((t) => t.type === "addition").reduce((s, t) => s + t.amount, 0), [filtered]);
   const outflows = useMemo(() => filtered.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0), [filtered]);
@@ -312,55 +312,6 @@ const PettyCashReport = () => {
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
-};
-
-export default PettyCashReport;
-
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>ID</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead className="hidden md:table-cell">Category</TableHead>
-              <TableHead className="hidden md:table-cell">Payee</TableHead>
-              <TableHead className="text-right">Opening Balance</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead className="text-right">Closing Balance</TableHead>
-              <TableHead className="hidden sm:table-cell">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transactionsWithBalances.map((t) => (
-              <TableRow key={t.id}>
-                <TableCell>{t.date}</TableCell>
-                <TableCell className="font-medium">{t.id}</TableCell>
-                <TableCell>{t.description}</TableCell>
-                <TableCell className="hidden md:table-cell">{t.category}</TableCell>
-                <TableCell className="hidden md:table-cell">{t.payee ?? "-"}</TableCell>
-                <TableCell className="text-right font-medium">UGX {t.openingBalance.toLocaleString()}</TableCell>
-                <TableCell className={t.type === "expense" ? "text-red-600" : "text-green-600"}>
-                  {t.type === "expense" ? "-" : "+"}UGX {t.amount.toLocaleString()}
-                </TableCell>
-                <TableCell className="text-right font-medium">UGX {t.closingBalance.toLocaleString()}</TableCell>
-                <TableCell className="hidden sm:table-cell">
-                  <Badge variant="outline" className={
-                    t.status === "approved" ? "text-green-700" : t.status === "pending" ? "text-yellow-700" : "text-red-700"
-                  }>
-                    {t.status}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))}
-            {transactionsWithBalances.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center text-muted-foreground">No transactions for selected filters.</TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
     </div>
   );
 };
