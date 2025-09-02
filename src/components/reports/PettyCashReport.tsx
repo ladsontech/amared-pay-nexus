@@ -8,6 +8,28 @@ import { Badge } from "@/components/ui/badge";
 import { Download, Filter } from "lucide-react";
 import { pettyCashStartingFloat, pettyCashTransactions, PettyCashTransaction } from "@/data/reportData";
 
+// Calculate running balance for each transaction
+function calculateRunningBalances(transactions: PettyCashTransaction[], startingBalance: number) {
+  const sorted = [...transactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  let runningBalance = startingBalance;
+  
+  return sorted.map(transaction => {
+    const openingBalance = runningBalance;
+    if (transaction.type === "addition") {
+      runningBalance += transaction.amount;
+    } else {
+      runningBalance -= transaction.amount;
+    }
+    const closingBalance = runningBalance;
+    
+    return {
+      ...transaction,
+      openingBalance,
+      closingBalance
+    };
+  });
+}
+
 function parseDate(dateStr: string): Date {
   // Ensure consistent parsing for YYYY-MM-DD
   return new Date(`${dateStr}T00:00:00`);
@@ -78,8 +100,13 @@ const PettyCashReport = () => {
         const text = `${t.id} ${t.description} ${t.category} ${t.payee ?? ""}`.toLowerCase();
         return text.includes(search.toLowerCase());
       })
-      .sort((a, b) => parseDate(a.date).getTime() - parseDate(b.date).getTime());
+      .sort((a, b) => parseDate(b.date).getTime() - parseDate(a.date).getTime()); // Most recent first
   }, [fromDate, toDate, statusFilter, categoryFilter, search]);
+
+  // Calculate balances for filtered transactions
+  const transactionsWithBalances = useMemo(() => {
+    return calculateRunningBalances(filtered, openingBalance);
+  }, [filtered, openingBalance]);
 
   const openingBalance = useMemo(() => {
     const before = pettyCashTransactions
@@ -194,7 +221,7 @@ const PettyCashReport = () => {
       </Card>
 
       <div className="rounded-md border overflow-x-auto">
-        <Table className="min-w-[800px]">
+        <Table className="min-w-[1000px]">
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
@@ -202,21 +229,25 @@ const PettyCashReport = () => {
               <TableHead>Description</TableHead>
               <TableHead className="hidden md:table-cell">Category</TableHead>
               <TableHead className="hidden md:table-cell">Payee</TableHead>
+              <TableHead className="text-right">Opening Balance</TableHead>
               <TableHead>Amount</TableHead>
+              <TableHead className="text-right">Closing Balance</TableHead>
               <TableHead className="hidden sm:table-cell">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((t) => (
+            {transactionsWithBalances.map((t) => (
               <TableRow key={t.id}>
                 <TableCell>{t.date}</TableCell>
                 <TableCell className="font-medium">{t.id}</TableCell>
                 <TableCell>{t.description}</TableCell>
                 <TableCell className="hidden md:table-cell">{t.category}</TableCell>
                 <TableCell className="hidden md:table-cell">{t.payee ?? "-"}</TableCell>
+                <TableCell className="text-right font-medium">UGX {t.openingBalance.toLocaleString()}</TableCell>
                 <TableCell className={t.type === "expense" ? "text-red-600" : "text-green-600"}>
                   {t.type === "expense" ? "-" : "+"}UGX {t.amount.toLocaleString()}
                 </TableCell>
+                <TableCell className="text-right font-medium">UGX {t.closingBalance.toLocaleString()}</TableCell>
                 <TableCell className="hidden sm:table-cell">
                   <Badge variant="outline" className={
                     t.status === "approved" ? "text-green-700" : t.status === "pending" ? "text-yellow-700" : "text-red-700"
@@ -226,9 +257,9 @@ const PettyCashReport = () => {
                 </TableCell>
               </TableRow>
             ))}
-            {filtered.length === 0 && (
+            {transactionsWithBalances.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground">No transactions for selected filters.</TableCell>
+                <TableCell colSpan={9} className="text-center text-muted-foreground">No transactions for selected filters.</TableCell>
               </TableRow>
             )}
           </TableBody>

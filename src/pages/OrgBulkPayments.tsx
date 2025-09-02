@@ -1043,25 +1043,6 @@ const BulkPayments = () => {
 
       {/* Pay Bills Modal */}
       <PayBillsForm isOpen={showPayBills} onClose={() => setShowPayBills(false)} />
-
-      <nav className="mobile-nav fixed bottom-0 left-0 right-0 z-50 md:hidden">
-        <div className="grid grid-cols-4 gap-2 p-3 bg-white shadow-lg rounded-t-lg">
-          <Button variant="ghost" size="icon" onClick={() => setActiveTab("overview")}>
-            <FileText className={`h-6 w-6 ${activeTab === "overview" ? "text-primary" : "text-muted-foreground"}`} />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => setActiveTab("bank")}>
-            <CreditCard className={`h-6 w-6 ${activeTab === "bank" ? "text-primary" : "text-muted-foreground"}`} />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => setActiveTab("mobile")}>
-            <Upload className={`h-6 w-6 ${activeTab === "mobile" ? "text-primary" : "text-muted-foreground"}`} />
-          </Button>
-          {hasPermission("approve_bulk_payments") && (
-            <Button variant="ghost" size="icon" onClick={() => setActiveTab("approvals")}>
-              <Eye className={`h-6 w-6 ${activeTab === "approvals" ? "text-primary" : "text-muted-foreground"}`} />
-            </Button>
-          )}
-        </div>
-      </nav>
     </div>
   );
 };
