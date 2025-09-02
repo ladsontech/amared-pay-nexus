@@ -45,7 +45,7 @@ const OrganizationLayout = () => {
             <div className="container flex h-16 items-center justify-between px-6">
               <div className="flex items-center gap-4">
                 <SidebarTrigger className="md:ml-0" />
-                <img src="/images/Almaredpay_logo.png" alt="Almared Pay logo" className="h-12 w-auto object-contain" />
+                <img src="/images/Almaredpay_logo.png" alt="Alma Pay logo" className="h-12 w-auto object-contain" />
                 <div className="hidden sm:flex items-center gap-3">
                   <div className="p-2 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 shadow-md">
                     <Building className="h-5 w-5 text-blue-600" />

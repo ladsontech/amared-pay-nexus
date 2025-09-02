@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  baseURL: (import.meta as any)?.env?.VITE_API_BASE_URL || 'https://backendapi.bulkpay.almaredagencyuganda.com',
+  baseURL: (import.meta as any)?.env?.VITE_API_BASE_URL || 'https://backendapi.bulkpay.almaagencyuganda.com',
   endpoints: {
     auth: {
       login: '/users/auth/login/',

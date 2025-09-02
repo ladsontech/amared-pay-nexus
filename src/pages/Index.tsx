@@ -50,10 +50,10 @@ const Index = () => {
       <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
         <div className="text-center space-y-4 px-2">
           <div className="flex items-center justify-center mb-6">
-            <img src="/images/Almaredpay_logo.png" alt="Almared Pay Logo" className="h-16 w-auto object-contain" />
+            <img src="/images/Almaredpay_logo.png" alt="Alma Pay Logo" className="h-16 w-auto object-contain" />
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-            Almared Pay Nexus
+            Alma Pay
           </h1>
           <p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
             Advanced Bulk Payment System Demo - Experience role-based access and comprehensive financial management

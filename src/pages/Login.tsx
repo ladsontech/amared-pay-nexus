@@ -62,7 +62,7 @@ const Login = () => {
             <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 backdrop-blur-sm">
               <img 
                 src="/images/Almaredpay_logo.png" 
-                alt="Amared Pay Logo" 
+                alt="Alma Pay Logo" 
                 className="w-20 h-10 sm:w-28 sm:h-14 object-contain"
               />
             </div>
@@ -72,7 +72,7 @@ const Login = () => {
               Welcome Back
             </CardTitle>
             <CardDescription className="text-sm sm:text-base text-muted-foreground">
-              Sign in to access your Amared Pay account
+              Sign in to access your Alma Pay account
             </CardDescription>
           </div>
         </CardHeader>
