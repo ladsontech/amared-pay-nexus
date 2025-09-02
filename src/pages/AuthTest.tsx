@@ -83,17 +83,37 @@ const AuthTest = () => {
         description: 'API call completed successfully'
       });
     } catch (error: any) {
+      console.error(`${name} Error:`, error);
+      
+      // Enhanced error handling for authentication issues
+      let errorMessage = error.message;
+      let suggestion = '';
+      
+      if (error.status === 401) {
+        errorMessage = 'Authentication failed - Invalid or missing credentials';
+        suggestion = 'Please login first using the Authentication tab';
+      } else if (error.status === 403) {
+        errorMessage = 'Access forbidden - Insufficient permissions';
+        suggestion = 'Check if your account has the required permissions';
+      } else if (error.status === 400) {
+        errorMessage = 'Bad request - Check your input data';
+        suggestion = 'Verify all required fields are filled correctly';
+      }
+      
       setResults(prev => ({ 
         ...prev, 
         [name]: { 
           success: false, 
-          error: error.message, 
+          error: errorMessage,
+          suggestion,
+          status: error.status,
           details: error.details 
         } 
       }));
+      
       toast({
         title: `${name} Failed`,
-        description: error.message,
+        description: suggestion || errorMessage,
         variant: 'destructive'
       });
     } finally {
@@ -119,6 +139,12 @@ const AuthTest = () => {
         ) : (
           <div>
             <p className="text-red-600 font-medium">{result?.error}</p>
+            {result?.suggestion && (
+              <p className="text-amber-600 text-sm mt-1 font-medium">💡 {result.suggestion}</p>
+            )}
+            {result?.status && (
+              <p className="text-sm text-muted-foreground mt-1">Status: {result.status}</p>
+            )}
             {result?.details && (
               <pre className="text-xs bg-muted p-2 rounded mt-2 overflow-x-auto">
                 {JSON.stringify(result.details, null, 2)}
@@ -404,6 +430,14 @@ const AuthTest = () => {
         </TabsContent>
 
         <TabsContent value="users" className="space-y-6">
+          {/* Authentication Warning */}
+          <Alert className="border-amber-500 bg-amber-50">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-800">
+              <strong>Authentication Required:</strong> You must login first (Authentication tab) before creating sub admins or staff members. These endpoints require valid authentication tokens.
+            </AlertDescription>
+          </Alert>
+          
           <div className="grid md:grid-cols-2 gap-6">
             {/* Create Sub Admin Test */}
             <Card>
