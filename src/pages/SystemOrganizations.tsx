@@ -226,46 +226,46 @@ const SystemOrganizations = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
-              <CardTitle className="text-lg text-black">Total Organizations</CardTitle>
+              <CardTitle className="text-sm font-bold text-black">Total Organizations</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-black">{organizations.length}</div>
-              <p className="text-sm text-gray-600">Registered</p>
+            <CardContent className="pt-2">
+              <div className="text-lg font-bold text-black">{organizations.length}</div>
+              <p className="text-xs text-gray-600">Registered</p>
             </CardContent>
           </Card>
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
-              <CardTitle className="text-lg text-black">Active</CardTitle>
+              <CardTitle className="text-sm font-bold text-black">Active</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
+            <CardContent className="pt-2">
+              <div className="text-lg font-bold text-blue-600">
                 {organizations.filter(org => org.status === "active").length}
               </div>
-              <p className="text-sm text-gray-600">Currently active</p>
+              <p className="text-xs text-gray-600">Currently active</p>
             </CardContent>
           </Card>
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
-              <CardTitle className="text-lg text-black">Total Balance</CardTitle>
+              <CardTitle className="text-sm font-bold text-black">Total Balance</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-black">
-                UGX {organizations.reduce((sum, org) => sum + org.walletBalance, 0).toLocaleString()}
+            <CardContent className="pt-2">
+              <div className="text-lg font-bold text-black">
+                {(organizations.reduce((sum, org) => sum + org.walletBalance, 0) / 1000000).toFixed(1)}M
               </div>
-              <p className="text-sm text-gray-600">System wide</p>
+              <p className="text-xs text-gray-600">UGX system wide</p>
             </CardContent>
           </Card>
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
-              <CardTitle className="text-lg text-black">Total Users</CardTitle>
+              <CardTitle className="text-sm font-bold text-black">Total Users</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-black">
+            <CardContent className="pt-2">
+              <div className="text-lg font-bold text-black">
                 {organizations.reduce((sum, org) => sum + org.members, 0)}
               </div>
-              <p className="text-sm text-gray-600">All organizations</p>
+              <p className="text-xs text-gray-600">All organizations</p>
             </CardContent>
           </Card>
         </div>
@@ -307,71 +307,71 @@ const SystemOrganizations = () => {
         ) : (
           <div className="space-y-4">
             {filteredOrganizations.map((org) => (
-              <Card key={org.id} className="border border-blue-200 shadow-lg bg-white hover:shadow-xl transition-shadow">
-                <CardContent className="p-6">
+              <Card key={org.id} className="border border-blue-200 shadow-sm bg-white hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center">
-                        <Building className="h-6 w-6 text-blue-600" />
+                      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <Building className="h-5 w-5 text-blue-600" />
                       </div>
                       <div>
                         <div className="flex items-center space-x-2 mb-1">
-                          <h3 className="font-semibold text-lg text-black">{org.name}</h3>
+                          <h3 className="font-semibold text-base text-black">{org.name}</h3>
                           <Badge className={getStatusColor(org.status)}>
                             {org.status}
                           </Badge>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-gray-600">
                           <div>
-                            <p><strong>ID:</strong> {org.id}</p>
-                            <p><strong>Email:</strong> {org.email}</p>
+                            <p className="truncate"><strong>ID:</strong> {org.id}</p>
+                            <p className="truncate"><strong>Email:</strong> {org.email}</p>
                           </div>
                           <div>
-                            <p><strong>Admin:</strong> {org.adminName}</p>
-                            <p><strong>Phone:</strong> {org.phone}</p>
+                            <p className="truncate"><strong>Admin:</strong> {org.adminName}</p>
+                            <p className="truncate"><strong>Phone:</strong> {org.phone}</p>
                           </div>
                           <div>
                             <p><strong>Created:</strong> {new Date(org.createdAt).toLocaleDateString()}</p>
-                            {org.address && <p><strong>Address:</strong> {org.address}</p>}
+                            {org.address && <p className="truncate"><strong>Address:</strong> {org.address}</p>}
                           </div>
                         </div>
-                        <div className="flex items-center space-x-6 mt-3">
+                        <div className="flex items-center space-x-4 mt-2">
                           <div className="flex items-center space-x-1">
-                            <Wallet className="h-4 w-4 text-blue-600" />
-                            <span className="font-medium">UGX {org.walletBalance.toLocaleString()}</span>
+                            <Wallet className="h-3 w-3 text-blue-600" />
+                            <span className="font-medium text-xs">{(org.walletBalance / 1000).toFixed(0)}K</span>
                           </div>
                           <div className="flex items-center space-x-1">
-                            <Users className="h-4 w-4 text-blue-600" />
-                            <span className="font-medium">{org.members} members</span>
+                            <Users className="h-3 w-3 text-blue-600" />
+                            <span className="font-medium text-xs">{org.members}</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
                       <Button variant="outline" size="sm" onClick={() => setEditOpen(org)}>
-                        <Edit className="h-4 w-4 mr-1" />
+                        <Edit className="h-3 w-3 mr-1" />
                         Manage
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
+                            <MoreHorizontal className="h-3 w-3" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => setTopUpOpen(org)}>
-                            <CreditCard className="h-4 w-4 mr-2" /> Top up wallet
+                            <CreditCard className="h-3 w-3 mr-2" /> Top up
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleToggleStatus(org)}>
                             {org.status === "active" ? (
-                              <Ban className="h-4 w-4 mr-2" />
+                              <Ban className="h-3 w-3 mr-2" />
                             ) : (
-                              <CheckCircle2 className="h-4 w-4 mr-2" />
+                              <CheckCircle2 className="h-3 w-3 mr-2" />
                             )}
                             {org.status === "active" ? "Suspend" : "Activate"}
                           </DropdownMenuItem>
                           <DropdownMenuItem className="text-red-600" onClick={() => setConfirmDelete(org)}>
-                            <Trash2 className="h-4 w-4 mr-2" /> Delete
+                            <Trash2 className="h-3 w-3 mr-2" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

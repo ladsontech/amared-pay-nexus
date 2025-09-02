@@ -308,46 +308,46 @@ const SystemUsers = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
-              <CardTitle className="text-lg text-black">Total Users</CardTitle>
+              <CardTitle className="text-sm font-bold text-black">Total Users</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-black">{allUsers.length}</div>
-              <p className="text-sm text-gray-600">System wide</p>
+            <CardContent className="pt-2">
+              <div className="text-lg font-bold text-black">{allUsers.length}</div>
+              <p className="text-xs text-gray-600">System wide</p>
             </CardContent>
           </Card>
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
-              <CardTitle className="text-lg text-black">Active Users</CardTitle>
+              <CardTitle className="text-sm font-bold text-black">Active Users</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
+            <CardContent className="pt-2">
+              <div className="text-lg font-bold text-blue-600">
                 {allUsers.filter(user => user.status === "active").length}
               </div>
-              <p className="text-sm text-gray-600">Currently active</p>
+              <p className="text-xs text-gray-600">Currently active</p>
             </CardContent>
           </Card>
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
-              <CardTitle className="text-lg text-black">Admins</CardTitle>
+              <CardTitle className="text-sm font-bold text-black">Admins</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-black">
+            <CardContent className="pt-2">
+              <div className="text-lg font-bold text-black">
                 {allUsers.filter(user => user.role === "admin" || user.role === "super_admin").length}
               </div>
-              <p className="text-sm text-gray-600">Admin level access</p>
+              <p className="text-xs text-gray-600">Admin access</p>
             </CardContent>
           </Card>
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
-              <CardTitle className="text-lg text-black">Organizations</CardTitle>
+              <CardTitle className="text-sm font-bold text-black">Organizations</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-black">
+            <CardContent className="pt-2">
+              <div className="text-lg font-bold text-black">
                 {new Set(allUsers.filter(u => u.organization !== "System").map(u => u.organization)).size}
               </div>
-              <p className="text-sm text-gray-600">With users</p>
+              <p className="text-xs text-gray-600">With users</p>
             </CardContent>
           </Card>
         </div>
@@ -389,16 +389,16 @@ const SystemUsers = () => {
         ) : (
           <div className="space-y-4">
             {filteredUsers.map((user) => (
-              <Card key={user.id} className="border border-blue-200 shadow-lg bg-white hover:shadow-xl transition-shadow">
-                <CardContent className="p-6">
+              <Card key={user.id} className="border border-blue-200 shadow-sm bg-white hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center">
-                        <UserCircle className="h-6 w-6 text-blue-600" />
+                      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <UserCircle className="h-5 w-5 text-blue-600" />
                       </div>
                       <div>
                         <div className="flex items-center space-x-2 mb-1">
-                          <h3 className="font-semibold text-lg text-black">{user.name}</h3>
+                          <h3 className="font-semibold text-base text-black">{user.name}</h3>
                           <Badge className={getStatusColor(user.status)}>
                             {user.status}
                           </Badge>
@@ -412,23 +412,23 @@ const SystemUsers = () => {
                             </Badge>
                           )}
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-gray-600">
                           <div>
                             <div className="flex items-center space-x-1 mb-1">
                               <Mail className="h-3 w-3" />
-                              <span>{user.email}</span>
+                              <span className="truncate">{user.email}</span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <Phone className="h-3 w-3" />
-                              <span>{user.phone}</span>
+                              <span className="truncate">{user.phone}</span>
                             </div>
                           </div>
                           <div>
                             <div className="flex items-center space-x-1 mb-1">
                               <Building className="h-3 w-3" />
-                              <span>{user.organization}</span>
+                              <span className="truncate">{user.organization}</span>
                             </div>
-                            <p><strong>Username:</strong> {user.username}</p>
+                            <p className="truncate"><strong>Username:</strong> {user.username}</p>
                           </div>
                           <div>
                             <p><strong>Last Login:</strong> {new Date(user.lastLogin).toLocaleDateString()}</p>
@@ -437,9 +437,9 @@ const SystemUsers = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
                       <Button variant="outline" size="sm" onClick={() => setEditOpen(user)}>
-                        <Edit className="h-4 w-4 mr-1" />
+                        <Edit className="h-3 w-3 mr-1" />
                         Edit
                       </Button>
                       <Button 

@@ -93,48 +93,48 @@ const SystemAlerts = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="border border-blue-200 shadow-sm bg-white">
         <Card className="border border-blue-200 shadow-lg bg-white">
-          <CardHeader>
-            <CardTitle className="text-black">Total Alerts</CardTitle>
+            <CardTitle className="text-xs font-bold text-black">Total Alerts</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-blue-600" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-black">{alerts.length}</div>
-            <CardDescription className="text-gray-600">All severities</CardDescription>
+          <CardContent className="pt-2">
+            <div className="text-lg font-bold text-black">{alerts.length}</div>
+            <p className="text-xs text-gray-600">All severities</p>
           </CardContent>
-        </Card>
+        <Card className="border border-blue-200 shadow-sm bg-white">
         <Card className="border border-blue-200 shadow-lg bg-white">
-          <CardHeader>
-            <CardTitle className="text-black">Open</CardTitle>
+            <CardTitle className="text-xs font-bold text-black">Open</CardTitle>
+            <Activity className="h-4 w-4 text-gray-600" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{alerts.filter(a => !a.resolved).length}</div>
-            <CardDescription className="text-gray-600">Needs attention</CardDescription>
+          <CardContent className="pt-2">
+            <div className="text-lg font-bold text-gray-800">{alerts.filter(a => !a.resolved).length}</div>
+            <p className="text-xs text-gray-600">Needs attention</p>
           </CardContent>
-        </Card>
+        <Card className="border border-blue-200 shadow-sm bg-white">
         <Card className="border border-blue-200 shadow-lg bg-white">
-          <CardHeader>
-            <CardTitle className="text-black">Resolved</CardTitle>
+            <CardTitle className="text-xs font-bold text-black">Resolved</CardTitle>
+            <CheckCircle2 className="h-4 w-4 text-blue-600" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{alerts.filter(a => a.resolved).length}</div>
-            <CardDescription className="text-gray-600">Awaiting archival</CardDescription>
+          <CardContent className="pt-2">
+            <div className="text-lg font-bold text-blue-600">{alerts.filter(a => a.resolved).length}</div>
+            <p className="text-xs text-gray-600">Awaiting archival</p>
           </CardContent>
         </Card>
       </div>
 
       <div className="space-y-4">
         {alerts.map(alert => (
-          <Card key={alert.id} className="border border-blue-200 shadow-lg bg-white hover:shadow-xl transition-shadow">
-            <CardContent className="p-6">
+          <Card key={alert.id} className="border border-blue-200 shadow-sm bg-white hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center">
-                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <AlertTriangle className="h-4 w-4 text-blue-600" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-lg text-black">{alert.title}</h3>
+                      <h3 className="font-semibold text-base text-black">{alert.title}</h3>
                       <Badge className={severityStyle(alert.severity)}>{alert.severity}</Badge>
                       <Badge variant="outline" className="capitalize">
                         <Shield className="h-3 w-3 mr-1" /> {alert.type}
@@ -145,7 +145,7 @@ const SystemAlerts = () => {
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600">{alert.description}</p>
+                    <p className="text-xs text-gray-600">{alert.description}</p>
                     <p className="text-xs text-gray-500 mt-1">{new Date(alert.createdAt).toLocaleString()}</p>
                   </div>
                 </div>

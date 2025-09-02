@@ -65,7 +65,7 @@ const SystemSettings = () => {
 
         <TabsContent value="general">
           <div className="grid gap-6">
-            <Card className="border border-blue-200 shadow-lg bg-white">
+            <Card className="border border-blue-200 shadow-sm bg-white">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Settings className="h-5 w-5" />
@@ -75,7 +75,7 @@ const SystemSettings = () => {
                   Basic system configuration and preferences
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="siteName">Site Name</Label>
@@ -168,7 +168,7 @@ const SystemSettings = () => {
         </TabsContent>
 
         <TabsContent value="notifications">
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
@@ -178,7 +178,7 @@ const SystemSettings = () => {
                 Configure system-wide notification preferences
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Email Notifications</Label>
@@ -231,7 +231,7 @@ const SystemSettings = () => {
         </TabsContent>
 
         <TabsContent value="security">
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
@@ -241,7 +241,7 @@ const SystemSettings = () => {
                 Configure security policies and access controls
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="maxFileSize">Max File Upload Size (MB)</Label>
@@ -285,7 +285,7 @@ const SystemSettings = () => {
         </TabsContent>
 
         <TabsContent value="database">
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Database className="h-5 w-5" />
@@ -295,7 +295,7 @@ const SystemSettings = () => {
                 Configure database backup and maintenance settings
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="backupFrequency">Backup Frequency</Label>
@@ -341,7 +341,7 @@ const SystemSettings = () => {
         </TabsContent>
 
         <TabsContent value="integrations">
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
@@ -351,7 +351,7 @@ const SystemSettings = () => {
                 Configure third-party integrations and API settings
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
