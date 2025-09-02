@@ -87,7 +87,7 @@ const Collections = () => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem("auth_token");
-      const response = await fetch("/api/payments/collections/", {
+      const response = await fetch("https://bulksrv.almaredagencyuganda.com/payments/collections/", {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -201,7 +201,7 @@ const Collections = () => {
 
     try {
       const token = localStorage.getItem("auth_token");
-      const response = await fetch("/api/payments/mobile-money/initiate-collection/", {
+      const response = await fetch("https://bulksrv.almaredagencyuganda.com/payments/mobile-money/initiate-collection/", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
