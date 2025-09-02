@@ -8,12 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Filter, Download, Eye, CreditCard, Upload, Trash2, Check, AlertCircle, FileText } from "lucide-react";
+import { Plus, Search, Filter, Download, Eye, CreditCard, Upload, Trash2, Check, AlertCircle, FileText, Users, Receipt } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
+import PayBillsForm from "@/components/PayBillsForm";
 
 // Add shared bank names used for selection
 const BANK_NAMES = [
@@ -30,6 +32,16 @@ interface BulkPayment {
   status: "pending" | "processing" | "completed" | "failed";
   createdAt: string;
   description: string;
+}
+
+interface PaymentRecipient {
+  id: string;
+  name: string;
+  account: string;
+  amount: number;
+  status: "completed" | "pending" | "failed";
+  processedAt?: string;
+  failureReason?: string;
 }
 
 interface PaymentRow {
@@ -57,6 +69,30 @@ const BulkPayments = () => {
   const [mobilePaymentRows, setMobilePaymentRows] = useState<PaymentRow[]>([]);
   const [bulkDescription, setBulkDescription] = useState("");
   const { toast } = useToast();
+  const [selectedPaymentDetails, setSelectedPaymentDetails] = useState<BulkPayment | null>(null);
+  const [paymentRecipients, setPaymentRecipients] = useState<PaymentRecipient[]>([]);
+  const [showPayBills, setShowPayBills] = useState(false);
+
+  // Mock recipient data for demonstration
+  const mockRecipients: Record<string, PaymentRecipient[]> = {
+    "BP001": [
+      { id: "R001", name: "John Doe", account: "1234567890", amount: 1500000, status: "completed", processedAt: "2024-01-15T10:35:00Z" },
+      { id: "R002", name: "Jane Smith", account: "0987654321", amount: 1200000, status: "completed", processedAt: "2024-01-15T10:36:00Z" },
+      { id: "R003", name: "Bob Wilson", account: "1122334455", amount: 1800000, status: "failed", failureReason: "Invalid account number" },
+      { id: "R004", name: "Alice Brown", account: "5566778899", amount: 1400000, status: "pending" },
+      { id: "R005", name: "Charlie Davis", account: "9988776655", amount: 1600000, status: "completed", processedAt: "2024-01-15T10:38:00Z" }
+    ],
+    "BP002": [
+      { id: "R006", name: "Vendor A Ltd", account: "1111222233", amount: 500000, status: "completed", processedAt: "2024-01-14T14:25:00Z" },
+      { id: "R007", name: "Vendor B Co", account: "4444555566", amount: 300000, status: "pending" },
+      { id: "R008", name: "Vendor C Inc", account: "7777888899", amount: 750000, status: "completed", processedAt: "2024-01-14T14:27:00Z" }
+    ],
+    "BP003": [
+      { id: "R009", name: "Agent 1", account: "+256701234567", amount: 150000, status: "pending" },
+      { id: "R010", name: "Agent 2", account: "+256789012345", amount: 200000, status: "pending" },
+      { id: "R011", name: "Agent 3", account: "+256700111222", amount: 180000, status: "pending" }
+    ]
+  };
 
   useEffect(() => {
     // Simulate fetching bulk payments
@@ -318,6 +354,24 @@ const BulkPayments = () => {
     setActiveTab("overview");
   };
 
+  const handleViewRecipients = (payment: BulkPayment) => {
+    setSelectedPaymentDetails(payment);
+    setPaymentRecipients(mockRecipients[payment.id] || []);
+  };
+
+  const getRecipientStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-blue-100 text-blue-800";
+      case "pending":
+        return "bg-gray-100 text-gray-800";
+      case "failed":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6 pb-24 md:pb-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -336,6 +390,126 @@ const BulkPayments = () => {
               </Link>
             </Button>
           )}
+          <Button variant="outline" onClick={() => setShowPayBills(true)}>
+            <Receipt className="h-4 w-4 mr-2" />
+            Pay Bills
+          </Button>
+        </div>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 sm:gap-0 p-1">
+          <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 py-1.5">Overview</TabsTrigger>
+          <TabsTrigger value="bank" className="text-xs sm:text-sm px-2 py-1.5">Bank Payments</TabsTrigger>
+          <TabsTrigger value="mobile" className="text-xs sm:text-sm px-2 py-1.5">Mobile Payments</TabsTrigger>
+          {hasPermission("approve_bulk_payments") && (
+            <TabsTrigger value="approvals" className="text-xs sm:text-sm px-2 py-1.5">Approvals</TabsTrigger>
+          )}
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search payments..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                <Filter className="h-4 w-4 mr-2" />
+                Filter
+              </Button>
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader className="p-3">
+                    <div className="h-3 bg-muted rounded w-1/2"></div>
+                    <div className="h-2 bg-muted rounded w-3/4"></div>
+                  </CardHeader>
+                  <CardContent className="p-3">
+                    <div className="space-y-2">
+                      <div className="h-2 bg-muted rounded"></div>
+                      <div className="h-2 bg-muted rounded w-2/3"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {filteredPayments.map((payment) => (
+                <Card key={payment.id} className="hover:shadow-md transition-shadow border border-gray-200 bg-white">
+                  <CardHeader className="p-3 pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm font-bold text-black">{payment.id}</CardTitle>
+                      <Badge className={getStatusColor(payment.status)}>
+                        {payment.status}
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-xs text-gray-600 line-clamp-2">{payment.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-3 pt-0">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-500">Amount</span>
+                        <span className="font-medium text-black">UGX {(payment.amount / 1000).toFixed(0)}K</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-500">Recipients</span>
+                        <span className="font-medium text-black">{payment.recipients}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-500">Created</span>
+                        <span className="font-medium text-black">
+                          {new Date(payment.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex gap-1 mt-3">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 text-xs h-7"
+                          onClick={() => handleViewRecipients(payment)}
+                        >
+                          <Users className="h-3 w-3 mr-1" />
+                          Recipients
+                        </Button>
+                        <Button variant="outline" size="sm" className="flex-1 text-xs h-7">
+                          <Eye className="h-3 w-3 mr-1" />
+                          Details
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {filteredPayments.length === 0 && !isLoading && (
+            <Card className="border border-gray-200">
+              <CardContent className="text-center py-6">
+                <div className="text-muted-foreground">
+                  <CreditCard className="h-8 w-8 mx-auto mb-3 opacity-50" />
+                  <h3 className="text-sm font-medium mb-1">No bulk payments found</h3>
+                  <p className="text-xs">Create your first bulk payment to get started.</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
         </div>
       </div>
 
@@ -792,6 +966,84 @@ const BulkPayments = () => {
           </TabsContent>
         )}
       </Tabs>
+
+      {/* Recipients Detail Modal */}
+      <Dialog open={!!selectedPaymentDetails} onOpenChange={(open) => !open && setSelectedPaymentDetails(null)}>
+        <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Payment Recipients - {selectedPaymentDetails?.id}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedPaymentDetails?.description} • {paymentRecipients.length} recipients
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-xs text-gray-600">Completed</p>
+                <p className="text-lg font-bold text-blue-600">
+                  {paymentRecipients.filter(r => r.status === "completed").length}
+                </p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-xs text-gray-600">Pending</p>
+                <p className="text-lg font-bold text-gray-800">
+                  {paymentRecipients.filter(r => r.status === "pending").length}
+                </p>
+              </div>
+              <div className="text-center p-3 bg-red-50 rounded-lg border border-red-200">
+                <p className="text-xs text-gray-600">Failed</p>
+                <p className="text-lg font-bold text-red-600">
+                  {paymentRecipients.filter(r => r.status === "failed").length}
+                </p>
+              </div>
+            </div>
+
+            {/* Recipients Table */}
+            <div className="border rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50">
+                    <TableHead className="text-xs font-medium">Recipient</TableHead>
+                    <TableHead className="text-xs font-medium">Account</TableHead>
+                    <TableHead className="text-xs font-medium">Amount</TableHead>
+                    <TableHead className="text-xs font-medium">Status</TableHead>
+                    <TableHead className="text-xs font-medium">Processed</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paymentRecipients.map((recipient) => (
+                    <TableRow key={recipient.id} className="hover:bg-gray-50">
+                      <TableCell className="text-sm font-medium">{recipient.name}</TableCell>
+                      <TableCell className="text-sm font-mono">{recipient.account}</TableCell>
+                      <TableCell className="text-sm">UGX {recipient.amount.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <Badge className={getRecipientStatusColor(recipient.status)}>
+                          {recipient.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs text-gray-600">
+                        {recipient.processedAt 
+                          ? new Date(recipient.processedAt).toLocaleString()
+                          : recipient.failureReason || "-"
+                        }
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pay Bills Modal */}
+      <PayBillsForm isOpen={showPayBills} onClose={() => setShowPayBills(false)} />
+
       <nav className="mobile-nav fixed bottom-0 left-0 right-0 z-50 md:hidden">
         <div className="grid grid-cols-4 gap-2 p-3 bg-white shadow-lg rounded-t-lg">
           <Button variant="ghost" size="icon" onClick={() => setActiveTab("overview")}>
