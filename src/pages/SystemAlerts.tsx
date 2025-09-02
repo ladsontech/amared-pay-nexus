@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, CheckCircle2, Shield, Archive, RefreshCw } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Shield, Archive, RefreshCw, Activity } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface SystemAlert {
@@ -93,8 +93,9 @@ const SystemAlerts = () => {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border border-blue-200 shadow-sm bg-white">
-        <Card className="border border-blue-200 shadow-lg bg-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs font-bold text-black">Total Alerts</CardTitle>
             <AlertTriangle className="h-4 w-4 text-blue-600" />
           </CardHeader>
@@ -102,8 +103,9 @@ const SystemAlerts = () => {
             <div className="text-lg font-bold text-black">{alerts.length}</div>
             <p className="text-xs text-gray-600">All severities</p>
           </CardContent>
+        </Card>
         <Card className="border border-blue-200 shadow-sm bg-white">
-        <Card className="border border-blue-200 shadow-lg bg-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs font-bold text-black">Open</CardTitle>
             <Activity className="h-4 w-4 text-gray-600" />
           </CardHeader>
@@ -111,8 +113,9 @@ const SystemAlerts = () => {
             <div className="text-lg font-bold text-gray-800">{alerts.filter(a => !a.resolved).length}</div>
             <p className="text-xs text-gray-600">Needs attention</p>
           </CardContent>
+        </Card>
         <Card className="border border-blue-200 shadow-sm bg-white">
-        <Card className="border border-blue-200 shadow-lg bg-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs font-bold text-black">Resolved</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-blue-600" />
           </CardHeader>
