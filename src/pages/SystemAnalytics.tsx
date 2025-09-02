@@ -82,116 +82,116 @@ const SystemAnalytics = () => {
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 shadow-lg">
-              <BarChart3 className="h-8 w-8 text-blue-600" />
+          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+            <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 shadow-md">
+              <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-blue-600" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
             System Analytics Dashboard
             </h1>
           </div>
-          <p className="text-lg text-slate-600 font-medium">
+          <p className="text-sm sm:text-base md:text-lg text-slate-600 font-medium">
             Real-time platform insights and performance monitoring
           </p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50 shadow-md">
-            <Calendar className="h-4 w-4 mr-2" />
-            Last 30 days
+        <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+          <Button variant="outline" size="sm" className="border-blue-200 text-blue-700 hover:bg-blue-50 shadow-sm">
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm">Last 30 days</span>
           </Button>
-          <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg">
-            <Download className="h-4 w-4 mr-2" />
-            Export Report
+          <Button size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-sm">
+            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm">Export Report</span>
           </Button>
         </div>
       </div>
 
       {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border border-blue-200 shadow-lg bg-white hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        <Card className="border border-blue-200 shadow-sm bg-white hover:shadow-md transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4 lg:p-6">
             <div>
-              <CardTitle className="text-sm font-bold text-black mb-1">Total Transactions</CardTitle>
-              <CardDescription className="text-gray-600 text-xs">All-time platform activity</CardDescription>
+              <CardTitle className="text-xs sm:text-sm font-bold text-black mb-1">Total Transactions</CardTitle>
+              <CardDescription className="text-gray-600 text-xs hidden sm:block">All-time platform activity</CardDescription>
             </div>
-            <div className="p-3 bg-blue-50 rounded-xl shadow-md">
-              <Activity className="h-4 w-4 text-blue-600" />
+            <div className="p-1.5 sm:p-2 lg:p-3 bg-blue-50 rounded-lg shadow-sm">
+              <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-black mb-2">{systemStats.totalTransactions.toLocaleString()}</div>
-            <div className="flex items-center space-x-2 text-sm">
-              <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                <TrendingUp className="h-3 w-3" />
-                <span className="font-semibold">+12.5%</span>
+          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+            <div className="text-lg sm:text-xl lg:text-3xl font-bold text-black mb-1 sm:mb-2">{systemStats.totalTransactions.toLocaleString()}</div>
+            <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm">
+              <div className="flex items-center gap-0.5 sm:gap-1 bg-blue-100 text-blue-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
+                <TrendingUp className="h-2 w-2 sm:h-3 sm:w-3" />
+                <span className="font-semibold text-xs">+12.5%</span>
               </div>
-              <span className="text-gray-600 text-xs">vs last month</span>
+              <span className="text-gray-600 text-xs hidden sm:inline">vs last month</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border border-blue-200 shadow-lg bg-white hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <Card className="border border-blue-200 shadow-sm bg-white hover:shadow-md transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4 lg:p-6">
             <div>
-              <CardTitle className="text-sm font-bold text-black mb-1">Total Volume</CardTitle>
-              <CardDescription className="text-gray-600 text-xs">Financial throughput</CardDescription>
+              <CardTitle className="text-xs sm:text-sm font-bold text-black mb-1">Total Volume</CardTitle>
+              <CardDescription className="text-gray-600 text-xs hidden sm:block">Financial throughput</CardDescription>
             </div>
-            <div className="p-3 bg-blue-50 rounded-xl shadow-md">
-              <DollarSign className="h-4 w-4 text-blue-600" />
+            <div className="p-1.5 sm:p-2 lg:p-3 bg-blue-50 rounded-lg shadow-sm">
+              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-black mb-2">UGX {(systemStats.totalAmount / 1000000).toFixed(1)}M</div>
-            <div className="flex items-center space-x-2 text-sm">
-              <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                <TrendingUp className="h-3 w-3" />
-                <span className="font-semibold">+18.2%</span>
+          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+            <div className="text-lg sm:text-xl lg:text-3xl font-bold text-black mb-1 sm:mb-2">UGX {(systemStats.totalAmount / 1000000).toFixed(1)}M</div>
+            <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm">
+              <div className="flex items-center gap-0.5 sm:gap-1 bg-blue-100 text-blue-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
+                <TrendingUp className="h-2 w-2 sm:h-3 sm:w-3" />
+                <span className="font-semibold text-xs">+18.2%</span>
               </div>
-              <span className="text-gray-600 text-xs">vs last month</span>
+              <span className="text-gray-600 text-xs hidden sm:inline">vs last month</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border border-blue-200 shadow-lg bg-white hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <Card className="border border-blue-200 shadow-sm bg-white hover:shadow-md transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4 lg:p-6">
             <div>
-              <CardTitle className="text-sm font-bold text-black mb-1">Active Organizations</CardTitle>
-              <CardDescription className="text-gray-600 text-xs">Platform participants</CardDescription>
+              <CardTitle className="text-xs sm:text-sm font-bold text-black mb-1">Active Organizations</CardTitle>
+              <CardDescription className="text-gray-600 text-xs hidden sm:block">Platform participants</CardDescription>
             </div>
-            <div className="p-3 bg-blue-50 rounded-xl shadow-md">
-              <Building className="h-4 w-4 text-blue-600" />
+            <div className="p-1.5 sm:p-2 lg:p-3 bg-blue-50 rounded-lg shadow-sm">
+              <Building className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-black mb-2">{systemStats.activeOrganizations}</div>
-            <div className="flex items-center space-x-2 text-sm">
-              <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                <TrendingUp className="h-3 w-3" />
-                <span className="font-semibold">+4</span>
+          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+            <div className="text-lg sm:text-xl lg:text-3xl font-bold text-black mb-1 sm:mb-2">{systemStats.activeOrganizations}</div>
+            <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm">
+              <div className="flex items-center gap-0.5 sm:gap-1 bg-blue-100 text-blue-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
+                <TrendingUp className="h-2 w-2 sm:h-3 sm:w-3" />
+                <span className="font-semibold text-xs">+4</span>
               </div>
-              <span className="text-gray-600 text-xs">this month</span>
+              <span className="text-gray-600 text-xs hidden sm:inline">this month</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border border-blue-200 shadow-lg bg-white hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <Card className="border border-blue-200 shadow-sm bg-white hover:shadow-md transition-all duration-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4 lg:p-6">
             <div>
-              <CardTitle className="text-sm font-bold text-black mb-1">Total Users</CardTitle>
-              <CardDescription className="text-gray-600 text-xs">Platform user base</CardDescription>
+              <CardTitle className="text-xs sm:text-sm font-bold text-black mb-1">Total Users</CardTitle>
+              <CardDescription className="text-gray-600 text-xs hidden sm:block">Platform user base</CardDescription>
             </div>
-            <div className="p-3 bg-blue-50 rounded-xl shadow-md">
-              <Users className="h-4 w-4 text-blue-600" />
+            <div className="p-1.5 sm:p-2 lg:p-3 bg-blue-50 rounded-lg shadow-sm">
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-black mb-2">{systemStats.totalUsers}</div>
-            <div className="flex items-center space-x-2 text-sm">
-              <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                <TrendingUp className="h-3 w-3" />
-                <span className="font-semibold">+23</span>
+          <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+            <div className="text-lg sm:text-xl lg:text-3xl font-bold text-black mb-1 sm:mb-2">{systemStats.totalUsers}</div>
+            <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm">
+              <div className="flex items-center gap-0.5 sm:gap-1 bg-blue-100 text-blue-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
+                <TrendingUp className="h-2 w-2 sm:h-3 sm:w-3" />
+                <span className="font-semibold text-xs">+23</span>
               </div>
-              <span className="text-gray-600 text-xs">this month</span>
+              <span className="text-gray-600 text-xs hidden sm:inline">this month</span>
             </div>
           </CardContent>
         </Card>
@@ -199,23 +199,23 @@ const SystemAnalytics = () => {
 
       {/* System Health & Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 border border-blue-200 shadow-lg bg-white">
+        <Card className="lg:col-span-2 border border-blue-200 shadow-sm bg-white">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-2xl font-bold text-black flex items-center gap-2">
-                  <Zap className="h-6 w-6 text-blue-600" />
+                <CardTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-black flex items-center gap-2">
+                  <Zap className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-blue-600" />
                   Transaction Volume Trend
                 </CardTitle>
-                <CardDescription className="text-gray-600 font-medium">Monthly transaction patterns and growth analysis</CardDescription>
+                <CardDescription className="text-gray-600 font-medium text-sm sm:text-base">Monthly transaction patterns and growth analysis</CardDescription>
               </div>
-              <Badge className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-2 font-semibold">
+              <Badge className="bg-blue-50 text-blue-700 border-blue-200 px-2 sm:px-3 py-1 sm:py-2 font-semibold text-xs sm:text-sm">
                 7-day average: 2.1K transactions
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="pt-6">
-            <ResponsiveContainer width="100%" height={350}>
+          <CardContent className="pt-3 sm:pt-6">
+            <ResponsiveContainer width="100%" height={250} className="sm:h-[300px] lg:h-[350px]">
               <LineChart data={transactionData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="name" stroke="#475569" fontSize={12} fontWeight={500} />
@@ -242,89 +242,89 @@ const SystemAnalytics = () => {
 
         <div className="space-y-6">
           {/* System Health */}
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
-              <CardTitle className="text-xl font-bold flex items-center gap-3 text-black">
-                <div className="p-2 bg-blue-50 rounded-xl shadow-md">
-                  <Shield className="h-5 w-5 text-blue-600" />
+              <CardTitle className="text-base sm:text-lg lg:text-xl font-bold flex items-center gap-2 sm:gap-3 text-black">
+                <div className="p-1.5 sm:p-2 bg-blue-50 rounded-lg shadow-sm">
+                  <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                 </div>
                 System Health
               </CardTitle>
-              <CardDescription className="text-gray-600 font-medium">Real-time performance monitoring</CardDescription>
+              <CardDescription className="text-gray-600 font-medium text-sm">Real-time performance monitoring</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
+              <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-bold text-black">System Uptime</span>
-                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-bold">
+                  <span className="text-xs sm:text-sm font-bold text-black">System Uptime</span>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-bold text-xs">
                     {systemStats.systemUptime}%
                   </Badge>
                 </div>
-                <Progress value={systemStats.systemUptime} className="h-3 bg-gray-100" />
+                <Progress value={systemStats.systemUptime} className="h-2 sm:h-3 bg-gray-100" />
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-bold text-black">Avg Response Time</span>
-                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-bold">
+                  <span className="text-xs sm:text-sm font-bold text-black">Avg Response Time</span>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-bold text-xs">
                     {systemStats.averageResponseTime}ms
                   </Badge>
                 </div>
-                <Progress value={75} className="h-3 bg-gray-100" />
+                <Progress value={75} className="h-2 sm:h-3 bg-gray-100" />
               </div>
 
-              <div className="pt-4 border-t border-blue-200 space-y-3">
+              <div className="pt-3 sm:pt-4 border-t border-blue-200 space-y-2 sm:space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-bold text-black">Active Sessions</span>
-                  <span className="text-sm font-bold text-black">127</span>
+                  <span className="text-xs sm:text-sm font-bold text-black">Active Sessions</span>
+                  <span className="text-xs sm:text-sm font-bold text-black">127</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-bold text-black">Database Status</span>
-                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-bold">Optimal</Badge>
+                  <span className="text-xs sm:text-sm font-bold text-black">Database Status</span>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-bold text-xs">Optimal</Badge>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Recent Alerts */}
-          <Card className="border border-blue-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-sm bg-white">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl font-bold flex items-center gap-3 text-black">
-                  <div className="p-2 bg-blue-50 rounded-xl shadow-md">
-                    <AlertTriangle className="h-5 w-5 text-blue-600" />
+                <CardTitle className="text-base sm:text-lg lg:text-xl font-bold flex items-center gap-2 sm:gap-3 text-black">
+                  <div className="p-1.5 sm:p-2 bg-blue-50 rounded-lg shadow-sm">
+                    <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                   </div>
                   System Alerts
                 </CardTitle>
-                <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-bold">
+                <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-bold text-xs">
                   {systemStats.criticalAlerts} critical
                 </Badge>
               </div>
-              <CardDescription className="text-gray-600 font-medium">Recent system notifications</CardDescription>
+              <CardDescription className="text-gray-600 font-medium text-sm">Recent system notifications</CardDescription>
             </CardHeader>
-            <CardContent className="pt-4">
-              <div className="space-y-4">
+            <CardContent className="pt-3 sm:pt-4">
+              <div className="space-y-2 sm:space-y-3">
                 {recentAlerts.map((alert) => {
                   const SeverityIcon = getSeverityIcon(alert.severity);
                   return (
-                    <div key={alert.id} className="flex items-start gap-4 p-4 rounded-xl bg-blue-50 hover:bg-blue-100 transition-all duration-200 border border-blue-200 shadow-sm hover:shadow-md">
-                      <div className="p-2 rounded-xl shadow-sm bg-blue-100">
-                        <SeverityIcon className="h-4 w-4 text-blue-600" />
+                    <div key={alert.id} className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-all duration-200 border border-blue-200 shadow-sm">
+                      <div className="p-1.5 sm:p-2 rounded-lg shadow-sm bg-blue-100">
+                        <SeverityIcon className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge className={`${getSeverityColor(alert.severity)} font-semibold`}>
+                        <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                          <Badge className={`${getSeverityColor(alert.severity)} font-semibold text-xs`}>
                             {alert.severity}
                           </Badge>
                           <span className="text-xs text-gray-500 font-medium">{alert.time}</span>
                         </div>
-                        <p className="text-sm font-semibold text-black line-clamp-2">{alert.message}</p>
+                        <p className="text-xs sm:text-sm font-semibold text-black line-clamp-2">{alert.message}</p>
                       </div>
                     </div>
                   );
                 })}
               </div>
-              <Button variant="outline" className="w-full mt-6 border-blue-200 text-blue-700 hover:bg-blue-50 font-semibold">
+              <Button variant="outline" size="sm" className="w-full mt-3 sm:mt-4 border-blue-200 text-blue-700 hover:bg-blue-50 font-semibold text-xs sm:text-sm">
                 View All Alerts
               </Button>
             </CardContent>
@@ -334,23 +334,23 @@ const SystemAnalytics = () => {
 
       {/* Transaction Categories & Organization Growth */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border border-blue-200 shadow-lg bg-white">
+        <Card className="border border-blue-200 shadow-sm bg-white">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-black flex items-center gap-2">
-              <Globe className="h-6 w-6 text-blue-600" />
+            <CardTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-black flex items-center gap-2">
+              <Globe className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-blue-600" />
               Transaction Distribution
             </CardTitle>
-            <CardDescription className="text-gray-600 font-medium">Breakdown by transaction type and volume</CardDescription>
+            <CardDescription className="text-gray-600 font-medium text-sm sm:text-base">Breakdown by transaction type and volume</CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ResponsiveContainer width="100%" height={200}>
+          <CardContent className="pt-3 sm:pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
+              <ResponsiveContainer width="100%" height={150} className="sm:h-[200px]">
                 <PieChart>
                   <Pie
                     data={categoryData}
                     cx="50%"
                     cy="50%"
-                    outerRadius={70}
+                    outerRadius={60}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -361,19 +361,19 @@ const SystemAnalytics = () => {
                   <Tooltip formatter={(value) => [`${value}%`, 'Percentage']} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="space-y-4">
+              <div className="space-y-2 sm:space-y-3">
                 {categoryData.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <div className="flex items-center space-x-2">
+                  <div key={index} className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
                       <div 
-                        className="w-4 h-4 rounded-full shadow-sm" 
+                        className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-sm" 
                         style={{ backgroundColor: item.color }}
                       ></div>
-                      <span className="text-sm font-semibold text-black">{item.name}</span>
+                      <span className="text-xs sm:text-sm font-semibold text-black">{item.name}</span>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-bold text-black">{item.value}%</div>
-                      <div className="text-xs text-gray-600 font-medium">UGX {(item.amount / 1000000).toFixed(1)}M</div>
+                      <div className="text-xs sm:text-sm font-bold text-black">{item.value}%</div>
+                      <div className="text-xs text-gray-600 font-medium hidden sm:block">UGX {(item.amount / 1000000).toFixed(1)}M</div>
                     </div>
                   </div>
                 ))}
@@ -382,16 +382,16 @@ const SystemAnalytics = () => {
           </CardContent>
         </Card>
 
-        <Card className="border border-blue-200 shadow-lg bg-white">
+        <Card className="border border-blue-200 shadow-sm bg-white">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-black flex items-center gap-2">
-              <TrendingUp className="h-6 w-6 text-blue-600" />
+            <CardTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-black flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-blue-600" />
               Platform Growth
             </CardTitle>
-            <CardDescription className="text-gray-600 font-medium">Organizations and user acquisition trends</CardDescription>
+            <CardDescription className="text-gray-600 font-medium text-sm sm:text-base">Organizations and user acquisition trends</CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
-            <ResponsiveContainer width="100%" height={250}>
+          <CardContent className="pt-3 sm:pt-6">
+            <ResponsiveContainer width="100%" height={200} className="sm:h-[250px]">
               <BarChart data={organizationGrowth}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
                 <XAxis dataKey="name" stroke="#374151" fontSize={12} fontWeight={500} />
@@ -414,52 +414,52 @@ const SystemAnalytics = () => {
       </div>
 
       {/* Top Organizations */}
-      <Card className="border border-blue-200 shadow-lg bg-white">
+      <Card className="border border-blue-200 shadow-sm bg-white">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl font-bold text-black flex items-center gap-2">
-                <Building className="h-6 w-6 text-blue-600" />
+              <CardTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-black flex items-center gap-2">
+                <Building className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-blue-600" />
                 Top Performing Organizations
               </CardTitle>
-              <CardDescription className="text-gray-600 font-medium">Organizations ranked by transaction volume and growth</CardDescription>
+              <CardDescription className="text-gray-600 font-medium text-sm sm:text-base">Organizations ranked by transaction volume and growth</CardDescription>
             </div>
-            <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50 font-semibold">
+            <Button variant="outline" size="sm" className="border-blue-200 text-blue-700 hover:bg-blue-50 font-semibold text-xs sm:text-sm">
               View All Organizations
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-5">
+        <CardContent className="pt-3 sm:pt-6">
+          <div className="space-y-3 sm:space-y-4">
             {topOrganizations.map((org, index) => (
-              <div key={index} className="flex items-center justify-between p-5 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-all duration-300 border border-gray-200 shadow-md hover:shadow-lg transform hover:scale-[1.01]">
-                <div className="flex items-center space-x-5">
-                  <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold shadow-lg text-lg">
+              <div key={index} className="flex items-center justify-between p-3 sm:p-4 lg:p-5 rounded-lg sm:rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200 border border-gray-200 shadow-sm hover:shadow-md">
+                <div className="flex items-center space-x-3 sm:space-x-4">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center text-white font-bold shadow-sm text-sm sm:text-base lg:text-lg">
                     #{index + 1}
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-black mb-1">{org.name}</h3>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <span className="font-medium">{org.transactions} transactions</span>
-                      <span>•</span>
-                      <span className="font-medium">{org.users} users</span>
-                      <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-semibold">
+                    <h3 className="font-bold text-sm sm:text-base lg:text-lg text-black mb-1">{org.name}</h3>
+                    <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
+                      <span className="font-medium">{org.transactions} txns</span>
+                      <span className="hidden sm:inline">•</span>
+                      <span className="font-medium hidden sm:inline">{org.users} users</span>
+                      <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-semibold text-xs">
                         {org.status}
                       </Badge>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-xl text-black mb-1">UGX {(org.amount / 1000000).toFixed(1)}M</p>
-                  <div className="flex items-center justify-end space-x-2">
+                  <p className="font-bold text-sm sm:text-base lg:text-xl text-black mb-1">UGX {(org.amount / 1000000).toFixed(1)}M</p>
+                  <div className="flex items-center justify-end space-x-1 sm:space-x-2">
                     {org.growth > 0 ? (
-                      <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                        <TrendingUp className="h-3 w-3" />
+                      <div className="flex items-center gap-0.5 sm:gap-1 bg-blue-100 text-blue-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
+                        <TrendingUp className="h-2 w-2 sm:h-3 sm:w-3" />
                         <span className="text-xs font-bold">+{org.growth}%</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1 bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                        <TrendingDown className="h-3 w-3" />
+                      <div className="flex items-center gap-0.5 sm:gap-1 bg-gray-100 text-gray-600 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
+                        <TrendingDown className="h-2 w-2 sm:h-3 sm:w-3" />
                         <span className="text-xs font-bold">{org.growth}%</span>
                       </div>
                     )}
