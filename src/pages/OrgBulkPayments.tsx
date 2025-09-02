@@ -607,7 +607,7 @@ const BulkPayments = () => {
                             <Input
                               type="number"
                               placeholder="0"
-                              value={row.amount || ''}
+                              value={String(row.amount || '')}
                               onChange={(e) => updatePaymentRow("bank", row.id, "amount", parseFloat(e.target.value) || 0)}
                               className="h-7 text-xs"
                             />
@@ -780,7 +780,7 @@ const BulkPayments = () => {
                             <Input
                               type="number"
                               placeholder="0"
-                              value={row.amount || ''}
+                              value={String(row.amount || '')}
                               onChange={(e) => updatePaymentRow("mobile", row.id, "amount", parseFloat(e.target.value) || 0)}
                               className="h-7 text-xs"
                             />
