@@ -130,6 +130,7 @@ const Index = () => {
                   // Store demo admin in localStorage for authentication
                   localStorage.setItem('user', JSON.stringify(demoAdmin));
                   localStorage.setItem('auth_token', 'demo-admin-token');
+                  localStorage.setItem('access_token', 'demo-admin-token');
                   
                   // Navigate to admin dashboard
                   navigate('/system/analytics');

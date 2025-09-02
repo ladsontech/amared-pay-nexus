@@ -35,11 +35,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Load user from localStorage or API
     const storedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+    
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
         // Ensure user has permissions array
-        if (user && user.permissions && Array.isArray(user.permissions)) {
+        if (user && user.permissions && Array.isArray(user.permissions) && token) {
           setAuthState({
             user,
             isAuthenticated: true,
@@ -48,11 +50,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else {
           // Invalid user data, clear localStorage
           localStorage.removeItem('user');
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('access_token');
           setAuthState(prev => ({ ...prev, loading: false }));
         }
       } catch (error) {
         // Invalid JSON, clear localStorage
         localStorage.removeItem('user');
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('access_token');
         setAuthState(prev => ({ ...prev, loading: false }));
       }
     } else {
