@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 const PaymentLinkForm = lazy(() => import("@/components/PaymentLinkForm"));
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_CONFIG } from "@/services/api-config";
 
 interface Collection {
   id: string;
@@ -87,7 +88,7 @@ const Collections = () => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem("auth_token");
-      const response = await fetch("https://bulksrv.almaredagencyuganda.com/payments/collections/", {
+      const response = await fetch(new URL("/payments/collections/", API_CONFIG.baseURL).toString(), {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -201,7 +202,7 @@ const Collections = () => {
 
     try {
       const token = localStorage.getItem("auth_token");
-      const response = await fetch("https://bulksrv.almaredagencyuganda.com/payments/mobile-money/initiate-collection/", {
+      const response = await fetch(new URL("/payments/mobile-money/initiate-collection/", API_CONFIG.baseURL).toString(), {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,

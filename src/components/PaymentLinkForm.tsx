@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { API_CONFIG } from "@/services/api-config";
 
 interface PaymentLinkFormProps {
   onSuccess: () => void;
@@ -33,7 +34,7 @@ const PaymentLinkForm = ({ onSuccess }: PaymentLinkFormProps) => {
     
     try {
       const token = localStorage.getItem("auth_token");
-      const response = await fetch("https://bulksrv.almaredagencyuganda.com/payments/mobile-money/initiate-collection/", {
+      const response = await fetch(new URL("/payments/mobile-money/initiate-collection/", API_CONFIG.baseURL).toString(), {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
