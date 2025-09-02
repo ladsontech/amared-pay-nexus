@@ -50,15 +50,15 @@ const SystemAlerts = () => {
   const severityStyle = (severity: SystemAlert["severity"]) => {
     switch (severity) {
       case "critical":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-700";
       case "high":
-        return "bg-orange-100 text-orange-800";
+        return "bg-red-100 text-red-700";
       case "medium":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-gray-100 text-gray-700";
       case "low":
-        return "bg-green-100 text-green-800";
+        return "bg-blue-100 text-blue-700";
       default:
-        return "bg-slate-100 text-slate-800";
+        return "bg-gray-100 text-gray-700";
     }
   };
 
@@ -94,64 +94,64 @@ const SystemAlerts = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+        <Card className="border border-blue-200 shadow-lg bg-white">
           <CardHeader>
-            <CardTitle>Total Alerts</CardTitle>
+            <CardTitle className="text-black">Total Alerts</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{alerts.length}</div>
-            <CardDescription>All severities</CardDescription>
+            <div className="text-2xl font-bold text-black">{alerts.length}</div>
+            <CardDescription className="text-gray-600">All severities</CardDescription>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border border-blue-200 shadow-lg bg-white">
           <CardHeader>
-            <CardTitle>Open</CardTitle>
+            <CardTitle className="text-black">Open</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-amber-600">{alerts.filter(a => !a.resolved).length}</div>
-            <CardDescription>Needs attention</CardDescription>
+            <div className="text-2xl font-bold text-red-600">{alerts.filter(a => !a.resolved).length}</div>
+            <CardDescription className="text-gray-600">Needs attention</CardDescription>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border border-blue-200 shadow-lg bg-white">
           <CardHeader>
-            <CardTitle>Resolved</CardTitle>
+            <CardTitle className="text-black">Resolved</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{alerts.filter(a => a.resolved).length}</div>
-            <CardDescription>Awaiting archival</CardDescription>
+            <div className="text-2xl font-bold text-blue-600">{alerts.filter(a => a.resolved).length}</div>
+            <CardDescription className="text-gray-600">Awaiting archival</CardDescription>
           </CardContent>
         </Card>
       </div>
 
       <div className="space-y-4">
         {alerts.map(alert => (
-          <Card key={alert.id} className="hover:shadow-lg transition-shadow">
+          <Card key={alert.id} className="border border-blue-200 shadow-lg bg-white hover:shadow-xl transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center">
                     <AlertTriangle className="h-5 w-5 text-red-600" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-lg">{alert.title}</h3>
+                      <h3 className="font-semibold text-lg text-black">{alert.title}</h3>
                       <Badge className={severityStyle(alert.severity)}>{alert.severity}</Badge>
                       <Badge variant="outline" className="capitalize">
                         <Shield className="h-3 w-3 mr-1" /> {alert.type}
                       </Badge>
                       {alert.resolved && (
-                        <Badge variant="outline" className="text-green-700 border-green-200">
+                        <Badge variant="outline" className="text-blue-700 border-blue-200">
                           <CheckCircle2 className="h-3 w-3 mr-1" /> Resolved
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">{alert.description}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{new Date(alert.createdAt).toLocaleString()}</p>
+                    <p className="text-sm text-gray-600">{alert.description}</p>
+                    <p className="text-xs text-gray-500 mt-1">{new Date(alert.createdAt).toLocaleString()}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
                   {!alert.resolved && (
-                    <Button size="sm" variant="outline" onClick={() => resolveAlert(alert.id)}>
+                    <Button size="sm" variant="outline" onClick={() => resolveAlert(alert.id)} className="border-blue-200 text-blue-700 hover:bg-blue-50">
                       Resolve
                     </Button>
                   )}

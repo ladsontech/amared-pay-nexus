@@ -104,13 +104,13 @@ const SystemOrganizations = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800";
+        return "bg-blue-100 text-blue-800";
       case "inactive":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-gray-100 text-gray-700";
       case "suspended":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-700";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-700";
     }
   };
 
@@ -226,46 +226,46 @@ const SystemOrganizations = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
             <CardHeader>
-              <CardTitle className="text-lg">Total Organizations</CardTitle>
+              <CardTitle className="text-lg text-black">Total Organizations</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{organizations.length}</div>
-              <p className="text-sm text-muted-foreground">Registered</p>
+              <div className="text-2xl font-bold text-black">{organizations.length}</div>
+              <p className="text-sm text-gray-600">Registered</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
             <CardHeader>
-              <CardTitle className="text-lg">Active</CardTitle>
+              <CardTitle className="text-lg text-black">Active</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-blue-600">
                 {organizations.filter(org => org.status === "active").length}
               </div>
-              <p className="text-sm text-muted-foreground">Currently active</p>
+              <p className="text-sm text-gray-600">Currently active</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
             <CardHeader>
-              <CardTitle className="text-lg">Total Balance</CardTitle>
+              <CardTitle className="text-lg text-black">Total Balance</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-black">
                 UGX {organizations.reduce((sum, org) => sum + org.walletBalance, 0).toLocaleString()}
               </div>
-              <p className="text-sm text-muted-foreground">System wide</p>
+              <p className="text-sm text-gray-600">System wide</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
             <CardHeader>
-              <CardTitle className="text-lg">Total Users</CardTitle>
+              <CardTitle className="text-lg text-black">Total Users</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-black">
                 {organizations.reduce((sum, org) => sum + org.members, 0)}
               </div>
-              <p className="text-sm text-muted-foreground">All organizations</p>
+              <p className="text-sm text-gray-600">All organizations</p>
             </CardContent>
           </Card>
         </div>
@@ -307,21 +307,21 @@ const SystemOrganizations = () => {
         ) : (
           <div className="space-y-4">
             {filteredOrganizations.map((org) => (
-              <Card key={org.id} className="hover:shadow-lg transition-shadow">
+              <Card key={org.id} className="border border-blue-200 shadow-lg bg-white hover:shadow-xl transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                        <Building className="h-6 w-6 text-primary" />
+                      <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center">
+                        <Building className="h-6 w-6 text-blue-600" />
                       </div>
                       <div>
                         <div className="flex items-center space-x-2 mb-1">
-                          <h3 className="font-semibold text-lg">{org.name}</h3>
+                          <h3 className="font-semibold text-lg text-black">{org.name}</h3>
                           <Badge className={getStatusColor(org.status)}>
                             {org.status}
                           </Badge>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                           <div>
                             <p><strong>ID:</strong> {org.id}</p>
                             <p><strong>Email:</strong> {org.email}</p>
@@ -337,7 +337,7 @@ const SystemOrganizations = () => {
                         </div>
                         <div className="flex items-center space-x-6 mt-3">
                           <div className="flex items-center space-x-1">
-                            <Wallet className="h-4 w-4 text-green-600" />
+                            <Wallet className="h-4 w-4 text-blue-600" />
                             <span className="font-medium">UGX {org.walletBalance.toLocaleString()}</span>
                           </div>
                           <div className="flex items-center space-x-1">

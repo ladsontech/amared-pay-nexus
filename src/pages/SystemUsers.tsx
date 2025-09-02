@@ -127,27 +127,27 @@ const SystemUsers = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800";
+        return "bg-blue-100 text-blue-800";
       case "inactive":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-gray-100 text-gray-700";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-700";
     }
   };
 
   const getRoleColor = (role: string) => {
     switch (role) {
       case "super_admin":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-700";
       case "admin":
-        return "bg-purple-100 text-purple-800";
-      case "manager":
         return "bg-blue-100 text-blue-800";
+      case "manager":
+        return "bg-blue-100 text-blue-700";
       case "operator":
       case "staff":
-        return "bg-orange-100 text-orange-800";
+        return "bg-gray-100 text-gray-700";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-700";
     }
   };
 
@@ -308,46 +308,46 @@ const SystemUsers = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
             <CardHeader>
-              <CardTitle className="text-lg">Total Users</CardTitle>
+              <CardTitle className="text-lg text-black">Total Users</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{allUsers.length}</div>
-              <p className="text-sm text-muted-foreground">System wide</p>
+              <div className="text-2xl font-bold text-black">{allUsers.length}</div>
+              <p className="text-sm text-gray-600">System wide</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
             <CardHeader>
-              <CardTitle className="text-lg">Active Users</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {allUsers.filter(user => user.status === "active").length}
-              </div>
-              <p className="text-sm text-muted-foreground">Currently active</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Admins</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-600">
-                {allUsers.filter(user => user.role === "admin" || user.role === "super_admin").length}
-              </div>
-              <p className="text-sm text-muted-foreground">Admin level access</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Organizations</CardTitle>
+              <CardTitle className="text-lg text-black">Active Users</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">
+                {allUsers.filter(user => user.status === "active").length}
+              </div>
+              <p className="text-sm text-gray-600">Currently active</p>
+            </CardContent>
+          </Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
+            <CardHeader>
+              <CardTitle className="text-lg text-black">Admins</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-black">
+                {allUsers.filter(user => user.role === "admin" || user.role === "super_admin").length}
+              </div>
+              <p className="text-sm text-gray-600">Admin level access</p>
+            </CardContent>
+          </Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
+            <CardHeader>
+              <CardTitle className="text-lg text-black">Organizations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-black">
                 {new Set(allUsers.filter(u => u.organization !== "System").map(u => u.organization)).size}
               </div>
-              <p className="text-sm text-muted-foreground">With users</p>
+              <p className="text-sm text-gray-600">With users</p>
             </CardContent>
           </Card>
         </div>
@@ -389,16 +389,16 @@ const SystemUsers = () => {
         ) : (
           <div className="space-y-4">
             {filteredUsers.map((user) => (
-              <Card key={user.id} className="hover:shadow-lg transition-shadow">
+              <Card key={user.id} className="border border-blue-200 shadow-lg bg-white hover:shadow-xl transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                        <UserCircle className="h-6 w-6 text-primary" />
+                      <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center">
+                        <UserCircle className="h-6 w-6 text-blue-600" />
                       </div>
                       <div>
                         <div className="flex items-center space-x-2 mb-1">
-                          <h3 className="font-semibold text-lg">{user.name}</h3>
+                          <h3 className="font-semibold text-lg text-black">{user.name}</h3>
                           <Badge className={getStatusColor(user.status)}>
                             {user.status}
                           </Badge>
@@ -412,7 +412,7 @@ const SystemUsers = () => {
                             </Badge>
                           )}
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                           <div>
                             <div className="flex items-center space-x-1 mb-1">
                               <Mail className="h-3 w-3" />
