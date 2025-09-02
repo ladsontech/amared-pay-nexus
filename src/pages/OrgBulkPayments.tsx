@@ -103,24 +103,24 @@ const BulkPayments = () => {
           setPayments([
             {
               id: "BP001",
-              amount: 250000,
-              recipients: 150,
+              amount: 8500000,
+              recipients: 5,
               status: "completed",
               createdAt: "2024-01-15T10:30:00Z",
               description: "Monthly Salary Payment",
             },
             {
               id: "BP002",
-              amount: 75000,
-              recipients: 50,
+              amount: 1550000,
+              recipients: 3,
               status: "processing",
               createdAt: "2024-01-14T14:20:00Z",
               description: "Vendor Payments Q1",
             },
             {
               id: "BP003",
-              amount: 180000,
-              recipients: 120,
+              amount: 530000,
+              recipients: 3,
               status: "pending",
               createdAt: "2024-01-13T09:15:00Z",
               description: "Commission Payments",
@@ -163,11 +163,11 @@ const BulkPayments = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-800";
-      case "processing":
         return "bg-blue-100 text-blue-800";
+      case "processing":
+        return "bg-blue-50 text-blue-600";
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-gray-100 text-gray-800";
       case "failed":
         return "bg-red-100 text-red-800";
       default:
@@ -373,82 +373,83 @@ const BulkPayments = () => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-24 md:pb-0">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-3 sm:space-y-4 pb-20 md:pb-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Bulk Payments</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-black">Bulk Payments</h1>
+          <p className="text-xs sm:text-sm text-gray-600">
             Manage and monitor your bulk payment transactions
           </p>
         </div>
         <div className="flex gap-2">
           {hasPermission("view_department_reports") && (
-            <Button variant="outline" asChild>
-              <Link to="/org/reports/bulk-payments" className="flex items-center space-x-2">
-                <FileText className="h-4 w-4" />
-                <span>View Bulk Payments Report</span>
+            <Button variant="outline" size="sm" asChild className="text-xs">
+              <Link to="/org/reports/bulk-payments" className="flex items-center space-x-1">
+                <FileText className="h-3 w-3" />
+                <span className="hidden sm:inline">Reports</span>
               </Link>
             </Button>
           )}
-          <Button variant="outline" onClick={() => setShowPayBills(true)}>
-            <Receipt className="h-4 w-4 mr-2" />
-            Pay Bills
+          <Button variant="outline" size="sm" onClick={() => setShowPayBills(true)} className="text-xs">
+            <Receipt className="h-3 w-3 mr-1" />
+            <span className="hidden sm:inline">Pay Bills</span>
+            <span className="sm:hidden">Bills</span>
           </Button>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 sm:gap-0 p-1">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 py-1.5">Overview</TabsTrigger>
-          <TabsTrigger value="bank" className="text-xs sm:text-sm px-2 py-1.5">Bank Payments</TabsTrigger>
-          <TabsTrigger value="mobile" className="text-xs sm:text-sm px-2 py-1.5">Mobile Payments</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 p-1">
+          <TabsTrigger value="overview" className="text-xs px-2 py-1.5">Overview</TabsTrigger>
+          <TabsTrigger value="bank" className="text-xs px-2 py-1.5">Bank</TabsTrigger>
+          <TabsTrigger value="mobile" className="text-xs px-2 py-1.5">Mobile</TabsTrigger>
           {hasPermission("approve_bulk_payments") && (
-            <TabsTrigger value="approvals" className="text-xs sm:text-sm px-2 py-1.5">Approvals</TabsTrigger>
+            <TabsTrigger value="approvals" className="text-xs px-2 py-1.5">Approvals</TabsTrigger>
           )}
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <TabsContent value="overview" className="space-y-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
               <Input
                 placeholder="Search payments..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-8 h-8 text-xs"
               />
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
+              <Button variant="outline" size="sm" className="text-xs h-8">
+                <Filter className="h-3 w-3 mr-1" />
+                <span className="hidden sm:inline">Filter</span>
               </Button>
-              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
+              <Button variant="outline" size="sm" className="text-xs h-8">
+                <Download className="h-3 w-3 mr-1" />
+                <span className="hidden sm:inline">Export</span>
               </Button>
             </div>
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {[1, 2, 3].map((i) => (
                 <Card key={i} className="animate-pulse">
                   <CardHeader className="p-3">
-                    <div className="h-3 bg-muted rounded w-1/2"></div>
-                    <div className="h-2 bg-muted rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-2 bg-gray-200 rounded w-3/4"></div>
                   </CardHeader>
                   <CardContent className="p-3">
                     <div className="space-y-2">
-                      <div className="h-2 bg-muted rounded"></div>
-                      <div className="h-2 bg-muted rounded w-2/3"></div>
+                      <div className="h-2 bg-gray-200 rounded"></div>
+                      <div className="h-2 bg-gray-200 rounded w-2/3"></div>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredPayments.map((payment) => (
                 <Card key={payment.id} className="hover:shadow-md transition-shadow border border-gray-200 bg-white">
                   <CardHeader className="p-3 pb-2">
@@ -501,131 +502,26 @@ const BulkPayments = () => {
           {filteredPayments.length === 0 && !isLoading && (
             <Card className="border border-gray-200">
               <CardContent className="text-center py-6">
-                <div className="text-muted-foreground">
+                <div className="text-gray-600">
                   <CreditCard className="h-8 w-8 mx-auto mb-3 opacity-50" />
-                  <h3 className="text-sm font-medium mb-1">No bulk payments found</h3>
+                  <h3 className="text-sm font-medium mb-1 text-black">No bulk payments found</h3>
                   <p className="text-xs">Create your first bulk payment to get started.</p>
                 </div>
               </CardContent>
             </Card>
           )}
         </TabsContent>
-        </div>
-      </div>
 
-      <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 sm:gap-0 p-1">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 py-1.5">Overview</TabsTrigger>
-          <TabsTrigger value="bank" className="text-xs sm:text-sm px-2 py-1.5">Bank Payments</TabsTrigger>
-          <TabsTrigger value="mobile" className="text-xs sm:text-sm px-2 py-1.5">Mobile Payments</TabsTrigger>
-          {hasPermission("approve_bulk_payments") && (
-            <TabsTrigger value="approvals" className="text-xs sm:text-sm px-2 py-1.5">Approvals</TabsTrigger>
-          )}
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search payments..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-            </div>
-          </div>
-
-          {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {[1, 2, 3].map((i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardHeader>
-                    <div className="h-4 bg-muted rounded w-1/2"></div>
-                    <div className="h-3 bg-muted rounded w-3/4"></div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="h-3 bg-muted rounded"></div>
-                      <div className="h-3 bg-muted rounded w-2/3"></div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {filteredPayments.map((payment) => (
-                <Card key={payment.id} className="hover:shadow-lg transition-all duration-200 hover:scale-[1.02] shadow-md border-0 bg-gradient-to-br from-card to-card/80">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-base sm:text-lg">{payment.id}</CardTitle>
-                      <Badge className={getStatusColor(payment.status)}>
-                        {payment.status}
-                      </Badge>
-                    </div>
-                    <CardDescription className="text-sm">{payment.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-xs sm:text-sm text-muted-foreground">Amount</span>
-                        <span className="text-sm sm:text-base font-medium">UGX {payment.amount.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-xs sm:text-sm text-muted-foreground">Recipients</span>
-                        <span className="text-sm sm:text-base font-medium">{payment.recipients}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-xs sm:text-sm text-muted-foreground">Created</span>
-                        <span className="text-sm sm:text-base font-medium">
-                          {new Date(payment.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <Button variant="outline" size="sm" className="w-full mt-4 text-xs sm:text-sm">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View Details
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-
-          {filteredPayments.length === 0 && !isLoading && (
-            <Card>
-              <CardContent className="text-center py-8 sm:py-12">
-                <div className="text-muted-foreground">
-                  <CreditCard className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-base sm:text-lg font-medium mb-2">No bulk payments found</h3>
-                  <p className="text-sm sm:text-base">Create your first bulk payment to get started.</p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="bank" className="space-y-4">
-          <Card className="shadow-md border-0 bg-gradient-to-br from-card to-card/80">
-            <CardHeader>
-              <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <span>Bank Bulk Payments</span>
-                <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setBankPaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `bank-new-${Date.now()}-${i}`, recipientName: '', recipientAccount: '', bankName: '', amount: 0, description: '', verified: false }))])}>
-                    <Plus className="h-4 w-4 mr-1 sm:mr-2" />
-                    <span className="hidden sm:inline">Add 5 Rows</span>
-                    <span className="sm:hidden">Add 5</span>
+        <TabsContent value="bank" className="space-y-3">
+          <Card className="shadow-sm border border-gray-200 bg-white">
+            <CardHeader className="p-3">
+              <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
+                <span className="text-black">Bank Bulk Payments</span>
+                <div className="flex flex-wrap gap-1">
+                  <Button variant="outline" size="sm" onClick={() => setBankPaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `bank-new-${Date.now()}-${i}`, recipientName: '', recipientAccount: '', bankName: '', amount: 0, description: '', verified: false }))])} className="text-xs h-7">
+                    <Plus className="h-3 w-3 mr-1" />
+                    <span className="hidden sm:inline">Add 5</span>
+                    <span className="sm:hidden">+5</span>
                   </Button>
                   <input
                     type="file"
@@ -635,27 +531,27 @@ const BulkPayments = () => {
                     id="bank-csv-upload"
                   />
                   <label htmlFor="bank-csv-upload">
-                    <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-1 sm:mr-2" />
-                      <span className="hidden sm:inline">Upload CSV</span>
-                      <span className="sm:hidden">CSV</span>
+                    <Button variant="outline" size="sm" className="text-xs h-7">
+                      <Upload className="h-3 w-3 mr-1" />
+                      <span className="hidden sm:inline">CSV</span>
+                      <span className="sm:hidden">↑</span>
                     </Button>
                   </label>
                 </div>
               </CardTitle>
-              <CardDescription>
-                Create bulk payments to bank accounts. Upload CSV or enter manually.
-                CSV format: Name, Account Number, Amount, Description
+              <CardDescription className="text-xs text-gray-600">
+                Create bulk payments to bank accounts. CSV format: Name, Account, Amount, Description
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Payment Description</Label>
+            <CardContent className="p-3">
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Payment Description</Label>
                   <Input
                     placeholder="e.g., Monthly salary payments"
                     value={bulkDescription}
                     onChange={(e) => setBulkDescription(e.target.value)}
+                    className="h-8 text-xs"
                   />
                 </div>
                  
@@ -664,85 +560,89 @@ const BulkPayments = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="min-w-[150px]">Recipient Name</TableHead>
-                          <TableHead className="min-w-[160px]">Bank Name</TableHead>
-                          <TableHead className="min-w-[180px]">Bank Account</TableHead>
-                          <TableHead className="min-w-[120px]">Amount (UGX)</TableHead>
-                          <TableHead className="min-w-[150px]">Description</TableHead>
-                          <TableHead className="min-w-[100px]">Status</TableHead>
-                          <TableHead className="min-w-[120px]">Actions</TableHead>
+                          <TableHead className="min-w-[120px] text-xs p-2">Name</TableHead>
+                          <TableHead className="min-w-[100px] text-xs p-2">Bank</TableHead>
+                          <TableHead className="min-w-[120px] text-xs p-2">Account</TableHead>
+                          <TableHead className="min-w-[80px] text-xs p-2">Amount</TableHead>
+                          <TableHead className="min-w-[100px] text-xs p-2">Description</TableHead>
+                          <TableHead className="min-w-[70px] text-xs p-2">Status</TableHead>
+                          <TableHead className="min-w-[80px] text-xs p-2">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                       {bankPaymentRows.map((row, index) => (
                         <TableRow key={row.id}>
-                          <TableCell>
+                          <TableCell className="p-2">
                             <Input
                               placeholder="Enter name"
                               value={row.recipientName}
                               onChange={(e) => updatePaymentRow("bank", row.id, "recipientName", e.target.value)}
+                              className="h-7 text-xs"
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="p-2">
                             <Select
                               value={row.bankName || ''}
                               onValueChange={(value) => updatePaymentRow("bank", row.id, "bankName", value)}
                             >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select bank" />
+                              <SelectTrigger className="h-7 text-xs">
+                                <SelectValue placeholder="Bank" />
                               </SelectTrigger>
                               <SelectContent>
                                 {BANK_NAMES.map(name => (
-                                  <SelectItem key={name} value={name}>{name}</SelectItem>
+                                  <SelectItem key={name} value={name} className="text-xs">{name}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="p-2">
                             <Input
                               placeholder="Account number"
                               value={row.recipientAccount || ''}
                               onChange={(e) => updatePaymentRow("bank", row.id, "recipientAccount", e.target.value)}
+                              className="h-7 text-xs"
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="p-2">
                             <Input
                               type="number"
                               placeholder="0"
                               value={row.amount || ''}
                               onChange={(e) => updatePaymentRow("bank", row.id, "amount", parseFloat(e.target.value) || 0)}
+                              className="h-7 text-xs"
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="p-2">
                             <Input
-                              placeholder="Payment description"
+                              placeholder="Description"
                               value={row.description}
                               onChange={(e) => updatePaymentRow("bank", row.id, "description", e.target.value)}
+                              className="h-7 text-xs"
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="p-2">
                             {row.verified ? (
-                              <Badge className="bg-green-100 text-green-800">
-                                <Check className="h-3 w-3 mr-1" />
-                                Verified
+                              <Badge className="bg-blue-100 text-blue-800 text-xs">
+                                <Check className="h-2 w-2 mr-1" />
+                                OK
                               </Badge>
                             ) : row.recipientName && row.recipientAccount ? (
-                              <Badge variant="outline" className="text-orange-600">
-                                <AlertCircle className="h-3 w-3 mr-1" />
-                                Pending
+                              <Badge variant="outline" className="text-gray-600 text-xs">
+                                <AlertCircle className="h-2 w-2 mr-1" />
+                                Wait
                               </Badge>
                             ) : (
-                              <Badge variant="outline">Empty</Badge>
+                              <Badge variant="outline" className="text-xs">Empty</Badge>
                             )}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="p-2">
                             <div className="flex gap-1">
                               {row.recipientName && row.recipientAccount && !row.verified && (
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   onClick={() => verifyPaymentRow("bank", row.id)}
-                                  className="text-green-600"
+                                  className="text-blue-600 h-6 w-6 p-0"
                                 >
                                   <Check className="h-3 w-3" />
                                 </Button>
@@ -751,7 +651,7 @@ const BulkPayments = () => {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => removePaymentRow("bank", row.id)}
-                                className="text-red-600"
+                                className="text-red-600 h-6 w-6 p-0"
                               >
                                 <Trash2 className="h-3 w-3" />
                               </Button>
@@ -764,23 +664,23 @@ const BulkPayments = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-muted/50 rounded-lg">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <div>
-                    <p className="text-sm text-muted-foreground">
-                      Total recipients: {bankPaymentRows.filter(row => row.recipientName && row.amount > 0).length}
+                    <p className="text-xs text-gray-600">
+                      Recipients: {bankPaymentRows.filter(row => row.recipientName && row.amount > 0).length}
                     </p>
-                    <p className="font-medium">
-                      Total amount: UGX {bankPaymentRows.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
+                    <p className="font-medium text-sm text-black">
+                      Total: UGX {bankPaymentRows.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <Button variant="outline" onClick={() => verifyAllRows("bank")} className="w-full sm:w-auto">
+                    <Button variant="outline" onClick={() => verifyAllRows("bank")} className="w-full sm:w-auto text-xs h-8">
                       Verify All
                     </Button>
                     <Button 
                       onClick={() => handleSubmitBulkPayment("bank")}
                       disabled={bankPaymentRows.filter(row => row.recipientName && row.amount > 0).length === 0}
-                      className="w-full sm:w-auto"
+                      className="w-full sm:w-auto text-xs h-8"
                     >
                       Submit Bank Payments
                     </Button>
@@ -791,16 +691,16 @@ const BulkPayments = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="mobile" className="space-y-4">
-          <Card className="shadow-md border-0 bg-gradient-to-br from-card to-card/80">
-            <CardHeader>
-              <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <span>Mobile Money Bulk Payments</span>
-                <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setMobilePaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `mobile-new-${Date.now()}-${i}`, recipientName: '', phoneNumber: '+256', mobileProvider: 'Unknown' as const, amount: 0, description: '', verified: false }))])}>
-                    <Plus className="h-4 w-4 mr-1 sm:mr-2" />
-                    <span className="hidden sm:inline">Add 5 Rows</span>
-                    <span className="sm:hidden">Add 5</span>
+        <TabsContent value="mobile" className="space-y-3">
+          <Card className="shadow-sm border border-gray-200 bg-white">
+            <CardHeader className="p-3">
+              <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
+                <span className="text-black">Mobile Money Bulk Payments</span>
+                <div className="flex flex-wrap gap-1">
+                  <Button variant="outline" size="sm" onClick={() => setMobilePaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `mobile-new-${Date.now()}-${i}`, recipientName: '', phoneNumber: '+256', mobileProvider: 'Unknown' as const, amount: 0, description: '', verified: false }))])} className="text-xs h-7">
+                    <Plus className="h-3 w-3 mr-1" />
+                    <span className="hidden sm:inline">Add 5</span>
+                    <span className="sm:hidden">+5</span>
                   </Button>
                   <input
                     type="file"
@@ -810,27 +710,27 @@ const BulkPayments = () => {
                     id="mobile-csv-upload"
                   />
                   <label htmlFor="mobile-csv-upload">
-                    <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-1 sm:mr-2" />
-                      <span className="hidden sm:inline">Upload CSV</span>
-                      <span className="sm:hidden">CSV</span>
+                    <Button variant="outline" size="sm" className="text-xs h-7">
+                      <Upload className="h-3 w-3 mr-1" />
+                      <span className="hidden sm:inline">CSV</span>
+                      <span className="sm:hidden">↑</span>
                     </Button>
                   </label>
                 </div>
               </CardTitle>
-              <CardDescription>
-                Create bulk payments to mobile money accounts. Upload CSV or enter manually.
-                CSV format: Name, Phone Number, Amount, Description
+              <CardDescription className="text-xs text-gray-600">
+                Create bulk payments to mobile money accounts. CSV format: Name, Phone, Amount, Description
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Payment Description</Label>
+            <CardContent className="p-3">
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Payment Description</Label>
                   <Input
                     placeholder="e.g., Commission payments"
                     value={bulkDescription}
                     onChange={(e) => setBulkDescription(e.target.value)}
+                    className="h-8 text-xs"
                   />
                 </div>
                  
@@ -839,26 +739,27 @@ const BulkPayments = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="min-w-[150px]">Recipient Name</TableHead>
-                          <TableHead className="min-w-[130px]">Phone Number</TableHead>
-                          <TableHead className="min-w-[100px]">Provider</TableHead>
-                          <TableHead className="min-w-[120px]">Amount (UGX)</TableHead>
-                          <TableHead className="min-w-[150px]">Description</TableHead>
-                          <TableHead className="min-w-[100px]">Status</TableHead>
-                          <TableHead className="min-w-[120px]">Actions</TableHead>
+                          <TableHead className="min-w-[120px] text-xs p-2">Name</TableHead>
+                          <TableHead className="min-w-[100px] text-xs p-2">Phone</TableHead>
+                          <TableHead className="min-w-[70px] text-xs p-2">Provider</TableHead>
+                          <TableHead className="min-w-[80px] text-xs p-2">Amount</TableHead>
+                          <TableHead className="min-w-[100px] text-xs p-2">Description</TableHead>
+                          <TableHead className="min-w-[70px] text-xs p-2">Status</TableHead>
+                          <TableHead className="min-w-[80px] text-xs p-2">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                       {mobilePaymentRows.map((row, index) => (
                         <TableRow key={row.id}>
-                          <TableCell>
+                          <TableCell className="p-2">
                             <Input
                               placeholder="Enter name"
                               value={row.recipientName}
                               onChange={(e) => updatePaymentRow("mobile", row.id, "recipientName", e.target.value)}
+                              className="h-7 text-xs"
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="p-2">
                             <Input
                               placeholder="+256701234567"
                               value={row.phoneNumber || '+256'}
@@ -867,51 +768,54 @@ const BulkPayments = () => {
                                 updatePaymentRow("mobile", row.id, "phoneNumber", value);
                                 updatePaymentRow("mobile", row.id, "mobileProvider", detectMobileProvider(value));
                               }}
+                              className="h-7 text-xs"
                             />
                           </TableCell>
-                          <TableCell>
-                            <Badge className={row.mobileProvider === "MTN" ? "bg-yellow-100 text-yellow-800" : row.mobileProvider === "Airtel" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"}>
+                          <TableCell className="p-2">
+                            <Badge className={row.mobileProvider === "MTN" ? "bg-blue-100 text-blue-800 text-xs" : row.mobileProvider === "Airtel" ? "bg-gray-100 text-gray-800 text-xs" : "bg-gray-100 text-gray-800 text-xs"}>
                               {row.mobileProvider || "Unknown"}
                             </Badge>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="p-2">
                             <Input
                               type="number"
                               placeholder="0"
                               value={row.amount || ''}
                               onChange={(e) => updatePaymentRow("mobile", row.id, "amount", parseFloat(e.target.value) || 0)}
+                              className="h-7 text-xs"
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="p-2">
                             <Input
-                              placeholder="Payment description"
+                              placeholder="Description"
                               value={row.description}
                               onChange={(e) => updatePaymentRow("mobile", row.id, "description", e.target.value)}
+                              className="h-7 text-xs"
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="p-2">
                             {row.verified ? (
-                              <Badge className="bg-green-100 text-green-800">
-                                <Check className="h-3 w-3 mr-1" />
-                                Verified
+                              <Badge className="bg-blue-100 text-blue-800 text-xs">
+                                <Check className="h-2 w-2 mr-1" />
+                                OK
                               </Badge>
                             ) : row.recipientName && row.phoneNumber ? (
-                              <Badge variant="outline" className="text-orange-600">
-                                <AlertCircle className="h-3 w-3 mr-1" />
-                                Pending
+                              <Badge variant="outline" className="text-gray-600 text-xs">
+                                <AlertCircle className="h-2 w-2 mr-1" />
+                                Wait
                               </Badge>
                             ) : (
-                              <Badge variant="outline">Empty</Badge>
+                              <Badge variant="outline" className="text-xs">Empty</Badge>
                             )}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="p-2">
                             <div className="flex gap-1">
                               {row.recipientName && row.phoneNumber && !row.verified && (
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   onClick={() => verifyPaymentRow("mobile", row.id)}
-                                  className="text-green-600"
+                                  className="text-blue-600 h-6 w-6 p-0"
                                 >
                                   <Check className="h-3 w-3" />
                                 </Button>
@@ -920,7 +824,7 @@ const BulkPayments = () => {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => removePaymentRow("mobile", row.id)}
-                                className="text-red-600"
+                                className="text-red-600 h-6 w-6 p-0"
                               >
                                 <Trash2 className="h-3 w-3" />
                               </Button>
@@ -933,23 +837,23 @@ const BulkPayments = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-muted/50 rounded-lg">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <div>
-                    <p className="text-sm text-muted-foreground">
-                      Total recipients: {mobilePaymentRows.filter(row => row.recipientName && row.amount > 0).length}
+                    <p className="text-xs text-gray-600">
+                      Recipients: {mobilePaymentRows.filter(row => row.recipientName && row.amount > 0).length}
                     </p>
-                    <p className="font-medium">
-                      Total amount: UGX {mobilePaymentRows.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
+                    <p className="font-medium text-sm text-black">
+                      Total: UGX {mobilePaymentRows.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <Button variant="outline" onClick={() => verifyAllRows("mobile")} className="w-full sm:w-auto">
+                    <Button variant="outline" onClick={() => verifyAllRows("mobile")} className="w-full sm:w-auto text-xs h-8">
                       Verify All
                     </Button>
                     <Button 
                       onClick={() => handleSubmitBulkPayment("mobile")}
                       disabled={mobilePaymentRows.filter(row => row.recipientName && row.amount > 0).length === 0}
-                      className="w-full sm:w-auto"
+                      className="w-full sm:w-auto text-xs h-8"
                     >
                       Submit Mobile Payments
                     </Button>
@@ -961,7 +865,7 @@ const BulkPayments = () => {
         </TabsContent>
 
         {hasPermission("approve_bulk_payments") && (
-          <TabsContent value="approvals" className="space-y-4">
+          <TabsContent value="approvals" className="space-y-3">
             <BulkPaymentApprovals />
           </TabsContent>
         )}
@@ -971,18 +875,18 @@ const BulkPayments = () => {
       <Dialog open={!!selectedPaymentDetails} onOpenChange={(open) => !open && setSelectedPaymentDetails(null)}>
         <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
+            <DialogTitle className="flex items-center gap-2 text-black">
+              <Users className="h-4 w-4 text-blue-600" />
               Payment Recipients - {selectedPaymentDetails?.id}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-gray-600">
               {selectedPaymentDetails?.description} • {paymentRecipients.length} recipients
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             {/* Summary Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-xs text-gray-600">Completed</p>
                 <p className="text-lg font-bold text-blue-600">
@@ -1008,25 +912,25 @@ const BulkPayments = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50">
-                    <TableHead className="text-xs font-medium">Recipient</TableHead>
-                    <TableHead className="text-xs font-medium">Account</TableHead>
-                    <TableHead className="text-xs font-medium">Amount</TableHead>
-                    <TableHead className="text-xs font-medium">Status</TableHead>
-                    <TableHead className="text-xs font-medium">Processed</TableHead>
+                    <TableHead className="text-xs font-medium p-2">Recipient</TableHead>
+                    <TableHead className="text-xs font-medium p-2">Account</TableHead>
+                    <TableHead className="text-xs font-medium p-2">Amount</TableHead>
+                    <TableHead className="text-xs font-medium p-2">Status</TableHead>
+                    <TableHead className="text-xs font-medium p-2">Processed</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {paymentRecipients.map((recipient) => (
                     <TableRow key={recipient.id} className="hover:bg-gray-50">
-                      <TableCell className="text-sm font-medium">{recipient.name}</TableCell>
-                      <TableCell className="text-sm font-mono">{recipient.account}</TableCell>
-                      <TableCell className="text-sm">UGX {recipient.amount.toLocaleString()}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs font-medium p-2 text-black">{recipient.name}</TableCell>
+                      <TableCell className="text-xs font-mono p-2 text-gray-600">{recipient.account}</TableCell>
+                      <TableCell className="text-xs p-2 text-black">UGX {recipient.amount.toLocaleString()}</TableCell>
+                      <TableCell className="p-2">
                         <Badge className={getRecipientStatusColor(recipient.status)}>
                           {recipient.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs text-gray-600">
+                      <TableCell className="text-xs text-gray-600 p-2">
                         {recipient.processedAt 
                           ? new Date(recipient.processedAt).toLocaleString()
                           : recipient.failureReason || "-"
@@ -1043,6 +947,50 @@ const BulkPayments = () => {
 
       {/* Pay Bills Modal */}
       <PayBillsForm isOpen={showPayBills} onClose={() => setShowPayBills(false)} />
+
+      {/* Mobile Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-gray-200 p-2">
+        <div className="grid grid-cols-4 gap-1">
+          <Button 
+            variant={activeTab === "overview" ? "default" : "ghost"} 
+            size="sm" 
+            onClick={() => setActiveTab("overview")}
+            className="flex flex-col items-center gap-1 h-12 text-xs"
+          >
+            <FileText className="h-4 w-4" />
+            <span>Overview</span>
+          </Button>
+          <Button 
+            variant={activeTab === "bank" ? "default" : "ghost"} 
+            size="sm" 
+            onClick={() => setActiveTab("bank")}
+            className="flex flex-col items-center gap-1 h-12 text-xs"
+          >
+            <CreditCard className="h-4 w-4" />
+            <span>Bank</span>
+          </Button>
+          <Button 
+            variant={activeTab === "mobile" ? "default" : "ghost"} 
+            size="sm" 
+            onClick={() => setActiveTab("mobile")}
+            className="flex flex-col items-center gap-1 h-12 text-xs"
+          >
+            <Upload className="h-4 w-4" />
+            <span>Mobile</span>
+          </Button>
+          {hasPermission("approve_bulk_payments") && (
+            <Button 
+              variant={activeTab === "approvals" ? "default" : "ghost"} 
+              size="sm" 
+              onClick={() => setActiveTab("approvals")}
+              className="flex flex-col items-center gap-1 h-12 text-xs"
+            >
+              <Eye className="h-4 w-4" />
+              <span>Approvals</span>
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
