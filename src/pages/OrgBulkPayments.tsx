@@ -400,116 +400,102 @@ const BulkPayments = () => {
 
       <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 p-1">
-          <TabsTrigger value="overview" className="text-xs px-2 py-1.5">Overview</TabsTrigger>
-          <TabsTrigger value="bank" className="text-xs px-2 py-1.5">Bank</TabsTrigger>
-          <TabsTrigger value="mobile" className="text-xs px-2 py-1.5">Mobile</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs px-2 py-1.5">History</TabsTrigger>
+          <TabsTrigger value="bank" className="text-xs px-2 py-1.5">New Bank</TabsTrigger>
+          <TabsTrigger value="mobile" className="text-xs px-2 py-1.5">New Mobile</TabsTrigger>
           {hasPermission("approve_bulk_payments") && (
             <TabsTrigger value="approvals" className="text-xs px-2 py-1.5">Approvals</TabsTrigger>
           )}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-3">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
-              <Input
-                placeholder="Search payments..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8 h-8 text-xs"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="text-xs h-8">
-                <Filter className="h-3 w-3 mr-1" />
-                <span className="hidden sm:inline">Filter</span>
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs h-8">
-                <Download className="h-3 w-3 mr-1" />
-                <span className="hidden sm:inline">Export</span>
-              </Button>
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="p-4">
+              <CardTitle className="text-lg font-bold text-black">Bulk Payment History</CardTitle>
+              <CardDescription className="text-gray-600">
+                Click on any payment to view detailed recipient list and status
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
+                  <Input
+                    placeholder="Search payments..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8 h-8 text-xs"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="text-xs h-8">
+                    <Filter className="h-3 w-3 mr-1" />
+                    <span className="hidden sm:inline">Filter</span>
+                  </Button>
+                  <Button variant="outline" size="sm" className="text-xs h-8">
+                    <Download className="h-3 w-3 mr-1" />
+                    <span className="hidden sm:inline">Export</span>
+                  </Button>
+                </div>
+              </div>
 
-          {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {[1, 2, 3].map((i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardHeader className="p-3">
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-2 bg-gray-200 rounded w-3/4"></div>
-                  </CardHeader>
-                  <CardContent className="p-3">
-                    <div className="space-y-2">
-                      <div className="h-2 bg-gray-200 rounded"></div>
-                      <div className="h-2 bg-gray-200 rounded w-2/3"></div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {filteredPayments.map((payment) => (
-                <Card key={payment.id} className="hover:shadow-md transition-shadow border border-gray-200 bg-white">
-                  <CardHeader className="p-3 pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-bold text-black">{payment.id}</CardTitle>
-                      <Badge className={getStatusColor(payment.status)}>
-                        {payment.status}
-                      </Badge>
-                    </div>
-                    <CardDescription className="text-xs text-gray-600 line-clamp-2">{payment.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-3 pt-0">
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-gray-500">Amount</span>
-                        <span className="font-medium text-black">UGX {(payment.amount / 1000).toFixed(0)}K</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-gray-500">Recipients</span>
-                        <span className="font-medium text-black">{payment.recipients}</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-gray-500">Created</span>
-                        <span className="font-medium text-black">
-                          {new Date(payment.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className="flex gap-1 mt-3">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1 text-xs h-7"
-                          onClick={() => handleViewRecipients(payment)}
-                        >
-                          <Users className="h-3 w-3 mr-1" />
-                          Recipients
-                        </Button>
-                        <Button variant="outline" size="sm" className="flex-1 text-xs h-7">
-                          <Eye className="h-3 w-3 mr-1" />
-                          Details
-                        </Button>
+              {isLoading ? (
+                <div className="space-y-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="animate-pulse border rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 space-y-2">
+                          <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                          <div className="h-2 bg-gray-200 rounded w-1/2"></div>
+                        </div>
+                        <div className="h-6 bg-gray-200 rounded w-16"></div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {filteredPayments.map((payment) => (
+                    <div 
+                      key={payment.id} 
+                      className="border border-gray-200 rounded-lg p-3 hover:bg-blue-50 cursor-pointer transition-colors"
+                      onClick={() => handleViewRecipients(payment)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-bold text-sm text-black">{payment.id}</h3>
+                            <Badge className={getStatusColor(payment.status)}>
+                              {payment.status}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-gray-600 truncate">{payment.description}</p>
+                          <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+                            <span>{payment.recipients} recipients</span>
+                            <span>{new Date(payment.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                        <div className="text-right ml-4">
+                          <p className="font-bold text-sm text-black">
+                            UGX {(payment.amount / 1000000).toFixed(1)}M
+                          </p>
+                          <p className="text-xs text-gray-500">Click to view</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-          {filteredPayments.length === 0 && !isLoading && (
-            <Card className="border border-gray-200">
-              <CardContent className="text-center py-6">
-                <div className="text-gray-600">
+              {filteredPayments.length === 0 && !isLoading && (
+                <div className="text-center py-8 text-gray-600">
                   <CreditCard className="h-8 w-8 mx-auto mb-3 opacity-50" />
                   <h3 className="text-sm font-medium mb-1 text-black">No bulk payments found</h3>
                   <p className="text-xs">Create your first bulk payment to get started.</p>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="bank" className="space-y-3">
@@ -607,7 +593,7 @@ const BulkPayments = () => {
                             <Input
                               type="number"
                               placeholder="0"
-                              value={String(row.amount || '')}
+                              value={row.amount > 0 ? String(row.amount) : ''}
                               onChange={(e) => updatePaymentRow("bank", row.id, "amount", parseFloat(e.target.value) || 0)}
                               className="h-7 text-xs"
                             />
@@ -780,7 +766,7 @@ const BulkPayments = () => {
                             <Input
                               type="number"
                               placeholder="0"
-                              value={String(row.amount || '')}
+                              value={row.amount > 0 ? String(row.amount) : ''}
                               onChange={(e) => updatePaymentRow("mobile", row.id, "amount", parseFloat(e.target.value) || 0)}
                               className="h-7 text-xs"
                             />
@@ -873,68 +859,119 @@ const BulkPayments = () => {
 
       {/* Recipients Detail Modal */}
       <Dialog open={!!selectedPaymentDetails} onOpenChange={(open) => !open && setSelectedPaymentDetails(null)}>
-        <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-5xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-black">
-              <Users className="h-4 w-4 text-blue-600" />
-              Payment Recipients - {selectedPaymentDetails?.id}
+            <DialogTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-black">
+                <Users className="h-5 w-5 text-blue-600" />
+                Bulk Payment Details - {selectedPaymentDetails?.id}
+              </div>
+              <Badge className={selectedPaymentDetails ? getStatusColor(selectedPaymentDetails.status) : ""}>
+                {selectedPaymentDetails?.status}
+              </Badge>
             </DialogTitle>
             <DialogDescription className="text-gray-600">
-              {selectedPaymentDetails?.description} • {paymentRecipients.length} recipients
+              {selectedPaymentDetails?.description}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
+            {/* Payment Summary */}
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="p-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-600">Total Amount</p>
+                    <p className="font-bold text-lg text-black">
+                      UGX {selectedPaymentDetails?.amount.toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Total Recipients</p>
+                    <p className="font-bold text-lg text-black">{paymentRecipients.length}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Created Date</p>
+                    <p className="font-medium text-black">
+                      {selectedPaymentDetails ? new Date(selectedPaymentDetails.createdAt).toLocaleDateString() : ''}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Average Amount</p>
+                    <p className="font-medium text-black">
+                      UGX {paymentRecipients.length > 0 ? Math.round(paymentRecipients.reduce((sum, r) => sum + r.amount, 0) / paymentRecipients.length).toLocaleString() : '0'}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Summary Stats */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-xs text-gray-600">Completed</p>
-                <p className="text-lg font-bold text-blue-600">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                <p className="text-xs text-gray-600 mb-1">Completed</p>
+                <p className="text-xl font-bold text-green-700">
                   {paymentRecipients.filter(r => r.status === "completed").length}
                 </p>
-              </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-xs text-gray-600">Pending</p>
-                <p className="text-lg font-bold text-gray-800">
-                  {paymentRecipients.filter(r => r.status === "pending").length}
+                <p className="text-xs text-gray-500 mt-1">
+                  UGX {paymentRecipients.filter(r => r.status === "completed").reduce((sum, r) => sum + r.amount, 0).toLocaleString()}
                 </p>
               </div>
-              <div className="text-center p-3 bg-red-50 rounded-lg border border-red-200">
-                <p className="text-xs text-gray-600">Failed</p>
-                <p className="text-lg font-bold text-red-600">
+              <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                <p className="text-xs text-gray-600 mb-1">Pending</p>
+                <p className="text-xl font-bold text-yellow-700">
+                  {paymentRecipients.filter(r => r.status === "pending").length}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  UGX {paymentRecipients.filter(r => r.status === "pending").reduce((sum, r) => sum + r.amount, 0).toLocaleString()}
+                </p>
+              </div>
+              <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
+                <p className="text-xs text-gray-600 mb-1">Failed</p>
+                <p className="text-xl font-bold text-red-700">
                   {paymentRecipients.filter(r => r.status === "failed").length}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  UGX {paymentRecipients.filter(r => r.status === "failed").reduce((sum, r) => sum + r.amount, 0).toLocaleString()}
                 </p>
               </div>
             </div>
 
             {/* Recipients Table */}
-            <div className="border rounded-lg overflow-hidden">
+            <div className="border rounded-lg overflow-hidden bg-white">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50">
-                    <TableHead className="text-xs font-medium p-2">Recipient</TableHead>
-                    <TableHead className="text-xs font-medium p-2">Account</TableHead>
-                    <TableHead className="text-xs font-medium p-2">Amount</TableHead>
-                    <TableHead className="text-xs font-medium p-2">Status</TableHead>
-                    <TableHead className="text-xs font-medium p-2">Processed</TableHead>
+                  <TableRow className="bg-blue-50">
+                    <TableHead className="text-sm font-semibold p-3 text-black">Recipient Name</TableHead>
+                    <TableHead className="text-sm font-semibold p-3 text-black">Account/Phone</TableHead>
+                    <TableHead className="text-sm font-semibold p-3 text-black text-right">Amount</TableHead>
+                    <TableHead className="text-sm font-semibold p-3 text-black">Status</TableHead>
+                    <TableHead className="text-sm font-semibold p-3 text-black">Processed At</TableHead>
+                    <TableHead className="text-sm font-semibold p-3 text-black">Notes</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {paymentRecipients.map((recipient) => (
-                    <TableRow key={recipient.id} className="hover:bg-gray-50">
-                      <TableCell className="text-xs font-medium p-2 text-black">{recipient.name}</TableCell>
-                      <TableCell className="text-xs font-mono p-2 text-gray-600">{recipient.account}</TableCell>
-                      <TableCell className="text-xs p-2 text-black">UGX {recipient.amount.toLocaleString()}</TableCell>
-                      <TableCell className="p-2">
+                    <TableRow key={recipient.id} className="hover:bg-blue-50">
+                      <TableCell className="text-sm font-medium p-3 text-black">{recipient.name}</TableCell>
+                      <TableCell className="text-sm font-mono p-3 text-gray-700">{recipient.account}</TableCell>
+                      <TableCell className="text-sm p-3 text-black text-right font-medium">
+                        UGX {recipient.amount.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="p-3">
                         <Badge className={getRecipientStatusColor(recipient.status)}>
                           {recipient.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs text-gray-600 p-2">
+                      <TableCell className="text-sm text-gray-600 p-3">
                         {recipient.processedAt 
-                          ? new Date(recipient.processedAt).toLocaleString()
-                          : recipient.failureReason || "-"
+                          ? new Date(recipient.processedAt).toLocaleDateString() + " " + 
+                            new Date(recipient.processedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                          : "-"
                         }
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-600 p-3">
+                        {recipient.failureReason || "-"}
                       </TableCell>
                     </TableRow>
                   ))}
