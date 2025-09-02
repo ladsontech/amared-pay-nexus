@@ -2,23 +2,23 @@ export const API_CONFIG = {
   baseURL: (import.meta as any)?.env?.VITE_API_BASE_URL || 'https://backendapi.bulkpay.almaredagencyuganda.com',
   endpoints: {
     auth: {
-      login: '/auth/login/',
-      logout: '/auth/logout/',
-      changePassword: '/auth/password/change',
-      refresh: '/auth/token/refresh/',
-      verify: '/auth/token/verify/'
+      login: '/users/auth/login/',
+      logout: '/users/auth/logout/',
+      changePassword: '/users/auth/password/change',
+      refresh: '/users/auth/token/refresh/',
+      verify: '/users/auth/token/verify/'
     },
     user: {
-      list: '/user/',
-      detail: (id: string) => `/user/${id}/`
+      list: '/users/user/',
+      detail: (id: string) => `/users/user/${id}/`
     },
     subAdmin: {
-      create: '/sub_admin/',
-      list: '/sub_admin_list/',
-      detail: (id: string) => `/sub_admin_list/${id}/`,
-      update: (id: string) => `/update_sub_admin/${id}/`,
-      delete: (id: string) => `/sub_admin/${id}/`,
-      search: '/search_sub_admins/'
+      create: '/users/sub_admin/',
+      list: '/users/sub_admin_list/',
+      detail: (id: string) => `/users/sub_admin_list/${id}/`,
+      update: (id: string) => `/users/update_sub_admin/${id}/`,
+      delete: (id: string) => `/users/sub_admin/${id}/`,
+      search: '/users/search_sub_admins/'
     },
     organizations: {
       createWithOwner: '/organizations/create_org/',
