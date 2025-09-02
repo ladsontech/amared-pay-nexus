@@ -83,10 +83,10 @@ const SystemAnalytics = () => {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-red-100 to-red-200 shadow-lg">
-              <BarChart3 className="h-8 w-8 text-red-600" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 shadow-lg">
+              <BarChart3 className="h-8 w-8 text-blue-600" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
             System Analytics Dashboard
             </h1>
           </div>
@@ -95,11 +95,11 @@ const SystemAnalytics = () => {
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="border-red-200 text-red-700 hover:bg-red-50 shadow-md">
+          <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50 shadow-md">
             <Calendar className="h-4 w-4 mr-2" />
             Last 30 days
           </Button>
-          <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg">
+          <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg">
             <Download className="h-4 w-4 mr-2" />
             Export Report
           </Button>
@@ -287,16 +287,16 @@ const SystemAnalytics = () => {
           </Card>
 
           {/* Recent Alerts */}
-          <Card className="border border-red-200 shadow-lg bg-white">
+          <Card className="border border-blue-200 shadow-lg bg-white">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-bold flex items-center gap-3 text-black">
-                  <div className="p-2 bg-red-50 rounded-xl shadow-md">
-                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  <div className="p-2 bg-blue-50 rounded-xl shadow-md">
+                    <AlertTriangle className="h-5 w-5 text-blue-600" />
                   </div>
                   System Alerts
                 </CardTitle>
-                <Badge className="bg-red-100 text-red-800 border-red-200 font-bold">
+                <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-bold">
                   {systemStats.criticalAlerts} critical
                 </Badge>
               </div>
@@ -307,9 +307,9 @@ const SystemAnalytics = () => {
                 {recentAlerts.map((alert) => {
                   const SeverityIcon = getSeverityIcon(alert.severity);
                   return (
-                    <div key={alert.id} className="flex items-start gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200 border border-gray-200 shadow-sm hover:shadow-md">
-                      <div className={`p-2 rounded-xl shadow-sm ${alert.severity === 'high' ? 'bg-red-100' : alert.severity === 'medium' ? 'bg-gray-100' : 'bg-blue-100'}`}>
-                        <SeverityIcon className={`h-4 w-4 ${alert.severity === 'high' ? 'text-red-600' : alert.severity === 'medium' ? 'text-gray-600' : 'text-blue-600'}`} />
+                    <div key={alert.id} className="flex items-start gap-4 p-4 rounded-xl bg-blue-50 hover:bg-blue-100 transition-all duration-200 border border-blue-200 shadow-sm hover:shadow-md">
+                      <div className="p-2 rounded-xl shadow-sm bg-blue-100">
+                        <SeverityIcon className="h-4 w-4 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
@@ -458,7 +458,7 @@ const SystemAnalytics = () => {
                         <span className="text-xs font-bold">+{org.growth}%</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1 bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                      <div className="flex items-center gap-1 bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
                         <TrendingDown className="h-3 w-3" />
                         <span className="text-xs font-bold">{org.growth}%</span>
                       </div>
