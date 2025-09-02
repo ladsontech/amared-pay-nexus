@@ -17,7 +17,8 @@ export const API_CONFIG = {
       list: '/sub_admin_list/',
       detail: (id: string) => `/sub_admin_list/${id}/`,
       update: (id: string) => `/update_sub_admin/${id}/`,
-      delete: (id: string) => `/sub_admin/${id}/`
+      delete: (id: string) => `/sub_admin/${id}/`,
+      search: '/search_sub_admins/'
     },
     organizations: {
       createWithOwner: '/organizations/create_org/',

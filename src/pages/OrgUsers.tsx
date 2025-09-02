@@ -12,6 +12,7 @@ import { Plus, UserCircle, Search, ShieldCheck, Pencil, Trash2 } from "lucide-re
 import { Permission, User, rolePermissions } from "@/types/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { demoUsers } from "@/data/demoData";
+import { organizationService } from "@/services/organizationService";
 import { 
   AlertDialog, 
   AlertDialogAction, 
