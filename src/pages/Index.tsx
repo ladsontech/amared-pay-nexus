@@ -182,33 +182,33 @@ const Index = () => {
                     {/* Manager */}
                     {manager && (
                       <div>
-                        <h4 className="font-bold text-base text-slate-700 mb-4 flex items-center gap-2 border-b border-slate-200 pb-2">
-                          <Crown className="h-5 w-5 text-orange-600" />
+                        <h4 className="font-bold text-base text-black mb-4 flex items-center gap-2 border-b border-blue-200 pb-2">
+                          <Crown className="h-5 w-5 text-blue-600" />
                           Organization Manager
                         </h4>
-                        <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100/60 hover:from-orange-100 hover:to-orange-200/80 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                        <Card className="border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg"
                               onClick={() => handleUserLogin(manager)}>
                           <CardContent className="p-5">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                               <div className="flex items-center space-x-4">
                                 <Avatar className="h-12 w-12 shadow-lg">
-                                  <AvatarFallback className="bg-gradient-to-br from-orange-200 to-orange-300 text-orange-800 font-bold text-lg">
+                                  <AvatarFallback className="bg-blue-200 text-blue-800 font-bold text-lg">
                                     {manager.name.charAt(0)}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div className="min-w-0 flex-1">
                                   <div className="flex flex-wrap items-center gap-2 mb-2">
-                                    <h5 className="font-bold text-lg text-slate-800 truncate">{manager.name}</h5>
-                                    <Badge className="bg-orange-200 text-orange-800 border-orange-300 capitalize text-xs font-semibold">
+                                    <h5 className="font-bold text-lg text-black truncate">{manager.name}</h5>
+                                    <Badge className="bg-blue-200 text-blue-800 border-blue-300 capitalize text-xs font-semibold">
                                       <Crown className="h-3 w-3 mr-1" />
                                       {manager.role}
                                     </Badge>
                                   </div>
-                                  <p className="text-sm font-medium text-orange-700 truncate">{manager.position}</p>
-                                  <p className="text-xs text-orange-600 mt-1 line-clamp-2">{manager.description}</p>
+                                  <p className="text-sm font-medium text-blue-700 truncate">{manager.position}</p>
+                                  <p className="text-xs text-gray-600 mt-1 line-clamp-2">{manager.description}</p>
                                 </div>
                               </div>
-                              <Button className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-semibold shadow-lg hover:shadow-xl w-full sm:w-auto transform hover:scale-105 transition-all duration-200">
+                              <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md hover:shadow-lg w-full sm:w-auto transition-all duration-200">
                                 Login as {manager.name.split(' ')[0]}
                               </Button>
                             </div>
@@ -219,36 +219,36 @@ const Index = () => {
 
                     {/* Staff */}
                     <div>
-                      <h4 className="font-bold text-base text-slate-700 mb-4 flex items-center gap-2 border-b border-slate-200 pb-2">
+                      <h4 className="font-bold text-base text-black mb-4 flex items-center gap-2 border-b border-blue-200 pb-2">
                         <Users className="h-5 w-5 text-blue-600" />
                         Staff Members ({staff.length})
                       </h4>
                       <div className="grid gap-3 sm:gap-4">
                         {staff.map((user) => (
-                          <Card key={user.id} 
-                                className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100/60 hover:from-blue-100 hover:to-blue-200/80 transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg transform hover:scale-[1.01]"
+                          <Card key={user.id}
+                                className="border border-blue-200 bg-white hover:bg-blue-50 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
                                 onClick={() => handleUserLogin(user)}>
                             <CardContent className="p-4">
                               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                 <div className="flex items-center space-x-4">
-                                  <Avatar className="h-10 w-10 shadow-md">
-                                    <AvatarFallback className="bg-gradient-to-br from-blue-200 to-blue-300 text-blue-800 font-bold">
+                                  <Avatar className="h-10 w-10 shadow-sm">
+                                    <AvatarFallback className="bg-blue-100 text-blue-800 font-bold">
                                       {user.name.charAt(0)}
                                     </AvatarFallback>
                                   </Avatar>
                                   <div className="min-w-0 flex-1">
                                     <div className="flex flex-wrap items-center gap-2 mb-1">
-                                      <h5 className="font-semibold text-base text-slate-800 truncate">{user.name}</h5>
-                                      <Badge className="bg-blue-200 text-blue-800 border-blue-300 capitalize text-xs font-semibold">
+                                      <h5 className="font-semibold text-base text-black truncate">{user.name}</h5>
+                                      <Badge className="bg-gray-100 text-gray-700 border-gray-300 capitalize text-xs font-semibold">
                                         <User className="h-3 w-3 mr-1" />
                                         {user.role}
                                       </Badge>
                                     </div>
                                     <p className="text-sm font-medium text-blue-700 truncate">{user.position}</p>
-                                    <p className="text-xs text-blue-600 mt-1 line-clamp-2">{user.description}</p>
+                                    <p className="text-xs text-gray-600 mt-1 line-clamp-2">{user.description}</p>
                                   </div>
                                 </div>
-                                <Button variant="outline" className="border-blue-300 hover:bg-blue-200 text-blue-700 font-semibold w-full sm:w-auto transform hover:scale-105 transition-all duration-200">
+                                <Button variant="outline" className="border-blue-300 hover:bg-blue-50 text-blue-700 font-semibold w-full sm:w-auto transition-all duration-200">
                                   Login as {user.name.split(' ')[0]}
                                 </Button>
                               </div>
@@ -264,8 +264,8 @@ const Index = () => {
           })}
         </div>
 
-        <div className="text-center pt-6 px-2 border-t border-slate-200">
-          <div className="bg-slate-50 rounded-xl p-4 max-w-2xl mx-auto">
+        <div className="text-center pt-6 px-2 border-t border-blue-200">
+          <div className="bg-blue-50 rounded-xl p-4 max-w-2xl mx-auto border border-blue-200">
             <p className="text-sm text-slate-600 font-medium mb-2">
               🔒 Demo Environment Information
             </p>
