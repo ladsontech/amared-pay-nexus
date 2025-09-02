@@ -65,7 +65,7 @@ const SystemSettings = () => {
 
         <TabsContent value="general">
           <div className="grid gap-6">
-            <Card>
+            <Card className="border border-blue-200 shadow-lg bg-white">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Settings className="h-5 w-5" />
@@ -168,7 +168,7 @@ const SystemSettings = () => {
         </TabsContent>
 
         <TabsContent value="notifications">
-          <Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
@@ -231,7 +231,7 @@ const SystemSettings = () => {
         </TabsContent>
 
         <TabsContent value="security">
-          <Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
@@ -255,9 +255,9 @@ const SystemSettings = () => {
                 <div className="space-y-2">
                   <Label>Password Policy</Label>
                   <div className="space-y-1">
-                    <Badge variant="outline">Min 8 characters</Badge>
-                    <Badge variant="outline">Special characters required</Badge>
-                    <Badge variant="outline">Numbers required</Badge>
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">Min 8 characters</Badge>
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">Special characters required</Badge>
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">Numbers required</Badge>
                   </div>
                 </div>
               </div>
@@ -285,7 +285,7 @@ const SystemSettings = () => {
         </TabsContent>
 
         <TabsContent value="database">
-          <Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Database className="h-5 w-5" />
@@ -325,8 +325,8 @@ const SystemSettings = () => {
               <div className="space-y-2">
                 <Label>Database Status</Label>
                 <div className="flex items-center space-x-2">
-                  <Badge variant="outline" className="text-green-600">Healthy</Badge>
-                  <span className="text-sm text-muted-foreground">Last backup: 2 hours ago</span>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">Healthy</Badge>
+                  <span className="text-sm text-gray-600">Last backup: 2 hours ago</span>
                 </div>
               </div>
 
@@ -341,7 +341,7 @@ const SystemSettings = () => {
         </TabsContent>
 
         <TabsContent value="integrations">
-          <Card>
+          <Card className="border border-blue-200 shadow-lg bg-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
@@ -356,33 +356,33 @@ const SystemSettings = () => {
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <h3 className="font-medium">Payment Gateway</h3>
-                    <p className="text-sm text-muted-foreground">MTN Mobile Money integration</p>
+                    <p className="text-sm text-gray-600">MTN Mobile Money integration</p>
                   </div>
-                  <Badge variant="outline" className="text-green-600">Connected</Badge>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">Connected</Badge>
                 </div>
 
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <h3 className="font-medium">Email Service</h3>
-                    <p className="text-sm text-muted-foreground">SMTP configuration for notifications</p>
+                    <p className="text-sm text-gray-600">SMTP configuration for notifications</p>
                   </div>
-                  <Badge variant="outline" className="text-green-600">Active</Badge>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">Active</Badge>
                 </div>
 
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <h3 className="font-medium">SMS Service</h3>
-                    <p className="text-sm text-muted-foreground">SMS gateway for alerts</p>
+                    <p className="text-sm text-gray-600">SMS gateway for alerts</p>
                   </div>
-                  <Badge variant="outline" className="text-orange-600">Pending</Badge>
+                  <Badge className="bg-gray-100 text-gray-700 border-gray-200">Pending</Badge>
                 </div>
 
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <h3 className="font-medium">Analytics</h3>
-                    <p className="text-sm text-muted-foreground">Third-party analytics integration</p>
+                    <p className="text-sm text-gray-600">Third-party analytics integration</p>
                   </div>
-                  <Badge variant="outline">Disabled</Badge>
+                  <Badge className="bg-gray-100 text-gray-700 border-gray-200">Disabled</Badge>
                 </div>
               </div>
             </CardContent>
