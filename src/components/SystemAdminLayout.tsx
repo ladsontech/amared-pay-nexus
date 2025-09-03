@@ -59,8 +59,11 @@ const SystemAdminLayout = () => {
                   <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-sm border-red-200 shadow-xl" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-2 p-2">
-                        <p className="text-base font-bold leading-none text-slate-900">{user?.name}</p>
-                        <p className="text-sm leading-none text-slate-600 font-medium">{user?.email}</p>
+                        <p className="text-base font-bold leading-none text-slate-900">{user?.name || 'Admin User'}</p>
+                        <p className="text-sm leading-none text-slate-600 font-medium">{user?.email || 'admin@example.com'}</p>
+                        {user?.position && (
+                          <p className="text-xs leading-none text-slate-500">{user.position}</p>
+                        )}
                         <Badge className="w-fit bg-gradient-to-r from-red-500 to-red-600 text-white font-bold shadow-md">
                           <Crown className="h-3 w-3 mr-1" />
                           System Admin
