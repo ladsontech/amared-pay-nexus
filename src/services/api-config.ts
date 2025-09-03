@@ -10,7 +10,7 @@ export const API_CONFIG = {
     },
     user: {
       list: 'user/',
-      detail: (id: string) => `organizations/user/${id}/`
+      detail: (id: string) => `user/${id}/`
     },
     subAdmin: {
       create: '/sub_admin/',
