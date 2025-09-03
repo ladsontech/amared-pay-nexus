@@ -36,25 +36,25 @@ const MobileBottomNav = () => {
       path: "/org/petty-cash", 
       icon: Wallet, 
       label: "Cash", 
-      show: hasPermission('access_petty_cash') 
+      show: true 
     },
     { 
       path: "/org/bulk-payments", 
       icon: Send, 
       label: "Bulk", 
-      show: hasPermission('access_bulk_payments') 
+      show: true 
     },
     { 
       path: "/org/collections", 
       icon: DollarSign, 
       label: "Collect", 
-      show: hasPermission('access_collections') 
+      show: true 
     },
     { 
       path: "/org/deposits", 
       icon: Building, 
       label: "Deposits", 
-      show: hasPermission('access_bank_deposits') 
+      show: true 
     }
   ];
 
@@ -118,38 +118,32 @@ const MobileBottomNav = () => {
             <h3 className="text-lg font-bold text-black">Quick Actions</h3>
             
             <div className="grid grid-cols-2 gap-3">
-              {hasPermission('approve_transactions') && (
-                <button 
-                  className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"
-                  onClick={() => { navigate("/org/approvals"); setDrawerOpen(false); }}
-                >
-                  <CheckCircle className="h-5 w-5 text-blue-600 mb-2" />
-                  <p className="text-sm font-medium text-black">Approvals</p>
-                  <p className="text-xs text-gray-500">Review requests</p>
-                </button>
-              )}
+              <button 
+                className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"
+                onClick={() => { navigate("/org/approvals"); setDrawerOpen(false); }}
+              >
+                <CheckCircle className="h-5 w-5 text-blue-600 mb-2" />
+                <p className="text-sm font-medium text-black">Approvals</p>
+                <p className="text-xs text-gray-500">Review requests</p>
+              </button>
               
-              {hasPermission('view_department_reports') && (
-                <button 
-                  className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"
-                  onClick={() => { navigate("/org/reports"); setDrawerOpen(false); }}
-                >
-                  <BarChart3 className="h-5 w-5 text-blue-600 mb-2" />
-                  <p className="text-sm font-medium text-black">Reports</p>
-                  <p className="text-xs text-gray-500">View analytics</p>
-                </button>
-              )}
+              <button 
+                className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"
+                onClick={() => { navigate("/org/reports"); setDrawerOpen(false); }}
+              >
+                <BarChart3 className="h-5 w-5 text-blue-600 mb-2" />
+                <p className="text-sm font-medium text-black">Reports</p>
+                <p className="text-xs text-gray-500">View analytics</p>
+              </button>
               
-              {hasPermission('manage_team') && (
-                <button 
-                  className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"
-                  onClick={() => { navigate("/org/users"); setDrawerOpen(false); }}
-                >
-                  <Users className="h-5 w-5 text-blue-600 mb-2" />
-                  <p className="text-sm font-medium text-black">Users</p>
-                  <p className="text-xs text-gray-500">Manage team</p>
-                </button>
-              )}
+              <button 
+                className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"
+                onClick={() => { navigate("/org/users"); setDrawerOpen(false); }}
+              >
+                <Users className="h-5 w-5 text-blue-600 mb-2" />
+                <p className="text-sm font-medium text-black">Users</p>
+                <p className="text-xs text-gray-500">Manage team</p>
+              </button>
               
               <button 
                 className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"

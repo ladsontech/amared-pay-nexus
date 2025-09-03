@@ -21,23 +21,22 @@ type NavItem = { title: string; url: string; icon: React.ComponentType<{ classNa
 
 const orgItems: NavItem[] = [
   { title: "Dashboard", url: "/org/dashboard", icon: Home },
-  { title: "Petty Cash", url: "/org/petty-cash", icon: Wallet, permission: "access_petty_cash" },
-  { title: "Bulk Payments", url: "/org/bulk-payments", icon: Send, permission: "access_bulk_payments" },
-  { title: "Collections", url: "/org/collections", icon: DollarSign, permission: "access_collections" },
-  { title: "Approvals", url: "/org/approvals", icon: CheckCircle, permission: "approve_transactions" },
-  { title: "Reports", url: "/org/reports", icon: BarChart3, permission: "view_department_reports" },
-  { title: "Users", url: "/org/users", icon: Users, permission: "manage_team" },
+  { title: "Petty Cash", url: "/org/petty-cash", icon: Wallet },
+  { title: "Bulk Payments", url: "/org/bulk-payments", icon: Send },
+  { title: "Collections", url: "/org/collections", icon: DollarSign },
+  { title: "Approvals", url: "/org/approvals", icon: CheckCircle },
+  { title: "Reports", url: "/org/reports", icon: BarChart3 },
+  { title: "Users", url: "/org/users", icon: Users },
   { title: "Settings", url: "/org/settings", icon: Settings },
 ];
 
 export default function AppOrgSidebar() {
-  const { hasPermission } = useAuth();
   const { setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
 
-  const items = orgItems.filter((i) => !i.permission || hasPermission(i.permission));
+  const items = orgItems;
 
   const handleNavClick = () => {
     if (isMobile) {

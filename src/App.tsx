@@ -64,11 +64,7 @@ const AppRoutes = () => {
         {/* Role Dashboard Aliases */}
 
         {/* System Admin Routes */}
-        <Route path="/system" element={
-          <ProtectedRoute requiredPermissions={['system_admin']}>
-            <SystemAdminLayout />
-          </ProtectedRoute>
-        }>
+        <Route path="/system" element={<SystemAdminLayout />}>
           <Route index element={<Navigate to="/system/analytics" replace />} />
           <Route path="analytics" element={<SystemAnalytics />} />
           <Route path="organizations" element={<SystemOrganizations />} />
@@ -78,64 +74,21 @@ const AppRoutes = () => {
         </Route>
 
         {/* Organization Routes */}
-        <Route path="/org" element={
-          <ProtectedRoute requiredPermissions={['access_petty_cash', 'access_bulk_payments', 'access_collections']}>
-            <OrganizationLayout />
-          </ProtectedRoute>
-        }>
+        <Route path="/org" element={<OrganizationLayout />}>
           <Route index element={<Navigate to="/org/dashboard" replace />} />
           <Route path="dashboard" element={<OrgDashboard />} />
-          <Route path="petty-cash" element={
-            <ProtectedRoute requiredPermissions={['access_petty_cash']}>
-              <OrgPettyCash />
-            </ProtectedRoute>
-          } />
-          <Route path="bulk-payments" element={
-            <ProtectedRoute requiredPermissions={['access_bulk_payments']}>
-              <OrgBulkPayments />
-            </ProtectedRoute>
-          } />
-          <Route path="collections" element={
-            <ProtectedRoute requiredPermissions={['access_collections']}>
-              <OrgCollections />
-            </ProtectedRoute>
-          } />
-          <Route path="deposits" element={
-            <ProtectedRoute requiredPermissions={['access_bank_deposits']}>
-              <OrgDeposits />
-            </ProtectedRoute>
-          } />
-          <Route path="approvals" element={
-            <ProtectedRoute requiredPermissions={['approve_transactions']}>
-              <OrgApprovals />
-            </ProtectedRoute>
-          } />
-          <Route path="reports" element={
-            <ProtectedRoute requiredPermissions={['view_department_reports']}>
-              <OrgReports />
-            </ProtectedRoute>
-          } />
-          <Route path="reports/petty-cash" element={
-            <ProtectedRoute requiredPermissions={['view_department_reports']}>
-              <OrgPettyCashReport />
-            </ProtectedRoute>
-          } />
-          <Route path="reports/bulk-payments" element={
-            <ProtectedRoute requiredPermissions={['view_department_reports']}>
-              <OrgBulkPaymentsReport />
-            </ProtectedRoute>
-          } />
-          <Route path="reports/collections" element={
-            <ProtectedRoute requiredPermissions={['view_department_reports']}>
-              <OrgCollectionsReport />
-            </ProtectedRoute>
-          } />
+          <Route path="petty-cash" element={<OrgPettyCash />} />
+          <Route path="bulk-payments" element={<OrgBulkPayments />} />
+          <Route path="collections" element={<OrgCollections />} />
+          <Route path="deposits" element={<OrgDeposits />} />
+          <Route path="approvals" element={<OrgApprovals />} />
+          <Route path="reports" element={<OrgReports />} />
+          <Route path="reports/petty-cash" element={<OrgPettyCashReport />} />
+          <Route path="reports/bulk-payments" element={<OrgBulkPaymentsReport />} />
+          <Route path="reports/collections" element={<OrgCollectionsReport />} />
           <Route path="settings" element={<OrgSettings />} />
-          <Route path="users" element={
-            <ProtectedRoute requiredPermissions={['manage_team']}>
-              <OrgUsers />
-            </ProtectedRoute>
-          } />
+          <Route path="users" element={<OrgUsers />} />
+          <Route path="pay-bills" element={<PayBills />} />
         </Route>
 
         {/* Redirect authenticated users to appropriate dashboard */}
