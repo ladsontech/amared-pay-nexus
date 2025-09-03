@@ -151,11 +151,15 @@ class AuthService {
   async logout(): Promise<void> {
     console.log('Logout attempt...');
     
-    try {
-      await apiClient.post(API_CONFIG.endpoints.auth.logout);
-    } catch (error) {
-      console.error('Logout API call failed:', error);
-      // Continue with local cleanup even if API call fails
+    // Only make API call if user is actually authenticated
+    const token = localStorage.getItem("access_token") || localStorage.getItem("auth_token");
+    if (token) {
+      try {
+        await apiClient.post(API_CONFIG.endpoints.auth.logout);
+      } catch (error) {
+        console.error('Logout API call failed:', error);
+        // Continue with local cleanup even if API call fails
+      }
     }
 
     // Always clear local storage
