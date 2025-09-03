@@ -148,23 +148,34 @@ class AuthService {
       let role: 'admin' | 'manager' | 'staff' = 'staff';
       if (userData.is_superuser || userData.is_staff) {
         role = 'admin';
-      } else if (userData.permissions && userData.permissions.includes('manage_team')) {
+      } else if (userData.permissions && (userData.permissions.includes('manage_team') || userData.permissions.includes('approve_transactions'))) {
         role = 'manager';
       }
 
+      // Get organization info if available
+      let organizationInfo = {
+        id: 'default-org',
+        name: 'Organization',
+        description: '',
+        industry: ''
+      };
+      
+      if (userData.organization) {
+        organizationInfo = {
+          id: userData.organization.id || 'default-org',
+          name: userData.organization.name || 'Organization',
+          description: userData.organization.description || '',
+          industry: userData.organization.industry || ''
+        };
+      }
       // Build complete user profile
       const userProfile = {
         id: userData.id,
-        name: `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || userData.username,
+        name: `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || userData.username || 'User',
         email: userData.email,
         role,
-        organizationId: 'default-org', // Will be updated when we fetch organization data
-        organization: {
-          id: 'default-org',
-          name: 'Organization',
-          description: '',
-          industry: ''
-        },
+        organizationId: organizationInfo.id,
+        organization: organizationInfo,
         position: userData.is_superuser ? 'System Administrator' : 'Member',
         department: userData.is_superuser ? 'System' : undefined,
         avatar: userData.avatar,
@@ -180,8 +191,8 @@ class AuthService {
       // Fallback user profile
       const fallbackProfile = {
         id: 'fallback-user',
-        name: 'User',
-        email: 'user@example.com',
+        name: 'Demo User',
+        email: 'demo@example.com',
         role: 'staff' as const,
         organizationId: 'default-org',
         organization: {

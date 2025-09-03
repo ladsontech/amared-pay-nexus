@@ -9,8 +9,8 @@ export const API_CONFIG = {
       verify: 'auth/token/verify/'
     },
     user: {
-      list: 'users/user/',
-      detail: (id: string) => `users/user/${id}/`
+      list: 'user/',
+      detail: (id: string) => `organizations/user/${id}/`
     },
     subAdmin: {
       create: '/sub_admin/',
