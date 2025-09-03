@@ -409,93 +409,113 @@ const BulkPayments = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-3">
-          <Card>
-            <CardHeader className="p-4">
-              <CardTitle className="text-lg font-bold text-black">Bulk Payment History</CardTitle>
-              <CardDescription className="text-gray-600">
-                Click on any payment to view detailed recipient list and status
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
-                  <Input
-                    placeholder="Search payments..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-8 h-8 text-xs"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="text-xs h-8">
-                    <Filter className="h-3 w-3 mr-1" />
-                    <span className="hidden sm:inline">Filter</span>
-                  </Button>
-                  <Button variant="outline" size="sm" className="text-xs h-8">
-                    <Download className="h-3 w-3 mr-1" />
-                    <span className="hidden sm:inline">Export</span>
-                  </Button>
-                </div>
-              </div>
+          <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
+              <Input
+                placeholder="Search payments..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8 h-8 text-xs"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="text-xs h-8">
+                <Filter className="h-3 w-3 mr-1" />
+                <span className="hidden sm:inline">Filter</span>
+              </Button>
+              <Button variant="outline" size="sm" className="text-xs h-8">
+                <Download className="h-3 w-3 mr-1" />
+                <span className="hidden sm:inline">Export</span>
+              </Button>
+            </div>
+          </div>
 
-              {isLoading ? (
-                <div className="space-y-2">
+          {isLoading ? (
+            <Card>
+              <CardContent className="p-4">
+                <div className="animate-pulse space-y-4">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="animate-pulse border rounded-lg p-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 space-y-2">
-                          <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                          <div className="h-2 bg-gray-200 rounded w-1/2"></div>
-                        </div>
-                        <div className="h-6 bg-gray-200 rounded w-16"></div>
-                      </div>
-                    </div>
+                    <div key={i} className="h-12 bg-gray-200 rounded"></div>
                   ))}
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  {filteredPayments.map((payment) => (
-                    <div 
-                      key={payment.id} 
-                      className="border border-gray-200 rounded-lg p-3 hover:bg-blue-50 cursor-pointer transition-colors"
-                      onClick={() => handleViewRecipients(payment)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-bold text-sm text-black">{payment.id}</h3>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader className="p-4">
+                <CardTitle className="text-lg font-bold text-black">Bulk Payment History</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Click on any payment row to view detailed recipient list and status
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-blue-50">
+                        <TableHead className="font-semibold text-black">Payment ID</TableHead>
+                        <TableHead className="font-semibold text-black">Description</TableHead>
+                        <TableHead className="font-semibold text-black">Recipients</TableHead>
+                        <TableHead className="font-semibold text-black">Amount</TableHead>
+                        <TableHead className="font-semibold text-black">Status</TableHead>
+                        <TableHead className="font-semibold text-black">Created</TableHead>
+                        <TableHead className="font-semibold text-black">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredPayments.map((payment) => (
+                        <TableRow 
+                          key={payment.id} 
+                          className="hover:bg-blue-50 cursor-pointer transition-colors"
+                          onClick={() => handleViewRecipients(payment)}
+                        >
+                          <TableCell className="font-bold text-blue-600">{payment.id}</TableCell>
+                          <TableCell className="text-black">{payment.description}</TableCell>
+                          <TableCell className="text-black">{payment.recipients}</TableCell>
+                          <TableCell className="font-bold text-black">
+                            UGX {(payment.amount / 1000000).toFixed(1)}M
+                          </TableCell>
+                          <TableCell>
                             <Badge className={getStatusColor(payment.status)}>
                               {payment.status}
                             </Badge>
-                          </div>
-                          <p className="text-xs text-gray-600 truncate">{payment.description}</p>
-                          <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
-                            <span>{payment.recipients} recipients</span>
-                            <span>{new Date(payment.createdAt).toLocaleDateString()}</span>
-                          </div>
-                        </div>
-                        <div className="text-right ml-4">
-                          <p className="font-bold text-sm text-black">
-                            UGX {(payment.amount / 1000000).toFixed(1)}M
-                          </p>
-                          <p className="text-xs text-gray-500">Click to view</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                          </TableCell>
+                          <TableCell className="text-gray-600">
+                            {new Date(payment.createdAt).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewRecipients(payment);
+                              }}
+                              className="text-xs"
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              View
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
-              )}
+              </CardContent>
+            </Card>
+          )}
 
-              {filteredPayments.length === 0 && !isLoading && (
-                <div className="text-center py-8 text-gray-600">
-                  <CreditCard className="h-8 w-8 mx-auto mb-3 opacity-50" />
-                  <h3 className="text-sm font-medium mb-1 text-black">No bulk payments found</h3>
-                  <p className="text-xs">Create your first bulk payment to get started.</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {filteredPayments.length === 0 && !isLoading && (
+            <Card>
+              <CardContent className="text-center py-8 text-gray-600">
+                <CreditCard className="h-8 w-8 mx-auto mb-3 opacity-50" />
+                <h3 className="text-sm font-medium mb-1 text-black">No bulk payments found</h3>
+                <p className="text-xs">Create your first bulk payment to get started.</p>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="bank" className="space-y-3">

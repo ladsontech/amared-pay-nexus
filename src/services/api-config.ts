@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  baseURL: (import.meta as any)?.env?.VITE_API_BASE_URL || 'https://bulksrv.almaredagencyuganda.com/',
+  baseURL: (import.meta as any)?.env?.VITE_API_BASE_URL || 'https://bulksrv.almaredagencyuganda.com',
   endpoints: {
     auth: {
       login: '/auth/login/',
@@ -9,16 +9,15 @@ export const API_CONFIG = {
       verify: '/auth/token/verify/'
     },
     user: {
-      list: '/users/user/',
-      detail: (id: string) => `/users/user/${id}/`
+      list: '/user/',
+      detail: (id: string) => `/user/${id}/`
     },
     subAdmin: {
-      create: '/users/sub_admin/',
-      list: '/users/sub_admin_list/',
-      detail: (id: string) => `/users/sub_admin_list/${id}/`,
-      update: (id: string) => `/users/update_sub_admin/${id}/`,
-      delete: (id: string) => `/users/sub_admin/${id}/`,
-      search: '/users/search_sub_admins/'
+      create: '/sub_admin/',
+      list: '/sub_admin_list/',
+      detail: (id: string) => `/sub_admin_list/${id}/`,
+      update: (id: string) => `/update_sub_admin/${id}/`,
+      delete: (id: string) => `/sub_admin/${id}/`
     },
     organizations: {
       createWithOwner: '/organizations/create_org/',
@@ -35,21 +34,32 @@ export const API_CONFIG = {
       transactions: '/organizations/wallet_transaction/',
       transactionDetail: (id: string) => `/organizations/wallet_transaction/${id}/`
     },
-    otp: {
-      email: {
-        send: '/otp/forgot_password/email/',
-        resend: '/otp/resend/email/',
-        verify: '/otp/verify/email_address/',
-        resetPassword: '/otp/reset_password/email_code/'
-      },
-      sms: {
-        send: '/otp/forgot_password/sms/',
-        resend: '/otp/resend/sms/',
-        verify: '/otp/verify/phone_number/',
-        resetPassword: '/otp/reset_password/sms_code/'
-      }
-    },
     payments: {
+      bulkPayment: {
+        list: '/payments/bulk_payment/',
+        detail: (id: string) => `/payments/bulk_payment/${id}/`,
+        create: '/payments/create_bulk_payment/',
+        process: '/payments/process_bulk_payment/transaction',
+        check: (linkId: string) => `/payments/check_bulk_payment/${linkId}/`
+      },
+      collections: {
+        list: '/payments/collections/',
+        detail: (id: string) => `/payments/collections/${id}/`,
+        initiate: '/payments/mobile_money/initiate_collection'
+      },
+      mobileMoneyWithdraw: '/payments/mobile_money/withdraw',
+      momoWithdraws: {
+        list: '/payments/momo_withdraws/',
+        detail: (id: string) => `/payments/momo_withdraws/${id}/`
+      },
+      links: {
+        list: '/payments/link/',
+        detail: (id: string) => `/payments/link/${id}/`
+      },
+      transactions: {
+        list: '/payments/transaction/',
+        detail: (id: string) => `/payments/transaction/${id}/`
+      },
       currency: {
         list: '/payments/currency/',
         detail: (id: string | number) => `/payments/currency/${id}/`
@@ -66,6 +76,24 @@ export const API_CONFIG = {
         list: '/payments/profit_configuration/',
         detail: (id: string | number) => `/payments/profit_configuration/${id}/`,
         update: (id: string | number) => `/payments/change_profit_configuration/${id}/`
+      },
+      profits: {
+        list: '/payments/profit/',
+        detail: (id: string) => `/payments/profit/${id}/`
+      }
+    },
+    otp: {
+      email: {
+        send: '/otp/forgot_password/email/',
+        resend: '/otp/resend/email/',
+        verify: '/otp/verify/email_address/',
+        resetPassword: '/otp/reset_password/email_code/'
+      },
+      sms: {
+        send: '/otp/forgot_password/sms/',
+        resend: '/otp/resend/sms/',
+        verify: '/otp/verify/phone_number/',
+        resetPassword: '/otp/reset_password/sms_code/'
       }
     }
   }
