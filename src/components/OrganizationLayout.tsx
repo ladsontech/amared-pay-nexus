@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Building, LogOut, Crown, User } from "lucide-react";
+import { Building, LogOut, Crown, User, CreditCard } from "lucide-react";
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppOrgSidebar from "./AppOrgSidebar";
