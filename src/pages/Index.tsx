@@ -8,10 +8,15 @@ import { Shield, Building, User, Crown, Users, Settings, BarChart3 } from "lucid
 import { useAuth } from "@/contexts/AuthContext";
 import { demoOrganizations, demoUsers, demoSystemAdmin } from "@/data/demoData";
 import { DemoUser, Permission } from "@/types/auth";
+import { useEffect } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { loginAsUser } = useAuth();
+
+  useEffect(() => {
+    console.log("Index page loaded");
+  }, []);
 
   const handleUserLogin = (user: DemoUser) => {
     loginAsUser(user.id);
