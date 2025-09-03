@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -155,6 +154,12 @@ const Login = () => {
               >
                 API Testing Interface
               </Link>
+              <p className="text-gray-600 mt-2">
+                Want to see the demo?{' '}
+                <Link to="/demo" className="text-blue-600 hover:text-blue-500 font-medium">
+                  View Demo Organizations
+                </Link>
+              </p>
             </div>
           </div>
         </CardContent>

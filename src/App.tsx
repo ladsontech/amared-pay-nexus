@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -56,7 +55,8 @@ const AppRoutes = () => {
       </div>
     }>
       <Routes>
-        <Route path="/" element={<Index />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/demo" element={<Index />} />
         <Route path="/login" element={<Login />} />
         <Route path="/auth-test" element={<AuthTest />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
