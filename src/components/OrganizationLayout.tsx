@@ -72,10 +72,13 @@ const OrganizationLayout = () => {
                   <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-sm border-blue-200 shadow-xl" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-2 p-2">
-                        <p className="text-base font-bold leading-none text-slate-900">{user?.name}</p>
-                        <p className="text-sm leading-none text-slate-600 font-medium">{user?.email}</p>
+                        <p className="text-base font-bold leading-none text-slate-900">{user?.name || 'User'}</p>
+                        <p className="text-sm leading-none text-slate-600 font-medium">{user?.email || 'No email'}</p>
                         {user?.department && (
                           <p className="text-sm leading-none text-slate-500 font-medium">{user.department}</p>
+                        )}
+                        {user?.position && (
+                          <p className="text-xs leading-none text-slate-500">{user.position}</p>
                         )}
                         <Badge className={`w-fit capitalize mt-1 font-bold shadow-sm ${
                           user?.role === 'manager' 
@@ -83,7 +86,7 @@ const OrganizationLayout = () => {
                             : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
                         }`}>
                           {user?.role === 'manager' ? <Crown className="h-3 w-3 mr-1" /> : <User className="h-3 w-3 mr-1" />}
-                          {user?.role}
+                          {user?.role || 'staff'}
                         </Badge>
                       </div>
                     </DropdownMenuLabel>
