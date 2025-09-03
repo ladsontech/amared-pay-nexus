@@ -159,6 +159,29 @@ class AuthService {
     }
   }
 
+  private hasManagerPermissions(permissions: any): boolean {
+    const permissionList = this.parsePermissions(permissions, 'staff');
+    const managerPerms = ['approve_transactions', 'manage_team', 'view_department_reports'];
+    return managerPerms.some(perm => permissionList.includes(perm as any));
+  }
+
+  private getPositionByRole(role: 'admin' | 'manager' | 'staff'): string {
+    switch (role) {
+      case 'admin': return 'System Administrator';
+      case 'manager': return 'Department Manager';
+      case 'staff': return 'Staff Member';
+      default: return 'Member';
+    }
+  }
+
+  private getDepartmentByRole(role: 'admin' | 'manager' | 'staff'): string {
+    switch (role) {
+      case 'admin': return 'System';
+      case 'manager': return 'Management';
+      case 'staff': return 'Operations';
+      default: return 'General';
+    }
+  }
   private async fetchAndStoreUserProfile(token: string): Promise<void> {
     try {
       // Decode token to get user ID
@@ -202,6 +225,7 @@ class AuthService {
           industry: ''
         },
         position: 'Member',
+        department: 'Operations',
         permissions: rolePermissions.staff
       };
       

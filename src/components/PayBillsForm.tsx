@@ -128,7 +128,7 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Payment Source Selection - Dropdown */}
+          {/* Payment Source Selection */}
           <div>
             <Label className="text-sm font-medium">Payment Source *</Label>
             <Select value={paymentSource} onValueChange={(value: "wallet" | "petty_cash") => setPaymentSource(value)}>
@@ -137,23 +137,37 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="wallet">
-                  <div className="flex items-center gap-3 py-2">
+                  <div className="flex items-center gap-2">
                     <Wallet className="h-4 w-4 text-blue-600" />
-                    <div>
-                      <p className="font-medium">Main Wallet</p>
-                      <p className="text-xs text-gray-600">UGX {(walletBalance / 1000000).toFixed(1)}M available</p>
-                    </div>
+                    <span>Main Wallet - UGX {(walletBalance / 1000000).toFixed(1)}M</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="petty_cash">
-                  <div className="flex items-center gap-3 py-2">
+                  <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-green-600" />
-                    <div>
-                      <p className="font-medium">Petty Cash</p>
-                      <p className="text-xs text-gray-600">UGX {(pettyCashBalance / 1000).toFixed(0)}K available</p>
-                    </div>
+                    <span>Petty Cash - UGX {(pettyCashBalance / 1000).toFixed(0)}K</span>
                   </div>
                 </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Bill Type Selection */}
+          <div className="space-y-2">
+            <Label>Select Bill Type</Label>
+            <Select value={selectedBill} onValueChange={setSelectedBill}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select bill type" />
+              </SelectTrigger>
+              <SelectContent>
+                {billTypes.map((bill) => (
+                  <SelectItem key={bill.id} value={bill.id}>
+                    <div className="flex items-center gap-2">
+                      <bill.icon className="h-4 w-4 text-blue-600" />
+                      <span>{bill.name} - {bill.provider}</span>
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -162,9 +176,7 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-700">
-                Paying from: <span className="font-semibold text-black">
-                  {paymentSource === "wallet" ? "Main Wallet" : "Petty Cash"}
-                </span>
+                Available Balance:
               </span>
               <span className="font-bold text-blue-600">
                 UGX {selectedBalance.toLocaleString()}
@@ -176,29 +188,6 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
                 <span className="font-bold text-black">UGX {remainingBalance.toLocaleString()}</span>
               </div>
             )}
-          </div>
-
-          {/* Bill Type Selection - Dropdown */}
-          <div className="space-y-2">
-            <Label>Select Bill Type</Label>
-            <Select value={selectedBill} onValueChange={setSelectedBill}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select bill type" />
-              </SelectTrigger>
-              <SelectContent>
-                {billTypes.map((bill) => (
-                  <SelectItem key={bill.id} value={bill.id}>
-                    <div className="flex items-center gap-3 py-2">
-                      <bill.icon className="h-4 w-4 text-blue-600" />
-                      <div>
-                        <p className="font-medium">{bill.name}</p>
-                        <p className="text-xs text-gray-600">{bill.provider}</p>
-                      </div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Account Number */}

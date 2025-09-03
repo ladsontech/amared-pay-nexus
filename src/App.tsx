@@ -65,7 +65,7 @@ const AppRoutes = () => {
 
         {/* System Admin Routes */}
         <Route path="/system" element={
-          <ProtectedRoute requiredRole="admin">
+          <ProtectedRoute requiredPermissions={['system_admin']}>
             <SystemAdminLayout />
           </ProtectedRoute>
         }>
@@ -79,7 +79,7 @@ const AppRoutes = () => {
 
         {/* Organization Routes */}
         <Route path="/org" element={
-          <ProtectedRoute requiredPermissions={['submit_transactions', 'approve_transactions']}>
+          <ProtectedRoute requiredPermissions={['access_petty_cash', 'access_bulk_payments', 'access_collections']}>
             <OrganizationLayout />
           </ProtectedRoute>
         }>
@@ -141,11 +141,9 @@ const AppRoutes = () => {
         {/* Redirect authenticated users to appropriate dashboard */}
         <Route path="/dashboard" element={
           isAuthenticated ? (
-            user?.role === 'admin' ?
+            user?.permissions?.includes('system_admin') ?
               <Navigate to="/system/analytics" replace /> :
-              (user?.role === 'manager' ?
-                <Navigate to="/org/dashboard" replace /> :
-                <Navigate to="/org/dashboard" replace />)
+              <Navigate to="/org/dashboard" replace />
           ) : (
             <Navigate to="/login" replace />
           )

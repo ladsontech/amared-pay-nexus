@@ -16,7 +16,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRole,
   fallbackRoute = '/login',
 }) => {
-  const { isAuthenticated, hasAnyPermission, isRole, loading } = useAuth();
+  const { isAuthenticated, hasAnyPermission, isRole, loading, user } = useAuth();
 
   if (loading) {
     return (
@@ -31,10 +31,16 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (requiredRole && !isRole(requiredRole)) {
+    console.log('Role check failed:', { userRole: user?.role, requiredRole });
     return <Navigate to="/unauthorized" replace />;
   }
 
   if (requiredPermissions.length > 0 && !hasAnyPermission(requiredPermissions)) {
+    console.log('Permission check failed:', { 
+      userPermissions: user?.permissions, 
+      requiredPermissions,
+      hasAny: hasAnyPermission(requiredPermissions)
+    });
     return <Navigate to="/unauthorized" replace />;
   }
 

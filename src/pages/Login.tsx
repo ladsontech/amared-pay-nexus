@@ -33,7 +33,18 @@ const Login = () => {
       
       // Smooth transition to dashboard
       setTimeout(() => {
-        navigate('/dashboard');
+        // Get user from localStorage to determine redirect
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          if (user.role === 'admin') {
+            navigate('/system/analytics');
+          } else {
+            navigate('/org/dashboard');
+          }
+        } else {
+          navigate('/dashboard');
+        }
       }, 1000);
     } catch (error) {
       console.error("Login error:", error);
