@@ -64,42 +64,23 @@ class AuthService {
   }
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const identity = credentials.username || credentials.email;
-    
-    // Construct payload with proper field mapping
+    // Construct payload according to API documentation
     const payload = {
-      username: identity,
+      username: credentials.username || credentials.email.split('@')[0],
       email: credentials.email,
       password: credentials.password
     };
 
-    console.log('Login attempt:', { identity, payload: { ...payload, password: '***' } });
+    console.log('Login attempt:', { payload: { ...payload, password: '***' } });
 
     try {
-      // Make login request without existing auth headers
-      const url = `${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.login}`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': 'AlmaPay-Web/1.0'
-        },
-        body: JSON.stringify(payload),
-        mode: 'cors'
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Login failed:', response.status, errorText);
-        throw new Error(`Authentication failed (${response.status})`);
-      }
-
-      const loginResponse: LoginResponse = await response.json();
+      const loginResponse = await apiClient.post<LoginResponse>(API_CONFIG.endpoints.auth.login, payload);
       
-      // Handle successful login response
-      const accessToken = loginResponse.access || loginResponse.token || "";
-      const refreshToken = loginResponse.refresh || "";
+      console.log('Login response:', loginResponse);
+      
+      // The API returns user data directly in login response
+      const accessToken = loginResponse.access || loginResponse.token;
+      const refreshToken = loginResponse.refresh;
       
       if (accessToken) {
         localStorage.setItem("auth_token", accessToken);
@@ -109,8 +90,13 @@ class AuthService {
         localStorage.setItem("refresh_token", refreshToken);
       }
 
-      // Fetch complete user details from API
-      await this.fetchAndStoreUserProfile(accessToken);
+      // Store user profile from login response
+      if (loginResponse.user) {
+        await this.storeUserProfile(loginResponse.user, accessToken);
+      } else {
+        // Fallback: fetch user details using token
+        await this.fetchAndStoreUserProfile(accessToken);
+      }
       
       return loginResponse;
     } catch (error) {
@@ -119,36 +105,17 @@ class AuthService {
     }
   }
 
-  private async fetchAndStoreUserProfile(token: string): Promise<void> {
+  private async storeUserProfile(userData: any, token: string): Promise<void> {
     try {
-      // Decode token to get user ID
-      const claims = this.decodeJwt(token);
-      const userId = claims?.user_id || claims?.sub || claims?.id;
-      
-      if (!userId) {
-        throw new Error('No user ID found in token');
-      }
-
-      // Fetch complete user details
-      const userResponse = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.user.detail(userId)}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!userResponse.ok) {
-        throw new Error(`Failed to fetch user details: ${userResponse.status}`);
-      }
-
-      const userData = await userResponse.json();
-      
-      // Determine role based on user data
+      // Determine role based on user flags and permissions
       let role: 'admin' | 'manager' | 'staff' = 'staff';
       if (userData.is_superuser || userData.is_staff) {
         role = 'admin';
-      } else if (userData.permissions && (userData.permissions.includes('manage_team') || userData.permissions.includes('approve_transactions'))) {
+      } else if (userData.permissions && (
+        userData.permissions.includes('manage_team') || 
+        userData.permissions.includes('approve_transactions') ||
+        typeof userData.permissions === 'string' && userData.permissions.includes('manage_team')
+      )) {
         role = 'manager';
       }
 
@@ -168,6 +135,7 @@ class AuthService {
           industry: userData.organization.industry || ''
         };
       }
+
       // Build complete user profile
       const userProfile = {
         id: userData.id,
@@ -176,14 +144,46 @@ class AuthService {
         role,
         organizationId: organizationInfo.id,
         organization: organizationInfo,
-        position: userData.is_superuser ? 'System Administrator' : 'Member',
-        department: userData.is_superuser ? 'System' : undefined,
+        position: userData.is_superuser ? 'System Administrator' : (userData.position || 'Member'),
+        department: userData.is_superuser ? 'System' : (userData.department || undefined),
         avatar: userData.avatar,
         permissions: this.parsePermissions(userData.permissions, role)
       };
 
       localStorage.setItem("user", JSON.stringify(userProfile));
       console.log('User profile stored:', userProfile);
+      
+    } catch (error) {
+      console.error('Failed to store user profile:', error);
+      throw error;
+    }
+  }
+
+  private async fetchAndStoreUserProfile(token: string): Promise<void> {
+    try {
+      // Decode token to get user ID
+      const claims = this.decodeJwt(token);
+      const userId = claims?.user_id || claims?.sub || claims?.id;
+      
+      if (!userId) {
+        throw new Error('No user ID found in token');
+      }
+
+      // Fetch complete user details
+      const userResponse = await fetch(`${API_CONFIG.baseURL}user/${userId}/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!userResponse.ok) {
+        throw new Error(`Failed to fetch user details: ${userResponse.status}`);
+      }
+
+      const userData = await userResponse.json();
+      await this.storeUserProfile(userData, token);
       
     } catch (error) {
       console.error('Failed to fetch user profile, using fallback:', error);
@@ -209,7 +209,7 @@ class AuthService {
     }
   }
 
-  private parsePermissions(permissionsString: string, role: 'admin' | 'manager' | 'staff'): Permission[] {
+  private parsePermissions(permissionsString: any, role: 'admin' | 'manager' | 'staff'): Permission[] {
     try {
       // If permissions is a string, try to parse it
       if (typeof permissionsString === 'string' && permissionsString.length > 0) {
@@ -222,6 +222,10 @@ class AuthService {
           return JSON.parse(permissionsString) as Permission[];
         }
       }
+      // If permissions is already an array
+      if (Array.isArray(permissionsString)) {
+        return permissionsString as Permission[];
+      }
     } catch (error) {
       console.warn('Failed to parse permissions string:', error);
     }
@@ -229,6 +233,7 @@ class AuthService {
     // Fallback to role-based permissions
     return rolePermissions[role];
   }
+
   async logout(): Promise<void> {
     console.log('Logout attempt...');
     

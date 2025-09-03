@@ -26,13 +26,15 @@ function getBasicHeaders(): Record<string, string> {
     'User-Agent': 'AlmaPay-Web/1.0'
   };
   
-  // For login requests, don't add auth headers
-  // For authenticated requests, add Bearer token
+  return headers;
+}
+
+function getAuthHeaders(): Record<string, string> {
+  const headers = getBasicHeaders();
   const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  
   return headers;
 }
 
@@ -62,7 +64,7 @@ export const apiClient = {
     console.log('GET request:', url);
     const res = await fetch(url, {
       method: 'GET',
-      headers: getBasicHeaders(),
+      headers: getAuthHeaders(),
       mode: 'cors'
     });
     return handleResponse<T>(res);
@@ -70,9 +72,14 @@ export const apiClient = {
   post: async <T>(path: string, body?: unknown, query?: QueryParams): Promise<T> => {
     const url = buildUrl(path, query);
     console.log('POST request:', url, body);
+    
+    // For login endpoint, don't include auth headers
+    const isLoginRequest = path.includes('/auth/login');
+    const headers = isLoginRequest ? getBasicHeaders() : getAuthHeaders();
+    
     const res = await fetch(url, {
       method: 'POST',
-      headers: getBasicHeaders(),
+      headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
       mode: 'cors'
     });
@@ -83,7 +90,7 @@ export const apiClient = {
     console.log('PUT request:', url, body);
     const res = await fetch(url, {
       method: 'PUT',
-      headers: getBasicHeaders(),
+      headers: getAuthHeaders(),
       body: body !== undefined ? JSON.stringify(body) : undefined,
       mode: 'cors'
     });
@@ -94,7 +101,7 @@ export const apiClient = {
     console.log('DELETE request:', url);
     const res = await fetch(url, {
       method: 'DELETE',
-      headers: getBasicHeaders(),
+      headers: getAuthHeaders(),
       mode: 'cors'
     });
     return handleResponse<T>(res);

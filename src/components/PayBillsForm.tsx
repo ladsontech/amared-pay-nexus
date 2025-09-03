@@ -128,42 +128,34 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Payment Source Selection - Enhanced */}
+          {/* Payment Source Selection - Dropdown */}
           <div>
-            <Label className="text-sm font-medium mb-3 block">Select Payment Source</Label>
-            <div className="grid grid-cols-2 gap-3">
-              <Card 
-                className={`cursor-pointer transition-all border-2 ${
-                  paymentSource === "wallet" 
-                    ? "border-blue-500 bg-blue-50 shadow-md" 
-                    : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
-                }`}
-                onClick={() => setPaymentSource("wallet")}
-              >
-                <CardContent className="p-4 text-center">
-                  <Wallet className="h-6 w-6 mx-auto mb-2 text-blue-600" />
-                  <p className="text-sm font-semibold text-black">Main Wallet</p>
-                  <p className="text-lg font-bold text-blue-600">UGX {(walletBalance / 1000000).toFixed(1)}M</p>
-                  <p className="text-xs text-gray-600">Available balance</p>
-                </CardContent>
-              </Card>
-              
-              <Card 
-                className={`cursor-pointer transition-all border-2 ${
-                  paymentSource === "petty_cash" 
-                    ? "border-blue-500 bg-blue-50 shadow-md" 
-                    : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
-                }`}
-                onClick={() => setPaymentSource("petty_cash")}
-              >
-                <CardContent className="p-4 text-center">
-                  <DollarSign className="h-6 w-6 mx-auto mb-2 text-blue-600" />
-                  <p className="text-sm font-semibold text-black">Petty Cash</p>
-                  <p className="text-lg font-bold text-blue-600">UGX {(pettyCashBalance / 1000).toFixed(0)}K</p>
-                  <p className="text-xs text-gray-600">Available balance</p>
-                </CardContent>
-              </Card>
-            </div>
+            <Label className="text-sm font-medium">Payment Source *</Label>
+            <Select value={paymentSource} onValueChange={(value: "wallet" | "petty_cash") => setPaymentSource(value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select payment source" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="wallet">
+                  <div className="flex items-center gap-3 py-2">
+                    <Wallet className="h-4 w-4 text-blue-600" />
+                    <div>
+                      <p className="font-medium">Main Wallet</p>
+                      <p className="text-xs text-gray-600">UGX {(walletBalance / 1000000).toFixed(1)}M available</p>
+                    </div>
+                  </div>
+                </SelectItem>
+                <SelectItem value="petty_cash">
+                  <div className="flex items-center gap-3 py-2">
+                    <DollarSign className="h-4 w-4 text-green-600" />
+                    <div>
+                      <p className="font-medium">Petty Cash</p>
+                      <p className="text-xs text-gray-600">UGX {(pettyCashBalance / 1000).toFixed(0)}K available</p>
+                    </div>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Selected Source Info */}
@@ -186,28 +178,27 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
             )}
           </div>
 
-          {/* Bill Type Selection - Enhanced */}
+          {/* Bill Type Selection - Dropdown */}
           <div className="space-y-2">
             <Label>Select Bill Type</Label>
-            <div className="grid grid-cols-2 gap-2">
-              {billTypes.map((bill) => (
-                <Card
-                  key={bill.id}
-                  className={`cursor-pointer transition-all border ${
-                    selectedBill === bill.id
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-blue-300"
-                  }`}
-                  onClick={() => setSelectedBill(bill.id)}
-                >
-                  <CardContent className="p-3 text-center">
-                    <bill.icon className="h-5 w-5 mx-auto mb-1 text-blue-600" />
-                    <p className="text-xs font-medium text-black">{bill.name}</p>
-                    <p className="text-xs text-gray-600">{bill.provider}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <Select value={selectedBill} onValueChange={setSelectedBill}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select bill type" />
+              </SelectTrigger>
+              <SelectContent>
+                {billTypes.map((bill) => (
+                  <SelectItem key={bill.id} value={bill.id}>
+                    <div className="flex items-center gap-3 py-2">
+                      <bill.icon className="h-4 w-4 text-blue-600" />
+                      <div>
+                        <p className="font-medium">{bill.name}</p>
+                        <p className="text-xs text-gray-600">{bill.provider}</p>
+                      </div>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Account Number */}
