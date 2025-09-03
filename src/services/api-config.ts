@@ -1,12 +1,12 @@
 export const API_CONFIG = {
-  baseURL: (import.meta as any)?.env?.VITE_API_BASE_URL || 'https://bulksrv.almaredagencyuganda.com',
+  baseURL: 'https://bulksrv.almaredagencyuganda.com/',
   endpoints: {
     auth: {
-      login: '/auth/login/',
-      logout: '/auth/logout/',
-      changePassword: '/auth/password/change',
-      refresh: '/auth/token/refresh/',
-      verify: '/auth/token/verify/'
+      login: 'auth/login/',
+      logout: 'auth/logout/',
+      changePassword: 'auth/password/change/',
+      refresh: 'auth/token/refresh/',
+      verify: 'auth/token/verify/'
     },
     user: {
       list: '/user/',

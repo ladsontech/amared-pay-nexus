@@ -22,19 +22,15 @@ function buildUrl(path: string, query?: QueryParams): string {
 function getBasicHeaders(): Record<string, string> {
   const headers: Record<string, string> = { 
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    'User-Agent': 'AlmaPay-Web/1.0'
   };
   
-  // Try Bearer token first
+  // For login requests, don't add auth headers
+  // For authenticated requests, add Bearer token
   const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
-  } else {
-    // Fallback to Basic auth if available
-    const basic = localStorage.getItem('basic_auth');
-    if (basic) {
-      headers['Authorization'] = `Basic ${basic}`;
-    }
   }
   
   return headers;

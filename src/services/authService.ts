@@ -66,21 +66,40 @@ class AuthService {
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const identity = credentials.username || credentials.email;
     
-    // Construct payload including both username and email to satisfy backend schema
+    // Construct payload with proper field mapping
     const payload = {
-      username: credentials.username || credentials.email || '',
-      email: credentials.email || credentials.username || '',
+      username: identity,
+      email: credentials.email,
       password: credentials.password
     };
 
     console.log('Login attempt:', { identity, payload: { ...payload, password: '***' } });
 
     try {
-      const response = await apiClient.post<LoginResponse>(API_CONFIG.endpoints.auth.login, payload);
+      // Make login request without existing auth headers
+      const url = `${API_CONFIG.baseURL}${API_CONFIG.endpoints.auth.login}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': 'AlmaPay-Web/1.0'
+        },
+        body: JSON.stringify(payload),
+        mode: 'cors'
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Login failed:', response.status, errorText);
+        throw new Error(`Authentication failed (${response.status})`);
+      }
+
+      const loginResponse: LoginResponse = await response.json();
       
       // Handle successful login response
-      const accessToken = response.access || response.token || "";
-      const refreshToken = response.refresh || "";
+      const accessToken = loginResponse.access || loginResponse.token || "";
+      const refreshToken = loginResponse.refresh || "";
       
       if (accessToken) {
         localStorage.setItem("auth_token", accessToken);
@@ -92,9 +111,9 @@ class AuthService {
 
       // Build user profile from response
       let userProfile;
-      if (response.user) {
+      if (loginResponse.user) {
         // Use user data from response
-        const user = response.user;
+        const user = loginResponse.user;
         const role = user.role?.toLowerCase() || 'staff';
         const validRole = (['admin', 'manager', 'staff'] as const).includes(role as any) ? role : 'staff';
         
@@ -122,9 +141,9 @@ class AuthService {
         const role = (['admin', 'manager', 'staff'] as const).includes(derivedRole) ? derivedRole : 'staff';
 
         userProfile = {
-          id: response.email || identity,
-          name: claims?.name || response.username || identity,
-          email: claims?.email || response.email || credentials.email,
+          id: loginResponse.email || identity,
+          name: claims?.name || loginResponse.username || identity,
+          email: claims?.email || loginResponse.email || credentials.email,
           role,
           organizationId: claims?.organizationId || 'default-org',
           organization: {
@@ -141,7 +160,7 @@ class AuthService {
       }
 
       localStorage.setItem("user", JSON.stringify(userProfile));
-      return response;
+      return loginResponse;
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
