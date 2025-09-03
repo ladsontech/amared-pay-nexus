@@ -12,12 +12,14 @@ import PettyCashReconciliation from "@/components/petty-cash/PettyCashReconcilia
 import PendingApprovals from "@/components/petty-cash/PendingApprovals";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
 import { useSearchParams, Link } from "react-router-dom";
+import PayBillsForm from "@/components/PayBillsForm";
 
 const PettyCash = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") as string || "overview";
   const [activeTab, setActiveTab] = useState(initialTab);
   const [currentBalance, setCurrentBalance] = useState(150000); // Initial petty cash balance
+  const [isPayBillsOpen, setIsPayBillsOpen] = useState(false);
   const { toast } = useToast();
   const { hasPermission } = useAuth();
 
@@ -70,12 +72,15 @@ const PettyCash = () => {
       >
         {/* Mobile Tabs */}
         <div className="md:hidden">
-          <TabsList className="grid w-full grid-cols-3 h-12 bg-gray-50 rounded-xl p-1">
+          <TabsList className="grid w-full grid-cols-4 h-12 bg-gray-50 rounded-xl p-1">
             <TabsTrigger value="overview" className="text-xs font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600">
               Overview
             </TabsTrigger>
             <TabsTrigger value="add" className="text-xs font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600">
               Add
+            </TabsTrigger>
+            <TabsTrigger value="bills" className="text-xs font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600">
+              Bills
             </TabsTrigger>
             <TabsTrigger value="history" className="text-xs font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600">
               History
@@ -107,9 +112,10 @@ const PettyCash = () => {
 
         {/* Desktop Tabs */}
         <div className="hidden md:block">
-          <TabsList className="grid w-full grid-cols-5 h-auto">
+          <TabsList className="grid w-full grid-cols-6 h-auto">
             <TabsTrigger value="overview" className="text-sm">Overview</TabsTrigger>
             <TabsTrigger value="add" className="text-sm">Add Transaction</TabsTrigger>
+            <TabsTrigger value="bills" className="text-sm">Pay Bills</TabsTrigger>
             <TabsTrigger value="history" className="text-sm">History</TabsTrigger>
             <TabsTrigger value="approvals" className="text-sm">PC Approvals</TabsTrigger>
             <TabsTrigger value="reconciliation" className="text-sm">Reconciliation</TabsTrigger>
@@ -161,6 +167,61 @@ const PettyCash = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="bills" className="space-y-4 mt-6">
+          <Card className="bg-white border border-gray-100">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold text-black flex items-center gap-2">
+                <FileText className="h-5 w-5 text-blue-600" />
+                Pay Bills Demo
+              </CardTitle>
+              <CardDescription className="text-gray-600">
+                Pay utility bills using your Main Wallet or Petty Cash funds
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Balance Cards */}
+                <Card className="border-2 border-blue-100">
+                  <CardContent className="p-4 text-center">
+                    <Wallet className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                    <p className="text-sm font-semibold text-black">Main Wallet</p>
+                    <p className="text-2xl font-bold text-blue-600">UGX 12.3M</p>
+                    <p className="text-xs text-gray-600">Available for bills</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-2 border-green-100">
+                  <CardContent className="p-4 text-center">
+                    <Wallet className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                    <p className="text-sm font-semibold text-black">Petty Cash</p>
+                    <p className="text-2xl font-bold text-green-600">UGX 850K</p>
+                    <p className="text-xs text-gray-600">Available for bills</p>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <Button 
+                onClick={() => setIsPayBillsOpen(true)} 
+                className="w-full"
+                size="lg"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Start Bill Payment
+              </Button>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-semibold text-black mb-2">Demo Features:</h4>
+                <ul className="text-sm text-gray-700 space-y-1">
+                  <li>• Choose payment source (Main Wallet or Petty Cash)</li>
+                  <li>• Real-time balance validation</li>
+                  <li>• Support for Electricity, Internet, Water, and Rent bills</li>
+                  <li>• Transaction simulation with success/error handling</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="history" className="space-y-4 mt-6">
           <div className="bg-white">
             <TransactionHistory />
@@ -179,6 +240,9 @@ const PettyCash = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Pay Bills Modal */}
+      <PayBillsForm isOpen={isPayBillsOpen} onClose={() => setIsPayBillsOpen(false)} />
     </div>
   );
 };
