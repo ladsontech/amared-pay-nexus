@@ -296,8 +296,9 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
             )}
           </Button>
         </DialogFooter>
-      </Dialog>
-    );
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 export default PayBillsForm;
