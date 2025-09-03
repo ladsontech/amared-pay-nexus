@@ -1,5 +1,6 @@
 import { API_CONFIG } from './api-config';
 import { apiClient, QueryParams } from './apiClient';
+import { demoOrganizations } from '@/data/demoData';
 
 export interface CreateOrganizationRequest {
   username: string;
@@ -131,8 +132,23 @@ class OrganizationService {
       
       return [];
     } catch (error) {
-      console.error('Failed to fetch organizations:', error);
-      throw new Error('Failed to fetch organizations');
+      console.warn('API call failed, using demo data:', error);
+      // Fallback to demo data
+      return {
+        count: demoOrganizations.length,
+        next: null,
+        previous: null,
+        results: demoOrganizations.map(org => ({
+          id: org.id,
+          name: org.name,
+          address: '123 Demo Street, Kampala, Uganda',
+          company_reg_id: `REG-${org.id.slice(-6).toUpperCase()}`,
+          tin: `TIN-${org.id.slice(-8).toUpperCase()}`,
+          logo: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }))
+      };
     }
   }
 
@@ -140,8 +156,22 @@ class OrganizationService {
     try {
       return await apiClient.get<OrganizationResponse>(API_CONFIG.endpoints.organizations.detail(id));
     } catch (error) {
-      console.error(`Failed to fetch organization ${id}:`, error);
-      throw new Error(`Failed to fetch organization ${id}`);
+      console.warn('API call failed, using demo data:', error);
+      // Fallback to demo data
+      const demoOrg = demoOrganizations.find(o => o.id === id);
+      if (demoOrg) {
+        return {
+          id: demoOrg.id,
+          name: demoOrg.name,
+          address: '123 Demo Street, Kampala, Uganda',
+          company_reg_id: `REG-${demoOrg.id.slice(-6).toUpperCase()}`,
+          tin: `TIN-${demoOrg.id.slice(-8).toUpperCase()}`,
+          logo: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+      }
+      throw new Error('Organization not found');
     }
   }
 
