@@ -498,7 +498,7 @@ const OrgDashboard = () => {
             <div className="bg-white border border-gray-100 rounded-xl p-3">
               <div className="flex items-center justify-between mb-2">
                 <Activity className="h-4 w-4 text-blue-600" />
-                <TrendingUp className="h-3 w-3 text-blue-600" />
+                
               </div>
               <p className="text-lg font-bold text-black">{dashboardData.monthlyTransactions}</p>
               <p className="text-xs text-gray-500">Transactions</p>

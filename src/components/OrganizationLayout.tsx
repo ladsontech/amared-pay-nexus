@@ -86,7 +86,7 @@ const OrganizationLayout = () => {
 
           {/* Main Content */}
           <main className="flex-1 pb-16 md:pb-0 bg-gradient-to-br from-blue-50/20 via-white to-slate-50/30">
-            <div className="container py-8 px-[5px]">
+            <div className="container py-8 px-[15px]">
               <Outlet />
             </div>
           </main>
