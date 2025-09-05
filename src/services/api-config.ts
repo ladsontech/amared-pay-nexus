@@ -2,22 +2,25 @@ export const API_CONFIG = {
   baseURL: 'https://bulksrv.almaredagencyuganda.com/',
   endpoints: {
     auth: {
-      login: 'auth/login/',
-      logout: 'auth/logout/',
-      changePassword: 'auth/password/change/',
-      refresh: 'auth/token/refresh/',
-      verify: 'auth/token/verify/'
+      login: 'users/auth/login/',
+      logout: 'users/auth/logout/',
+      changePassword: 'users/auth/password/change/',
+      refresh: 'users/auth/token/refresh/',
+      verify: 'users/auth/token/verify/'
     },
     user: {
       list: 'user/',
-      detail: (id: string) => `user/${id}/`
+      detail: (id: string) => `user/${id}/`,
+      userList: 'users/user/',
+      userDetail: (id: string) => `users/user/${id}/`
     },
     subAdmin: {
-      create: '/sub_admin/',
-      list: '/sub_admin_list/',
-      detail: (id: string) => `/sub_admin_list/${id}/`,
-      update: (id: string) => `/update_sub_admin/${id}/`,
-      delete: (id: string) => `/sub_admin/${id}/`
+      create: 'users/sub_admin/',
+      list: 'users/sub_admin_list/',
+      search: 'users/search_sub_admins/',
+      detail: (id: string) => `users/sub_admin_list/${id}/`,
+      update: (id: string) => `users/update_sub_admin/${id}/`,
+      delete: (id: string) => `users/sub_admin/${id}/`
     },
     organizations: {
       createWithOwner: '/organizations/create_org/',
@@ -84,16 +87,16 @@ export const API_CONFIG = {
     },
     otp: {
       email: {
-        send: '/otp/forgot_password/email/',
-        resend: '/otp/resend/email/',
-        verify: '/otp/verify/email_address/',
-        resetPassword: '/otp/reset_password/email_code/'
+        send: 'users/otp/forgot_password/email/',
+        resend: 'users/otp/resend/email/',
+        verify: 'users/otp/verify/email_address/',
+        resetPassword: 'users/otp/reset_password/email_code/'
       },
       sms: {
-        send: '/otp/forgot_password/sms/',
-        resend: '/otp/resend/sms/',
-        verify: '/otp/verify/phone_number/',
-        resetPassword: '/otp/reset_password/sms_code/'
+        send: 'users/otp/forgot_password/sms/',
+        resend: 'users/otp/resend/sms/',
+        verify: 'users/otp/verify/phone_number/',
+        resetPassword: 'users/otp/reset_password/sms_code/'
       }
     }
   }

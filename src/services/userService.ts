@@ -60,7 +60,7 @@ class UserService {
   async listUsers(query?: UserQuery): Promise<UserResponse[]> {
     try {
       const response = await apiClient.get<{ results?: UserResponse[]; data?: UserResponse[] } | UserResponse[]>(
-        API_CONFIG.endpoints.user.list, 
+        API_CONFIG.endpoints.user.userList, 
         query
       );
       
@@ -92,7 +92,7 @@ class UserService {
 
   async getUser(id: string): Promise<UserResponse> {
     try {
-      return await apiClient.get<UserResponse>(API_CONFIG.endpoints.user.detail(id));
+      return await apiClient.get<UserResponse>(API_CONFIG.endpoints.user.userDetail(id));
     } catch (error) {
       console.warn('API call failed, using demo data:', error);
       // Fallback to demo data

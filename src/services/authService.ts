@@ -9,9 +9,9 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  username?: string;
-  email?: string;
-  token?: string;
+  username: string;
+  email: string;
+  password: string;
   access?: string;
   refresh?: string;
   user?: {
@@ -20,12 +20,17 @@ export interface LoginResponse {
     email: string;
     first_name: string;
     last_name: string;
-    role?: string;
+    is_superuser?: boolean;
+    is_staff?: boolean;
+    permissions?: string;
+    phone_number?: string;
+    avatar?: string;
+    is_active?: boolean;
+    date_joined?: string;
     organization?: {
       id: string;
       name: string;
     };
-    permissions?: string[];
   };
 }
 
@@ -78,9 +83,10 @@ class AuthService {
       
       console.log('Login response:', loginResponse);
       
-      // The API returns user data directly in login response
-      const accessToken = loginResponse.access || loginResponse.token;
-      const refreshToken = loginResponse.refresh;
+      // Check if response has access_token in data field or directly
+      const responseData = (loginResponse as any).data || loginResponse;
+      const accessToken = responseData.access_token || responseData.access || responseData.token;
+      const refreshToken = responseData.refresh_token || responseData.refresh;
       
       if (accessToken) {
         localStorage.setItem("auth_token", accessToken);
@@ -91,8 +97,8 @@ class AuthService {
       }
 
       // Store user profile from login response
-      if (loginResponse.user) {
-        await this.storeUserProfile(loginResponse.user, accessToken);
+      if (responseData.user) {
+        await this.storeUserProfile(responseData.user, accessToken);
       } else {
         // Fallback: fetch user details using token
         await this.fetchAndStoreUserProfile(accessToken);

@@ -27,6 +27,7 @@ const orgItems: NavItem[] = [
   { title: "Approvals", url: "/org/approvals", icon: CheckCircle },
   { title: "Reports", url: "/org/reports", icon: BarChart3 },
   { title: "Users", url: "/org/users", icon: Users },
+  { title: "Account", url: "/org/account", icon: User },
   { title: "Settings", url: "/org/settings", icon: Settings },
 ];
 
