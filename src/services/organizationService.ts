@@ -134,21 +134,15 @@ class OrganizationService {
     } catch (error) {
       console.warn('API call failed, using demo data:', error);
       // Fallback to demo data
-      return {
-        count: demoOrganizations.length,
-        next: null,
-        previous: null,
-        results: demoOrganizations.map(org => ({
-          id: org.id,
-          name: org.name,
-          address: '123 Demo Street, Kampala, Uganda',
-          company_reg_id: `REG-${org.id.slice(-6).toUpperCase()}`,
-          tin: `TIN-${org.id.slice(-8).toUpperCase()}`,
-          logo: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }))
-      };
+      return demoOrganizations.map(org => ({
+        id: org.id,
+        name: org.name,
+        address: '123 Demo Street, Kampala, Uganda',
+        company_reg_id: `REG-${org.id.slice(-6).toUpperCase()}`,
+        tin: `TIN-${org.id.slice(-8).toUpperCase()}`,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }));
     }
   }
 
@@ -166,7 +160,6 @@ class OrganizationService {
           address: '123 Demo Street, Kampala, Uganda',
           company_reg_id: `REG-${demoOrg.id.slice(-6).toUpperCase()}`,
           tin: `TIN-${demoOrg.id.slice(-8).toUpperCase()}`,
-          logo: null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };

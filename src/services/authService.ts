@@ -233,22 +233,22 @@ class AuthService {
     }
   }
 
-  private parsePermissions(permissionsString: any, role: 'admin' | 'manager' | 'staff'): Permission[] {
+  private parsePermissions(permissionsString: any, role: 'admin' | 'manager' | 'staff'): import('@/types/auth').Permission[] {
     try {
       // If permissions is a string, try to parse it
       if (typeof permissionsString === 'string' && permissionsString.length > 0) {
         // Handle comma-separated permissions
         if (permissionsString.includes(',')) {
-          return permissionsString.split(',').map(p => p.trim()) as Permission[];
+          return permissionsString.split(',').map(p => p.trim()) as import('@/types/auth').Permission[];
         }
         // Handle JSON array string
         if (permissionsString.startsWith('[')) {
-          return JSON.parse(permissionsString) as Permission[];
+          return JSON.parse(permissionsString) as import('@/types/auth').Permission[];
         }
       }
       // If permissions is already an array
       if (Array.isArray(permissionsString)) {
-        return permissionsString as Permission[];
+        return permissionsString as import('@/types/auth').Permission[];
       }
     } catch (error) {
       console.warn('Failed to parse permissions string:', error);

@@ -32,6 +32,7 @@ const OrgBulkPaymentsReport = lazy(() => import("./pages/OrgBulkPaymentsReport")
 const OrgCollectionsReport = lazy(() => import("./pages/OrgCollectionsReport"));
 const OrgSettings = lazy(() => import("./pages/OrgSettings"));
 const OrgUsers = lazy(() => import("./pages/OrgUsers"));
+const PayBills = lazy(() => import("./pages/PayBills"));
 const Unauthorized = lazy(() => import("./pages/Unauthorized"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 

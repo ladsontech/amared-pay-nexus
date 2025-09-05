@@ -77,25 +77,16 @@ class UserService {
     } catch (error) {
       console.warn('API call failed, using demo data:', error);
       // Fallback to demo data
-      return {
-        count: allDemoUsers.length,
-        next: null,
-        previous: null,
-        results: allDemoUsers.map(user => ({
-          id: user.id,
-          username: user.email.split('@')[0],
-          email: user.email,
-          first_name: user.name.split(' ')[0],
-          last_name: user.name.split(' ')[1] || '',
-          phone_number: '+256700000000',
-          is_active: true,
-          is_email_verified: true,
-          is_phone_verified: true,
-          permissions: user.permissions.join(','),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }))
-      };
+      return allDemoUsers.map(user => ({
+        id: user.id,
+        username: user.email.split('@')[0],
+        email: user.email,
+        first_name: user.name.split(' ')[0],
+        last_name: user.name.split(' ')[1] || '',
+        phone_number: '+256700000000',
+        is_active: true,
+        date_joined: new Date().toISOString()
+      }));
     }
   }
 
@@ -115,11 +106,7 @@ class UserService {
           last_name: demoUser.name.split(' ')[1] || '',
           phone_number: '+256700000000',
           is_active: true,
-          is_email_verified: true,
-          is_phone_verified: true,
-          permissions: demoUser.permissions.join(','),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          date_joined: new Date().toISOString()
         };
       }
       throw new Error('User not found');

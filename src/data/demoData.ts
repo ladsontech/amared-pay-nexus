@@ -201,12 +201,7 @@ export const demoSystemAdmin: DemoUser = {
     'system_admin',
     'manage_organizations',
     'manage_system_users',
-    'view_system_analytics',
-    'create_organizations',
-    'delete_organizations',
-    'manage_sub_admins',
-    'view_all_transactions',
-    'system_settings'
+    'view_system_analytics'
   ]
 };
 
