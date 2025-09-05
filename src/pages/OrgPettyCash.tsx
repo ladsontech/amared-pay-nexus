@@ -13,18 +13,19 @@ import PendingApprovals from "@/components/petty-cash/PendingApprovals";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
 import { useSearchParams, Link } from "react-router-dom";
 import PayBillsForm from "@/components/PayBillsForm";
-
 const PettyCash = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") as string || "overview";
   const [activeTab, setActiveTab] = useState(initialTab);
   const [currentBalance, setCurrentBalance] = useState(150000); // Initial petty cash balance
   const [isPayBillsOpen, setIsPayBillsOpen] = useState(false);
-  const { toast } = useToast();
-  const { hasPermission } = useAuth();
-
-  return (
-    <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
+  const {
+    toast
+  } = useToast();
+  const {
+    hasPermission
+  } = useAuth();
+  return <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b border-gray-100 -mx-6 px-6 py-4 mb-4">
         <h1 className="text-xl font-bold text-black">Petty Cash</h1>
@@ -42,14 +43,12 @@ const PettyCash = () => {
         
         {/* Quick Action Buttons */}
         <div className="flex flex-wrap gap-2">
-          {hasPermission("view_department_reports") && (
-            <Button variant="outline" asChild>
+          {hasPermission("view_department_reports") && <Button variant="outline" asChild>
               <Link to="/org/reports/petty-cash" className="flex items-center space-x-2">
                 <FileText className="h-4 w-4" />
                 <span>View Petty Cash Report</span>
               </Link>
-            </Button>
-          )}
+            </Button>}
           
           <Button variant="default" onClick={() => setActiveTab("add")} className="flex items-center space-x-2">
             <Plus className="h-4 w-4" />
@@ -58,18 +57,14 @@ const PettyCash = () => {
         </div>
       </div>
 
-      <Tabs 
-        value={activeTab} 
-        onValueChange={(val) => {
-          setActiveTab(val);
-          setSearchParams(prev => {
-            const p = new URLSearchParams(prev);
-            p.set('tab', val);
-            return p;
-          });
-        }} 
-        className="w-full"
-      >
+      <Tabs value={activeTab} onValueChange={val => {
+      setActiveTab(val);
+      setSearchParams(prev => {
+        const p = new URLSearchParams(prev);
+        p.set('tab', val);
+        return p;
+      });
+    }} className="w-full">
         {/* Mobile Tabs */}
         <div className="md:hidden">
           <TabsList className="grid w-full grid-cols-4 h-12 bg-gray-50 rounded-xl p-1">
@@ -88,26 +83,14 @@ const PettyCash = () => {
           </TabsList>
           
           {/* Mobile Secondary Tabs */}
-          {(activeTab === "approvals" || activeTab === "reconciliation") && (
-            <div className="flex gap-2 mt-3">
-              <Button 
-                variant={activeTab === "approvals" ? "default" : "outline"} 
-                size="sm" 
-                onClick={() => setActiveTab("approvals")}
-                className="flex-1"
-              >
+          {(activeTab === "approvals" || activeTab === "reconciliation") && <div className="flex gap-2 mt-3">
+              <Button variant={activeTab === "approvals" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("approvals")} className="flex-1">
                 Approvals
               </Button>
-              <Button 
-                variant={activeTab === "reconciliation" ? "default" : "outline"} 
-                size="sm" 
-                onClick={() => setActiveTab("reconciliation")}
-                className="flex-1"
-              >
+              <Button variant={activeTab === "reconciliation" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("reconciliation")} className="flex-1">
                 Reconciliation
               </Button>
-            </div>
-          )}
+            </div>}
         </div>
 
         {/* Desktop Tabs */}
@@ -124,22 +107,10 @@ const PettyCash = () => {
 
         {/* Mobile Action Buttons */}
         <div className="md:hidden flex gap-2 mt-4">
-          {hasPermission("approve_transactions") && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setActiveTab("approvals")}
-              className="flex-1"
-            >
+          {hasPermission("approve_transactions") && <Button variant="outline" size="sm" onClick={() => setActiveTab("approvals")} className="flex-1">
               Approvals
-            </Button>
-          )}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setActiveTab("reconciliation")}
-            className="flex-1"
-          >
+            </Button>}
+          <Button variant="outline" size="sm" onClick={() => setActiveTab("reconciliation")} className="flex-1">
             Reconciliation
           </Button>
         </div>
@@ -200,24 +171,12 @@ const PettyCash = () => {
                 </Card>
               </div>
               
-              <Button 
-                onClick={() => setIsPayBillsOpen(true)} 
-                className="w-full"
-                size="lg"
-              >
+              <Button onClick={() => setIsPayBillsOpen(true)} className="w-full" size="lg">
                 <FileText className="h-4 w-4 mr-2" />
                 Start Bill Payment
               </Button>
               
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-semibold text-black mb-2">Demo Features:</h4>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  <li>• Choose payment source (Main Wallet or Petty Cash)</li>
-                  <li>• Real-time balance validation</li>
-                  <li>• Support for Electricity, Internet, Water, and Rent bills</li>
-                  <li>• Transaction simulation with success/error handling</li>
-                </ul>
-              </div>
+              
             </CardContent>
           </Card>
         </TabsContent>
@@ -243,8 +202,6 @@ const PettyCash = () => {
 
       {/* Pay Bills Modal */}
       <PayBillsForm isOpen={isPayBillsOpen} onClose={() => setIsPayBillsOpen(false)} />
-    </div>
-  );
+    </div>;
 };
-
 export default PettyCash;
