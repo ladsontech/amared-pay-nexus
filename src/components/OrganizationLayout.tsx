@@ -4,23 +4,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Building, LogOut, Crown, User, CreditCard } from "lucide-react";
-
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppOrgSidebar from "./AppOrgSidebar";
 import MobileBottomNav from "./MobileBottomNav";
-
 const OrganizationLayout = () => {
-  const { user, logout } = useAuth();
-
+  const {
+    user,
+    logout
+  } = useAuth();
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case "manager":
@@ -31,9 +24,7 @@ const OrganizationLayout = () => {
         return "outline" as const;
     }
   };
-
-  return (
-    <SidebarProvider>
+  return <SidebarProvider>
       <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-blue-50/20 flex w-full">
         {/* Fixed Sidebar */}
         <AppOrgSidebar />
@@ -74,17 +65,9 @@ const OrganizationLayout = () => {
                       <div className="flex flex-col space-y-2 p-2">
                         <p className="text-base font-bold leading-none text-slate-900">{user?.name || 'User'}</p>
                         <p className="text-sm leading-none text-slate-600 font-medium">{user?.email || 'No email'}</p>
-                        {user?.department && (
-                          <p className="text-sm leading-none text-slate-500 font-medium">{user.department}</p>
-                        )}
-                        {user?.position && (
-                          <p className="text-xs leading-none text-slate-500">{user.position}</p>
-                        )}
-                        <Badge className={`w-fit capitalize mt-1 font-bold shadow-sm ${
-                          user?.role === 'manager' 
-                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' 
-                            : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                        }`}>
+                        {user?.department && <p className="text-sm leading-none text-slate-500 font-medium">{user.department}</p>}
+                        {user?.position && <p className="text-xs leading-none text-slate-500">{user.position}</p>}
+                        <Badge className={`w-fit capitalize mt-1 font-bold shadow-sm ${user?.role === 'manager' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'}`}>
                           {user?.role === 'manager' ? <Crown className="h-3 w-3 mr-1" /> : <User className="h-3 w-3 mr-1" />}
                           {user?.role || 'staff'}
                         </Badge>
@@ -103,7 +86,7 @@ const OrganizationLayout = () => {
 
           {/* Main Content */}
           <main className="flex-1 pb-16 md:pb-0 bg-gradient-to-br from-blue-50/20 via-white to-slate-50/30">
-            <div className="container py-8 px-6">
+            <div className="container py-8 px-[5px]">
               <Outlet />
             </div>
           </main>
@@ -112,8 +95,6 @@ const OrganizationLayout = () => {
         {/* Mobile Bottom Navigation */}
         <MobileBottomNav />
       </div>
-    </SidebarProvider>
-  );
+    </SidebarProvider>;
 };
-
 export default OrganizationLayout;
