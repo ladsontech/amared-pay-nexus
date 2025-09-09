@@ -13,7 +13,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Home, Wallet, Send, DollarSign, BarChart3, Settings, CheckCircle, Building, Users, Crown, User } from "lucide-react";
+import { Home, Wallet, Send, DollarSign, BarChart3, Shield, CheckCircle, Building, Users, Crown, User, Settings } from "lucide-react";
 import NewActionButton from "./NewActionButton";
 import { useIsMobile } from "@/hooks/use-mobile";
 

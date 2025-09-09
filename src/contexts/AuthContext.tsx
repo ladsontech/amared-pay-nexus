@@ -31,6 +31,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAuthenticated: false,
     loading: true,
   });
+  
+  // Auto-logout timer (15 minutes)
+  const timeoutDuration = 15 * 60 * 1000; // 15 minutes in milliseconds
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const resetTimer = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
+    if (authState.isAuthenticated) {
+      timeoutRef.current = setTimeout(() => {
+        logout();
+      }, timeoutDuration);
+    }
+  };
+
+  // Reset timer on user activity
+  React.useEffect(() => {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    
+    const resetActivity = () => {
+      if (authState.isAuthenticated) {
+        resetTimer();
+      }
+    };
+
+    events.forEach(event => {
+      document.addEventListener(event, resetActivity, true);
+    });
+
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, resetActivity, true);
+      });
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [authState.isAuthenticated]);
 
   useEffect(() => {
     // Load user from localStorage or API
@@ -78,6 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: true,
         loading: false,
       });
+      resetTimer(); // Start auto-logout timer
     }
   };
 
@@ -97,10 +138,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     console.log('Setting auth state with user:', user);
     setAuthState({ user, isAuthenticated: true, loading: false });
+    resetTimer(); // Start auto-logout timer
   };
 
   const logout = async () => {
-    await authService.logout();
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    
+    // Clear localStorage
+    localStorage.removeItem('user');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    
     setAuthState({ user: null, isAuthenticated: false, loading: false });
   };
 

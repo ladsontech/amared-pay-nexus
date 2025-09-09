@@ -12,7 +12,7 @@ import PettyCashReconciliation from "@/components/petty-cash/PettyCashReconcilia
 import PendingApprovals from "@/components/petty-cash/PendingApprovals";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
 import { useSearchParams, Link } from "react-router-dom";
-import PayBillsForm from "@/components/PayBillsForm";
+import EnhancedPayBillsForm from "@/components/EnhancedPayBillsForm";
 const PettyCash = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") as string || "overview";

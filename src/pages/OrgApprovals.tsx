@@ -25,6 +25,7 @@ const OrgApprovals = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
 
+  // Expanded approval types including Send to Bank and Pay Bill
   const pendingTransactions = [
     {
       id: '1',
@@ -39,25 +40,52 @@ const OrgApprovals = () => {
     },
     {
       id: '2',
-      type: 'Petty Cash',
-      requester: 'Jane Smith',
-      amount: 75000,
-      description: 'Client meeting refreshments',
-      date: '2024-01-20',
-      category: 'Entertainment',
-      receipt: 'receipt_002.jpg',
-      department: 'Sales'
+      type: 'Send to Bank',
+      requester: 'Finance Team',
+      amount: 5000000,
+      description: 'Monthly bank deposit - excess cash',
+      date: '2024-01-21',
+      category: 'Bank Transfer',
+      receipt: null,
+      department: 'Finance',
+      bankDetails: 'Standard Chartered - Account: 123456789'
     },
     {
       id: '3',
-      type: 'Petty Cash',
-      requester: 'Bob Wilson',
-      amount: 200000,
-      description: 'Emergency office repairs',
-      date: '2024-01-19',
-      category: 'Maintenance',
-      receipt: 'receipt_003.pdf',
-      department: 'Facilities'
+      type: 'Pay Bill',
+      requester: 'Operations Manager',
+      amount: 850000,
+      description: 'Monthly electricity bill payment',
+      date: '2024-01-21',
+      category: 'Utilities - Electricity',
+      receipt: 'umeme_bill_jan2024.pdf',
+      department: 'Operations',
+      billDetails: 'UMEME - Account: 404050607080'
+    },
+    {
+      id: '4',
+      type: 'Pay Bill',
+      requester: 'HR Manager',
+      amount: 2500000,
+      description: 'Staff airtime distribution',
+      date: '2024-01-20',
+      category: 'Airtime',
+      receipt: null,
+      department: 'HR',
+      billDetails: 'MTN/Airtel - Bulk airtime purchase'
+    },
+    {
+      id: '5',
+      type: 'Send to Bank',
+      requester: 'CEO',
+      amount: 10000000,
+      description: 'Emergency fund transfer to operations account',
+      date: '2024-01-20',
+      category: 'Bank Transfer',
+      receipt: null,
+      department: 'Executive',
+      bankDetails: 'DFCU Bank - Account: 987654321',
+      urgent: true
     }
   ];
 
@@ -138,13 +166,13 @@ const OrgApprovals = () => {
       <Tabs defaultValue="transactions" className="space-y-4">
         <TabsList className="grid w-full grid-cols-2 h-auto">
           <TabsTrigger value="transactions" className="relative">
-            Transaction Approvals
+            All Approvals
             <Badge variant="secondary" className="ml-2">
               {pendingTransactions.length}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="funding" className="relative">
-            Funding Approvals
+            Funding Requests
             <Badge variant="secondary" className="ml-2">
               {pendingFunding.length}
             </Badge>
@@ -160,11 +188,24 @@ const OrgApprovals = () => {
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-orange-100 rounded-lg">
-                            <Clock className="h-4 w-4 text-orange-600" />
+                          <div className={`p-2 rounded-lg ${
+                            transaction.type === 'Send to Bank' ? 'bg-blue-100' :
+                            transaction.type === 'Pay Bill' ? 'bg-purple-100' : 'bg-orange-100'
+                          }`}>
+                            {transaction.type === 'Send to Bank' ? 
+                              <DollarSign className={`h-4 w-4 ${transaction.type === 'Send to Bank' ? 'text-blue-600' : 'text-orange-600'}`} /> :
+                              transaction.type === 'Pay Bill' ?
+                              <Wallet className="h-4 w-4 text-purple-600" /> :
+                              <Clock className="h-4 w-4 text-orange-600" />
+                            }
                           </div>
                           <div>
-                            <h3 className="font-semibold">{transaction.type}</h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold">{transaction.type}</h3>
+                              {transaction.urgent && (
+                                <Badge variant="destructive" className="text-xs">URGENT</Badge>
+                              )}
+                            </div>
                             <p className="text-sm text-muted-foreground">
                               Requested by {transaction.requester} • {transaction.department}
                             </p>
@@ -189,6 +230,18 @@ const OrgApprovals = () => {
                           <p className="font-medium">{transaction.date}</p>
                         </div>
                       </div>
+                      
+                      {/* Additional details for Send to Bank and Pay Bill */}
+                      {(transaction.bankDetails || transaction.billDetails) && (
+                        <div className="bg-muted/30 p-3 rounded-lg">
+                          <Label className="text-muted-foreground text-xs">
+                            {transaction.type === 'Send to Bank' ? 'Bank Details' : 'Bill Details'}
+                          </Label>
+                          <p className="font-medium text-sm">
+                            {transaction.bankDetails || transaction.billDetails}
+                          </p>
+                        </div>
+                      )}
                       
                       <div>
                         <Label className="text-muted-foreground">Description</Label>

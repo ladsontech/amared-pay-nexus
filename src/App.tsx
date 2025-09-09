@@ -32,6 +32,8 @@ const OrgBulkPaymentsReport = lazy(() => import("./pages/OrgBulkPaymentsReport")
 const OrgCollectionsReport = lazy(() => import("./pages/OrgCollectionsReport"));
 const OrgSettings = lazy(() => import("./pages/OrgSettings"));
 const OrgAccount = lazy(() => import("./pages/OrgAccount"));
+const OrgBulkPaymentsDemo = lazy(() => import("./pages/OrgBulkPaymentsDemo"));
+const OrgSecurityDemo = lazy(() => import("./pages/OrgSecurityDemo"));
 const OrgUsers = lazy(() => import("./pages/OrgUsers"));
 const PayBills = lazy(() => import("./pages/PayBills"));
 const Unauthorized = lazy(() => import("./pages/Unauthorized"));
@@ -89,7 +91,8 @@ const AppRoutes = () => {
           <Route path="reports/bulk-payments" element={<OrgBulkPaymentsReport />} />
           <Route path="reports/collections" element={<OrgCollectionsReport />} />
           <Route path="settings" element={<OrgSettings />} />
-          <Route path="account" element={<OrgAccount />} />
+          <Route path="bulk-payments-demo" element={<OrgBulkPaymentsDemo />} />
+          <Route path="security-demo" element={<OrgSecurityDemo />} />
           <Route path="users" element={<OrgUsers />} />
           <Route path="pay-bills" element={<PayBills />} />
         </Route>
