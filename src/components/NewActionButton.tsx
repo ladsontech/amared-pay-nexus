@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Plus, Wallet, Send, DollarSign, Banknote, CheckCircle } from "lucide-react";
+import { Plus, Wallet, Send, DollarSign, Banknote, CheckCircle, FileText } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSidebar } from "@/components/ui/sidebar";
 
@@ -22,6 +22,11 @@ const NewActionButton = () => {
   const [open, setOpen] = useState(false);
 
   const quickActions = [
+    {
+      label: "Pay Bills",
+      icon: FileText,
+      action: () => navigate("/org/petty-cash?tab=bills"),
+    },
     {
       label: "New Petty Cash Transaction",
       icon: Wallet,
