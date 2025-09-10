@@ -201,7 +201,7 @@ const PettyCash = () => {
       </Tabs>
 
       {/* Pay Bills Modal */}
-      <PayBillsForm isOpen={isPayBillsOpen} onClose={() => setIsPayBillsOpen(false)} />
+      <EnhancedPayBillsForm isOpen={isPayBillsOpen} onClose={() => setIsPayBillsOpen(false)} />
     </div>;
 };
 export default PettyCash;
