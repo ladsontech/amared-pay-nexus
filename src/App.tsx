@@ -68,7 +68,11 @@ const AppRoutes = () => {
         {/* Role Dashboard Aliases */}
 
         {/* System Admin Routes */}
-        <Route path="/system" element={<SystemAdminLayout />}>
+        <Route path="/system" element={
+          <ProtectedRoute requiredRole="admin" fallbackRoute="/login">
+            <SystemAdminLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<Navigate to="/system/analytics" replace />} />
           <Route path="analytics" element={<SystemAnalytics />} />
           <Route path="organizations" element={<SystemOrganizations />} />
@@ -78,29 +82,73 @@ const AppRoutes = () => {
         </Route>
 
         {/* Organization Routes */}
-        <Route path="/org" element={<OrganizationLayout />}>
+        <Route path="/org" element={
+          <ProtectedRoute fallbackRoute="/login">
+            <OrganizationLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<Navigate to="/org/dashboard" replace />} />
           <Route path="dashboard" element={<OrgDashboard />} />
-          <Route path="petty-cash" element={<OrgPettyCash />} />
-          <Route path="bulk-payments" element={<OrgBulkPayments />} />
-          <Route path="collections" element={<OrgCollections />} />
-          <Route path="deposits" element={<OrgDeposits />} />
-          <Route path="approvals" element={<OrgApprovals />} />
-          <Route path="reports" element={<OrgReports />} />
-          <Route path="reports/petty-cash" element={<OrgPettyCashReport />} />
-          <Route path="reports/bulk-payments" element={<OrgBulkPaymentsReport />} />
-          <Route path="reports/collections" element={<OrgCollectionsReport />} />
+          <Route path="petty-cash" element={
+            <ProtectedRoute requiredPermissions={["access_petty_cash"]}>
+              <OrgPettyCash />
+            </ProtectedRoute>
+          } />
+          <Route path="bulk-payments" element={
+            <ProtectedRoute requiredPermissions={["access_bulk_payments"]}>
+              <OrgBulkPayments />
+            </ProtectedRoute>
+          } />
+          <Route path="collections" element={
+            <ProtectedRoute requiredPermissions={["access_collections"]}>
+              <OrgCollections />
+            </ProtectedRoute>
+          } />
+          <Route path="deposits" element={
+            <ProtectedRoute requiredPermissions={["access_bank_deposits"]}>
+              <OrgDeposits />
+            </ProtectedRoute>
+          } />
+          <Route path="approvals" element={
+            <ProtectedRoute requiredPermissions={["approve_transactions", "approve_funding", "approve_bulk_payments", "approve_bank_deposits"]}>
+              <OrgApprovals />
+            </ProtectedRoute>
+          } />
+          <Route path="reports" element={
+            <ProtectedRoute requiredPermissions={["view_department_reports", "view_own_history"]}>
+              <OrgReports />
+            </ProtectedRoute>
+          } />
+          <Route path="reports/petty-cash" element={
+            <ProtectedRoute requiredPermissions={["view_department_reports", "view_own_history"]}>
+              <OrgPettyCashReport />
+            </ProtectedRoute>
+          } />
+          <Route path="reports/bulk-payments" element={
+            <ProtectedRoute requiredPermissions={["view_department_reports", "view_own_history"]}>
+              <OrgBulkPaymentsReport />
+            </ProtectedRoute>
+          } />
+          <Route path="reports/collections" element={
+            <ProtectedRoute requiredPermissions={["view_department_reports", "view_own_history"]}>
+              <OrgCollectionsReport />
+            </ProtectedRoute>
+          } />
           <Route path="settings" element={<OrgSettings />} />
           <Route path="bulk-payments-demo" element={<OrgBulkPaymentsDemo />} />
           <Route path="security-demo" element={<OrgSecurityDemo />} />
-          <Route path="users" element={<OrgUsers />} />
+          <Route path="users" element={
+            <ProtectedRoute requiredPermissions={["manage_team"]}>
+              <OrgUsers />
+            </ProtectedRoute>
+          } />
           <Route path="pay-bills" element={<PayBills />} />
         </Route>
 
         {/* Redirect authenticated users to appropriate dashboard */}
         <Route path="/dashboard" element={
           isAuthenticated ? (
-            user?.permissions?.includes('system_admin') ?
+            (user?.role === 'admin' || user?.permissions?.includes('system_admin')) ?
               <Navigate to="/system/analytics" replace /> :
               <Navigate to="/org/dashboard" replace />
           ) : (

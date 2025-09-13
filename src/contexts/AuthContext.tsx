@@ -170,18 +170,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const verifyToken = (token: string) => authService.verifyToken(token);
 
   const hasPermission = (permission: Permission): boolean => {
-    // Temporarily allow all permissions
-    return true;
+    const currentUser = authState.user;
+    if (!authState.isAuthenticated || !currentUser) return false;
+    return Array.isArray(currentUser.permissions) && currentUser.permissions.includes(permission);
   };
 
   const hasAnyPermission = (permissions: Permission[]): boolean => {
-    // Temporarily allow all permissions
-    return true;
+    const currentUser = authState.user;
+    if (!authState.isAuthenticated || !currentUser) return false;
+    if (!Array.isArray(currentUser.permissions)) return false;
+    return permissions.some(p => currentUser.permissions.includes(p));
   };
 
   const isRole = (role: string): boolean => {
-    // Temporarily allow all roles
-    return true;
+    const currentUser = authState.user;
+    if (!authState.isAuthenticated || !currentUser) return false;
+    return currentUser.role === role;
   };
 
   return (
