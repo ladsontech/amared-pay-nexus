@@ -73,7 +73,7 @@ const AppRoutes = () => {
             <SystemAdminLayout />
           </ProtectedRoute>
         }>
-          <Route index element={<Navigate to="/system/analytics" replace />} />
+          <Route index element={<Navigate to="/system/organizations" replace />} />
           <Route path="analytics" element={<SystemAnalytics />} />
           <Route path="organizations" element={<SystemOrganizations />} />
           <Route path="users" element={<SystemUsers />} />
@@ -149,7 +149,7 @@ const AppRoutes = () => {
         <Route path="/dashboard" element={
           isAuthenticated ? (
             (user?.role === 'admin' || user?.permissions?.includes('system_admin')) ?
-              <Navigate to="/system/analytics" replace /> :
+              <Navigate to="/system/organizations" replace /> :
               <Navigate to="/org/dashboard" replace />
           ) : (
             <Navigate to="/login" replace />
