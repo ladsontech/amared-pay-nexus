@@ -199,7 +199,7 @@ class AuthService {
       }
 
       // Fetch complete user details
-      const userResponse = await fetch(`${API_CONFIG.baseURL}user/${userId}/`, {
+      const userResponse = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.user.userDetail(String(userId))}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
