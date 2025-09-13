@@ -17,16 +17,24 @@ import { Home, Wallet, Send, DollarSign, BarChart3, Shield, CheckCircle, Buildin
 import NewActionButton from "./NewActionButton";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-type NavItem = { title: string; url: string; icon: React.ComponentType<{ className?: string }>; permission?: Permission };
+type NavItem = { 
+  title: string; 
+  url: string; 
+  icon: React.ComponentType<{ className?: string }>; 
+  permission?: Permission; // requires this single permission
+  anyOf?: Permission[];    // requires any of these permissions
+};
 
 const orgItems: NavItem[] = [
   { title: "Dashboard", url: "/org/dashboard", icon: Home },
-  { title: "Petty Cash", url: "/org/petty-cash", icon: Wallet },
-  { title: "Bulk Payments", url: "/org/bulk-payments", icon: Send },
-  { title: "Collections", url: "/org/collections", icon: DollarSign },
-  { title: "Approvals", url: "/org/approvals", icon: CheckCircle },
-  { title: "Reports", url: "/org/reports", icon: BarChart3 },
-  { title: "Users", url: "/org/users", icon: Users },
+  { title: "Petty Cash", url: "/org/petty-cash", icon: Wallet, permission: "access_petty_cash" },
+  { title: "Bulk Payments", url: "/org/bulk-payments", icon: Send, permission: "access_bulk_payments" },
+  { title: "Collections", url: "/org/collections", icon: DollarSign, permission: "access_collections" },
+  { title: "Approvals", url: "/org/approvals", icon: CheckCircle, anyOf: [
+      "approve_transactions", "approve_funding", "approve_bulk_payments", "approve_bank_deposits"
+    ] },
+  { title: "Reports", url: "/org/reports", icon: BarChart3, anyOf: ["view_department_reports", "view_own_history"] },
+  { title: "Users", url: "/org/users", icon: Users, permission: "manage_team" },
   { title: "Account", url: "/org/account", icon: User },
   { title: "Settings", url: "/org/settings", icon: Settings },
 ];
@@ -35,9 +43,18 @@ export default function AppOrgSidebar() {
   const { setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
   const location = useLocation();
+  const { hasPermission, hasAnyPermission } = useAuth();
   const isActive = (path: string) => location.pathname === path;
 
-  const items = orgItems;
+  const items = orgItems.filter(item => {
+    if (item.permission) {
+      return hasPermission(item.permission);
+    }
+    if (item.anyOf && item.anyOf.length > 0) {
+      return hasAnyPermission(item.anyOf);
+    }
+    return true;
+  });
 
   const handleNavClick = () => {
     if (isMobile) {
