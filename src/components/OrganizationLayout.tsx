@@ -1,5 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,6 +15,10 @@ const OrganizationLayout = () => {
     user,
     logout
   } = useAuth();
+  // Redirect system admins to the system dashboard
+  if (user?.role === 'admin') {
+    return <Navigate to="/system/organizations" replace />;
+  }
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case "manager":
