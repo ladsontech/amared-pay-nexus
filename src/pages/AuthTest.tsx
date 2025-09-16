@@ -33,6 +33,18 @@ const AuthTest = () => {
     current_password: 'oldpassword123',
     new_password: 'newpassword123'
   });
+
+  // OTP test states
+  const [emailOtp, setEmailOtp] = useState({
+    email: 'user@example.com',
+    email_code: '123456',
+    new_password: 'newpassword123'
+  });
+  const [smsOtp, setSmsOtp] = useState({
+    phone_number: '+256700000000',
+    sms_code: '123456',
+    new_password: 'newpassword123'
+  });
   
   // Organization test states
   const [orgData, setOrgData] = useState({
@@ -166,11 +178,12 @@ const AuthTest = () => {
       </div>
 
       <Tabs defaultValue="auth" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="auth">Authentication</TabsTrigger>
           <TabsTrigger value="organization">Organizations</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="results">Test Results</TabsTrigger>
+          <TabsTrigger value="otp">OTP</TabsTrigger>
         </TabsList>
 
         <TabsContent value="auth" className="space-y-6">
@@ -292,6 +305,155 @@ const AuthTest = () => {
                   >
                     {loading === 'Logout' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Logout
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="otp" className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Email OTP */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="h-5 w-5" />
+                  Email OTP
+                </CardTitle>
+                <CardDescription>Forgot password via email and verification</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Email</Label>
+                  <Input
+                    type="email"
+                    value={emailOtp.email}
+                    onChange={(e) => setEmailOtp(prev => ({ ...prev, email: e.target.value }))}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button 
+                    onClick={() => testEndpoint('Send Forgot Password Email', () => authService.sendForgotPasswordEmail(emailOtp.email))}
+                    disabled={loading === 'Send Forgot Password Email'}
+                  >
+                    {loading === 'Send Forgot Password Email' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Send Email OTP
+                  </Button>
+                  <Button 
+                    onClick={() => testEndpoint('Resend Email OTP', () => authService.resendEmailOtp(emailOtp.email))}
+                    disabled={loading === 'Resend Email OTP'}
+                    variant="outline"
+                  >
+                    {loading === 'Resend Email OTP' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Resend Email OTP
+                  </Button>
+                </div>
+                <Separator />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Email Code</Label>
+                    <Input
+                      value={emailOtp.email_code}
+                      onChange={(e) => setEmailOtp(prev => ({ ...prev, email_code: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label>New Password</Label>
+                    <Input
+                      type="password"
+                      value={emailOtp.new_password}
+                      onChange={(e) => setEmailOtp(prev => ({ ...prev, new_password: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button 
+                    onClick={() => testEndpoint('Verify Email Address', () => authService.verifyEmailAddress({ email_code: emailOtp.email_code, email: emailOtp.email }))}
+                    disabled={loading === 'Verify Email Address'}
+                  >
+                    {loading === 'Verify Email Address' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Verify Email
+                  </Button>
+                  <Button 
+                    onClick={() => testEndpoint('Reset Password (Email Code)', () => authService.resetPasswordWithEmailCode({ email_code: emailOtp.email_code, new_password: emailOtp.new_password }))}
+                    disabled={loading === 'Reset Password (Email Code)'}
+                    variant="outline"
+                  >
+                    {loading === 'Reset Password (Email Code)' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Reset Password
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* SMS OTP */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  SMS OTP
+                </CardTitle>
+                <CardDescription>Forgot password via SMS and verification</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Phone Number</Label>
+                  <Input
+                    value={smsOtp.phone_number}
+                    onChange={(e) => setSmsOtp(prev => ({ ...prev, phone_number: e.target.value }))}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button 
+                    onClick={() => testEndpoint('Send Forgot Password SMS', () => authService.sendForgotPasswordSms(smsOtp.phone_number))}
+                    disabled={loading === 'Send Forgot Password SMS'}
+                  >
+                    {loading === 'Send Forgot Password SMS' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Send SMS OTP
+                  </Button>
+                  <Button 
+                    onClick={() => testEndpoint('Resend SMS OTP', () => authService.resendSmsOtp(smsOtp.phone_number))}
+                    disabled={loading === 'Resend SMS OTP'}
+                    variant="outline"
+                  >
+                    {loading === 'Resend SMS OTP' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Resend SMS OTP
+                  </Button>
+                </div>
+                <Separator />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>SMS Code</Label>
+                    <Input
+                      value={smsOtp.sms_code}
+                      onChange={(e) => setSmsOtp(prev => ({ ...prev, sms_code: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label>New Password</Label>
+                    <Input
+                      type="password"
+                      value={smsOtp.new_password}
+                      onChange={(e) => setSmsOtp(prev => ({ ...prev, new_password: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button 
+                    onClick={() => testEndpoint('Verify Phone Number', () => authService.verifyPhoneNumber({ sms_code: smsOtp.sms_code, phone_number: smsOtp.phone_number }))}
+                    disabled={loading === 'Verify Phone Number'}
+                  >
+                    {loading === 'Verify Phone Number' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Verify Phone
+                  </Button>
+                  <Button 
+                    onClick={() => testEndpoint('Reset Password (SMS Code)', () => authService.resetPasswordWithSmsCode({ sms_code: smsOtp.sms_code, new_password: smsOtp.new_password }))}
+                    disabled={loading === 'Reset Password (SMS Code)'}
+                    variant="outline"
+                  >
+                    {loading === 'Reset Password (SMS Code)' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Reset Password
                   </Button>
                 </div>
               </CardContent>
@@ -664,7 +826,9 @@ const AuthTest = () => {
               </Alert>
             ) : (
               Object.entries(results).map(([name, result]) => (
-                <ResultCard key={name} name={name} result={result} />
+                <div key={name}>
+                  <ResultCard name={name} result={result} />
+                </div>
               ))
             )}
           </div>

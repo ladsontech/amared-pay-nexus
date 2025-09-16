@@ -47,6 +47,28 @@ export interface TokenVerifyRequest {
   token: string;
 }
 
+export interface ForgotPasswordEmailRequest { email: string }
+export interface ResendEmailOtpRequest { email: string }
+export interface VerifyEmailAddressRequest { email_code: string; email: string }
+export interface ResetPasswordEmailCodeRequest { email_code: string; new_password: string }
+export interface ForgotPasswordSmsRequest { phone_number: string }
+export interface ResendSmsOtpRequest { phone_number: string }
+export interface VerifyPhoneNumberRequest { sms_code: string; phone_number: string }
+export interface ResetPasswordSmsCodeRequest { sms_code: string; new_password: string }
+
+export interface BasicSuccessResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface OtpVerifyResponse extends BasicSuccessResponse {
+  data?: {
+    user?: any;
+    access_token?: string;
+    refresh_token?: string;
+  };
+}
+
 class AuthService {
   private decodeJwt(token: string): any | null {
     try {
@@ -344,6 +366,106 @@ class AuthService {
     } catch (error) {
       console.error('Token verify failed:', error);
       return false;
+    }
+  }
+
+  // --- OTP EMAIL FLOWS ---
+  async sendForgotPasswordEmail(email: string): Promise<BasicSuccessResponse> {
+    try {
+      return await apiClient.post<BasicSuccessResponse>(API_CONFIG.endpoints.otp.email.send, { email } as ForgotPasswordEmailRequest);
+    } catch (error) {
+      console.error('Forgot password email failed:', error);
+      throw error;
+    }
+  }
+
+  async resendEmailOtp(email: string): Promise<BasicSuccessResponse> {
+    try {
+      return await apiClient.post<BasicSuccessResponse>(API_CONFIG.endpoints.otp.email.resend, { email } as ResendEmailOtpRequest);
+    } catch (error) {
+      console.error('Resend email OTP failed:', error);
+      throw error;
+    }
+  }
+
+  async verifyEmailAddress(body: VerifyEmailAddressRequest): Promise<OtpVerifyResponse> {
+    try {
+      const response = await apiClient.post<OtpVerifyResponse>(API_CONFIG.endpoints.otp.email.verify, body);
+      const accessToken = response?.data?.access_token;
+      const refreshToken = response?.data?.refresh_token;
+      if (accessToken) {
+        localStorage.setItem('auth_token', accessToken);
+        localStorage.setItem('access_token', accessToken);
+      }
+      if (refreshToken) {
+        localStorage.setItem('refresh_token', refreshToken);
+      }
+      if (response?.data?.user) {
+        await this.storeUserProfile(response.data.user, accessToken || '');
+      }
+      return response;
+    } catch (error) {
+      console.error('Verify email address failed:', error);
+      throw error;
+    }
+  }
+
+  async resetPasswordWithEmailCode(body: ResetPasswordEmailCodeRequest): Promise<BasicSuccessResponse> {
+    try {
+      return await apiClient.post<BasicSuccessResponse>(API_CONFIG.endpoints.otp.email.resetPassword, body);
+    } catch (error) {
+      console.error('Reset password with email code failed:', error);
+      throw error;
+    }
+  }
+
+  // --- OTP SMS FLOWS ---
+  async sendForgotPasswordSms(phone_number: string): Promise<BasicSuccessResponse> {
+    try {
+      return await apiClient.post<BasicSuccessResponse>(API_CONFIG.endpoints.otp.sms.send, { phone_number } as ForgotPasswordSmsRequest);
+    } catch (error) {
+      console.error('Forgot password SMS failed:', error);
+      throw error;
+    }
+  }
+
+  async resendSmsOtp(phone_number: string): Promise<BasicSuccessResponse> {
+    try {
+      return await apiClient.post<BasicSuccessResponse>(API_CONFIG.endpoints.otp.sms.resend, { phone_number } as ResendSmsOtpRequest);
+    } catch (error) {
+      console.error('Resend SMS OTP failed:', error);
+      throw error;
+    }
+  }
+
+  async verifyPhoneNumber(body: VerifyPhoneNumberRequest): Promise<OtpVerifyResponse> {
+    try {
+      const response = await apiClient.post<OtpVerifyResponse>(API_CONFIG.endpoints.otp.sms.verify, body);
+      const accessToken = response?.data?.access_token;
+      const refreshToken = response?.data?.refresh_token;
+      if (accessToken) {
+        localStorage.setItem('auth_token', accessToken);
+        localStorage.setItem('access_token', accessToken);
+      }
+      if (refreshToken) {
+        localStorage.setItem('refresh_token', refreshToken);
+      }
+      if (response?.data?.user) {
+        await this.storeUserProfile(response.data.user, accessToken || '');
+      }
+      return response;
+    } catch (error) {
+      console.error('Verify phone number failed:', error);
+      throw error;
+    }
+  }
+
+  async resetPasswordWithSmsCode(body: ResetPasswordSmsCodeRequest): Promise<BasicSuccessResponse> {
+    try {
+      return await apiClient.post<BasicSuccessResponse>(API_CONFIG.endpoints.otp.sms.resetPassword, body);
+    } catch (error) {
+      console.error('Reset password with SMS code failed:', error);
+      throw error;
     }
   }
 

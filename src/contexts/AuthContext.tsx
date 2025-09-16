@@ -10,6 +10,14 @@ interface AuthContextType extends AuthState {
   changePassword: (current_password: string, new_password: string) => Promise<{ success: boolean; message: string }>;
   refreshToken: () => Promise<{ access: string; refresh: string }>;
   verifyToken: (token: string) => Promise<boolean>;
+  forgotPasswordEmail: (email: string) => Promise<{ success: boolean; message: string }>;
+  resendEmailOtp: (email: string) => Promise<{ success: boolean; message: string }>;
+  verifyEmailAddress: (email_code: string, email: string) => Promise<boolean>;
+  resetPasswordWithEmailCode: (email_code: string, new_password: string) => Promise<{ success: boolean; message: string }>;
+  forgotPasswordSms: (phone_number: string) => Promise<{ success: boolean; message: string }>;
+  resendSmsOtp: (phone_number: string) => Promise<{ success: boolean; message: string }>;
+  verifyPhoneNumber: (sms_code: string, phone_number: string) => Promise<boolean>;
+  resetPasswordWithSmsCode: (sms_code: string, new_password: string) => Promise<{ success: boolean; message: string }>;
   hasPermission: (permission: Permission) => boolean;
   hasAnyPermission: (permissions: Permission[]) => boolean;
   isRole: (role: string) => boolean;
@@ -32,9 +40,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading: true,
   });
   
-  // Auto-logout timer (15 minutes)
-  const timeoutDuration = 15 * 60 * 1000; // 15 minutes in milliseconds
-  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  // Auto-logout timer (configurable, default 15 minutes)
+  const timeoutMinutes = Number((import.meta as any).env?.VITE_AUTH_IDLE_TIMEOUT_MINUTES ?? 15);
+  const timeoutDuration = timeoutMinutes * 60 * 1000;
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const resetTimer = () => {
     if (timeoutRef.current) {
@@ -169,6 +178,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const verifyToken = (token: string) => authService.verifyToken(token);
 
+  // OTP email flows
+  const forgotPasswordEmail = (email: string) => authService.sendForgotPasswordEmail(email);
+  const resendEmailOtp = (email: string) => authService.resendEmailOtp(email);
+  const verifyEmailAddress = async (email_code: string, email: string) => {
+    const result = await authService.verifyEmailAddress({ email_code, email });
+    if (result?.success) {
+      const raw = localStorage.getItem('user');
+      if (raw) {
+        try {
+          const user = JSON.parse(raw);
+          setAuthState({ user, isAuthenticated: true, loading: false });
+          resetTimer();
+        } catch {
+          // ignore
+        }
+      }
+    }
+    return !!result?.success;
+  };
+  const resetPasswordWithEmailCode = (email_code: string, new_password: string) => authService.resetPasswordWithEmailCode({ email_code, new_password });
+
+  // OTP sms flows
+  const forgotPasswordSms = (phone_number: string) => authService.sendForgotPasswordSms(phone_number);
+  const resendSmsOtp = (phone_number: string) => authService.resendSmsOtp(phone_number);
+  const verifyPhoneNumber = async (sms_code: string, phone_number: string) => {
+    const result = await authService.verifyPhoneNumber({ sms_code, phone_number });
+    if (result?.success) {
+      const raw = localStorage.getItem('user');
+      if (raw) {
+        try {
+          const user = JSON.parse(raw);
+          setAuthState({ user, isAuthenticated: true, loading: false });
+          resetTimer();
+        } catch {
+          // ignore
+        }
+      }
+    }
+    return !!result?.success;
+  };
+  const resetPasswordWithSmsCode = (sms_code: string, new_password: string) => authService.resetPasswordWithSmsCode({ sms_code, new_password });
+
   const hasPermission = (permission: Permission): boolean => {
     const currentUser = authState.user;
     if (!authState.isAuthenticated || !currentUser) return false;
@@ -198,6 +249,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         changePassword,
         refreshToken,
         verifyToken,
+        forgotPasswordEmail,
+        resendEmailOtp,
+        verifyEmailAddress,
+        resetPasswordWithEmailCode,
+        forgotPasswordSms,
+        resendSmsOtp,
+        verifyPhoneNumber,
+        resetPasswordWithSmsCode,
         hasPermission,
         hasAnyPermission,
         isRole,
