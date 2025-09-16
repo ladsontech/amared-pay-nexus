@@ -134,6 +134,7 @@ const AppRoutes = () => {
               <OrgCollectionsReport />
             </ProtectedRoute>
           } />
+          <Route path="account" element={<OrgAccount />} />
           <Route path="settings" element={<OrgSettings />} />
           <Route path="bulk-payments-demo" element={<OrgBulkPaymentsDemo />} />
           <Route path="security-demo" element={<OrgSecurityDemo />} />
