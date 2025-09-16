@@ -30,6 +30,7 @@ const orgItems: NavItem[] = [
   { title: "Petty Cash", url: "/org/petty-cash", icon: Wallet, permission: "access_petty_cash" },
   { title: "Bulk Payments", url: "/org/bulk-payments", icon: Send, permission: "access_bulk_payments" },
   { title: "Collections", url: "/org/collections", icon: DollarSign, permission: "access_collections" },
+  { title: "Deposits", url: "/org/deposits", icon: Building, permission: "access_bank_deposits" },
   { title: "Approvals", url: "/org/approvals", icon: CheckCircle, anyOf: [
       "approve_transactions", "approve_funding", "approve_bulk_payments", "approve_bank_deposits"
     ] },
@@ -45,16 +46,7 @@ export default function AppOrgSidebar() {
   const location = useLocation();
   const { hasPermission, hasAnyPermission } = useAuth();
   const isActive = (path: string) => location.pathname === path;
-
-  const items = orgItems.filter(item => {
-    if (item.permission) {
-      return hasPermission(item.permission);
-    }
-    if (item.anyOf && item.anyOf.length > 0) {
-      return hasAnyPermission(item.anyOf);
-    }
-    return true;
-  });
+  const items = orgItems; // Always show all items; disable ones without permission
 
   const handleNavClick = () => {
     if (isMobile) {
@@ -79,20 +71,28 @@ export default function AppOrgSidebar() {
               <NewActionButton />
             </div>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={isActive(item.url)}
-                    className="hover:bg-blue-50 data-[active=true]:bg-blue-100 data-[active=true]:text-blue-700 data-[active=true]:border-r-3 data-[active=true]:border-blue-500 data-[active=true]:font-bold transition-all duration-200"
-                  >
-                    <NavLink to={item.url} end onClick={handleNavClick}>
-                      <item.icon className="mr-3 h-5 w-5" />
-                      <span className="font-semibold">{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                const canAccess = item.permission
+                  ? hasPermission(item.permission)
+                  : item.anyOf && item.anyOf.length > 0
+                    ? hasAnyPermission(item.anyOf)
+                    : true;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton 
+                      asChild 
+                      isActive={isActive(item.url)}
+                      aria-disabled={!canAccess}
+                      className="hover:bg-blue-50 data-[active=true]:bg-blue-100 data-[active=true]:text-blue-700 data-[active=true]:border-r-3 data-[active=true]:border-blue-500 data-[active=true]:font-bold transition-all duration-200"
+                    >
+                      <NavLink to={item.url} end onClick={handleNavClick}>
+                        <item.icon className="mr-3 h-5 w-5" />
+                        <span className="font-semibold">{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
