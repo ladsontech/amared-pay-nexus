@@ -15,11 +15,11 @@ const OrganizationLayout = lazy(() => import("./components/OrganizationLayout"))
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
 const AuthTest = lazy(() => import("./pages/AuthTest"));
-const SystemAnalytics = lazy(() => import("./pages/SystemAnalytics"));
+// Removed: SystemAnalytics
 const SystemOrganizations = lazy(() => import("./pages/SystemOrganizations"));
 const SystemUsers = lazy(() => import("./pages/SystemUsers"));
 const SystemSettings = lazy(() => import("./pages/SystemSettings"));
-const SystemAlerts = lazy(() => import("./pages/SystemAlerts"));
+// Removed: SystemAlerts
 const OrgDashboard = lazy(() => import("./pages/OrgDashboard"));
 const OrgPettyCash = lazy(() => import("./pages/OrgPettyCash"));
 const OrgBulkPayments = lazy(() => import("./pages/OrgBulkPayments"));
@@ -69,15 +69,17 @@ const AppRoutes = () => {
 
         {/* System Admin Routes */}
         <Route path="/system" element={
-          <ProtectedRoute requiredRole="admin" fallbackRoute="/login">
-            <SystemAdminLayout />
+          <ProtectedRoute fallbackRoute="/login">
+            {(user?.role === 'admin' || user?.permissions?.includes('system_admin')) ? (
+              <SystemAdminLayout />
+            ) : (
+              <Navigate to="/unauthorized" replace />
+            )}
           </ProtectedRoute>
         }>
           <Route index element={<Navigate to="/system/organizations" replace />} />
-          <Route path="analytics" element={<SystemAnalytics />} />
           <Route path="organizations" element={<SystemOrganizations />} />
           <Route path="users" element={<SystemUsers />} />
-          <Route path="alerts" element={<SystemAlerts />} />
           <Route path="settings" element={<SystemSettings />} />
         </Route>
 
