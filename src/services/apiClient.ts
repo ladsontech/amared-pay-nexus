@@ -7,6 +7,14 @@ export interface ApiError extends Error {
 
 export type QueryParams = Record<string, string | number | boolean | undefined | null>;
 
+type AuthMode = 'bearer' | 'basic' | 'none';
+
+export interface RequestOptions {
+  authMode?: AuthMode;
+  basicCredentials?: { username: string; password: string };
+  headers?: Record<string, string>;
+}
+
 function buildUrl(path: string, query?: QueryParams): string {
   const url = new URL(path, API_CONFIG.baseURL);
   if (query) {
@@ -38,6 +46,40 @@ function getAuthHeaders(): Record<string, string> {
   return headers;
 }
 
+function getBasicAuthHeaders(opts?: RequestOptions): Record<string, string> {
+  const headers = getBasicHeaders();
+  let basicToken = localStorage.getItem('basic_auth') || '';
+
+  if (opts?.basicCredentials) {
+    const { username, password } = opts.basicCredentials;
+    try {
+      basicToken = btoa(`${username}:${password}`);
+    } catch {
+      basicToken = btoa(unescape(encodeURIComponent(`${username}:${password}`)));
+    }
+  }
+
+  if (!basicToken) {
+    const envUser = (import.meta as any).env?.VITE_BASIC_USERNAME;
+    const envPass = (import.meta as any).env?.VITE_BASIC_PASSWORD;
+    const envToken = (import.meta as any).env?.VITE_BASIC_AUTH;
+    if (envToken) {
+      basicToken = envToken;
+    } else if (envUser && envPass) {
+      try {
+        basicToken = btoa(`${envUser}:${envPass}`);
+      } catch {
+        basicToken = btoa(unescape(encodeURIComponent(`${envUser}:${envPass}`)));
+      }
+    }
+  }
+
+  if (basicToken) {
+    headers['Authorization'] = `Basic ${basicToken}`;
+  }
+  return headers;
+}
+
 async function handleResponse<T>(response: Response): Promise<T> {
   const contentType = response.headers.get('content-type') || '';
   const isJson = contentType.includes('application/json');
@@ -59,23 +101,25 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export const apiClient = {
-  get: async <T>(path: string, query?: QueryParams): Promise<T> => {
+  get: async <T>(path: string, query?: QueryParams, options?: RequestOptions): Promise<T> => {
     const url = buildUrl(path, query);
     console.log('GET request:', url);
     const res = await fetch(url, {
       method: 'GET',
-      headers: getAuthHeaders(),
+      headers: options?.authMode === 'none' ? getBasicHeaders() : options?.authMode === 'basic' ? getBasicAuthHeaders(options) : getAuthHeaders(),
       mode: 'cors'
     });
     return handleResponse<T>(res);
   },
-  post: async <T>(path: string, body?: unknown, query?: QueryParams): Promise<T> => {
+  post: async <T>(path: string, body?: unknown, query?: QueryParams, options?: RequestOptions): Promise<T> => {
     const url = buildUrl(path, query);
     console.log('POST request:', url, body);
     
-    // For login endpoint, don't include auth headers
+    // For login endpoint, don't include auth headers unless explicitly provided
     const isLoginRequest = path.includes('/auth/login');
-    const headers = isLoginRequest ? getBasicHeaders() : getAuthHeaders();
+    const headers = options?.authMode
+      ? (options.authMode === 'none' ? getBasicHeaders() : options.authMode === 'basic' ? getBasicAuthHeaders(options) : getAuthHeaders())
+      : (isLoginRequest ? getBasicHeaders() : getAuthHeaders());
     
     const res = await fetch(url, {
       method: 'POST',
@@ -85,23 +129,23 @@ export const apiClient = {
     });
     return handleResponse<T>(res);
   },
-  put: async <T>(path: string, body?: unknown, query?: QueryParams): Promise<T> => {
+  put: async <T>(path: string, body?: unknown, query?: QueryParams, options?: RequestOptions): Promise<T> => {
     const url = buildUrl(path, query);
     console.log('PUT request:', url, body);
     const res = await fetch(url, {
       method: 'PUT',
-      headers: getAuthHeaders(),
+      headers: options?.authMode === 'none' ? getBasicHeaders() : options?.authMode === 'basic' ? getBasicAuthHeaders(options) : getAuthHeaders(),
       body: body !== undefined ? JSON.stringify(body) : undefined,
       mode: 'cors'
     });
     return handleResponse<T>(res);
   },
-  delete: async <T>(path: string, query?: QueryParams): Promise<T> => {
+  delete: async <T>(path: string, query?: QueryParams, options?: RequestOptions): Promise<T> => {
     const url = buildUrl(path, query);
     console.log('DELETE request:', url);
     const res = await fetch(url, {
       method: 'DELETE',
-      headers: getAuthHeaders(),
+      headers: options?.authMode === 'none' ? getBasicHeaders() : options?.authMode === 'basic' ? getBasicAuthHeaders(options) : getAuthHeaders(),
       mode: 'cors'
     });
     return handleResponse<T>(res);

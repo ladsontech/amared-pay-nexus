@@ -16,7 +16,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRole,
   fallbackRoute = '/login',
 }) => {
-  const { loading, isAuthenticated, hasAnyPermission, isRole } = useAuth();
+  const { loading, isAuthenticated, hasAnyPermission, isRole, user } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -35,6 +35,23 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Role check
   if (requiredRole && !isRole(requiredRole)) {
     return <Navigate to="/unauthorized" replace />;
+  }
+
+  // Prevent superusers from accessing org payments pages by default
+  const isSuperUser = user?.role === 'admin' || user?.permissions?.includes('system_admin') || user?.is_superuser;
+  const isPaymentsPage = requiredPermissions.some((p) => [
+    'access_petty_cash',
+    'access_bulk_payments',
+    'access_collections',
+    'access_bank_deposits',
+    'approve_transactions',
+    'approve_funding',
+    'approve_bulk_payments',
+    'approve_bank_deposits',
+  ].includes(p as any));
+
+  if (isSuperUser && isPaymentsPage) {
+    return <Navigate to="/system/organizations" replace />;
   }
 
   // Permission check (any of provided)

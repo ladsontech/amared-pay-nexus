@@ -74,11 +74,9 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }>
           <Route index element={<Navigate to="/system/organizations" replace />} />
-          <Route path="analytics" element={<SystemAnalytics />} />
           <Route path="organizations" element={<SystemOrganizations />} />
           <Route path="users" element={<SystemUsers />} />
-          <Route path="alerts" element={<SystemAlerts />} />
-          <Route path="settings" element={<SystemSettings />} />
+          {/* Superusers should not access payments or other org features here */}
         </Route>
 
         {/* Organization Routes */}

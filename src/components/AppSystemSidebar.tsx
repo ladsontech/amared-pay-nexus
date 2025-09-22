@@ -4,11 +4,8 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGrou
 import { BarChart3, Building2, Users, Settings, Shield, AlertTriangle, Crown } from "lucide-react";
 
 const adminItems = [
-  { title: "Analytics", url: "/system/analytics", icon: BarChart3 },
   { title: "Organizations", url: "/system/organizations", icon: Building2 },
   { title: "Users", url: "/system/users", icon: Users },
-  { title: "Alerts", url: "/system/alerts", icon: AlertTriangle },
-  { title: "Settings", url: "/system/settings", icon: Settings },
 ];
 
 export default function AppSystemSidebar() {

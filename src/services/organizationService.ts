@@ -107,7 +107,12 @@ class OrganizationService {
   // Organizations
   async createOrganization(payload: CreateOrganizationRequest): Promise<OrganizationResponse> {
     try {
-      return await apiClient.post<OrganizationResponse>(API_CONFIG.endpoints.organizations.createWithOwner, payload);
+      return await apiClient.post<OrganizationResponse>(
+        API_CONFIG.endpoints.organizations.createWithOwner,
+        payload,
+        undefined,
+        { authMode: 'basic' }
+      );
     } catch (error) {
       console.error('Failed to create organization:', error);
       throw new Error('Failed to create organization');
@@ -117,8 +122,9 @@ class OrganizationService {
   async listOrganizations(query?: QueryParams): Promise<OrganizationResponse[]> {
     try {
       const response = await apiClient.get<{ results?: OrganizationResponse[]; data?: OrganizationResponse[] } | OrganizationResponse[]>(
-        API_CONFIG.endpoints.organizations.list, 
-        query
+        API_CONFIG.endpoints.organizations.list,
+        query,
+        { authMode: 'basic' }
       );
       
       // Handle different response formats
@@ -148,7 +154,11 @@ class OrganizationService {
 
   async getOrganization(id: string): Promise<OrganizationResponse> {
     try {
-      return await apiClient.get<OrganizationResponse>(API_CONFIG.endpoints.organizations.detail(id));
+      return await apiClient.get<OrganizationResponse>(
+        API_CONFIG.endpoints.organizations.detail(id),
+        undefined,
+        { authMode: 'basic' }
+      );
     } catch (error) {
       console.warn('API call failed, using demo data:', error);
       // Fallback to demo data
@@ -170,7 +180,12 @@ class OrganizationService {
 
   async updateOrganization(id: string, payload: UpdateOrganizationRequest): Promise<OrganizationResponse> {
     try {
-      return await apiClient.put<OrganizationResponse>(API_CONFIG.endpoints.organizations.update(id), payload);
+      return await apiClient.put<OrganizationResponse>(
+        API_CONFIG.endpoints.organizations.update(id),
+        payload,
+        undefined,
+        { authMode: 'basic' }
+      );
     } catch (error) {
       console.error(`Failed to update organization ${id}:`, error);
       throw new Error(`Failed to update organization ${id}`);

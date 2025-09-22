@@ -37,7 +37,7 @@ const Login = () => {
         const userStr = localStorage.getItem('user');
         if (userStr) {
           const user = JSON.parse(userStr);
-          if (user.role === 'admin' || user.permissions?.includes('system_admin')) {
+          if (user.role === 'admin' || user.permissions?.includes('system_admin') || user.is_superuser) {
             navigate('/system/organizations');
           } else {
             navigate('/org/dashboard');

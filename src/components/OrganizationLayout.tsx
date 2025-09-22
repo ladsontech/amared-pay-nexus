@@ -15,8 +15,8 @@ const OrganizationLayout = () => {
     user,
     logout
   } = useAuth();
-  // Redirect system admins to the system dashboard
-  if (user?.role === 'admin') {
+  // Redirect system admins/superusers to the system dashboard
+  if (user?.role === 'admin' || (user as any)?.is_superuser) {
     return <Navigate to="/system/organizations" replace />;
   }
   const getRoleBadgeVariant = (role: string) => {
