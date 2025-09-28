@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { authService } from "@/services/authService";
 import { useAuth } from "@/contexts/AuthContext";
+import { Permission } from "@/types/auth";
 
 const MobileBottomNav = () => {
   const location = useLocation();
@@ -23,7 +24,13 @@ const MobileBottomNav = () => {
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
 
-  const navItems = [
+  const navItems: Array<{
+    icon: any;
+    label: string;
+    path: string;
+    active: boolean;
+    permission?: Permission;
+  }> = [
     { 
       icon: Home, 
       label: "Home", 
@@ -35,21 +42,21 @@ const MobileBottomNav = () => {
       label: "Petty Cash", 
       path: "/org/petty-cash",
       active: location.pathname.includes("/petty-cash"),
-      permission: "access_petty_cash"
+      permission: "access_petty_cash" as Permission
     },
     { 
       icon: Send, 
       label: "Bulk Payments", 
       path: "/org/bulk-payments",
       active: location.pathname.includes("/bulk-payments"),
-      permission: "access_bulk_payments"
+      permission: "access_bulk_payments" as Permission
     },
     { 
       icon: DollarSign, 
       label: "Collections", 
       path: "/org/collections",
       active: location.pathname.includes("/collections"),
-      permission: "access_collections"
+      permission: "access_collections" as Permission
     }
   ];
 
@@ -81,7 +88,7 @@ const MobileBottomNav = () => {
   };
 
   const filteredNavItems = navItems.filter(item => 
-    !item.permission || hasPermission(item.permission as any)
+    !item.permission || hasPermission(item.permission)
   );
 
   return (
