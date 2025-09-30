@@ -12,7 +12,7 @@ const Unauthorized = () => {
     if (isAuthenticated && user) {
       // Redirect to appropriate dashboard based on user role
       if (user.role === 'admin') {
-        navigate('/system/analytics');
+        navigate('/admin/dashboard');
       } else {
         navigate('/org/dashboard');
       }

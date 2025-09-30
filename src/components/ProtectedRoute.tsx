@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Permission } from '@/types/auth';
 
@@ -16,7 +16,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRole,
   fallbackRoute = '/login',
 }) => {
-  const { isAuthenticated, hasAnyPermission, isRole, loading } = useAuth();
+  const { loading, isAuthenticated, hasAnyPermission, isRole } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -26,14 +27,17 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
+  // Authentication check
   if (!isAuthenticated) {
-    return <Navigate to={fallbackRoute} replace />;
+    return <Navigate to={fallbackRoute} replace state={{ from: location }} />;
   }
 
+  // Role check
   if (requiredRole && !isRole(requiredRole)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
+  // Permission check (any of provided)
   if (requiredPermissions.length > 0 && !hasAnyPermission(requiredPermissions)) {
     return <Navigate to="/unauthorized" replace />;
   }

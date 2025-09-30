@@ -217,3 +217,30 @@ export const demoUsers: DemoUser[] = [
     ]
   }
 ];
+
+// System Administrator Demo User
+export const demoSystemAdmin: DemoUser = {
+  id: 'system-admin-1',
+  name: 'System Administrator',
+  email: 'admin@almapay.com',
+  role: 'admin',
+  organizationId: 'system',
+  organization: {
+    id: 'system',
+    name: 'System Administration',
+    description: 'System level administration',
+    industry: 'Technology'
+  },
+  position: 'System Administrator',
+  department: 'System',
+  description: 'System Administrator with full platform access and management capabilities',
+  permissions: [
+    'system_admin',
+    'manage_organizations',
+    'manage_system_users',
+    'view_system_analytics'
+  ]
+};
+
+// Add system admin to the main users array
+export const allDemoUsers = [...demoUsers, demoSystemAdmin];

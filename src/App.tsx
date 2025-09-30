@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -15,10 +14,12 @@ const OrganizationLayout = lazy(() => import("./components/OrganizationLayout"))
 // Pages (lazy)
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
-const SystemAnalytics = lazy(() => import("./pages/SystemAnalytics"));
+const AuthTest = lazy(() => import("./pages/AuthTest"));
+// Removed: SystemAnalytics
 const SystemOrganizations = lazy(() => import("./pages/SystemOrganizations"));
 const SystemUsers = lazy(() => import("./pages/SystemUsers"));
 const SystemSettings = lazy(() => import("./pages/SystemSettings"));
+// Removed: SystemAlerts
 const OrgDashboard = lazy(() => import("./pages/OrgDashboard"));
 const OrgPettyCash = lazy(() => import("./pages/OrgPettyCash"));
 const OrgBulkPayments = lazy(() => import("./pages/OrgBulkPayments"));
@@ -26,7 +27,15 @@ const OrgCollections = lazy(() => import("./pages/OrgCollections"));
 const OrgDeposits = lazy(() => import("./pages/OrgDeposits"));
 const OrgApprovals = lazy(() => import("./pages/OrgApprovals"));
 const OrgReports = lazy(() => import("./pages/OrgReports"));
+const OrgPettyCashReport = lazy(() => import("./pages/OrgPettyCashReport"));
+const OrgBulkPaymentsReport = lazy(() => import("./pages/OrgBulkPaymentsReport"));
+const OrgCollectionsReport = lazy(() => import("./pages/OrgCollectionsReport"));
 const OrgSettings = lazy(() => import("./pages/OrgSettings"));
+const OrgAccount = lazy(() => import("./pages/OrgAccount"));
+const OrgBulkPaymentsDemo = lazy(() => import("./pages/OrgBulkPaymentsDemo"));
+const OrgSecurityDemo = lazy(() => import("./pages/OrgSecurityDemo"));
+const OrgUsers = lazy(() => import("./pages/OrgUsers"));
+const PayBills = lazy(() => import("./pages/PayBills"));
 const Unauthorized = lazy(() => import("./pages/Unauthorized"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const TestAuth = lazy(() => import("./pages/TestAuth"));
@@ -52,20 +61,27 @@ const AppRoutes = () => {
       </div>
     }>
       <Routes>
-        <Route path="/" element={<Index />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/demo" element={<Index />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/auth-test" element={<AuthTest />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/test-auth" element={<TestAuth />} />
         <Route path="/admin-test" element={<AdminTest />} />
 
+        {/* Role Dashboard Aliases */}
+
         {/* System Admin Routes */}
         <Route path="/system" element={
-          <ProtectedRoute requiredRole="admin">
-            <SystemAdminLayout />
+          <ProtectedRoute fallbackRoute="/login">
+            {(user?.role === 'admin' || user?.permissions?.includes('system_admin')) ? (
+              <SystemAdminLayout />
+            ) : (
+              <Navigate to="/unauthorized" replace />
+            )}
           </ProtectedRoute>
         }>
-          <Route index element={<Navigate to="/system/analytics" replace />} />
-          <Route path="analytics" element={<SystemAnalytics />} />
+          <Route index element={<Navigate to="/system/organizations" replace />} />
           <Route path="organizations" element={<SystemOrganizations />} />
           <Route path="users" element={<SystemUsers />} />
           <Route path="settings" element={<SystemSettings />} />
@@ -73,50 +89,74 @@ const AppRoutes = () => {
 
         {/* Organization Routes */}
         <Route path="/org" element={
-          <ProtectedRoute requiredPermissions={['submit_transactions', 'approve_transactions']}>
+          <ProtectedRoute fallbackRoute="/login">
             <OrganizationLayout />
           </ProtectedRoute>
         }>
           <Route index element={<Navigate to="/org/dashboard" replace />} />
           <Route path="dashboard" element={<OrgDashboard />} />
           <Route path="petty-cash" element={
-            <ProtectedRoute requiredPermissions={['access_petty_cash']}>
+            <ProtectedRoute requiredPermissions={["access_petty_cash"]}>
               <OrgPettyCash />
             </ProtectedRoute>
           } />
           <Route path="bulk-payments" element={
-            <ProtectedRoute requiredPermissions={['access_bulk_payments']}>
+            <ProtectedRoute requiredPermissions={["access_bulk_payments"]}>
               <OrgBulkPayments />
             </ProtectedRoute>
           } />
           <Route path="collections" element={
-            <ProtectedRoute requiredPermissions={['access_collections']}>
+            <ProtectedRoute requiredPermissions={["access_collections"]}>
               <OrgCollections />
             </ProtectedRoute>
           } />
           <Route path="deposits" element={
-            <ProtectedRoute requiredPermissions={['access_bank_deposits']}>
+            <ProtectedRoute requiredPermissions={["access_bank_deposits"]}>
               <OrgDeposits />
             </ProtectedRoute>
           } />
           <Route path="approvals" element={
-            <ProtectedRoute requiredPermissions={['approve_transactions']}>
+            <ProtectedRoute requiredPermissions={["approve_transactions", "approve_funding", "approve_bulk_payments", "approve_bank_deposits"]}>
               <OrgApprovals />
             </ProtectedRoute>
           } />
           <Route path="reports" element={
-            <ProtectedRoute requiredPermissions={['view_department_reports']}>
+            <ProtectedRoute requiredPermissions={["view_department_reports", "view_own_history"]}>
               <OrgReports />
             </ProtectedRoute>
           } />
+          <Route path="reports/petty-cash" element={
+            <ProtectedRoute requiredPermissions={["view_department_reports", "view_own_history"]}>
+              <OrgPettyCashReport />
+            </ProtectedRoute>
+          } />
+          <Route path="reports/bulk-payments" element={
+            <ProtectedRoute requiredPermissions={["view_department_reports", "view_own_history"]}>
+              <OrgBulkPaymentsReport />
+            </ProtectedRoute>
+          } />
+          <Route path="reports/collections" element={
+            <ProtectedRoute requiredPermissions={["view_department_reports", "view_own_history"]}>
+              <OrgCollectionsReport />
+            </ProtectedRoute>
+          } />
+          <Route path="account" element={<OrgAccount />} />
           <Route path="settings" element={<OrgSettings />} />
+          <Route path="bulk-payments-demo" element={<OrgBulkPaymentsDemo />} />
+          <Route path="security-demo" element={<OrgSecurityDemo />} />
+          <Route path="users" element={
+            <ProtectedRoute requiredPermissions={["manage_team"]}>
+              <OrgUsers />
+            </ProtectedRoute>
+          } />
+          <Route path="pay-bills" element={<PayBills />} />
         </Route>
 
         {/* Redirect authenticated users to appropriate dashboard */}
         <Route path="/dashboard" element={
           isAuthenticated ? (
-            user?.role === 'admin' ? 
-              <Navigate to="/system/analytics" replace /> : 
+            (user?.role === 'admin' || user?.permissions?.includes('system_admin')) ?
+              <Navigate to="/system/organizations" replace /> :
               <Navigate to="/org/dashboard" replace />
           ) : (
             <Navigate to="/login" replace />
@@ -124,10 +164,11 @@ const AppRoutes = () => {
         } />
 
         {/* Legacy routes - redirect to new structure */}
-        <Route path="/admin-dashboard" element={<Navigate to="/system/analytics" replace />} />
+        <Route path="/admin-dashboard" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin-organizations" element={<Navigate to="/system/organizations" replace />} />
         <Route path="/admin-system-users" element={<Navigate to="/system/users" replace />} />
         <Route path="/admin-analytics" element={<Navigate to="/system/analytics" replace />} />
+        <Route path="/admin-system-alerts" element={<Navigate to="/system/alerts" replace />} />
         <Route path="/org-dashboard" element={<Navigate to="/org/dashboard" replace />} />
         <Route path="/bulk-payments" element={<Navigate to="/org/bulk-payments" replace />} />
         <Route path="/collections" element={<Navigate to="/org/collections" replace />} />

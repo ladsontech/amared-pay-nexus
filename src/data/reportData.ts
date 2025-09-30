@@ -93,6 +93,19 @@ export type BulkPaymentReportItem = {
   status: "pending" | "processing" | "completed" | "failed";
   createdAt: string; // ISO
   description: string;
+  recipientDetails: {
+    successful: number;
+    pending: number;
+    failed: number;
+    recipients: Array<{
+      id: string;
+      name: string;
+      phoneNumber: string;
+      amount: number;
+      status: "successful" | "pending" | "failed";
+      reason?: string;
+    }>;
+  };
 };
 
 export const bulkPaymentReportData: BulkPaymentReportItem[] = [
@@ -102,7 +115,19 @@ export const bulkPaymentReportData: BulkPaymentReportItem[] = [
     recipients: 150,
     status: "completed",
     createdAt: "2024-01-15T10:30:00Z",
-    description: "Monthly Salary Payment"
+    description: "Monthly Salary Payment",
+    recipientDetails: {
+      successful: 145,
+      pending: 2,
+      failed: 3,
+      recipients: [
+        { id: "R001", name: "John Doe", phoneNumber: "+256701234567", amount: 1500, status: "successful" },
+        { id: "R002", name: "Jane Smith", phoneNumber: "+256709876543", amount: 1600, status: "successful" },
+        { id: "R003", name: "Bob Wilson", phoneNumber: "+256705555555", amount: 1400, status: "pending" },
+        { id: "R004", name: "Alice Brown", phoneNumber: "+256708888888", amount: 1700, status: "failed", reason: "Invalid account" },
+        { id: "R005", name: "David Johnson", phoneNumber: "+256707777777", amount: 1550, status: "successful" }
+      ]
+    }
   },
   {
     id: "BP002",
@@ -110,7 +135,18 @@ export const bulkPaymentReportData: BulkPaymentReportItem[] = [
     recipients: 50,
     status: "processing",
     createdAt: "2024-01-14T14:20:00Z",
-    description: "Vendor Payments Q1"
+    description: "Vendor Payments Q1",
+    recipientDetails: {
+      successful: 32,
+      pending: 15,
+      failed: 3,
+      recipients: [
+        { id: "V001", name: "Tech Solutions Ltd", phoneNumber: "+256701111111", amount: 1500, status: "successful" },
+        { id: "V002", name: "Office Supplies Co", phoneNumber: "+256702222222", amount: 1200, status: "pending" },
+        { id: "V003", name: "Catering Services", phoneNumber: "+256703333333", amount: 1800, status: "failed", reason: "Network timeout" },
+        { id: "V004", name: "Security Company", phoneNumber: "+256704444444", amount: 2000, status: "successful" }
+      ]
+    }
   },
   {
     id: "BP003",
@@ -118,7 +154,17 @@ export const bulkPaymentReportData: BulkPaymentReportItem[] = [
     recipients: 120,
     status: "pending",
     createdAt: "2024-01-13T09:15:00Z",
-    description: "Commission Payments"
+    description: "Commission Payments",
+    recipientDetails: {
+      successful: 0,
+      pending: 120,
+      failed: 0,
+      recipients: [
+        { id: "C001", name: "Sales Agent 1", phoneNumber: "+256705555555", amount: 1500, status: "pending" },
+        { id: "C002", name: "Sales Agent 2", phoneNumber: "+256706666666", amount: 1400, status: "pending" },
+        { id: "C003", name: "Sales Agent 3", phoneNumber: "+256707777777", amount: 1600, status: "pending" }
+      ]
+    }
   }
 ];
 

@@ -18,38 +18,29 @@ const PettyCashOverview = ({ currentBalance }: PettyCashOverviewProps) => {
       title: "Current Balance",
       value: `UGX ${currentBalance.toLocaleString()}`,
       icon: Wallet,
-      color: isLowBalance ? "text-red-600" : "text-green-600",
-      bgColor: isLowBalance ? "bg-red-50" : "bg-green-50",
-      borderColor: isLowBalance ? "border-red-200" : "border-green-200"
     },
     {
       title: "Monthly Spending",
       value: `UGX ${monthlySpending.toLocaleString()}`,
       icon: TrendingDown,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      borderColor: "border-orange-200"
     },
     {
       title: "Pending Approvals",
       value: pendingApprovals.toString(),
       icon: Bell,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200"
     }
   ];
 
   return (
     <div className="space-y-6">
       {isLowBalance && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-blue-200 bg-blue-50">
           <CardContent className="pt-6">
-            <div className="flex items-center space-x-2 text-red-800">
+            <div className="flex items-center space-x-2 text-blue-800">
               <AlertTriangle className="h-5 w-5" />
               <p className="font-medium">Low Balance Alert</p>
             </div>
-            <p className="text-sm text-red-600 mt-1">
+            <p className="text-sm text-blue-700 mt-1">
               Petty cash balance is below the threshold of UGX {lowBalanceThreshold.toLocaleString()}. 
               Consider adding funds soon.
             </p>
@@ -59,25 +50,25 @@ const PettyCashOverview = ({ currentBalance }: PettyCashOverviewProps) => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {stats.map((stat, index) => (
-          <Card key={index} className={`${stat.bgColor} ${stat.borderColor} border`}>
+          <Card key={index} className={`bg-blue-50 border border-blue-200`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700">
+              <CardTitle className="text-sm font-medium text-blue-800">
                 {stat.title}
               </CardTitle>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
+              <stat.icon className={`h-4 w-4 text-blue-600`} />
             </CardHeader>
             <CardContent>
-              <div className={`text-2xl font-bold ${stat.color}`}>{stat.value}</div>
+              <div className={`text-2xl font-bold text-blue-700`}>{stat.value}</div>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-blue-50 border border-blue-200">
           <CardHeader>
             <CardTitle>Recent Transactions</CardTitle>
-            <CardDescription>Latest petty cash activities</CardDescription>
+            <CardDescription className="text-blue-700">Latest petty cash activities</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -91,7 +82,7 @@ const PettyCashOverview = ({ currentBalance }: PettyCashOverviewProps) => {
                     <p className="font-medium">{transaction.description}</p>
                     <p className="text-sm text-muted-foreground">{transaction.category} • {transaction.date}</p>
                   </div>
-                  <div className={`font-medium ${transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className={`font-medium text-blue-700`}>
                     {transaction.amount > 0 ? '+' : ''}UGX {Math.abs(transaction.amount).toLocaleString()}
                   </div>
                 </div>
@@ -100,10 +91,10 @@ const PettyCashOverview = ({ currentBalance }: PettyCashOverviewProps) => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-blue-50 border border-blue-200">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common petty cash operations</CardDescription>
+            <CardDescription className="text-blue-700">Common petty cash operations</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button variant="outline" className="w-full justify-start">

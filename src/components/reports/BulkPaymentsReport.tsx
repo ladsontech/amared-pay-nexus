@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download } from "lucide-react";
+import { Download, Eye } from "lucide-react";
 import { bulkPaymentReportData } from "@/data/reportData";
+import BulkPaymentDetailsModal from "@/components/BulkPaymentDetailsModal";
 
 function exportCsv(filename: string, rows: Array<Record<string, any>>) {
   if (!rows.length) return;
@@ -50,6 +51,13 @@ const BulkPaymentsReport = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [fromDate, setFromDate] = useState<string>("2024-01-01");
   const [toDate, setToDate] = useState<string>("2024-12-31");
+  const [selectedPayment, setSelectedPayment] = useState<typeof bulkPaymentReportData[0] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleViewDetails = (payment: typeof bulkPaymentReportData[0]) => {
+    setSelectedPayment(payment);
+    setIsModalOpen(true);
+  };
 
   const inRange = (iso: string) => {
     const d = new Date(iso).getTime();
@@ -68,6 +76,9 @@ const BulkPaymentsReport = () => {
 
   const totalAmount = useMemo(() => filtered.reduce((s, p) => s + p.amount, 0), [filtered]);
   const totalRecipients = useMemo(() => filtered.reduce((s, p) => s + p.recipients, 0), [filtered]);
+  const totalSuccessful = useMemo(() => filtered.reduce((s, p) => s + p.recipientDetails.successful, 0), [filtered]);
+  const totalPending = useMemo(() => filtered.reduce((s, p) => s + p.recipientDetails.pending, 0), [filtered]);
+  const totalFailed = useMemo(() => filtered.reduce((s, p) => s + p.recipientDetails.failed, 0), [filtered]);
 
   const handleExport = () => {
     exportCsv("bulk-payments-report.csv", filtered.map((p) => ({
@@ -88,7 +99,7 @@ const BulkPaymentsReport = () => {
           <CardDescription>Summary of bulk disbursements for the period</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
             <div className="p-3 border rounded-md">
               <div className="text-xs text-muted-foreground">Total Amount</div>
               <div className="text-xl font-semibold">UGX {totalAmount.toLocaleString()}</div>
@@ -97,9 +108,17 @@ const BulkPaymentsReport = () => {
               <div className="text-xs text-muted-foreground">Total Recipients</div>
               <div className="text-xl font-semibold">{totalRecipients}</div>
             </div>
-            <div className="p-3 border rounded-md">
-              <div className="text-xs text-muted-foreground">Transactions</div>
-              <div className="text-xl font-semibold">{filtered.length}</div>
+            <div className="p-3 border rounded-md bg-green-50">
+              <div className="text-xs text-green-600">Successful</div>
+              <div className="text-xl font-semibold text-green-700">{totalSuccessful}</div>
+            </div>
+            <div className="p-3 border rounded-md bg-yellow-50">
+              <div className="text-xs text-yellow-600">Pending</div>
+              <div className="text-xl font-semibold text-yellow-700">{totalPending}</div>
+            </div>
+            <div className="p-3 border rounded-md bg-red-50">
+              <div className="text-xs text-red-600">Failed</div>
+              <div className="text-xl font-semibold text-red-700">{totalFailed}</div>
             </div>
           </div>
         </CardContent>
@@ -156,31 +175,57 @@ const BulkPaymentsReport = () => {
               <TableHead>Description</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Recipients</TableHead>
+              <TableHead>Success/Pending/Failed</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Created</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.map((p) => (
-              <TableRow key={p.id}>
+              <TableRow key={p.id} className="hover:bg-gray-50">
                 <TableCell className="font-medium">{p.id}</TableCell>
                 <TableCell>{p.description}</TableCell>
                 <TableCell>
                   <Badge className={statusColor(p.status)}>{p.status}</Badge>
                 </TableCell>
                 <TableCell>{p.recipients}</TableCell>
+                <TableCell>
+                  <div className="flex gap-1 text-xs">
+                    <span className="text-green-600">{p.recipientDetails.successful}✓</span>
+                    <span className="text-yellow-600">{p.recipientDetails.pending}⏳</span>
+                    <span className="text-red-600">{p.recipientDetails.failed}✗</span>
+                  </div>
+                </TableCell>
                 <TableCell>UGX {p.amount.toLocaleString()}</TableCell>
                 <TableCell>{new Date(p.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleViewDetails(p)}
+                    className="text-xs"
+                  >
+                    <Eye className="h-3 w-3 mr-1" />
+                    View
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">No records for selected filters.</TableCell>
+                <TableCell colSpan={8} className="text-center text-muted-foreground">No records for selected filters.</TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+
+      <BulkPaymentDetailsModal 
+        payment={selectedPayment}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };
