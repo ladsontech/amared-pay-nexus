@@ -16,6 +16,43 @@ export const demoOrganizations: Organization[] = [
 ];
 
 export const demoUsers: DemoUser[] = [
+  // System Admin User
+  {
+    id: 'admin-1',
+    name: 'System Administrator',
+    email: 'admin@almaredpay.com',
+    role: 'admin',
+    organizationId: 'system',
+    organization: {
+      id: 'system',
+      name: 'Almared Pay System',
+      description: 'System Administration',
+      industry: 'Financial Technology'
+    },
+    position: 'System Administrator',
+    department: 'System Administration',
+    description: 'System Administrator with full access to all system functions and organization management',
+    permissions: [
+      'system_admin',
+      'manage_organizations',
+      'manage_system_users',
+      'view_system_analytics',
+      'approve_transactions',
+      'approve_funding',
+      'approve_bulk_payments',
+      'approve_bank_deposits',
+      'view_department_reports',
+      'manage_team',
+      'submit_transactions',
+      'request_funding',
+      'view_own_history',
+      'access_petty_cash',
+      'access_bulk_payments',
+      'access_collections',
+      'access_bank_deposits'
+    ]
+  },
+
   // TechCorp Solutions Users
   {
     id: 'user-1',

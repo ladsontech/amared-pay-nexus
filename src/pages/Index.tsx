@@ -15,11 +15,17 @@ const Index = () => {
 
   const handleUserLogin = (user: DemoUser) => {
     loginAsUser(user.id);
-    navigate('/org/dashboard');
+    if (user.role === 'admin') {
+      navigate('/system/analytics');
+    } else {
+      navigate('/org/dashboard');
+    }
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
+      case 'admin':
+        return <Shield className="h-4 w-4" />;
       case 'manager':
         return <Crown className="h-4 w-4" />;
       case 'staff':
@@ -31,6 +37,8 @@ const Index = () => {
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
+      case 'admin':
+        return 'destructive';
       case 'manager':
         return 'default';
       case 'staff':
@@ -51,23 +59,57 @@ const Index = () => {
         </div>
 
         {/* Admin Access */}
-        <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+        <Card className="bg-gradient-to-r from-red-50 to-red-100 border-red-200">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <Shield className="h-6 w-6 text-primary" />
-              <CardTitle className="text-xl">System Administrator</CardTitle>
+              <Shield className="h-6 w-6 text-red-600" />
+              <CardTitle className="text-xl text-red-800">System Administrator</CardTitle>
             </div>
-            <CardDescription>
+            <CardDescription className="text-red-700">
               Access the main admin dashboard for system-wide management and analytics.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button 
-              onClick={() => navigate('/system/analytics')} 
-              className="w-full"
-            >
-              Go to Admin Dashboard (Demo)
-            </Button>
+            {(() => {
+              const adminUser = demoUsers.find(user => user.role === 'admin');
+              return adminUser ? (
+                <Card className="border-2 border-red-300 bg-red-50 hover:bg-red-100 transition-colors cursor-pointer"
+                      onClick={() => handleUserLogin(adminUser)}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback className="bg-red-100 text-red-700">
+                            {adminUser.name.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <h5 className="font-medium text-base">{adminUser.name}</h5>
+                            <Badge variant={getRoleBadgeVariant(adminUser.role)} className="capitalize text-xs">
+                              {getRoleIcon(adminUser.role)}
+                              <span className="ml-1">{adminUser.role}</span>
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{adminUser.position}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{adminUser.description}</p>
+                        </div>
+                      </div>
+                      <Button size="sm" className="bg-red-600 hover:bg-red-700 text-sm">
+                        Login as Admin
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Button 
+                  onClick={() => navigate('/system/analytics')} 
+                  className="w-full"
+                >
+                  Go to Admin Dashboard (Demo)
+                </Button>
+              );
+            })()}
           </CardContent>
         </Card>
 
@@ -189,10 +231,18 @@ const Index = () => {
           })}
         </div>
 
-        <div className="text-center pt-4 px-2">
+        <div className="text-center pt-4 px-2 space-y-2">
           <p className="text-xs text-muted-foreground">
             This is a demo environment. All users have the password "password" for testing purposes.
           </p>
+          <Button 
+            onClick={() => navigate('/admin-test')} 
+            variant="outline" 
+            size="sm"
+            className="text-xs"
+          >
+            Admin Access Test
+          </Button>
         </div>
       </div>
     </div>

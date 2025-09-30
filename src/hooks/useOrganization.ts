@@ -1,0 +1,280 @@
+import { useState, useEffect } from 'react';
+import { organizationService, Staff, Organization, Wallet, WalletTransaction } from '@/services/organizationService';
+import { useAuth } from '@/contexts/AuthContext';
+
+export const useOrganization = () => {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Staff Management
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+
+  // Organization Management
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+
+  // Wallet Management
+  const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [walletTransactions, setWalletTransactions] = useState<WalletTransaction[]>([]);
+
+  // Fetch staff for current organization
+  const fetchStaff = async () => {
+    if (!user?.organizationId) return;
+    
+    setStaffLoading(true);
+    setError(null);
+    
+    try {
+      const response = await organizationService.getStaffList({
+        organization: user.organizationId,
+        limit: 100
+      });
+      setStaff(response.results);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch staff');
+      console.error('Error fetching staff:', err);
+    } finally {
+      setStaffLoading(false);
+    }
+  };
+
+  // Fetch current organization details
+  const fetchOrganization = async () => {
+    if (!user?.organizationId) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const org = await organizationService.getOrganization(user.organizationId);
+      setOrganization(org);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch organization');
+      console.error('Error fetching organization:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch wallets for current organization
+  const fetchWallets = async () => {
+    if (!user?.organizationId) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await organizationService.getWallets({
+        organization: user.organizationId,
+        limit: 10
+      });
+      setWallets(response.results);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch wallets');
+      console.error('Error fetching wallets:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch wallet transactions
+  const fetchWalletTransactions = async (walletId?: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const params: any = { limit: 50 };
+      if (walletId) {
+        params.wallet = walletId;
+      } else if (user?.organizationId) {
+        // Get transactions for all wallets in the organization
+        const walletResponse = await organizationService.getWallets({
+          organization: user.organizationId,
+          limit: 10
+        });
+        if (walletResponse.results.length > 0) {
+          params.wallet = walletResponse.results[0].id;
+        }
+      }
+      
+      const response = await organizationService.getWalletTransactions(params);
+      setWalletTransactions(response.results);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch transactions');
+      console.error('Error fetching wallet transactions:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add new staff member
+  const addStaff = async (staffData: {
+    username: string;
+    password: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string;
+    role?: "owner" | "manager" | "member";
+  }) => {
+    if (!user?.organizationId) throw new Error('No organization selected');
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const newStaff = await organizationService.addStaff({
+        ...staffData,
+        organization: user.organizationId
+      });
+      
+      // Refresh staff list
+      await fetchStaff();
+      return newStaff;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add staff member';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update staff role
+  const updateStaffRole = async (staffId: string, role: "owner" | "manager" | "member") => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const updatedStaff = await organizationService.updateStaffRole(staffId, { role });
+      
+      // Update local state
+      setStaff(prev => prev.map(s => s.id === staffId ? updatedStaff : s));
+      return updatedStaff;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update staff role';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete staff member
+  const deleteStaff = async (staffId: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await organizationService.deleteStaff(staffId);
+      
+      // Update local state
+      setStaff(prev => prev.filter(s => s.id !== staffId));
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete staff member';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update organization
+  const updateOrganization = async (orgData: {
+    name: string;
+    address?: string;
+    company_reg_id?: string;
+    tin?: string;
+  }) => {
+    if (!user?.organizationId) throw new Error('No organization selected');
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const updatedOrg = await organizationService.updateOrganization(user.organizationId, orgData);
+      setOrganization(updatedOrg);
+      return updatedOrg;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update organization';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update wallet
+  const updateWallet = async (walletId: string, walletData: {
+    balance?: number;
+    is_pin_set?: boolean;
+    currency?: number;
+  }) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const updatedWallet = await organizationService.updateWallet(walletId, {
+        ...walletData,
+        updated_by: user?.id
+      });
+      
+      // Update local state
+      setWallets(prev => prev.map(w => w.id === walletId ? updatedWallet : w));
+      return updatedWallet;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update wallet';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load initial data when user changes
+  useEffect(() => {
+    if (user?.organizationId) {
+      fetchOrganization();
+      fetchStaff();
+      fetchWallets();
+      fetchWalletTransactions();
+    }
+  }, [user?.organizationId]);
+
+  return {
+    // State
+    loading,
+    error,
+    staff,
+    staffLoading,
+    organization,
+    organizations,
+    wallets,
+    walletTransactions,
+    
+    // Actions
+    fetchStaff,
+    fetchOrganization,
+    fetchWallets,
+    fetchWalletTransactions,
+    addStaff,
+    updateStaffRole,
+    deleteStaff,
+    updateOrganization,
+    updateWallet,
+    
+    // Computed values
+    totalStaff: staff.length,
+    activeStaff: staff.filter(s => s.user.is_email_verified && s.user.is_phone_verified).length,
+    totalWalletBalance: wallets.reduce((sum, wallet) => sum + (wallet.balance || 0), 0),
+    monthlyTransactions: walletTransactions.filter(t => {
+      const transactionDate = new Date(t.created_at);
+      const now = new Date();
+      return transactionDate.getMonth() === now.getMonth() && 
+             transactionDate.getFullYear() === now.getFullYear();
+    }).length,
+    pendingApprovals: walletTransactions.filter(t => t.type === 'debit' && !t.title?.includes('approved')).length
+  };
+};

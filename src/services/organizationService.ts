@@ -1,0 +1,447 @@
+const API_BASE_URL = "https://bulksrv.almaredagencyuganda.com";
+
+// Types based on the API documentation
+export interface Staff {
+  id: string;
+  user: {
+    id: string;
+    username: string;
+    email: string;
+    phone_number: string;
+    groups: string[];
+    is_email_verified: boolean;
+    is_phone_verified: boolean;
+    permissions: string;
+  };
+  organization: {
+    id: string;
+    name: string;
+    logo: string | null;
+    address: string | null;
+    company_reg_id: string | null;
+    tin: string | null;
+    created_at: string;
+    updated_at: string;
+  };
+  role: "owner" | "manager" | "member" | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  logo: string | null;
+  address: string | null;
+  company_reg_id: string | null;
+  tin: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Wallet {
+  id: string;
+  organization: Organization;
+  currency: {
+    id: number;
+    name: string;
+    symbol: string;
+    created_at: string;
+    updated_at: string;
+  };
+  balance: number | null;
+  is_pin_set: boolean;
+  created_at: string;
+  updated_at: string;
+  updated_by: string | null;
+}
+
+export interface WalletTransaction {
+  id: string;
+  currency: {
+    id: number;
+    name: string;
+    symbol: string;
+    created_at: string;
+    updated_at: string;
+  };
+  wallet: Wallet;
+  type: "debit" | "credit" | null;
+  amount: number;
+  title: string | null;
+  created_at: string;
+  updated_at: string;
+  updated_by: string | null;
+}
+
+export interface CreateStaffRequest {
+  username: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  organization: string;
+  role?: "owner" | "manager" | "member";
+}
+
+export interface UpdateStaffRequest {
+  role: "owner" | "manager" | "member";
+}
+
+export interface CreateOrganizationRequest {
+  username: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  org_name: string;
+  address?: string;
+  company_reg_id?: string;
+  tin?: string;
+  wallet_currency: number;
+  wallet_pin: string;
+}
+
+export interface UpdateOrganizationRequest {
+  name: string;
+  address?: string;
+  company_reg_id?: string;
+  tin?: string;
+}
+
+export interface UpdateWalletRequest {
+  balance?: number;
+  is_pin_set?: boolean;
+  currency?: number;
+  updated_by?: string;
+}
+
+class OrganizationService {
+  private getAuthHeaders() {
+    const accessToken = localStorage.getItem("access_token");
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+    return headers;
+  }
+
+  // Staff Management
+  async addStaff(staffData: CreateStaffRequest): Promise<CreateStaffRequest> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/add_staff/`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(staffData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Add staff error:", error);
+      throw error;
+    }
+  }
+
+  async updateStaffRole(staffId: string, roleData: UpdateStaffRequest): Promise<Staff> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/change_staff/${staffId}/`, {
+        method: "PUT",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(roleData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Update staff role error:", error);
+      throw error;
+    }
+  }
+
+  async deleteStaff(staffId: string): Promise<void> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/change_staff/${staffId}/`, {
+        method: "DELETE",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Delete staff error:", error);
+      throw error;
+    }
+  }
+
+  async getStaffList(params?: {
+    user?: string;
+    organization?: string;
+    role?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ count: number; next: string | null; previous: string | null; results: Staff[] }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.user) queryParams.append("user", params.user);
+      if (params?.organization) queryParams.append("organization", params.organization);
+      if (params?.role) queryParams.append("role", params.role);
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.offset) queryParams.append("offset", params.offset.toString());
+
+      const response = await fetch(`${API_BASE_URL}/organizations/staff/?${queryParams}`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get staff list error:", error);
+      throw error;
+    }
+  }
+
+  async getStaff(staffId: string): Promise<Staff> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/staff/${staffId}/`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get staff error:", error);
+      throw error;
+    }
+  }
+
+  // Organization Management
+  async createOrganization(orgData: CreateOrganizationRequest): Promise<CreateOrganizationRequest & { logo: string | null }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/create_org/`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(orgData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Create organization error:", error);
+      throw error;
+    }
+  }
+
+  async getOrganizations(params?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<{ count: number; next: string | null; previous: string | null; results: Organization[] }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.offset) queryParams.append("offset", params.offset.toString());
+
+      const response = await fetch(`${API_BASE_URL}/organizations/org/?${queryParams}`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get organizations error:", error);
+      throw error;
+    }
+  }
+
+  async getOrganization(orgId: string): Promise<Organization> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/org/${orgId}/`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get organization error:", error);
+      throw error;
+    }
+  }
+
+  async updateOrganization(orgId: string, orgData: UpdateOrganizationRequest): Promise<Organization> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/org/${orgId}/`, {
+        method: "PUT",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(orgData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Update organization error:", error);
+      throw error;
+    }
+  }
+
+  // Wallet Management
+  async getWallets(params?: {
+    organization?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ count: number; next: string | null; previous: string | null; results: Wallet[] }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.organization) queryParams.append("organization", params.organization);
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.offset) queryParams.append("offset", params.offset.toString());
+
+      const response = await fetch(`${API_BASE_URL}/organizations/wallet/?${queryParams}`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get wallets error:", error);
+      throw error;
+    }
+  }
+
+  async getWallet(walletId: string): Promise<Wallet> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/wallet/${walletId}/`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get wallet error:", error);
+      throw error;
+    }
+  }
+
+  async updateWallet(walletId: string, walletData: UpdateWalletRequest): Promise<Wallet> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/update_wallet/${walletId}/`, {
+        method: "PUT",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(walletData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Update wallet error:", error);
+      throw error;
+    }
+  }
+
+  // Wallet Transactions
+  async getWalletTransactions(params?: {
+    wallet?: string;
+    type?: string;
+    currency?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ count: number; next: string | null; previous: string | null; results: WalletTransaction[] }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.wallet) queryParams.append("wallet", params.wallet);
+      if (params?.type) queryParams.append("type", params.type);
+      if (params?.currency) queryParams.append("currency", params.currency);
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.offset) queryParams.append("offset", params.offset.toString());
+
+      const response = await fetch(`${API_BASE_URL}/organizations/wallet_transaction/?${queryParams}`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get wallet transactions error:", error);
+      throw error;
+    }
+  }
+
+  async getWalletTransaction(transactionId: string): Promise<WalletTransaction> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/wallet_transaction/${transactionId}/`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get wallet transaction error:", error);
+      throw error;
+    }
+  }
+}
+
+export const organizationService = new OrganizationService();

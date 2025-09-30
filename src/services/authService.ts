@@ -1,5 +1,7 @@
 
-const API_BASE_URL = "https://backendapi.bulkpay.almaredagencyuganda.com";
+const API_BASE_URL = "https://bulksrv.almaredagencyuganda.com";
+
+import { otpService, OtpResponse } from "./otpService";
 
 export interface LoginRequest {
   username?: string;
@@ -40,10 +42,14 @@ class AuthService {
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login/`, {
+      const usernameForBasic = (credentials.username || credentials.email || '').toString();
+      const basicToken = typeof btoa === 'function' ? btoa(`${usernameForBasic}:${credentials.password}`) : '';
+      // Attempt 1: Full payload (username, email, password) + Basic header
+      let response = await fetch(`${API_BASE_URL}/auth/login/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(basicToken ? { "Authorization": `Basic ${basicToken}` } : {}),
         },
         body: JSON.stringify({
           username: credentials.username || credentials.email,
@@ -52,10 +58,52 @@ class AuthService {
         }),
       });
       
-      const data = await response.json();
+      // If the first attempt fails, try alternative payloads
+      if (!response.ok) {
+        // Attempt 2: Only username + password
+        const responseUsernameOnly = await fetch(`${API_BASE_URL}/auth/login/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(basicToken ? { "Authorization": `Basic ${basicToken}` } : {}),
+          },
+          body: JSON.stringify({
+            username: credentials.username || credentials.email,
+            password: credentials.password,
+          }),
+        });
+        if (responseUsernameOnly.ok) {
+          response = responseUsernameOnly;
+        } else {
+          // Attempt 3: Basic only with minimal body (in case server strictly uses Basic)
+          const responseBasicOnly = await fetch(`${API_BASE_URL}/auth/login/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(basicToken ? { "Authorization": `Basic ${basicToken}` } : {}),
+            },
+            body: JSON.stringify({
+              password: credentials.password,
+            }),
+          });
+          if (responseBasicOnly.ok) {
+            response = responseBasicOnly;
+          } else {
+            // Keep the most informative error body for messaging below
+            const errBody = await responseBasicOnly.text().catch(() => "");
+            const errBodyFallback = await responseUsernameOnly.text().catch(() => "");
+            const firstErr = await response.text().catch(() => "");
+            const combined = errBody || errBodyFallback || firstErr;
+            throw new Error(`Login failed (${responseBasicOnly.status}). ${combined}`);
+          }
+        }
+      }
+
+      const data = await response.json().catch(() => ({}));
       
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        const errText = typeof data === 'object' ? (data.message || JSON.stringify(data)) : String(data);
+        throw new Error(errText || `HTTP error! status: ${response.status}`);
       }
       
       // Store tokens and user data
@@ -223,6 +271,51 @@ class AuthService {
     } catch {
       return null;
     }
+  }
+
+  // OTP-related methods
+  async forgotPasswordEmail(email: string): Promise<OtpResponse> {
+    return await otpService.forgotPasswordEmail({ email });
+  }
+
+  async forgotPasswordSms(phoneNumber: string): Promise<OtpResponse> {
+    return await otpService.forgotPasswordSms({ phone_number: phoneNumber });
+  }
+
+  async resendEmailOtp(email: string): Promise<OtpResponse> {
+    return await otpService.resendEmailOtp({ email });
+  }
+
+  async resendSmsOtp(phoneNumber: string): Promise<OtpResponse> {
+    return await otpService.resendSmsOtp({ phone_number: phoneNumber });
+  }
+
+  async resetPasswordWithEmailCode(emailCode: string, newPassword: string): Promise<OtpResponse> {
+    return await otpService.resetPasswordWithEmailCode({ 
+      email_code: emailCode, 
+      new_password: newPassword 
+    });
+  }
+
+  async resetPasswordWithSmsCode(smsCode: string, newPassword: string): Promise<OtpResponse> {
+    return await otpService.resetPasswordWithSmsCode({ 
+      sms_code: smsCode, 
+      new_password: newPassword 
+    });
+  }
+
+  async verifyEmailAddress(emailCode: string, email: string): Promise<OtpResponse> {
+    return await otpService.verifyEmailAddress({ 
+      email_code: emailCode, 
+      email: email 
+    });
+  }
+
+  async verifyPhoneNumber(smsCode: string, phoneNumber: string): Promise<OtpResponse> {
+    return await otpService.verifyPhoneNumber({ 
+      sms_code: smsCode, 
+      phone_number: phoneNumber 
+    });
   }
 }
 
