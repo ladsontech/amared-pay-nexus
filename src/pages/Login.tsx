@@ -31,19 +31,20 @@ const Login = () => {
         className: "border-green-200 bg-green-50 text-green-800",
       });
       
-      // Smooth transition to dashboard
+      // Smooth transition to dashboard - check user role
       setTimeout(() => {
-        // Get user from localStorage to determine redirect
         const userStr = localStorage.getItem('user');
         if (userStr) {
           const user = JSON.parse(userStr);
+          // Super admin / system admin goes to admin dashboard
           if (user.role === 'admin' || user.permissions?.includes('system_admin')) {
             navigate('/system/organizations');
           } else {
+            // Regular users go to organization dashboard
             navigate('/org/dashboard');
           }
         } else {
-          navigate('/dashboard');
+          navigate('/org/dashboard');
         }
       }, 1000);
     } catch (error) {

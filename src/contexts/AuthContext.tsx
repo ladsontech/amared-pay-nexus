@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, AuthState, Permission } from '@/types/auth';
+import { User, AuthState, Permission, rolePermissions } from '@/types/auth';
 import { demoUsers } from '@/data/demoData';
 import { authService } from '@/services/authService';
 
@@ -76,11 +76,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await authService.login({ email, password });
       
-      // Build user object from API response or sensible defaults
-      type ApiLogin = Partial<User> & { permissions?: Permission[]; role?: import('@/types/auth').UserRole } & { organization_id?: string; organization?: string };
+      // Build user object from API response
+      type ApiLogin = Partial<User> & { 
+        permissions?: Permission[]; 
+        role?: import('@/types/auth').UserRole;
+        groups?: string[];
+        is_staff?: boolean;
+        is_superuser?: boolean;
+      } & { organization_id?: string; organization?: string };
+      
       const api = response as ApiLogin;
       const apiPermissions = api.permissions;
-      const apiRole = api.role;
+      
+      // Determine role - check for super admin first
+      let userRole: import('@/types/auth').UserRole = 'staff';
+      if (api.is_superuser || (api.groups && api.groups.includes('admin')) || api.role === 'admin') {
+        userRole = 'admin';
+      } else if (api.role === 'manager' || (api.groups && api.groups.includes('manager'))) {
+        userRole = 'manager';
+      } else {
+        userRole = api.role || 'staff';
+      }
+      
       const organizationId = api.organizationId || api.organization_id || 'default-org';
       const organizationName = api.organization?.name || api.organization || 'Default Organization';
 
@@ -88,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: response.username || 'unknown',
         name: response.username || 'Unknown User',
         email: response.email,
-        role: apiRole ?? 'staff',
+        role: userRole,
         organizationId,
         organization: {
           id: organizationId,
@@ -96,8 +113,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: organizationName,
           industry: 'Finance'
         },
-        permissions: apiPermissions && apiPermissions.length > 0 ? apiPermissions : ['access_petty_cash', 'access_bulk_payments', 'access_collections'],
-        position: 'Staff Member'
+        permissions: apiPermissions && apiPermissions.length > 0 
+          ? apiPermissions 
+          : rolePermissions[userRole],
+        position: userRole === 'admin' ? 'System Administrator' : 'Staff Member'
       };
       
       localStorage.setItem('user', JSON.stringify(user));
