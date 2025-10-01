@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, Building, Phone, Send, Target, Calendar, BarChart3, ChevronRight, Eye, ArrowUpRight, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AIInsights } from "@/components/AIInsights";
 const OrgDashboard = () => {
   const {
     user,
@@ -648,6 +649,21 @@ const OrgDashboard = () => {
                 </Button>
               </div>
             </div>}
+          
+          {/* AI Insights Section */}
+          <div className="mt-4">
+            <AIInsights 
+              transactions={[
+                { id: "1", amount: 250000, description: "Airtime MTN", date: "2025-09-28", type: "expense" },
+                { id: "2", amount: 180000, description: "UMEME Bill Payment", date: "2025-09-27", type: "expense" },
+                { id: "3", amount: 500000, description: "Office Supplies", date: "2025-09-25", type: "expense" },
+                { id: "4", amount: 1200000, description: "Client Payment Received", date: "2025-09-24", type: "income" },
+                { id: "5", amount: 85000, description: "Transport Reimbursement", date: "2025-09-23", type: "expense" },
+                { id: "6", amount: 320000, description: "Internet Bundle", date: "2025-09-22", type: "expense" },
+                { id: "7", amount: 450000, description: "Staff Lunch", date: "2025-09-20", type: "expense" }
+              ]} 
+            />
+          </div>
         </div>
       </div>
     </div>;

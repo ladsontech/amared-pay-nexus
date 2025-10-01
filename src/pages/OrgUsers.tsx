@@ -116,7 +116,7 @@ export default function OrgUsers() {
       const response = await organizationService.addStaff(staffPayload);
       
       const newUser: OrgUser = {
-        id: response.id,
+        id: crypto.randomUUID(), // Generate temp ID since API doesn't return it
         name: `${response.first_name} ${response.last_name}`.trim(),
         email: response.email,
         role: response.role === 'manager' ? 'manager' : 'staff',
