@@ -22,6 +22,15 @@ export const AIInsights = ({ transactions }: AIInsightsProps) => {
   const { toast } = useToast();
 
   const generateInsights = async (type: "insights" | "categorize" | "forecast") => {
+    if (!supabase) {
+      toast({
+        title: "Configuration Required",
+        description: "AI features are being set up. Please refresh the page in a moment.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('ai-insights', {
