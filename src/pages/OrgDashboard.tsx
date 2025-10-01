@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
-import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, Building, Phone, Send, Target, Calendar, BarChart3, ChevronRight, Eye, ArrowUpRight } from "lucide-react";
+import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, Building, Phone, Send, Target, Calendar, BarChart3, ChevronRight, Eye, ArrowUpRight, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 const OrgDashboard = () => {
   const {
@@ -446,8 +446,18 @@ const OrgDashboard = () => {
                     <Button onClick={handleSendToBank} className="w-full bg-blue-600 hover:bg-blue-700">
                       Confirm Transfer
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md mx-4">
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs py-2">
+                    <Plus className="h-3 w-3 mr-1" />
+                    Request Funds
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md mx-4">
                     <DialogHeader>
                       <DialogTitle className="flex items-center gap-2">
                         <Building className="h-5 w-5 text-blue-600" />
