@@ -63,32 +63,6 @@ export const AIInsights = ({
   };
   return <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-blue-50">
       
-      <CardContent className="space-y-4">
-        <div className="flex flex-wrap gap-2">
-          <Button onClick={() => generateInsights("insights")} disabled={loading} className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-            {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <TrendingUp className="h-4 w-4 mr-2" />}
-            Analyze Spending
-          </Button>
-          <Button onClick={() => generateInsights("categorize")} disabled={loading} variant="outline">
-            Categorize Transactions
-          </Button>
-          <Button onClick={() => generateInsights("forecast")} disabled={loading} variant="outline">
-            Forecast Spending
-          </Button>
-        </div>
-
-        {insights && <div className="mt-4 p-4 bg-white rounded-lg border border-purple-200">
-            <div className="flex items-start gap-2">
-              <Sparkles className="h-5 w-5 text-purple-600 mt-1 flex-shrink-0" />
-              <div className="flex-1 whitespace-pre-wrap text-sm">{insights}</div>
-            </div>
-          </div>}
-
-        {!insights && !loading && <div className="text-center py-8 text-muted-foreground">
-            <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">Click a button above to get AI-powered insights</p>
-            <p className="text-xs mt-1">All Gemini models are FREE until Oct 6, 2025</p>
-          </div>}
-      </CardContent>
+      
     </Card>;
 };
