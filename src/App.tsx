@@ -18,6 +18,7 @@ const AuthTest = lazy(() => import("./pages/AuthTest"));
 // Removed: SystemAnalytics
 const SystemOrganizations = lazy(() => import("./pages/SystemOrganizations"));
 const SystemUsers = lazy(() => import("./pages/SystemUsers"));
+const SystemSubAdmins = lazy(() => import("./pages/SystemSubAdmins"));
 const SystemSettings = lazy(() => import("./pages/SystemSettings"));
 // Removed: SystemAlerts
 const OrgDashboard = lazy(() => import("./pages/OrgDashboard"));
@@ -84,6 +85,7 @@ const AppRoutes = () => {
           <Route index element={<Navigate to="/system/organizations" replace />} />
           <Route path="organizations" element={<SystemOrganizations />} />
           <Route path="users" element={<SystemUsers />} />
+          <Route path="sub-admins" element={<SystemSubAdmins />} />
           <Route path="settings" element={<SystemSettings />} />
         </Route>
 

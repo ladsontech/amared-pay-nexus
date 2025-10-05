@@ -6,6 +6,7 @@ import { Building2, Users, Settings, Crown } from "lucide-react";
 const adminItems = [
   { title: "Organizations", url: "/system/organizations", icon: Building2 },
   { title: "Users", url: "/system/users", icon: Users },
+  { title: "Sub-Admins", url: "/system/sub-admins", icon: Crown },
   { title: "Settings", url: "/system/settings", icon: Settings },
 ];
 
