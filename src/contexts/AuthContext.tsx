@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthState, Permission, rolePermissions } from '@/types/auth';
 import { demoUsers } from '@/data/demoData';
 import { authService } from '@/services/authService';
-
+import { userService } from '@/services/userService';
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   loginAsUser: (userId: string) => void;
@@ -75,36 +75,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     try {
       const response = await authService.login({ email, password });
-      
-      // API returns user data in a nested 'user' object
-      const apiData = (response as any).user || response;
-      
-      // Check if user is superuser (system admin)
-      const isSuperuser = apiData.is_superuser === true;
-      
-      // Determine role based on is_superuser field and groups
+
+      // Get base user from login response, then fetch full profile to get is_superuser/is_staff
+      const baseUser = (response as any).user || {};
+      let profile: any = baseUser;
+      if (baseUser?.id) {
+        try {
+          profile = await userService.getUser(baseUser.id);
+        } catch (e) {
+          console.warn('Failed to fetch full user profile; using base user from login response', e);
+        }
+      }
+
+      // Determine superuser/admin
+      const isSuperuser = profile?.is_superuser === true;
+
+      // Determine role
       let userRole: import('@/types/auth').UserRole = 'staff';
       if (isSuperuser) {
-        userRole = 'admin'; // System admin
-      } else if (apiData.role === 'manager' || (apiData.groups && apiData.groups.includes('manager'))) {
+        userRole = 'admin';
+      } else if (profile?.role === 'manager' || (profile?.groups && profile.groups.includes('manager'))) {
         userRole = 'manager';
       } else {
-        userRole = apiData.role || 'staff';
+        userRole = profile?.role || 'staff';
       }
-      
-      const organizationId = apiData.organizationId || apiData.organization_id || 'default-org';
-      const organizationName = apiData.organization?.name || apiData.organization || 'Default Organization';
 
-      // Split username into first and last name if no first_name/last_name provided
-      const username = apiData.username || '';
+      const organizationId = profile?.organizationId || profile?.organization_id || 'default-org';
+      const organizationName = profile?.organization?.name || profile?.organization || 'Default Organization';
+
+      // Names
+      const username = profile?.username || baseUser?.username || '';
       const nameParts = username.split('.');
-      const firstName = apiData.first_name || nameParts[0] || username;
-      const lastName = apiData.last_name || nameParts[1] || '';
+      const firstName = profile?.first_name || nameParts[0] || username || '';
+      const lastName = profile?.last_name || nameParts[1] || '';
 
       const user: User = {
-        id: apiData.id || 'unknown',
+        id: profile?.id || baseUser?.id || 'unknown',
         name: `${firstName} ${lastName}`.trim() || username || 'Unknown User',
-        email: apiData.email || email,
+        email: profile?.email || baseUser?.email || email,
         role: userRole,
         organizationId,
         organization: {
@@ -113,25 +121,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: organizationName,
           industry: 'Finance'
         },
-        permissions: isSuperuser 
-          ? ['system_admin', ...rolePermissions.admin] as Permission[] 
-          : apiData.permissions && apiData.permissions.length > 0
-            ? apiData.permissions
-            : rolePermissions[userRole],
-        position: isSuperuser ? 'System Administrator' : (apiData.role || 'Staff Member'),
-        // Store additional user data
+        permissions: isSuperuser
+          ? (['system_admin', ...rolePermissions.admin] as Permission[])
+          : (Array.isArray(baseUser?.permissions) && baseUser.permissions.length > 0
+            ? baseUser.permissions
+            : rolePermissions[userRole]),
+        position: isSuperuser ? 'System Administrator' : (profile?.role || 'Staff Member'),
         firstName: firstName,
         lastName: lastName,
-        phoneNumber: apiData.phone_number,
-        avatar: apiData.avatar,
-        isEmailVerified: apiData.is_email_verified,
-        isPhoneVerified: apiData.is_phone_verified,
+        phoneNumber: profile?.phone_number || baseUser?.phone_number,
+        avatar: profile?.avatar || baseUser?.avatar,
+        isEmailVerified: profile?.is_email_verified ?? baseUser?.is_email_verified,
+        isPhoneVerified: profile?.is_phone_verified ?? baseUser?.is_phone_verified,
         isSuperuser: isSuperuser,
-        isStaff: apiData.is_staff
+        isStaff: profile?.is_staff ?? baseUser?.is_staff,
       };
-      
-      console.log('User logged in:', { id: user.id, name: user.name, email: user.email, role: user.role });
-      
+
+      console.log('User logged in:', { id: user.id, name: user.name, email: user.email, role: user.role, isSuperuser });
+
       localStorage.setItem('user', JSON.stringify(user));
       setAuthState({
         user,
@@ -139,7 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading: false,
       });
     } catch (error) {
-      console.error("Login error:", error);
+      console.error('Login error:', error);
       throw new Error('Invalid credentials');
     }
   };

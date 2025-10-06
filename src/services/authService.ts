@@ -108,19 +108,28 @@ class AuthService {
         throw new Error(errText || `HTTP error! status: ${response.status}`);
       }
 
-      // Store tokens
-      if (data.access) localStorage.setItem("access_token", data.access);
-      if (data.refresh) localStorage.setItem("refresh_token", data.refresh);
-      if (data.token) localStorage.setItem("auth_token", data.token);
+      // Store tokens (support multiple API shapes)
+      const accessToken = data.access_token || data.access || data.token;
+      const refreshToken = data.refresh_token || data.refresh;
 
-      // Return enriched payload so AuthContext can derive roles
+      if (accessToken) {
+        localStorage.setItem("access_token", accessToken);
+        // Back-compat key used elsewhere in the app
+        localStorage.setItem("auth_token", accessToken);
+      }
+      if (refreshToken) {
+        localStorage.setItem("refresh_token", refreshToken);
+      }
+
+      // Return enriched payload so AuthContext can derive roles and details
       return {
         username: data.username,
         email: data.email,
-        token: data.token,
-        access: data.access,
-        refresh: data.refresh,
-        // passthrough fields used by AuthContext
+        token: accessToken,
+        access: accessToken,
+        refresh: refreshToken,
+        user: data.user, // critical: nested user from API
+        // passthrough fields used by AuthContext (if login returns them)
         is_superuser: data.is_superuser,
         is_staff: data.is_staff,
         groups: data.groups,
