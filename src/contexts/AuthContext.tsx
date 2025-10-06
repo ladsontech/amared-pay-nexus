@@ -76,13 +76,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await authService.login({ email, password });
       
-      // Build user object from API response
-      const apiData = response as any;
+      // API returns user data in a nested 'user' object
+      const apiData = (response as any).user || response;
       
       // Check if user is superuser (system admin)
       const isSuperuser = apiData.is_superuser === true;
       
-      // Determine role based on is_superuser field
+      // Determine role based on is_superuser field and groups
       let userRole: import('@/types/auth').UserRole = 'staff';
       if (isSuperuser) {
         userRole = 'admin'; // System admin
@@ -95,10 +95,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const organizationId = apiData.organizationId || apiData.organization_id || 'default-org';
       const organizationName = apiData.organization?.name || apiData.organization || 'Default Organization';
 
+      // Split username into first and last name if no first_name/last_name provided
+      const username = apiData.username || '';
+      const nameParts = username.split('.');
+      const firstName = apiData.first_name || nameParts[0] || username;
+      const lastName = apiData.last_name || nameParts[1] || '';
+
       const user: User = {
-        id: apiData.id || apiData.username || 'unknown',
-        name: `${apiData.first_name || ''} ${apiData.last_name || ''}`.trim() || apiData.username || 'Unknown User',
-        email: apiData.email || response.email,
+        id: apiData.id || 'unknown',
+        name: `${firstName} ${lastName}`.trim() || username || 'Unknown User',
+        email: apiData.email || email,
         role: userRole,
         organizationId,
         organization: {
@@ -107,11 +113,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: organizationName,
           industry: 'Finance'
         },
-        permissions: isSuperuser ? ['system_admin', ...rolePermissions.admin] as Permission[] : rolePermissions[userRole],
+        permissions: isSuperuser 
+          ? ['system_admin', ...rolePermissions.admin] as Permission[] 
+          : apiData.permissions && apiData.permissions.length > 0
+            ? apiData.permissions
+            : rolePermissions[userRole],
         position: isSuperuser ? 'System Administrator' : (apiData.role || 'Staff Member'),
         // Store additional user data
-        firstName: apiData.first_name,
-        lastName: apiData.last_name,
+        firstName: firstName,
+        lastName: lastName,
         phoneNumber: apiData.phone_number,
         avatar: apiData.avatar,
         isEmailVerified: apiData.is_email_verified,
@@ -119,6 +129,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isSuperuser: isSuperuser,
         isStaff: apiData.is_staff
       };
+      
+      console.log('User logged in:', { id: user.id, name: user.name, email: user.email, role: user.role });
       
       localStorage.setItem('user', JSON.stringify(user));
       setAuthState({
