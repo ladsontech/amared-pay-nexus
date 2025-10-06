@@ -16,6 +16,14 @@ export interface User {
   department?: string;
   avatar?: string;
   position: string;
+  // Additional fields from API
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  isEmailVerified?: boolean;
+  isPhoneVerified?: boolean;
+  isSuperuser?: boolean;
+  isStaff?: boolean;
 }
 
 export type UserRole = 'admin' | 'manager' | 'staff';

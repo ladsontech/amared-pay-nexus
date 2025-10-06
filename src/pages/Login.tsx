@@ -36,11 +36,13 @@ const Login = () => {
         const userStr = localStorage.getItem('user');
         if (userStr) {
           const user = JSON.parse(userStr);
-          // Super admin / system admin goes to admin dashboard
-          if (user.role === 'admin' || user.permissions?.includes('system_admin')) {
+          // Super admin (is_superuser = true) goes to system dashboard
+          if (user.isSuperuser === true || user.role === 'admin') {
+            console.log('Redirecting superuser to system dashboard');
             navigate('/system/organizations');
           } else {
-            // Regular users go to organization dashboard
+            // Regular organization users go to organization dashboard
+            console.log('Redirecting regular user to org dashboard');
             navigate('/org/dashboard');
           }
         } else {
