@@ -65,7 +65,16 @@ export interface WalletTransaction {
     created_at: string;
     updated_at: string;
   };
-  wallet: Wallet;
+  wallet: {
+    id: string;
+    balance: number | null;
+    is_pin_set: boolean;
+    created_at: string;
+    updated_at: string;
+    organization: string;
+    currency: number;
+    updated_by: string | null;
+  };
   type: "debit" | "credit" | null;
   amount: number;
   title: string | null;

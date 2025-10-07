@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Search, Filter, Building, Wallet, Users, Edit } from "lucide-react";
+import { Plus, Search, Filter, Building, Wallet, Users, Edit, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { organizationService, Organization, CreateOrganizationRequest } from "@/services/organizationService";
 
 const SystemOrganizations = () => {
+  const navigate = useNavigate();
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -178,10 +180,16 @@ const SystemOrganizations = () => {
                         </div>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => setEditOpen(org)}>
-                      <Edit className="h-4 w-4 mr-1" />
-                      Manage
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="default" size="sm" onClick={() => navigate(`/system/organizations/${org.id}`)}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        View Details
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setEditOpen(org)}>
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
