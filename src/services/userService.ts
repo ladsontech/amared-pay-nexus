@@ -57,6 +57,18 @@ export interface SubAdminResponse {
 }
 
 class UserService {
+  private checkAdminPermission(): boolean {
+    const userStr = localStorage.getItem("user");
+    if (!userStr) return false;
+    
+    try {
+      const user = JSON.parse(userStr);
+      return user.isSuperuser === true || user.role === 'admin';
+    } catch {
+      return false;
+    }
+  }
+
   async listUsers(query?: UserQuery): Promise<UserResponse[]> {
     try {
       const response = await apiClient.get<{ results?: UserResponse[]; data?: UserResponse[] } | UserResponse[]>(
@@ -114,11 +126,28 @@ class UserService {
   }
 
   async createSubAdmin(payload: CreateSubAdminRequest): Promise<SubAdminResponse> {
+    if (!this.checkAdminPermission()) {
+      throw new Error("Unauthorized: Only superusers can create sub-admins");
+    }
+
     try {
-      return await apiClient.post<SubAdminResponse>(API_CONFIG.endpoints.subAdmin.create, payload);
-    } catch (error) {
+      const response = await apiClient.post<SubAdminResponse>(API_CONFIG.endpoints.subAdmin.create, payload);
+      return response;
+    } catch (error: any) {
       console.error('Failed to create sub admin:', error);
-      throw new Error('Failed to create sub admin');
+      
+      // Extract meaningful error messages
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        if (typeof errorData === 'object') {
+          const errors = Object.entries(errorData)
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+            .join('; ');
+          throw new Error(errors || 'Failed to create sub admin');
+        }
+      }
+      
+      throw new Error(error.message || 'Failed to create sub admin');
     }
   }
 

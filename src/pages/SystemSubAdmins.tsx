@@ -49,12 +49,19 @@ const SystemSubAdmins = () => {
 
   const handleCreate = async (data: CreateSubAdminRequest) => {
     try {
-      await userService.createSubAdmin(data);
+      console.log('Creating sub-admin with data:', data);
+      const result = await userService.createSubAdmin(data);
+      console.log('Sub-admin created successfully:', result);
       toast({ title: "Success", description: "Sub-admin created successfully" });
       setCreateOpen(false);
       fetchSubAdmins();
-    } catch (error) {
-      toast({ title: "Error", description: "Failed to create sub-admin", variant: "destructive" });
+    } catch (error: any) {
+      console.error('Create sub-admin error:', error);
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to create sub-admin",
+        variant: "destructive" 
+      });
     }
   };
 

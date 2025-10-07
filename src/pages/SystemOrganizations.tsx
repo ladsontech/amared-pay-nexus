@@ -45,12 +45,19 @@ const SystemOrganizations = () => {
 
   const handleCreate = async (data: CreateOrganizationRequest) => {
     try {
-      await organizationService.createOrganization(data);
+      console.log('Creating organization with data:', data);
+      const result = await organizationService.createOrganization(data);
+      console.log('Organization created successfully:', result);
       toast({ title: "Success", description: "Organization created successfully" });
       setCreateOpen(false);
       fetchOrganizations();
-    } catch (error) {
-      toast({ title: "Error", description: "Failed to create organization", variant: "destructive" });
+    } catch (error: any) {
+      console.error('Create organization error:', error);
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to create organization",
+        variant: "destructive" 
+      });
     }
   };
 

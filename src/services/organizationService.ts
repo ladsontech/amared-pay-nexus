@@ -128,6 +128,18 @@ class OrganizationService {
     return headers;
   }
 
+  private checkAdminPermission(): boolean {
+    const userStr = localStorage.getItem("user");
+    if (!userStr) return false;
+    
+    try {
+      const user = JSON.parse(userStr);
+      return user.isSuperuser === true || user.role === 'admin';
+    } catch {
+      return false;
+    }
+  }
+
   // Staff Management
   async addStaff(staffData: CreateStaffRequest): Promise<CreateStaffRequest> {
     try {
@@ -239,6 +251,10 @@ class OrganizationService {
 
   // Organization Management
   async createOrganization(orgData: CreateOrganizationRequest): Promise<CreateOrganizationRequest & { logo: string | null }> {
+    if (!this.checkAdminPermission()) {
+      throw new Error("Unauthorized: Only superusers can create organizations");
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/organizations/create_org/`, {
         method: "POST",
@@ -247,8 +263,23 @@ class OrganizationService {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        let errorData: any = {};
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { message: errorText };
+        }
+        
+        // Format error messages
+        if (typeof errorData === 'object' && !errorData.message) {
+          const errors = Object.entries(errorData)
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+            .join('; ');
+          throw new Error(errors || `HTTP error! status: ${response.status}`);
+        }
+        
+        throw new Error(errorData.message || errorText || `HTTP error! status: ${response.status}`);
       }
 
       return await response.json();
