@@ -136,18 +136,40 @@ class UserService {
     } catch (error: any) {
       console.error('Failed to create sub admin:', error);
       
+      let errorMessage = "";
+      
       // Extract meaningful error messages
       if (error.response?.data) {
         const errorData = error.response.data;
-        if (typeof errorData === 'object') {
+        
+        if (typeof errorData === 'string') {
+          // Check if it's HTML error
+          if (errorData.includes('IntegrityError') || errorData.includes('duplicate key')) {
+            const duplicateMatch = errorData.match(/duplicate key value violates unique constraint "([^"]+)"[^(]*\(([^)]+)\)/);
+            if (duplicateMatch) {
+              const field = duplicateMatch[1].replace('user_', '').replace('_key', '').replace(/_/g, ' ');
+              const value = duplicateMatch[2].split('=')[1]?.replace(/\)/g, '');
+              errorMessage = `A user with this ${field} (${value}) already exists. Please use a different ${field}.`;
+            } else {
+              errorMessage = "This data already exists. Please check your phone number, email, or username.";
+            }
+          } else if (errorData.includes('<!DOCTYPE html>')) {
+            errorMessage = "Server error occurred. Please check all fields and try again.";
+          } else {
+            errorMessage = errorData;
+          }
+        } else if (typeof errorData === 'object') {
           const errors = Object.entries(errorData)
-            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+            .map(([key, value]) => {
+              const fieldName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+              return `${fieldName}: ${Array.isArray(value) ? value.join(', ') : value}`;
+            })
             .join('; ');
-          throw new Error(errors || 'Failed to create sub admin');
+          errorMessage = errors;
         }
       }
       
-      throw new Error(error.message || 'Failed to create sub admin');
+      throw new Error(errorMessage || error.message || 'Failed to create sub admin');
     }
   }
 

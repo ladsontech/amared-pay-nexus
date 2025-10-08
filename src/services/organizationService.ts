@@ -151,6 +151,10 @@ class OrganizationService {
 
   // Staff Management
   async addStaff(staffData: CreateStaffRequest): Promise<CreateStaffRequest> {
+    if (!this.checkAdminPermission()) {
+      throw new Error("Unauthorized: Only admins can add staff to organizations");
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/organizations/add_staff/`, {
         method: "POST",
@@ -159,12 +163,44 @@ class OrganizationService {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        let errorMessage = "";
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          if (typeof errorData === 'object' && !errorData.message) {
+            const errors = Object.entries(errorData)
+              .map(([key, value]) => {
+                const fieldName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `${fieldName}: ${Array.isArray(value) ? value.join(', ') : value}`;
+              })
+              .join('; ');
+            errorMessage = errors;
+          } else {
+            errorMessage = errorData.message || errorText;
+          }
+        } catch {
+          if (errorText.includes('IntegrityError') || errorText.includes('duplicate key')) {
+            const duplicateMatch = errorText.match(/duplicate key value violates unique constraint "([^"]+)"[^(]*\(([^)]+)\)/);
+            if (duplicateMatch) {
+              const field = duplicateMatch[1].replace('user_', '').replace('_key', '').replace(/_/g, ' ');
+              const value = duplicateMatch[2].split('=')[1]?.replace(/\)/g, '');
+              errorMessage = `A user with this ${field} (${value}) already exists. Please use a different ${field}.`;
+            } else {
+              errorMessage = "This user data already exists. Please check phone number, email, or username.";
+            }
+          } else if (errorText.includes('<!DOCTYPE html>')) {
+            errorMessage = "Server error occurred. Please check all fields and try again.";
+          } else {
+            errorMessage = errorText;
+          }
+        }
+        
+        throw new Error(errorMessage || `Server error: ${response.status}`);
       }
 
       return await response.json();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Add staff error:", error);
       throw error;
     }
@@ -273,26 +309,48 @@ class OrganizationService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        let errorData: any = {};
+        let errorMessage = "";
+        
         try {
-          errorData = JSON.parse(errorText);
+          // Try parsing as JSON first
+          const errorData = JSON.parse(errorText);
+          
+          if (typeof errorData === 'object' && !errorData.message) {
+            const errors = Object.entries(errorData)
+              .map(([key, value]) => {
+                const fieldName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `${fieldName}: ${Array.isArray(value) ? value.join(', ') : value}`;
+              })
+              .join('; ');
+            errorMessage = errors;
+          } else {
+            errorMessage = errorData.message || errorText;
+          }
         } catch {
-          errorData = { message: errorText };
+          // If not JSON, check if it's HTML error page
+          if (errorText.includes('IntegrityError') || errorText.includes('duplicate key')) {
+            // Extract meaningful error from HTML
+            const duplicateMatch = errorText.match(/duplicate key value violates unique constraint "([^"]+)"[^(]*\(([^)]+)\)/);
+            if (duplicateMatch) {
+              const field = duplicateMatch[1].replace('user_', '').replace('_key', '').replace(/_/g, ' ');
+              const value = duplicateMatch[2].split('=')[1]?.replace(/\)/g, '');
+              errorMessage = `A user with this ${field} (${value}) already exists. Please use a different ${field}.`;
+            } else {
+              errorMessage = "This data already exists in the system. Please check your phone number, email, or username.";
+            }
+          } else if (errorText.includes('<!DOCTYPE html>')) {
+            // Generic HTML error
+            errorMessage = "Server error occurred. Please check all fields and try again.";
+          } else {
+            errorMessage = errorText;
+          }
         }
         
-        // Format error messages
-        if (typeof errorData === 'object' && !errorData.message) {
-          const errors = Object.entries(errorData)
-            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-            .join('; ');
-          throw new Error(errors || `HTTP error! status: ${response.status}`);
-        }
-        
-        throw new Error(errorData.message || errorText || `HTTP error! status: ${response.status}`);
+        throw new Error(errorMessage || `Server error: ${response.status}`);
       }
 
       return await response.json();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Create organization error:", error);
       throw error;
     }
