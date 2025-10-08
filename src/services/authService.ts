@@ -138,21 +138,10 @@ class AuthService {
         organization: data.organization,
         role: data.role,
       } as any;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login API error:", error);
-      // Fallback to demo mode if API fails
-      const mockResponse: LoginResponse = {
-        username: "Demo User",
-        email: credentials.email,
-        token: "demo_token_123",
-        access: "demo_access_token",
-        refresh: "demo_refresh_token",
-      };
-      // Store mock tokens
-      localStorage.setItem("auth_token", mockResponse.token!);
-      localStorage.setItem("access_token", mockResponse.access!);
-      localStorage.setItem("refresh_token", mockResponse.refresh!);
-      return mockResponse;
+      // Do not fallback to demo login; enforce real authentication
+      throw new Error(error?.message || "Invalid credentials");
     }
   }
 

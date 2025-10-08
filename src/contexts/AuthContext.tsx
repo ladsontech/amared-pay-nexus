@@ -72,9 +72,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (identity: string, password: string) => {
     try {
-      const response = await authService.login({ email, password });
+      const isEmail = identity.includes('@');
+      const response = await authService.login({ 
+        email: isEmail ? identity : '', 
+        username: isEmail ? undefined : identity,
+        password 
+      });
 
       // Get base user from login response, then fetch full profile to get is_superuser/is_staff
       const baseUser = (response as any).user || {};
@@ -112,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const user: User = {
         id: profile?.id || baseUser?.id || 'unknown',
         name: `${firstName} ${lastName}`.trim() || username || 'Unknown User',
-        email: profile?.email || baseUser?.email || email,
+        email: profile?.email || baseUser?.email || (isEmail ? identity : ''),
         role: userRole,
         organizationId,
         organization: {
