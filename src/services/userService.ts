@@ -135,13 +135,13 @@ class UserService {
       return response;
     } catch (error: any) {
       console.error('Failed to create sub admin:', error);
-      
+
       let errorMessage = "";
-      
-      // Extract meaningful error messages
-      if (error.response?.data) {
-        const errorData = error.response.data;
-        
+
+      // Extract meaningful error messages from the error details
+      if (error.details) {
+        const errorData = error.details;
+
         if (typeof errorData === 'string') {
           // Check if it's HTML error
           if (errorData.includes('IntegrityError') || errorData.includes('duplicate key')) {
@@ -168,7 +168,7 @@ class UserService {
           errorMessage = errors;
         }
       }
-      
+
       throw new Error(errorMessage || error.message || 'Failed to create sub admin');
     }
   }
