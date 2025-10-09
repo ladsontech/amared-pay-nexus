@@ -26,7 +26,7 @@ export interface User {
   isStaff?: boolean;
 }
 
-export type UserRole = 'admin' | 'manager' | 'staff';
+export type UserRole = 'admin' | 'owner' | 'manager' | 'staff';
 
 export type Permission = 
   // Admin permissions
@@ -70,6 +70,21 @@ export const rolePermissions: Record<UserRole, Permission[]> = {
     'manage_organizations',
     'manage_system_users',
     'view_system_analytics',
+    'approve_transactions',
+    'approve_funding',
+    'approve_bulk_payments',
+    'approve_bank_deposits',
+    'view_department_reports',
+    'manage_team',
+    'submit_transactions',
+    'request_funding',
+    'view_own_history',
+    'access_petty_cash',
+    'access_bulk_payments',
+    'access_collections',
+    'access_bank_deposits'
+  ],
+  owner: [
     'approve_transactions',
     'approve_funding',
     'approve_bulk_payments',

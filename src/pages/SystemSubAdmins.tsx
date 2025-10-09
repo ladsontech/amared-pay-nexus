@@ -52,16 +52,28 @@ const SystemSubAdmins = () => {
       console.log('Creating sub-admin with data:', data);
       const result = await userService.createSubAdmin(data);
       console.log('Sub-admin created successfully:', result);
-      toast({ title: "Success", description: "Sub-admin created successfully" });
+      
+      // Refresh the list first
+      await fetchSubAdmins();
+      
+      // Show success toast
+      toast({ 
+        title: "Success", 
+        description: "Sub-admin created successfully",
+        duration: 5000
+      });
+      
+      // Close dialog
       setCreateOpen(false);
-      fetchSubAdmins();
     } catch (error: any) {
       console.error('Create sub-admin error:', error);
       toast({ 
         title: "Error", 
         description: error.message || "Failed to create sub-admin",
-        variant: "destructive" 
+        variant: "destructive",
+        duration: 5000
       });
+      throw error; // Re-throw to stop loading state
     }
   };
 
@@ -301,10 +313,16 @@ const SubAdminForm = ({ initial, onSubmit, onCancel }: SubAdminFormProps) => {
     username: initial?.username || "",
     password: initial?.password || "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(form);
+    setIsSubmitting(true);
+    try {
+      await onSubmit(form);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -365,10 +383,12 @@ const SubAdminForm = ({ initial, onSubmit, onCancel }: SubAdminFormProps) => {
         </div>
       )}
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
           Cancel
         </Button>
-        <Button type="submit">{initial ? "Update" : "Create"}</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? (initial ? "Updating..." : "Creating...") : (initial ? "Update" : "Create")}
+        </Button>
       </DialogFooter>
     </form>
   );

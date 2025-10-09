@@ -95,18 +95,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Determine superuser/admin
       const isSuperuser = profile?.is_superuser === true;
 
+      // For non-superusers, fetch their organization and staff details
+      let organizationId = 'default-org';
+      let organizationName = 'Default Organization';
+      let staffRole: 'owner' | 'manager' | 'member' = 'member';
+      
+      if (!isSuperuser && baseUser?.id) {
+        try {
+          // Import organizationService dynamically to avoid circular dependency
+          const { organizationService } = await import('@/services/organizationService');
+          
+          // Fetch staff list for this user
+          const staffResponse = await organizationService.getStaffList({ user: baseUser.id });
+          if (staffResponse.results && staffResponse.results.length > 0) {
+            const staffRecord = staffResponse.results[0];
+            organizationId = staffRecord.organization.id;
+            organizationName = staffRecord.organization.name;
+            staffRole = staffRecord.role || 'member';
+          }
+        } catch (e) {
+          console.warn('Failed to fetch user organization data', e);
+        }
+      }
+
       // Determine role
       let userRole: import('@/types/auth').UserRole = 'staff';
       if (isSuperuser) {
         userRole = 'admin';
-      } else if (profile?.role === 'manager' || (profile?.groups && profile.groups.includes('manager'))) {
-        userRole = 'manager';
+      } else if (staffRole === 'owner' || staffRole === 'manager') {
+        userRole = staffRole;
       } else {
-        userRole = profile?.role || 'staff';
+        userRole = 'staff';
       }
-
-      const organizationId = profile?.organizationId || profile?.organization_id || 'default-org';
-      const organizationName = profile?.organization?.name || profile?.organization || 'Default Organization';
 
       // Names
       const username = profile?.username || baseUser?.username || '';
@@ -128,10 +148,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         permissions: isSuperuser
           ? (['system_admin', ...rolePermissions.admin] as Permission[])
-          : (Array.isArray(baseUser?.permissions) && baseUser.permissions.length > 0
-            ? baseUser.permissions
+          : (staffRole === 'owner' 
+            ? rolePermissions.manager 
             : rolePermissions[userRole]),
-        position: isSuperuser ? 'System Administrator' : (profile?.role || 'Staff Member'),
+        position: isSuperuser ? 'System Administrator' : (staffRole || 'Staff Member'),
         firstName: firstName,
         lastName: lastName,
         phoneNumber: profile?.phone_number || baseUser?.phone_number,
@@ -142,7 +162,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isStaff: profile?.is_staff ?? baseUser?.is_staff,
       };
 
-      console.log('User logged in:', { id: user.id, name: user.name, email: user.email, role: user.role, isSuperuser });
+      console.log('User logged in:', { 
+        id: user.id, 
+        name: user.name, 
+        email: user.email, 
+        role: user.role, 
+        isSuperuser,
+        organizationId: user.organizationId,
+        organizationName: user.organization.name
+      });
 
       localStorage.setItem('user', JSON.stringify(user));
       setAuthState({

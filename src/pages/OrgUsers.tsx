@@ -13,6 +13,7 @@ import { Permission, User, rolePermissions } from "@/types/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { demoUsers } from "@/data/demoData";
 import { organizationService } from "@/services/organizationService";
+import { StaffManagement } from "@/components/StaffManagement";
 import { 
   AlertDialog, 
   AlertDialogAction, 
@@ -31,6 +32,19 @@ const LOCAL_KEY_PREFIX = "org_users_";
 const getLocalKey = (orgId: string) => `${LOCAL_KEY_PREFIX}${orgId}`;
 
 export default function OrgUsers() {
+  const { user: currentUser } = useAuth();
+  
+  // If user has a real organization (not demo), show the real staff management
+  if (currentUser?.organizationId && currentUser.organizationId !== 'default-org') {
+    return <StaffManagement />;
+  }
+
+  // Otherwise show the legacy demo users UI
+  return <LegacyDemoUsersUI />;
+}
+
+// Legacy demo users component for backward compatibility
+function LegacyDemoUsersUI() {
   const { user: currentUser } = useAuth();
   const { toast } = useToast();
   const [search, setSearch] = useState("");

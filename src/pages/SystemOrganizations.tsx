@@ -50,16 +50,28 @@ const SystemOrganizations = () => {
       console.log('Creating organization with data:', data);
       const result = await organizationService.createOrganization(data);
       console.log('Organization created successfully:', result);
-      toast({ title: "Success", description: "Organization created successfully" });
+      
+      // Refresh the list first
+      await fetchOrganizations();
+      
+      // Show success toast
+      toast({ 
+        title: "Success", 
+        description: "Organization created successfully. The owner can now log in.",
+        duration: 5000
+      });
+      
+      // Close dialog
       setCreateOpen(false);
-      fetchOrganizations();
     } catch (error: any) {
       console.error('Create organization error:', error);
       toast({ 
         title: "Error", 
         description: error.message || "Failed to create organization",
-        variant: "destructive" 
+        variant: "destructive",
+        duration: 5000
       });
+      throw error; // Re-throw to stop loading state
     }
   };
 
@@ -252,10 +264,16 @@ const OrgForm = ({ onSubmit, onCancel }: OrgFormProps) => {
     wallet_currency: 1,
     wallet_pin: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(form);
+    setIsSubmitting(true);
+    try {
+      await onSubmit(form);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -327,8 +345,10 @@ const OrgForm = ({ onSubmit, onCancel }: OrgFormProps) => {
       </div>
 
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-        <Button type="submit">Create Organization</Button>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>Cancel</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Creating..." : "Create Organization"}
+        </Button>
       </DialogFooter>
     </form>
   );
