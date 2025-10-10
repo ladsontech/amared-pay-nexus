@@ -22,12 +22,15 @@ const SystemOrganizations = () => {
   const fetchOrganizations = async () => {
     try {
       setIsLoading(true);
+      console.log('Fetching organizations...');
       const response = await organizationService.getOrganizations();
+      console.log('Organizations fetched:', response);
       setOrganizations(response.results);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Failed to load organizations:', error);
       toast({
         title: "Error",
-        description: "Failed to load organizations",
+        description: error.message || "Failed to load organizations",
         variant: "destructive",
       });
     } finally {
@@ -51,18 +54,21 @@ const SystemOrganizations = () => {
       const result = await organizationService.createOrganization(data);
       console.log('Organization created successfully:', result);
       
-      // Refresh the list first
+      // Wait a bit for backend to process
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Refresh the list
       await fetchOrganizations();
       
-      // Show success toast
+      // Close dialog first
+      setCreateOpen(false);
+      
+      // Show success toast after closing
       toast({ 
         title: "Success", 
-        description: "Organization created successfully. The owner can now log in.",
+        description: `Organization "${data.org_name}" created successfully. The owner can now log in.`,
         duration: 5000
       });
-      
-      // Close dialog
-      setCreateOpen(false);
     } catch (error: any) {
       console.error('Create organization error:', error);
       toast({ 
@@ -271,6 +277,10 @@ const OrgForm = ({ onSubmit, onCancel }: OrgFormProps) => {
     setIsSubmitting(true);
     try {
       await onSubmit(form);
+      // Success - form will be reset when dialog closes
+    } catch (error) {
+      // Error already shown by parent, just keep dialog open
+      console.error('Form submission error:', error);
     } finally {
       setIsSubmitting(false);
     }

@@ -100,21 +100,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let organizationName = 'Default Organization';
       let staffRole: 'owner' | 'manager' | 'member' = 'member';
       
-      if (!isSuperuser && baseUser?.id) {
+      if (!isSuperuser) {
         try {
           // Import organizationService dynamically to avoid circular dependency
           const { organizationService } = await import('@/services/organizationService');
           
-          // Fetch staff list for this user
-          const staffResponse = await organizationService.getStaffList({ user: baseUser.id });
+          // Fetch staff list for this user - try with username if id doesn't work
+          console.log('Fetching staff data for user:', baseUser);
+          let staffResponse = await organizationService.getStaffList({ user: baseUser.id });
+          
+          // If no results with ID, try with username
+          if (!staffResponse.results || staffResponse.results.length === 0) {
+            console.log('No staff found by ID, trying username:', profile?.username);
+            staffResponse = await organizationService.getStaffList();
+            // Filter by username manually
+            const matchingStaff = staffResponse.results.find(
+              (s: any) => s.user.username === profile?.username || s.user.id === baseUser.id
+            );
+            if (matchingStaff) {
+              staffResponse.results = [matchingStaff];
+            }
+          }
+          
+          console.log('Staff response:', staffResponse);
+          
           if (staffResponse.results && staffResponse.results.length > 0) {
             const staffRecord = staffResponse.results[0];
             organizationId = staffRecord.organization.id;
             organizationName = staffRecord.organization.name;
             staffRole = staffRecord.role || 'member';
+            console.log('User belongs to organization:', organizationName, 'with role:', staffRole);
+          } else {
+            console.warn('No organization found for user, using default demo org');
           }
         } catch (e) {
-          console.warn('Failed to fetch user organization data', e);
+          console.error('Failed to fetch user organization data:', e);
         }
       }
 
