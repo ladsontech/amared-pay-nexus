@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { organizationService, Staff, Organization, Wallet, WalletTransaction } from '@/services/organizationService';
+import { paymentService, BulkPayment, Collection, MoMoWithdraw } from '@/services/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const useOrganization = () => {
@@ -18,6 +19,11 @@ export const useOrganization = () => {
   // Wallet Management
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [walletTransactions, setWalletTransactions] = useState<WalletTransaction[]>([]);
+
+  // Payments Management
+  const [bulkPayments, setBulkPayments] = useState<BulkPayment[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [momoWithdraws, setMomoWithdraws] = useState<MoMoWithdraw[]>([]);
 
   // Fetch staff for current organization
   const fetchStaff = async () => {
@@ -83,7 +89,7 @@ export const useOrganization = () => {
   const fetchWalletTransactions = async (walletId?: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const params: any = { limit: 50 };
       if (walletId) {
@@ -98,12 +104,75 @@ export const useOrganization = () => {
           params.wallet = walletResponse.results[0].id;
         }
       }
-      
+
       const response = await organizationService.getWalletTransactions(params);
       setWalletTransactions(response.results);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch transactions');
       console.error('Error fetching wallet transactions:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch bulk payments for current organization
+  const fetchBulkPayments = async () => {
+    if (!user?.organizationId) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await paymentService.getBulkPayments({
+        organization: user.organizationId,
+        limit: 20
+      });
+      setBulkPayments(response.results);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch bulk payments');
+      console.error('Error fetching bulk payments:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch collections for current organization
+  const fetchCollections = async () => {
+    if (!user?.organizationId) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await paymentService.getCollections({
+        organization: user.organizationId,
+        limit: 20
+      });
+      setCollections(response.results);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch collections');
+      console.error('Error fetching collections:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch mobile money withdraws for current organization
+  const fetchMomoWithdraws = async () => {
+    if (!user?.organizationId) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await paymentService.getMoMoWithdraws({
+        organization: user.organizationId,
+        limit: 20
+      });
+      setMomoWithdraws(response.results);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch mobile money withdraws');
+      console.error('Error fetching momo withdraws:', err);
     } finally {
       setLoading(false);
     }
@@ -240,6 +309,9 @@ export const useOrganization = () => {
       fetchStaff();
       fetchWallets();
       fetchWalletTransactions();
+      fetchBulkPayments();
+      fetchCollections();
+      fetchMomoWithdraws();
     }
   }, [user?.organizationId]);
 
@@ -253,18 +325,24 @@ export const useOrganization = () => {
     organizations,
     wallets,
     walletTransactions,
-    
+    bulkPayments,
+    collections,
+    momoWithdraws,
+
     // Actions
     fetchStaff,
     fetchOrganization,
     fetchWallets,
     fetchWalletTransactions,
+    fetchBulkPayments,
+    fetchCollections,
+    fetchMomoWithdraws,
     addStaff,
     updateStaffRole,
     deleteStaff,
     updateOrganization,
     updateWallet,
-    
+
     // Computed values
     totalStaff: staff.length,
     activeStaff: staff.filter(s => s.user.is_email_verified && s.user.is_phone_verified).length,
@@ -272,7 +350,7 @@ export const useOrganization = () => {
     monthlyTransactions: walletTransactions.filter(t => {
       const transactionDate = new Date(t.created_at);
       const now = new Date();
-      return transactionDate.getMonth() === now.getMonth() && 
+      return transactionDate.getMonth() === now.getMonth() &&
              transactionDate.getFullYear() === now.getFullYear();
     }).length,
     pendingApprovals: walletTransactions.filter(t => t.type === 'debit' && !t.title?.includes('approved')).length
