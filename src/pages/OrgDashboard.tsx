@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,9 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/hooks/useOrganization";
-import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, Building, Phone, Send, Target, Calendar, BarChart3, ChevronRight, Eye, ArrowUpRight, Plus, Loader2, AlertTriangle } from "lucide-react";
+import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, Building, Phone, Send, Target, Calendar, BarChart3, ChevronRight, Eye, ArrowUpRight, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AIInsights } from "@/components/AIInsights";
 const OrgDashboard = () => {
   const {
     user,
@@ -609,37 +608,7 @@ const OrgDashboard = () => {
               </div>
             </div>}
           
-          {/* AI Insights Section */}
-          <div className="mt-4">
-            <AIInsights
-              transactions={[
-                // Map bulk payments to transactions
-                ...bulkPayments.slice(0, 3).map(payment => ({
-                  id: payment.id,
-                  amount: payment.total_amount,
-                  description: `Bulk Payment - ${payment.reference || 'Multiple recipients'}`,
-                  date: new Date(payment.created_at).toISOString().split('T')[0],
-                  type: "expense" as const
-                })),
-                // Map collections to transactions
-                ...collections.slice(0, 2).map(collection => ({
-                  id: collection.id,
-                  amount: collection.amount,
-                  description: `Collection - ${collection.reason || 'Payment received'}`,
-                  date: new Date(collection.created_at).toISOString().split('T')[0],
-                  type: "income" as const
-                })),
-                // Map momo withdraws to transactions
-                ...momoWithdraws.slice(0, 2).map(withdraw => ({
-                  id: withdraw.id,
-                  amount: withdraw.amount,
-                  description: `Mobile Money Withdraw - ${withdraw.phone_number || 'Unknown'}`,
-                  date: new Date(withdraw.created_at).toISOString().split('T')[0],
-                  type: "expense" as const
-                }))
-              ]}
-            />
-          </div>
+
         </div>
       </div>
     </div>;
