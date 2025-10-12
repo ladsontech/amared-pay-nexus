@@ -1,0 +1,1496 @@
+payments
+payments_bulk_payment_list
+Authorizations:
+Basic
+query Parameters
+reference	
+string
+currency	
+string
+organization	
+string
+profit	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (BulkPayment)
+
+get
+/payments/bulk_payment/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+payments_bulk_payment_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this BulkPayment.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+currency
+required
+object (Currency)
+organization
+required
+object (Organization)
+profit
+required
+object (Profit)
+sheet	
+string or null <uri> (Sheet)
+total_amount
+required
+integer (Total amount) [ -2147483648 .. 2147483647 ]
+reference	
+string (Reference) [ 1 .. 100 ] characters
+charge	
+integer (Charge) [ -2147483648 .. 2147483647 ]
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+get
+/payments/bulk_payment/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"currency": {
+"id": 0,
+"name": "string",
+"symbol": "stri",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"organization": {
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"name": "string",
+"logo": "http://example.com",
+"address": "string",
+"company_reg_id": "string",
+"tin": "string",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"profit": {
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"currency": {},
+"type": "bulk_payment",
+"amount": -2147483648,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"sheet": "http://example.com",
+"total_amount": -2147483648,
+"reference": "string",
+"charge": -2147483648,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
+payments_change_profit_configuration_update
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this ProfitConfiguration.
+
+Request Body schema: application/json
+name	
+string or null (Name)
+Enum: "sms_fee" "whatsapp_fee" "cash_out_fee" "bank_transfer_fee" "mobile_money_disbursement_fee" "mobile_money_collection_fee"
+fee	
+integer or null (Fee) [ -2147483648 .. 2147483647 ]
+percentage	
+string or null <decimal> (Percentage)
+use_percentage	
+boolean (Use percentage)
+currency	
+integer or null (Currency)
+updated_by	
+string or null <uuid> (Updated by)
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+name	
+string or null (Name)
+Enum: "sms_fee" "whatsapp_fee" "cash_out_fee" "bank_transfer_fee" "mobile_money_disbursement_fee" "mobile_money_collection_fee"
+fee	
+integer or null (Fee) [ -2147483648 .. 2147483647 ]
+percentage	
+string or null <decimal> (Percentage)
+use_percentage	
+boolean (Use percentage)
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+currency	
+integer or null (Currency)
+updated_by	
+string or null <uuid> (Updated by)
+
+put
+/payments/change_profit_configuration/{id}/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"name": "sms_fee",
+"fee": -2147483648,
+"percentage": "string",
+"use_percentage": true,
+"currency": 0,
+"updated_by": "deea00dc-b6b6-4412-a483-26ac61e1f6fe"
+}
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"name": "sms_fee",
+"fee": -2147483648,
+"percentage": "string",
+"use_percentage": true,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z",
+"currency": 0,
+"updated_by": "deea00dc-b6b6-4412-a483-26ac61e1f6fe"
+}
+payments_check_bulk_payment_read
+Authorizations:
+Basic
+path Parameters
+linkId
+required
+string
+Responses
+200 get payment link details.
+400 Error
+
+get
+/payments/check_bulk_payment/{linkId}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "link details",
+"data": {
+"currency": {},
+"bulk_payment": {},
+"transaction": {},
+"amount": null,
+"url": "",
+"beneficiary_name": "",
+"beneficiary_email": "",
+"beneficiary_phone_number": "",
+"beneficiary_bank_name": "",
+"beneficiary_bank_branch": "",
+"beneficiary_account_number": "",
+"expiry_date": null,
+"verification_code": "",
+"status": null
+},
+"phone_info_verification_results": {
+"phone_number": "string",
+"first_name": "string",
+"last_name": "string"
+}
+}
+payments_collections_list
+Authorizations:
+Basic
+query Parameters
+organization	
+string
+status	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (Collection)
+
+get
+/payments/collections/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+payments_collections_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Collection.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+reason	
+string or null (Reason) <= 255 characters
+amount
+required
+integer (Amount) [ -2147483648 .. 2147483647 ]
+phone_number	
+string or null (Phone number) <= 100 characters
+status	
+string or null (Status)
+Enum: "pending" "successful" "failed"
+message	
+string or null (Message)
+charge	
+integer (Charge) [ -2147483648 .. 2147483647 ]
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+currency	
+integer or null (Currency)
+organization	
+string or null <uuid> (Organization)
+profit	
+string or null <uuid> (Profit)
+
+get
+/payments/collections/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"reason": "string",
+"amount": -2147483648,
+"phone_number": "string",
+"status": "pending",
+"message": "string",
+"charge": -2147483648,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z",
+"currency": 0,
+"organization": "452c1a86-a0af-475b-b03f-724878b0f387",
+"profit": "56293ede-0afe-4cd6-af10-bc84a66d195c"
+}
+payments_country_list
+Authorizations:
+Basic
+query Parameters
+dial_code	
+string
+alpha2	
+string
+alpha3	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (Country)
+
+get
+/payments/country/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+payments_country_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+integer
+A unique integer value identifying this Country.
+
+Responses
+200
+Response Schema: application/json
+id	
+integer (ID)
+name
+required
+string (Name) [ 1 .. 50 ] characters
+dial_code
+required
+string (Dial code) [ 1 .. 10 ] characters
+alpha2
+required
+string (Alpha2) [ 1 .. 2 ] characters
+alpha3
+required
+string (Alpha3) [ 1 .. 3 ] characters
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+get
+/payments/country/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": 0,
+"name": "string",
+"dial_code": "string",
+"alpha2": "st",
+"alpha3": "str",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
+payments_country_currency_list
+Authorizations:
+Basic
+query Parameters
+country	
+string
+currency	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (CountryCurrency)
+
+get
+/payments/country_currency/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+payments_country_currency_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Country_Currency.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+country
+required
+object (Country)
+currency
+required
+object (Currency)
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+get
+/payments/country_currency/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"country": {
+"id": 0,
+"name": "string",
+"dial_code": "string",
+"alpha2": "st",
+"alpha3": "str",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"currency": {
+"id": 0,
+"name": "string",
+"symbol": "stri",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
+payments_create_bulk_payment_create
+Authorizations:
+Basic
+Request Body schema: application/json
+organization
+required
+string <uuid> (Organization)
+total_amount
+required
+integer (Total amount) [ -2147483648 .. 2147483647 ]
+Responses
+201
+Response Schema: application/json
+id	
+string <uuid> (Id)
+organization
+required
+string <uuid> (Organization)
+sheet	
+string <uri> (Sheet)
+total_amount
+required
+integer (Total amount) [ -2147483648 .. 2147483647 ]
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+post
+/payments/create_bulk_payment/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"organization": "452c1a86-a0af-475b-b03f-724878b0f387",
+"total_amount": -2147483648
+}
+Response samples
+201
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"organization": "452c1a86-a0af-475b-b03f-724878b0f387",
+"sheet": "http://example.com",
+"total_amount": -2147483648,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
+payments_currency_list
+Authorizations:
+Basic
+query Parameters
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (Currency)
+
+get
+/payments/currency/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+payments_currency_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+integer
+A unique integer value identifying this Currency.
+
+Responses
+200
+Response Schema: application/json
+id	
+integer (ID)
+name
+required
+string (Name) [ 1 .. 50 ] characters
+symbol
+required
+string (Symbol) [ 1 .. 4 ] characters
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+get
+/payments/currency/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": 0,
+"name": "string",
+"symbol": "stri",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
+payments_link_list
+Authorizations:
+Basic
+query Parameters
+bulk_payment	
+string
+currency	
+string
+transaction	
+string
+status	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (LinkSerializer2)
+
+get
+/payments/link/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+payments_link_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Link.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+currency
+required
+object (Currency)
+bulk_payment
+required
+object (BulkPayment)
+transaction
+required
+object (Transaction)
+amount
+required
+integer (Amount) [ -2147483648 .. 2147483647 ]
+url	
+string or null (Url) <= 200 characters
+beneficiary_name	
+string or null (Beneficiary name) <= 200 characters
+beneficiary_email	
+string or null <email> (Beneficiary email) <= 200 characters
+beneficiary_phone_number	
+string or null (Beneficiary phone number) <= 200 characters
+beneficiary_bank_name	
+string or null (Beneficiary bank name) <= 200 characters
+beneficiary_bank_branch	
+string or null (Beneficiary bank branch) <= 200 characters
+beneficiary_account_number	
+string or null (Beneficiary account number) <= 200 characters
+expiry_date	
+string or null <date> (Expiry date)
+verification_code	
+string or null (Verification code) <= 150 characters
+status	
+string or null (Status)
+Enum: "sent" "processed" "expired"
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+get
+/payments/link/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"currency": {
+"id": 0,
+"name": "string",
+"symbol": "stri",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"bulk_payment": {
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"currency": {},
+"organization": {},
+"profit": {},
+"sheet": "http://example.com",
+"total_amount": -2147483648,
+"reference": "string",
+"charge": -2147483648,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"transaction": {
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"currency": {},
+"mode": "mobile_money",
+"amount": -2147483648,
+"charge": -2147483648,
+"status": "pending",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z",
+"link": "857d5352-31ec-481f-999c-13710791601a",
+"profit": "56293ede-0afe-4cd6-af10-bc84a66d195c"
+},
+"amount": -2147483648,
+"url": "string",
+"beneficiary_name": "string",
+"beneficiary_email": "user@example.com",
+"beneficiary_phone_number": "string",
+"beneficiary_bank_name": "string",
+"beneficiary_bank_branch": "string",
+"beneficiary_account_number": "string",
+"expiry_date": "2019-08-24",
+"verification_code": "string",
+"status": "sent",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
+payments_mobile_money_initiate_collection_create
+Authorizations:
+Basic
+Request Body schema: application/json
+organization
+required
+string <uuid> (Organization)
+amount
+required
+integer (Amount) [ -2147483648 .. 2147483647 ]
+phone_number	
+string or null (Phone number) <= 100 characters
+reason	
+string or null (Reason) <= 255 characters
+Responses
+200 collection transaction.
+400 Error
+
+post
+/payments/mobile_money/initiate_collection
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"organization": "452c1a86-a0af-475b-b03f-724878b0f387",
+"amount": -2147483648,
+"phone_number": "string",
+"reason": "string"
+}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "transaction was successful",
+"data": {
+"reason": "",
+"amount": null,
+"phone_number": "",
+"status": null,
+"message": "",
+"charge": null,
+"currency": null,
+"organization": null,
+"profit": null
+}
+}
+payments_mobile_money_phone_number_info_read
+Authorizations:
+Basic
+path Parameters
+phone_number
+required
+string
+Responses
+200
+
+get
+/payments/mobile_money/phone_number_info/{phone_number}
+payments_mobile_money_withdraw_create
+Authorizations:
+Basic
+Request Body schema: application/json
+organization
+required
+string <uuid> (Organization)
+amount
+required
+integer (Amount) [ -2147483648 .. 2147483647 ]
+phone_number	
+string or null (Phone number) <= 100 characters
+Responses
+200 withdraw transaction.
+400 Error
+
+post
+/payments/mobile_money/withdraw
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"organization": "452c1a86-a0af-475b-b03f-724878b0f387",
+"amount": -2147483648,
+"phone_number": "string"
+}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "transaction was successful",
+"data": {
+"amount": null,
+"phone_number": "",
+"status": null,
+"message": "",
+"charge": null,
+"currency": null,
+"organization": null,
+"profit": null
+}
+}
+payments_momo_withdraws_list
+Authorizations:
+Basic
+query Parameters
+organization	
+string
+status	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (MoMoWithdraw)
+
+get
+/payments/momo_withdraws/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+payments_momo_withdraws_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this MoMoWithdraw.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+amount
+required
+integer (Amount) [ -2147483648 .. 2147483647 ]
+phone_number	
+string or null (Phone number) <= 100 characters
+status	
+string or null (Status)
+Enum: "pending" "successful" "failed"
+message	
+string or null (Message)
+charge	
+integer (Charge) [ -2147483648 .. 2147483647 ]
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+currency	
+integer or null (Currency)
+organization	
+string or null <uuid> (Organization)
+profit	
+string or null <uuid> (Profit)
+
+get
+/payments/momo_withdraws/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"amount": -2147483648,
+"phone_number": "string",
+"status": "pending",
+"message": "string",
+"charge": -2147483648,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z",
+"currency": 0,
+"organization": "452c1a86-a0af-475b-b03f-724878b0f387",
+"profit": "56293ede-0afe-4cd6-af10-bc84a66d195c"
+}
+payments_process_bulk_payment_transaction_create
+Authorizations:
+Basic
+Request Body schema: application/json
+link
+required
+string <uuid> (Link)
+verification_code
+required
+string (Verification code) 6 characters
+mode	
+string or null (Mode)
+Enum: "mobile_money" "bank_transfer" "cashout"
+Responses
+200 process the payment transaction.
+400 Error
+
+post
+/payments/process_bulk_payment/transaction
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"link": "857d5352-31ec-481f-999c-13710791601a",
+"verification_code": "string",
+"mode": "mobile_money"
+}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "transaction processed successfully",
+"data": {
+"currency": {},
+"bulk_payment": {},
+"transaction": {},
+"amount": null,
+"url": "",
+"beneficiary_name": "",
+"beneficiary_email": "",
+"beneficiary_phone_number": "",
+"beneficiary_bank_name": "",
+"beneficiary_bank_branch": "",
+"beneficiary_account_number": "",
+"expiry_date": null,
+"verification_code": "",
+"status": null
+}
+}
+payments_profit_list
+Authorizations:
+Basic
+query Parameters
+type	
+string
+currency	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (Profit)
+
+get
+/payments/profit/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+payments_profit_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Profit.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+currency
+required
+object (Currency)
+type	
+string or null (Type)
+Enum: "bulk_payment" "bank_transfer" "cashout" "mobile_money_collection" "mobile_money_disbursement"
+amount
+required
+integer (Amount) [ -2147483648 .. 2147483647 ]
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+get
+/payments/profit/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"currency": {
+"id": 0,
+"name": "string",
+"symbol": "stri",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"type": "bulk_payment",
+"amount": -2147483648,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
+payments_profit_configuration_list
+Authorizations:
+Basic
+query Parameters
+name	
+string
+currency	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (ProfitConfiguration)
+
+get
+/payments/profit_configuration/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+payments_profit_configuration_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this ProfitConfiguration.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+currency
+required
+object (Currency)
+name	
+string or null (Name)
+Enum: "sms_fee" "whatsapp_fee" "cash_out_fee" "bank_transfer_fee" "mobile_money_disbursement_fee" "mobile_money_collection_fee"
+fee	
+integer or null (Fee) [ -2147483648 .. 2147483647 ]
+percentage	
+string or null <decimal> (Percentage)
+use_percentage	
+boolean (Use percentage)
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+updated_by	
+string or null <uuid> (Updated by)
+
+get
+/payments/profit_configuration/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"currency": {
+"id": 0,
+"name": "string",
+"symbol": "stri",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"name": "sms_fee",
+"fee": -2147483648,
+"percentage": "string",
+"use_percentage": true,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z",
+"updated_by": "deea00dc-b6b6-4412-a483-26ac61e1f6fe"
+}
+payments_transaction_list
+Authorizations:
+Basic
+query Parameters
+mode	
+string
+currency	
+string
+link	
+string
+profit	
+string
+status	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (TransactionSerializer2)
+
+get
+/payments/transaction/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+payments_transaction_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Transaction.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+currency
+required
+object (Currency)
+link
+required
+object (LinkSerializer3)
+profit
+required
+object (Profit)
+mode	
+string or null (Mode)
+Enum: "mobile_money" "bank_transfer" "cashout"
+amount
+required
+integer (Amount) [ -2147483648 .. 2147483647 ]
+charge	
+integer or null (Charge) [ -2147483648 .. 2147483647 ]
+status	
+string or null (Status)
+Enum: "pending" "successful" "failed"
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+get
+/payments/transaction/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"currency": {
+"id": 0,
+"name": "string",
+"symbol": "stri",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"link": {
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"currency": {},
+"bulk_payment": {},
+"amount": -2147483648,
+"url": "string",
+"beneficiary_name": "string",
+"beneficiary_email": "user@example.com",
+"beneficiary_phone_number": "string",
+"beneficiary_bank_name": "string",
+"beneficiary_bank_branch": "string",
+"beneficiary_account_number": "string",
+"expiry_date": "2019-08-24",
+"verification_code": "string",
+"status": "sent",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z",
+"transaction": "6b91fbed-a61e-4512-a48d-a6c1ac2f90cb"
+},
+"profit": {
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"currency": {},
+"type": "bulk_payment",
+"amount": -2147483648,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"mode": "mobile_money",
+"amount": -2147483648,
+"charge": -2147483648,
+"status": "pending",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
