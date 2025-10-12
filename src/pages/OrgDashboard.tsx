@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
+import { useOrganization } from "@/hooks/useOrganization";
 import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, Building, Phone, Send, Target, Calendar, BarChart3, ChevronRight, Eye, ArrowUpRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 const OrgDashboard = () => {
@@ -15,6 +16,17 @@ const OrgDashboard = () => {
     user,
     hasPermission
   } = useAuth();
+  const {
+    totalWalletBalance,
+    monthlyTransactions,
+    pendingApprovals,
+    totalStaff,
+    activeStaff,
+    wallets,
+    walletTransactions,
+    loading,
+    error
+  } = useOrganization();
   const {
     toast
   } = useToast();
@@ -30,46 +42,33 @@ const OrgDashboard = () => {
     phoneNumber: "+256",
     description: ""
   });
+
+  // Map wallet transactions to dashboard format
+  const recentTransactions = walletTransactions.slice(0, 5).map(transaction => ({
+    id: transaction.id,
+    type: transaction.type === 'debit' ? 'Payment' : 'Collection',
+    amount: transaction.amount,
+    status: transaction.title?.includes('approved') ? 'approved' : transaction.title?.includes('pending') ? 'pending' : 'completed',
+    date: new Date(transaction.created_at).toLocaleDateString(),
+    description: transaction.title || 'Transaction'
+  }));
+
+  // Find specific wallet balances
+  const collectionsWallet = wallets.find(w => w.organization.name.toLowerCase().includes('collection')) || wallets[0];
+  const pettyCashWallet = wallets.find(w => w.organization.name.toLowerCase().includes('petty') || w.organization.name.toLowerCase().includes('cash')) || wallets[1];
+
   const dashboardData = {
-    totalCollections: 45600000,
-    walletBalance: 12300000,
-    pettyCashBalance: 850000,
-    monthlyTransactions: 1247,
-    pendingApprovals: 8,
-    recentTransactions: [{
-      id: '1',
-      type: 'Petty Cash',
-      amount: 125000,
-      status: 'approved',
-      date: '2024-01-20',
-      description: 'Office supplies purchase'
-    }, {
-      id: '2',
-      type: 'Bulk Payment',
-      amount: 2500000,
-      status: 'pending',
-      date: '2024-01-20',
-      description: 'Monthly salary disbursement'
-    }, {
-      id: '3',
-      type: 'Collection',
-      amount: 850000,
-      status: 'completed',
-      date: '2024-01-19',
-      description: 'Client payment received'
-    }, {
-      id: '4',
-      type: 'Petty Cash',
-      amount: 75000,
-      status: 'rejected',
-      date: '2024-01-19',
-      description: 'Travel expense claim'
-    }],
+    totalCollections: collectionsWallet?.balance || 0,
+    walletBalance: totalWalletBalance,
+    pettyCashBalance: pettyCashWallet?.balance || 0,
+    monthlyTransactions,
+    pendingApprovals,
+    recentTransactions,
     teamMetrics: {
-      totalStaff: 12,
-      activeStaff: 9,
-      monthlyBudget: 5000000,
-      budgetUsed: 3200000
+      totalStaff,
+      activeStaff,
+      monthlyBudget: 5000000, // This might need to be fetched from API
+      budgetUsed: Math.round(totalWalletBalance * 0.64) // Estimate based on total balance
     }
   };
   const getStatusColor = (status: string) => {
@@ -446,42 +445,9 @@ const OrgDashboard = () => {
                     <Button onClick={handleSendToBank} className="w-full bg-blue-600 hover:bg-blue-700">
                       Confirm Transfer
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md mx-4">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2">
-                        <Building className="h-5 w-5 text-blue-600" />
-                        Send to Bank
-                      </DialogTitle>
-                      <DialogDescription>Transfer funds from wallet to bank account</DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="wallet-bank-amount">Amount (UGX)</Label>
-                        <Input id="wallet-bank-amount" type="number" placeholder="Enter amount" value={bankTransferData.amount} onChange={(e) => setBankTransferData({ ...bankTransferData, amount: e.target.value })} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="wallet-bank-account">Bank Account</Label>
-                        <Select value={bankTransferData.bankAccount} onValueChange={(value) => setBankTransferData({ ...bankTransferData, bankAccount: value })}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select bank account" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
-                            <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
-                            <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
-                            <SelectItem value="equity-6789">Equity Bank - ***6789</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="wallet-bank-description">Description</Label>
-                        <Input id="wallet-bank-description" placeholder="Transfer description" value={bankTransferData.description} onChange={(e) => setBankTransferData({ ...bankTransferData, description: e.target.value })} />
-                      </div>
-                      <Button onClick={handleSendToBank} className="w-full">Send to Bank</Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
               <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                 <DialogTrigger asChild>
@@ -531,7 +497,7 @@ const OrgDashboard = () => {
             <div className="bg-white border border-gray-100 rounded-xl p-3">
               <div className="flex items-center justify-between mb-2">
                 <Activity className="h-4 w-4 text-blue-600" />
-                
+
               </div>
               <p className="text-lg font-bold text-black">{dashboardData.monthlyTransactions}</p>
               <p className="text-xs text-gray-500">Transactions</p>
