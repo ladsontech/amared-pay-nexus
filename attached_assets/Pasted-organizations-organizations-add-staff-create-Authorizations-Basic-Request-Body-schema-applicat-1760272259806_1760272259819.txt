@@ -1,0 +1,1142 @@
+organizations
+organizations_add_staff_create
+Authorizations:
+Basic
+Request Body schema: application/json
+username	
+string (Username) non-empty
+password
+required
+string (Password) [ 8 .. 40 ] characters
+first_name
+required
+string (First name) non-empty
+last_name
+required
+string (Last name) non-empty
+email
+required
+string <email> (Email) non-empty
+phone_number
+required
+string (Phone number) >= 10 characters
+organization
+required
+string <uuid> (Organization)
+role	
+string or null (Role)
+Enum: "owner" "manager" "member"
+Responses
+201
+Response Schema: application/json
+username	
+string (Username) non-empty
+password
+required
+string (Password) [ 8 .. 40 ] characters
+first_name
+required
+string (First name) non-empty
+last_name
+required
+string (Last name) non-empty
+email
+required
+string <email> (Email) non-empty
+phone_number
+required
+string (Phone number) >= 10 characters
+organization
+required
+string <uuid> (Organization)
+role	
+string or null (Role)
+Enum: "owner" "manager" "member"
+
+post
+/organizations/add_staff/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"username": "string",
+"password": "stringst",
+"first_name": "string",
+"last_name": "string",
+"email": "user@example.com",
+"phone_number": "stringstri",
+"organization": "452c1a86-a0af-475b-b03f-724878b0f387",
+"role": "owner"
+}
+Response samples
+201
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"username": "string",
+"password": "stringst",
+"first_name": "string",
+"last_name": "string",
+"email": "user@example.com",
+"phone_number": "stringstri",
+"organization": "452c1a86-a0af-475b-b03f-724878b0f387",
+"role": "owner"
+}
+organizations_change_staff_update
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Staff.
+
+Request Body schema: application/json
+role	
+string or null (Role)
+Enum: "owner" "manager" "member"
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+role	
+string or null (Role)
+Enum: "owner" "manager" "member"
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+put
+/organizations/change_staff/{id}/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"role": "owner"
+}
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"role": "owner",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
+organizations_change_staff_delete
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Staff.
+
+Responses
+204
+
+delete
+/organizations/change_staff/{id}/
+organizations_create_org_create
+Authorizations:
+Basic
+Request Body schema: application/json
+username	
+string (Username) non-empty
+password
+required
+string (Password) [ 8 .. 40 ] characters
+first_name
+required
+string (First name) non-empty
+last_name
+required
+string (Last name) non-empty
+email
+required
+string <email> (Email) non-empty
+phone_number
+required
+string (Phone number) >= 10 characters
+org_name
+required
+string (Org name) non-empty
+address	
+string or null (Address) <= 150 characters
+company_reg_id	
+string or null (Company reg id) <= 150 characters
+tin	
+string or null (Tin) <= 150 characters
+wallet_currency	
+integer (Wallet currency)
+wallet_pin	
+string (Wallet pin) 4 characters
+Responses
+201
+Response Schema: application/json
+username	
+string (Username) non-empty
+password
+required
+string (Password) [ 8 .. 40 ] characters
+first_name
+required
+string (First name) non-empty
+last_name
+required
+string (Last name) non-empty
+email
+required
+string <email> (Email) non-empty
+phone_number
+required
+string (Phone number) >= 10 characters
+org_name
+required
+string (Org name) non-empty
+address	
+string or null (Address) <= 150 characters
+company_reg_id	
+string or null (Company reg id) <= 150 characters
+tin	
+string or null (Tin) <= 150 characters
+logo	
+string or null <uri> (Logo)
+wallet_currency	
+integer (Wallet currency)
+wallet_pin	
+string (Wallet pin) 4 characters
+
+post
+/organizations/create_org/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"username": "string",
+"password": "stringst",
+"first_name": "string",
+"last_name": "string",
+"email": "user@example.com",
+"phone_number": "stringstri",
+"org_name": "string",
+"address": "string",
+"company_reg_id": "string",
+"tin": "string",
+"wallet_currency": 0,
+"wallet_pin": "stri"
+}
+Response samples
+201
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"username": "string",
+"password": "stringst",
+"first_name": "string",
+"last_name": "string",
+"email": "user@example.com",
+"phone_number": "stringstri",
+"org_name": "string",
+"address": "string",
+"company_reg_id": "string",
+"tin": "string",
+"logo": "http://example.com",
+"wallet_currency": 0,
+"wallet_pin": "stri"
+}
+organizations_org_list
+Authorizations:
+Basic
+query Parameters
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (Organization)
+
+get
+/organizations/org/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+organizations_org_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Organization.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+name
+required
+string (Name) [ 1 .. 150 ] characters
+logo	
+string or null <uri> (Logo)
+address	
+string or null (Address) <= 150 characters
+company_reg_id	
+string or null (Company reg id) <= 150 characters
+tin	
+string or null (Tin) <= 150 characters
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+get
+/organizations/org/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"name": "string",
+"logo": "http://example.com",
+"address": "string",
+"company_reg_id": "string",
+"tin": "string",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
+organizations_org_update
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Organization.
+
+Request Body schema: application/json
+name
+required
+string (Name) [ 1 .. 150 ] characters
+address	
+string or null (Address) <= 150 characters
+company_reg_id	
+string or null (Company reg id) <= 150 characters
+tin	
+string or null (Tin) <= 150 characters
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+name
+required
+string (Name) [ 1 .. 150 ] characters
+logo	
+string or null <uri> (Logo)
+address	
+string or null (Address) <= 150 characters
+company_reg_id	
+string or null (Company reg id) <= 150 characters
+tin	
+string or null (Tin) <= 150 characters
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+put
+/organizations/org/{id}/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"name": "string",
+"address": "string",
+"company_reg_id": "string",
+"tin": "string"
+}
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"name": "string",
+"logo": "http://example.com",
+"address": "string",
+"company_reg_id": "string",
+"tin": "string",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
+organizations_staff_list
+Authorizations:
+Basic
+query Parameters
+user	
+string
+organization	
+string
+role	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (StaffSerializer2)
+
+get
+/organizations/staff/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+organizations_staff_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Staff.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+user
+required
+object (Details)
+organization
+required
+object (Organization)
+role	
+string or null (Role)
+Enum: "owner" "manager" "member"
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+
+get
+/organizations/staff/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"user": {
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"username": "string",
+"email": "user@example.com",
+"phone_number": "string",
+"groups": [],
+"is_email_verified": true,
+"is_phone_verified": true,
+"permissions": "string"
+},
+"organization": {
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"name": "string",
+"logo": "http://example.com",
+"address": "string",
+"company_reg_id": "string",
+"tin": "string",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"role": "owner",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+}
+organizations_update_wallet_update
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Wallet.
+
+Request Body schema: application/json
+balance	
+integer or null (Balance) [ -2147483648 .. 2147483647 ]
+is_pin_set	
+boolean (Is pin set)
+currency	
+integer or null (Currency)
+updated_by	
+string or null <uuid> (Updated by)
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+balance	
+integer or null (Balance) [ -2147483648 .. 2147483647 ]
+is_pin_set	
+boolean (Is pin set)
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+currency	
+integer or null (Currency)
+updated_by	
+string or null <uuid> (Updated by)
+
+put
+/organizations/update_wallet/{id}/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"balance": -2147483648,
+"is_pin_set": true,
+"currency": 0,
+"updated_by": "deea00dc-b6b6-4412-a483-26ac61e1f6fe"
+}
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"balance": -2147483648,
+"is_pin_set": true,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z",
+"currency": 0,
+"updated_by": "deea00dc-b6b6-4412-a483-26ac61e1f6fe"
+}
+organizations_wallet_list
+Authorizations:
+Basic
+query Parameters
+organization	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (WalletSerializer2)
+
+get
+/organizations/wallet/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+organizations_wallet_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this Wallet.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+organization
+required
+object (Organization)
+currency
+required
+object (Currency)
+balance	
+integer or null (Balance) [ -2147483648 .. 2147483647 ]
+is_pin_set	
+boolean (Is pin set)
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+updated_by	
+string or null <uuid> (Updated by)
+
+get
+/organizations/wallet/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"organization": {
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"name": "string",
+"logo": "http://example.com",
+"address": "string",
+"company_reg_id": "string",
+"tin": "string",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"currency": {
+"id": 0,
+"name": "string",
+"symbol": "stri",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"balance": -2147483648,
+"is_pin_set": true,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z",
+"updated_by": "deea00dc-b6b6-4412-a483-26ac61e1f6fe"
+}
+organizations_wallet_transaction_list
+Authorizations:
+Basic
+query Parameters
+wallet	
+string
+type	
+string
+currency	
+string
+limit	
+integer
+Number of results to return per page.
+
+offset	
+integer
+The initial index from which to return the results.
+
+Responses
+200
+Response Schema: application/json
+count
+required
+integer
+next	
+string or null <uri>
+previous	
+string or null <uri>
+results
+required
+Array of objects (WalletTransaction)
+
+get
+/organizations/wallet_transaction/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"count": 0,
+"next": "http://example.com",
+"previous": "http://example.com",
+"results": [
+{}
+]
+}
+organizations_wallet_transaction_read
+Authorizations:
+Basic
+path Parameters
+id
+required
+string <uuid>
+A UUID string identifying this WalletTransaction.
+
+Responses
+200
+Response Schema: application/json
+id	
+string <uuid> (Id)
+currency
+required
+object (Currency)
+wallet
+required
+object (Wallet)
+type	
+string or null (Type)
+Enum: "debit" "credit"
+amount
+required
+integer (Amount) [ -2147483648 .. 2147483647 ]
+title	
+string or null (Title) <= 200 characters
+created_at	
+string <date-time> (Created at)
+updated_at	
+string <date-time> (Updated at)
+updated_by	
+string or null <uuid> (Updated by)
+
+get
+/organizations/wallet_transaction/{id}/
+Response samples
+200
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"currency": {
+"id": 0,
+"name": "string",
+"symbol": "stri",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z"
+},
+"wallet": {
+"id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+"balance": -2147483648,
+"is_pin_set": true,
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z",
+"organization": "452c1a86-a0af-475b-b03f-724878b0f387",
+"currency": 0,
+"updated_by": "deea00dc-b6b6-4412-a483-26ac61e1f6fe"
+},
+"type": "debit",
+"amount": -2147483648,
+"title": "string",
+"created_at": "2019-08-24T14:15:22Z",
+"updated_at": "2019-08-24T14:15:22Z",
+"updated_by": "deea00dc-b6b6-4412-a483-26ac61e1f6fe"
+}
+otp
+otp_forgot_password_email_create
+Authorizations:
+Basic
+Request Body schema: application/json
+email
+required
+string <email> (Email) non-empty
+Responses
+200 forgot password email otp
+400 Error on email otp
+
+post
+/otp/forgot_password/email/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"email": "user@example.com"
+}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "string"
+}
+otp_forgot_password_sms_create
+Authorizations:
+Basic
+Request Body schema: application/json
+phone_number
+required
+string (Phone number) non-empty
+Responses
+200 sms otp
+400 Error on sms otp
+
+post
+/otp/forgot_password/sms/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"phone_number": "string"
+}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "string"
+}
+otp_resend_email_create
+Authorizations:
+Basic
+Request Body schema: application/json
+email
+required
+string <email> (Email) non-empty
+Responses
+200 resend email otp
+400 Error on email otp
+
+post
+/otp/resend/email/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"email": "user@example.com"
+}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "string"
+}
+otp_resend_sms_create
+Authorizations:
+Basic
+Request Body schema: application/json
+phone_number
+required
+string (Phone number) non-empty
+Responses
+200 sms otp
+400 Error on sms otp
+
+post
+/otp/resend/sms/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"phone_number": "string"
+}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "string"
+}
+otp_reset_password_email_code_create
+Authorizations:
+Basic
+Request Body schema: application/json
+email_code
+required
+string (Email code) 6 characters
+new_password
+required
+string (New password) [ 8 .. 40 ] characters
+Responses
+200 reset password
+400 Error
+
+post
+/otp/reset_password/email_code/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"email_code": "string",
+"new_password": "stringst"
+}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "string"
+}
+otp_reset_password_sms_code_create
+Authorizations:
+Basic
+Request Body schema: application/json
+sms_code
+required
+string (Sms code) 6 characters
+new_password
+required
+string (New password) [ 8 .. 40 ] characters
+Responses
+200 reset password
+400 Error
+
+post
+/otp/reset_password/sms_code/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"sms_code": "string",
+"new_password": "stringst"
+}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "string"
+}
+otp_verify_email_address_create
+Authorizations:
+Basic
+Request Body schema: application/json
+email_code
+required
+string (Email code) 6 characters
+email
+required
+string <email> (Email) non-empty
+Responses
+200 verify otp
+400 verify otp
+
+post
+/otp/verify/email_address/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"email_code": "string",
+"email": "user@example.com"
+}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "OTP verified successfully",
+"data": {
+"user": {},
+"access_token": "string",
+"refresh_token": "string"
+}
+}
+otp_verify_phone_number_create
+Authorizations:
+Basic
+Request Body schema: application/json
+sms_code
+required
+string (Sms code) 6 characters
+phone_number
+required
+string (Phone number) non-empty
+Responses
+200 verify otp
+400 verify otp
+
+post
+/otp/verify/phone_number/
+Request samples
+Payload
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"sms_code": "string",
+"phone_number": "string"
+}
+Response samples
+200400
+Content type
+application/json
+
+Copy
+Expand allCollapse all
+{
+"success": true,
+"message": "OTP verified successfully",
+"data": {
+"user": {},
+"access_token": "string",
+"refresh_token": "string"
+}
+}

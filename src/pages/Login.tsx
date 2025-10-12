@@ -102,6 +102,7 @@ const Login = () => {
                   value={identity}
                   onChange={(e) => setIdentity(e.target.value)}
                   className="pl-10 bg-white/50 border-border/50 focus:bg-white/80 transition-all duration-200"
+                  autoComplete="username"
                   required
                 />
               </div>
@@ -117,6 +118,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10 bg-white/50 border-border/50 focus:bg-white/80 transition-all duration-200"
+                  autoComplete="current-password"
                   required
                 />
                 <Button

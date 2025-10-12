@@ -16,7 +16,11 @@ This project was successfully migrated from Lovable to Replit as a **frontend-on
   - Eliminated unnecessary backend server setup (Express, Drizzle ORM, PostgreSQL integration)
   - Removed unused backend dependencies
   - AI/Supabase functionality remains in codebase but is not actively used
-- **Organization Owner Access**: The user credentials used during organization creation automatically grant full administrative access to that organization through the existing API's authentication system
+- **Organization Owner Access**: Fixed bug where organization owners were incorrectly assigned manager permissions instead of owner permissions. Organization owners now have full administrative access including:
+  - Access to all features (Deposits, Users, Approvals)
+  - Ability to manage staff and assign roles
+  - Full approval rights for transactions, funding, bulk payments, and deposits
+  - Access to all reports and analytics
 
 # User Preferences
 
