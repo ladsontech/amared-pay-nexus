@@ -1,7 +1,8 @@
-
-const API_BASE_URL = "https://bulksrv.almaredagencyuganda.com";
-
+import { API_CONFIG } from './api-config';
 import { otpService, OtpResponse } from "./otpService";
+
+const API_BASE_URL = API_CONFIG.baseURL.replace(/\/$/, '');
+
 
 export interface LoginRequest {
   username?: string;
@@ -44,8 +45,12 @@ class AuthService {
     try {
       const usernameForBasic = (credentials.username || credentials.email || '').toString();
       const basicToken = typeof btoa === 'function' ? btoa(`${usernameForBasic}:${credentials.password}`) : '';
+
+      const loginPath = API_CONFIG.endpoints.auth.login; // e.g. 'users/auth/login/'
+      const LOGIN_URL = `${API_BASE_URL}/${loginPath}`;
+
       // Attempt 1: Full payload (username, email, password) + Basic header
-      let response = await fetch(`${API_BASE_URL}/auth/login/`, {
+      let response = await fetch(LOGIN_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,14 +59,14 @@ class AuthService {
         body: JSON.stringify({
           username: credentials.username || credentials.email,
           email: credentials.email,
-          password: credentials.password
+          password: credentials.password,
         }),
       });
-      
+
       // If the first attempt fails, try alternative payloads
       if (!response.ok) {
         // Attempt 2: Only username + password
-        const responseUsernameOnly = await fetch(`${API_BASE_URL}/auth/login/`, {
+        const responseUsernameOnly = await fetch(LOGIN_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -76,20 +81,17 @@ class AuthService {
           response = responseUsernameOnly;
         } else {
           // Attempt 3: Basic only with minimal body (in case server strictly uses Basic)
-          const responseBasicOnly = await fetch(`${API_BASE_URL}/auth/login/`, {
+          const responseBasicOnly = await fetch(LOGIN_URL, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               ...(basicToken ? { "Authorization": `Basic ${basicToken}` } : {}),
             },
-            body: JSON.stringify({
-              password: credentials.password,
-            }),
+            body: JSON.stringify({ password: credentials.password }),
           });
           if (responseBasicOnly.ok) {
             response = responseBasicOnly;
           } else {
-            // Keep the most informative error body for messaging below
             const errBody = await responseBasicOnly.text().catch(() => "");
             const errBodyFallback = await responseUsernameOnly.text().catch(() => "");
             const firstErr = await response.text().catch(() => "");
@@ -99,67 +101,54 @@ class AuthService {
         }
       }
 
-      const data = await response.json().catch(() => ({}));
-      
+      const data: any = await response.json().catch(() => ({}));
+
       if (!response.ok) {
         const errText = typeof data === 'object' ? (data.message || JSON.stringify(data)) : String(data);
         throw new Error(errText || `HTTP error! status: ${response.status}`);
       }
-      
-      // Store tokens and user data
-      if (data.access) {
-        localStorage.setItem("access_token", data.access);
+
+      // Store tokens (support multiple API shapes)
+      const accessToken = data.access_token || data.access || data.token;
+      const refreshToken = data.refresh_token || data.refresh;
+
+      if (accessToken) {
+        localStorage.setItem("access_token", accessToken);
+        // Back-compat key used elsewhere in the app
+        localStorage.setItem("auth_token", accessToken);
       }
-      if (data.refresh) {
-        localStorage.setItem("refresh_token", data.refresh);
+      if (refreshToken) {
+        localStorage.setItem("refresh_token", refreshToken);
       }
-      if (data.token) {
-        localStorage.setItem("auth_token", data.token);
-      }
-      
-      // Store user data
-      const userData = {
+
+      // Return enriched payload so AuthContext can derive roles and details
+      return {
         username: data.username,
         email: data.email,
-        name: data.name || data.username,
-        organization: data.organization || "Unknown Organization"
-      };
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      return data;
-    } catch (error) {
+        token: accessToken,
+        access: accessToken,
+        refresh: refreshToken,
+        user: data.user, // critical: nested user from API
+        // passthrough fields used by AuthContext (if login returns them)
+        is_superuser: data.is_superuser,
+        is_staff: data.is_staff,
+        groups: data.groups,
+        permissions: data.permissions,
+        organizationId: data.organization_id || data.organizationId,
+        organization: data.organization,
+        role: data.role,
+      } as any;
+    } catch (error: any) {
       console.error("Login API error:", error);
-      
-      // Fallback to demo mode if API fails
-      const mockResponse = {
-        username: "Demo User",
-        email: credentials.email,
-        token: "demo_token_123",
-        access: "demo_access_token",
-        refresh: "demo_refresh_token"
-      };
-
-      // Store mock data
-      localStorage.setItem("auth_token", mockResponse.token);
-      localStorage.setItem("access_token", mockResponse.access);
-      localStorage.setItem("refresh_token", mockResponse.refresh);
-      
-      const userData = {
-        username: mockResponse.username,
-        email: mockResponse.email,
-        name: "Demo User",
-        organization: "Demo Organization"
-      };
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      return mockResponse;
+      // Do not fallback to demo login; enforce real authentication
+      throw new Error(error?.message || "Invalid credentials");
     }
   }
 
   async logout(): Promise<void> {
     // Attempt backend logout if available (non-blocking)
     try {
-      await fetch(`${API_BASE_URL}/auth/logout/`, {
+      await fetch(`${API_BASE_URL}/${API_CONFIG.endpoints.auth.logout}`, {
         method: "POST",
         headers: this.getAuthHeaders(),
       });
@@ -176,7 +165,7 @@ class AuthService {
 
   async changePassword(passwordData: ChangePasswordRequest): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/password/change`, {
+      const response = await fetch(`${API_BASE_URL}/${API_CONFIG.endpoints.auth.changePassword}`, {
         method: "POST",
         headers: this.getAuthHeaders(),
         body: JSON.stringify(passwordData),
@@ -203,7 +192,7 @@ class AuthService {
         throw new Error("No refresh token available");
       }
 
-      const response = await fetch(`${API_BASE_URL}/auth/token/refresh/`, {
+      const response = await fetch(`${API_BASE_URL}/${API_CONFIG.endpoints.auth.refresh}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -238,7 +227,7 @@ class AuthService {
 
   async verifyToken(token: string): Promise<boolean> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/token/verify/`, {
+      const response = await fetch(`${API_BASE_URL}/${API_CONFIG.endpoints.auth.verify}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

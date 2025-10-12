@@ -31,19 +31,22 @@ const Login = () => {
         className: "border-green-200 bg-green-50 text-green-800",
       });
       
-      // Smooth transition to dashboard
+      // Smooth transition to dashboard - check user role
       setTimeout(() => {
-        // Get user from localStorage to determine redirect
         const userStr = localStorage.getItem('user');
         if (userStr) {
           const user = JSON.parse(userStr);
-          if (user.role === 'admin' || user.permissions?.includes('system_admin')) {
+          // Super admin (is_superuser = true) goes to system dashboard
+          if (user.isSuperuser === true || user.role === 'admin') {
+            console.log('Redirecting superuser to system dashboard');
             navigate('/system/organizations');
           } else {
+            // Regular organization users go to organization dashboard
+            console.log('Redirecting regular user to org dashboard');
             navigate('/org/dashboard');
           }
         } else {
-          navigate('/dashboard');
+          navigate('/org/dashboard');
         }
       }, 1000);
     } catch (error) {

@@ -15,8 +15,8 @@ import { User, Mail, Phone, MapPin, Calendar, Shield, Building2, Briefcase, Cred
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function OrgAccount() {
-  const { changePassword } = useAuth();
-  const { userProfile, organization, stats, loading, updateUserProfile } = useOrganizationData();
+  const { user: authUser, changePassword } = useAuth();
+  const { organization, stats, loading: orgLoading } = useOrganizationData();
   const isMobile = useIsMobile();
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -32,31 +32,39 @@ export default function OrgAccount() {
     confirm_password: ''
   });
 
+  // Use auth user data directly
   useEffect(() => {
-    if (userProfile) {
+    if (authUser) {
       setFormData({
-        firstName: userProfile.firstName,
-        lastName: userProfile.lastName,
-        email: userProfile.email,
-        phoneNumber: userProfile.phoneNumber
+        firstName: authUser.firstName || '',
+        lastName: authUser.lastName || '',
+        email: authUser.email || '',
+        phoneNumber: authUser.phoneNumber || ''
       });
     }
-  }, [userProfile]);
+  }, [authUser]);
+
+  // Create userProfile from auth user for backward compatibility
+  const userProfile = authUser ? {
+    firstName: authUser.firstName || '',
+    lastName: authUser.lastName || '',
+    email: authUser.email || '',
+    phoneNumber: authUser.phoneNumber || '',
+    avatar: authUser.avatar,
+    role: authUser.role,
+    department: authUser.organization?.name || 'N/A',
+    position: authUser.position || 'Staff Member',
+    joinedDate: new Date().toISOString(),
+    isEmailVerified: authUser.isEmailVerified,
+    isPhoneVerified: authUser.isPhoneVerified
+  } : null;
+
+  const loading = orgLoading || !authUser;
 
   const handleSaveProfile = async () => {
-    const result = await updateUserProfile({
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phoneNumber: formData.phoneNumber
-    });
-
-    if (result.success) {
-      toast.success('Profile updated successfully');
-      setIsEditing(false);
-    } else {
-      toast.error('Failed to update profile');
-    }
+    // TODO: Implement API call to update user profile
+    toast.info('Profile update feature coming soon');
+    setIsEditing(false);
   };
 
   const handleChangePassword = async () => {
@@ -493,7 +501,7 @@ export default function OrgAccount() {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {userProfile?.permissions?.map((permission, index) => (
+                    {authUser?.permissions?.map((permission, index) => (
                       <Badge key={index} variant="outline" className="text-xs">
                         {permission.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </Badge>

@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, AuthState, Permission } from '@/types/auth';
+import { User, AuthState, Permission, rolePermissions } from '@/types/auth';
 import { demoUsers } from '@/data/demoData';
 import { authService } from '@/services/authService';
-
+import { userService } from '@/services/userService';
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   loginAsUser: (userId: string) => void;
@@ -72,23 +72,93 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (identity: string, password: string) => {
     try {
-      const response = await authService.login({ email, password });
+      const isEmail = identity.includes('@');
+      const response = await authService.login({ 
+        email: isEmail ? identity : '', 
+        username: isEmail ? undefined : identity,
+        password 
+      });
+
+      // Get base user from login response, then fetch full profile to get is_superuser/is_staff
+      const baseUser = (response as any).user || {};
+      let profile: any = baseUser;
+      if (baseUser?.id) {
+        try {
+          profile = await userService.getUser(baseUser.id);
+        } catch (e) {
+          console.warn('Failed to fetch full user profile; using base user from login response', e);
+        }
+      }
+
+      // Determine superuser/admin
+      const isSuperuser = profile?.is_superuser === true;
+
+      // For non-superusers, fetch their organization and staff details
+      let organizationId = 'default-org';
+      let organizationName = 'Default Organization';
+      let staffRole: 'owner' | 'manager' | 'member' = 'member';
       
-      // Build user object from API response or sensible defaults
-      type ApiLogin = Partial<User> & { permissions?: Permission[]; role?: import('@/types/auth').UserRole } & { organization_id?: string; organization?: string };
-      const api = response as ApiLogin;
-      const apiPermissions = api.permissions;
-      const apiRole = api.role;
-      const organizationId = api.organizationId || api.organization_id || 'default-org';
-      const organizationName = api.organization?.name || api.organization || 'Default Organization';
+      if (!isSuperuser) {
+        try {
+          // Import organizationService dynamically to avoid circular dependency
+          const { organizationService } = await import('@/services/organizationService');
+          
+          // Fetch staff list for this user - try with username if id doesn't work
+          console.log('Fetching staff data for user:', baseUser);
+          let staffResponse = await organizationService.getStaffList({ user: baseUser.id });
+          
+          // If no results with ID, try with username
+          if (!staffResponse.results || staffResponse.results.length === 0) {
+            console.log('No staff found by ID, trying username:', profile?.username);
+            staffResponse = await organizationService.getStaffList();
+            // Filter by username manually
+            const matchingStaff = staffResponse.results.find(
+              (s: any) => s.user.username === profile?.username || s.user.id === baseUser.id
+            );
+            if (matchingStaff) {
+              staffResponse.results = [matchingStaff];
+            }
+          }
+          
+          console.log('Staff response:', staffResponse);
+          
+          if (staffResponse.results && staffResponse.results.length > 0) {
+            const staffRecord = staffResponse.results[0];
+            organizationId = staffRecord.organization.id;
+            organizationName = staffRecord.organization.name;
+            staffRole = staffRecord.role || 'member';
+            console.log('User belongs to organization:', organizationName, 'with role:', staffRole);
+          } else {
+            console.warn('No organization found for user, using default demo org');
+          }
+        } catch (e) {
+          console.error('Failed to fetch user organization data:', e);
+        }
+      }
+
+      // Determine role
+      let userRole: import('@/types/auth').UserRole = 'staff';
+      if (isSuperuser) {
+        userRole = 'admin';
+      } else if (staffRole === 'owner' || staffRole === 'manager') {
+        userRole = staffRole;
+      } else {
+        userRole = 'staff';
+      }
+
+      // Names
+      const username = profile?.username || baseUser?.username || '';
+      const nameParts = username.split('.');
+      const firstName = profile?.first_name || nameParts[0] || username || '';
+      const lastName = profile?.last_name || nameParts[1] || '';
 
       const user: User = {
-        id: response.username || 'unknown',
-        name: response.username || 'Unknown User',
-        email: response.email,
-        role: apiRole ?? 'staff',
+        id: profile?.id || baseUser?.id || 'unknown',
+        name: `${firstName} ${lastName}`.trim() || username || 'Unknown User',
+        email: profile?.email || baseUser?.email || (isEmail ? identity : ''),
+        role: userRole,
         organizationId,
         organization: {
           id: organizationId,
@@ -96,10 +166,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: organizationName,
           industry: 'Finance'
         },
-        permissions: apiPermissions && apiPermissions.length > 0 ? apiPermissions : ['access_petty_cash', 'access_bulk_payments', 'access_collections'],
-        position: 'Staff Member'
+        permissions: isSuperuser
+          ? (['system_admin', ...rolePermissions.admin] as Permission[])
+          : (staffRole === 'owner' 
+            ? rolePermissions.manager 
+            : rolePermissions[userRole]),
+        position: isSuperuser ? 'System Administrator' : (staffRole || 'Staff Member'),
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: profile?.phone_number || baseUser?.phone_number,
+        avatar: profile?.avatar || baseUser?.avatar,
+        isEmailVerified: profile?.is_email_verified ?? baseUser?.is_email_verified,
+        isPhoneVerified: profile?.is_phone_verified ?? baseUser?.is_phone_verified,
+        isSuperuser: isSuperuser,
+        isStaff: profile?.is_staff ?? baseUser?.is_staff,
       };
-      
+
+      console.log('User logged in:', { 
+        id: user.id, 
+        name: user.name, 
+        email: user.email, 
+        role: user.role, 
+        isSuperuser,
+        organizationId: user.organizationId,
+        organizationName: user.organization.name
+      });
+
       localStorage.setItem('user', JSON.stringify(user));
       setAuthState({
         user,
@@ -107,7 +199,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading: false,
       });
     } catch (error) {
-      console.error("Login error:", error);
+      console.error('Login error:', error);
       throw new Error('Invalid credentials');
     }
   };

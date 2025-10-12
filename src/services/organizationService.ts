@@ -65,7 +65,16 @@ export interface WalletTransaction {
     created_at: string;
     updated_at: string;
   };
-  wallet: Wallet;
+  wallet: {
+    id: string;
+    balance: number | null;
+    is_pin_set: boolean;
+    created_at: string;
+    updated_at: string;
+    organization: string;
+    currency: number;
+    updated_by: string | null;
+  };
   type: "debit" | "credit" | null;
   amount: number;
   title: string | null;
@@ -128,8 +137,24 @@ class OrganizationService {
     return headers;
   }
 
+  private checkAdminPermission(): boolean {
+    const userStr = localStorage.getItem("user");
+    if (!userStr) return false;
+    
+    try {
+      const user = JSON.parse(userStr);
+      return user.isSuperuser === true || user.role === 'admin';
+    } catch {
+      return false;
+    }
+  }
+
   // Staff Management
   async addStaff(staffData: CreateStaffRequest): Promise<CreateStaffRequest> {
+    if (!this.checkAdminPermission()) {
+      throw new Error("Unauthorized: Only admins can add staff to organizations");
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/organizations/add_staff/`, {
         method: "POST",
@@ -138,12 +163,44 @@ class OrganizationService {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        let errorMessage = "";
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          if (typeof errorData === 'object' && !errorData.message) {
+            const errors = Object.entries(errorData)
+              .map(([key, value]) => {
+                const fieldName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `${fieldName}: ${Array.isArray(value) ? value.join(', ') : value}`;
+              })
+              .join('; ');
+            errorMessage = errors;
+          } else {
+            errorMessage = errorData.message || errorText;
+          }
+        } catch {
+          if (errorText.includes('IntegrityError') || errorText.includes('duplicate key')) {
+            const duplicateMatch = errorText.match(/duplicate key value violates unique constraint "([^"]+)"[^(]*\(([^)]+)\)/);
+            if (duplicateMatch) {
+              const field = duplicateMatch[1].replace('user_', '').replace('_key', '').replace(/_/g, ' ');
+              const value = duplicateMatch[2].split('=')[1]?.replace(/\)/g, '');
+              errorMessage = `A user with this ${field} (${value}) already exists. Please use a different ${field}.`;
+            } else {
+              errorMessage = "This user data already exists. Please check phone number, email, or username.";
+            }
+          } else if (errorText.includes('<!DOCTYPE html>')) {
+            errorMessage = "Server error occurred. Please check all fields and try again.";
+          } else {
+            errorMessage = errorText;
+          }
+        }
+        
+        throw new Error(errorMessage || `Server error: ${response.status}`);
       }
 
       return await response.json();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Add staff error:", error);
       throw error;
     }
@@ -239,6 +296,10 @@ class OrganizationService {
 
   // Organization Management
   async createOrganization(orgData: CreateOrganizationRequest): Promise<CreateOrganizationRequest & { logo: string | null }> {
+    if (!this.checkAdminPermission()) {
+      throw new Error("Unauthorized: Only superusers can create organizations");
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/organizations/create_org/`, {
         method: "POST",
@@ -247,12 +308,49 @@ class OrganizationService {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        let errorMessage = "";
+        
+        try {
+          // Try parsing as JSON first
+          const errorData = JSON.parse(errorText);
+          
+          if (typeof errorData === 'object' && !errorData.message) {
+            const errors = Object.entries(errorData)
+              .map(([key, value]) => {
+                const fieldName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `${fieldName}: ${Array.isArray(value) ? value.join(', ') : value}`;
+              })
+              .join('; ');
+            errorMessage = errors;
+          } else {
+            errorMessage = errorData.message || errorText;
+          }
+        } catch {
+          // If not JSON, check if it's HTML error page
+          if (errorText.includes('IntegrityError') || errorText.includes('duplicate key')) {
+            // Extract meaningful error from HTML
+            const duplicateMatch = errorText.match(/duplicate key value violates unique constraint "([^"]+)"[^(]*\(([^)]+)\)/);
+            if (duplicateMatch) {
+              const field = duplicateMatch[1].replace('user_', '').replace('_key', '').replace(/_/g, ' ');
+              const value = duplicateMatch[2].split('=')[1]?.replace(/\)/g, '');
+              errorMessage = `A user with this ${field} (${value}) already exists. Please use a different ${field}.`;
+            } else {
+              errorMessage = "This data already exists in the system. Please check your phone number, email, or username.";
+            }
+          } else if (errorText.includes('<!DOCTYPE html>')) {
+            // Generic HTML error
+            errorMessage = "Server error occurred. Please check all fields and try again.";
+          } else {
+            errorMessage = errorText;
+          }
+        }
+        
+        throw new Error(errorMessage || `Server error: ${response.status}`);
       }
 
       return await response.json();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Create organization error:", error);
       throw error;
     }

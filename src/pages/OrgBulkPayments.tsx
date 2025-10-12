@@ -375,6 +375,25 @@ const BulkPayments = () => {
               {[1, 2, 3].map((i) => (
                 <Card key={i} className="animate-pulse border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
                   <CardHeader>
+                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                      <div className="h-10 bg-gray-200 rounded mt-4"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : filteredPayments.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {filteredPayments.map((payment) => (
+                <Card key={payment.id} className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
+                  <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base sm:text-lg">{payment.id}</CardTitle>
                       <Badge className={getStatusColor(payment.status)}>
@@ -408,7 +427,7 @@ const BulkPayments = () => {
                 </Card>
               ))}
             </div>
-          )}
+          ) : null}
 
           {filteredPayments.length === 0 && !isLoading && (
             <Card>

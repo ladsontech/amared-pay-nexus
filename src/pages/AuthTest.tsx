@@ -334,7 +334,7 @@ const AuthTest = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <Button 
-                    onClick={() => testEndpoint('Send Forgot Password Email', () => authService.sendForgotPasswordEmail(emailOtp.email))}
+                    onClick={() => testEndpoint('Send Forgot Password Email', () => authService.forgotPasswordEmail(emailOtp.email))}
                     disabled={loading === 'Send Forgot Password Email'}
                   >
                     {loading === 'Send Forgot Password Email' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -369,14 +369,14 @@ const AuthTest = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <Button 
-                    onClick={() => testEndpoint('Verify Email Address', () => authService.verifyEmailAddress({ email_code: emailOtp.email_code, email: emailOtp.email }))}
+                    onClick={() => testEndpoint('Verify Email Address', () => authService.verifyEmailAddress(emailOtp.email_code, emailOtp.email))}
                     disabled={loading === 'Verify Email Address'}
                   >
                     {loading === 'Verify Email Address' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Verify Email
                   </Button>
                   <Button 
-                    onClick={() => testEndpoint('Reset Password (Email Code)', () => authService.resetPasswordWithEmailCode({ email_code: emailOtp.email_code, new_password: emailOtp.new_password }))}
+                    onClick={() => testEndpoint('Reset Password (Email Code)', () => authService.resetPasswordWithEmailCode(emailOtp.email_code, emailOtp.new_password))}
                     disabled={loading === 'Reset Password (Email Code)'}
                     variant="outline"
                   >
@@ -406,7 +406,7 @@ const AuthTest = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <Button 
-                    onClick={() => testEndpoint('Send Forgot Password SMS', () => authService.sendForgotPasswordSms(smsOtp.phone_number))}
+                    onClick={() => testEndpoint('Send Forgot Password SMS', () => authService.forgotPasswordSms(smsOtp.phone_number))}
                     disabled={loading === 'Send Forgot Password SMS'}
                   >
                     {loading === 'Send Forgot Password SMS' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -441,14 +441,14 @@ const AuthTest = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <Button 
-                    onClick={() => testEndpoint('Verify Phone Number', () => authService.verifyPhoneNumber({ sms_code: smsOtp.sms_code, phone_number: smsOtp.phone_number }))}
+                    onClick={() => testEndpoint('Verify Phone Number', () => authService.verifyPhoneNumber(smsOtp.sms_code, smsOtp.phone_number))}
                     disabled={loading === 'Verify Phone Number'}
                   >
                     {loading === 'Verify Phone Number' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Verify Phone
                   </Button>
                   <Button 
-                    onClick={() => testEndpoint('Reset Password (SMS Code)', () => authService.resetPasswordWithSmsCode({ sms_code: smsOtp.sms_code, new_password: smsOtp.new_password }))}
+                    onClick={() => testEndpoint('Reset Password (SMS Code)', () => authService.resetPasswordWithSmsCode(smsOtp.sms_code, smsOtp.new_password))}
                     disabled={loading === 'Reset Password (SMS Code)'}
                     variant="outline"
                   >
@@ -573,7 +573,7 @@ const AuthTest = () => {
 
           <div className="grid grid-cols-2 gap-6">
             <Button 
-              onClick={() => testEndpoint('List Organizations', () => organizationService.listOrganizations())}
+              onClick={() => testEndpoint('List Organizations', () => organizationService.getOrganizations())}
               disabled={loading === 'List Organizations'}
               variant="outline"
             >
@@ -581,7 +581,7 @@ const AuthTest = () => {
               List Organizations
             </Button>
             <Button 
-              onClick={() => testEndpoint('List Wallets', () => organizationService.listWallets())}
+              onClick={() => testEndpoint('List Wallets', () => organizationService.getWallets())}
               disabled={loading === 'List Wallets'}
               variant="outline"
             >
@@ -749,9 +749,9 @@ const AuthTest = () => {
                       size="sm" 
                       className="mt-2 w-full"
                       onClick={() => testEndpoint('Load Organizations', async () => {
-                        const orgs = await organizationService.listOrganizations();
-                        setOrganizations(orgs.map(org => ({ id: org.id, name: org.name })));
-                        return orgs;
+                        const response = await organizationService.getOrganizations();
+                        setOrganizations(response.results.map(org => ({ id: org.id, name: org.name })));
+                        return response;
                       })}
                     >
                       Load Organizations
@@ -804,7 +804,7 @@ const AuthTest = () => {
               List Sub Admins
             </Button>
             <Button 
-              onClick={() => testEndpoint('List Staff', () => organizationService.listStaff())}
+              onClick={() => testEndpoint('List Staff', () => organizationService.getStaffList())}
               disabled={loading === 'List Staff'}
               variant="outline"
             >
