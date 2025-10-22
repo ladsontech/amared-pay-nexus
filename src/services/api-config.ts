@@ -35,7 +35,32 @@ export const API_CONFIG = {
       walletDetail: (id: string) => `/organizations/wallet/${id}/`,
       updateWallet: (id: string) => `/organizations/update_wallet/${id}/`,
       transactions: '/organizations/wallet_transaction/',
-      transactionDetail: (id: string) => `/organizations/wallet_transaction/${id}/`
+      transactionDetail: (id: string) => `/organizations/wallet_transaction/${id}/`,
+      // Bill Payment endpoints
+      billPayments: '/organizations/bill_payment/',
+      billPaymentDetail: (id: string) => `/organizations/bill_payment/${id}/`,
+      // Petty Cash Wallet endpoints
+      pettyCashWallets: '/organizations/petty_cash_wallet/',
+      pettyCashWalletDetail: (id: string) => `/organizations/petty_cash_wallet/${id}/`,
+      // Petty Cash Transaction endpoints
+      pettyCashTransactions: '/organizations/petty_cash_transaction/',
+      pettyCashTransactionDetail: (id: string) => `/organizations/petty_cash_transaction/${id}/`,
+      // Petty Cash Expense endpoints
+      pettyCashExpenses: '/organizations/petty_cash_expense/',
+      pettyCashExpenseDetail: (id: string) => `/organizations/petty_cash_expense/${id}/`,
+      // Petty Cash Fund Request endpoints
+      pettyCashFundRequests: '/organizations/petty_cash_fund_request/',
+      pettyCashFundRequestDetail: (id: string) => `/organizations/petty_cash_fund_request/${id}/`
+    },
+    otp: {
+      forgotPasswordEmail: '/otp/forgot_password/email/',
+      forgotPasswordSMS: '/otp/forgot_password/sms/',
+      resendEmail: '/otp/resend/email/',
+      resendSMS: '/otp/resend/sms/',
+      resetPasswordEmailCode: '/otp/reset_password/email_code/',
+      resetPasswordSMSCode: '/otp/reset_password/sms_code/',
+      verifyEmailAddress: '/otp/verify/email_address/',
+      verifyPhoneNumber: '/otp/verify/phone_number/'
     },
     payments: {
       bulkPayment: {

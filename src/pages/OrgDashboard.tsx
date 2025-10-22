@@ -7,9 +7,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/hooks/useOrganization";
-import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, Building, Phone, Send, Target, Calendar, BarChart3, ChevronRight, Eye, ArrowUpRight, Plus } from "lucide-react";
+import { organizationService, CreateStaffRequest, UpdateStaffRequest } from "@/services/organizationService";
+import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, Building, Phone, Send, Target, Calendar, BarChart3, ChevronRight, Eye, ArrowUpRight, Plus, Edit, Trash2, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 const OrgDashboard = () => {
   const {
@@ -27,6 +29,9 @@ const OrgDashboard = () => {
     bulkPayments,
     collections,
     momoWithdraws,
+    staff,
+    staffLoading,
+    fetchStaff,
     loading,
     error
   } = useOrganization();
@@ -44,6 +49,21 @@ const OrgDashboard = () => {
     amount: "",
     phoneNumber: "+256",
     description: ""
+  });
+
+  // Staff Management States
+  const [addStaffOpen, setAddStaffOpen] = useState(false);
+  const [editStaffOpen, setEditStaffOpen] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState<{ id: string; user: { first_name: string; last_name: string; email: string; phone_number: string; username: string }; role: string } | null>(null);
+  const [staffFormData, setStaffFormData] = useState<CreateStaffRequest>({
+    username: "",
+    password: "",
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "",
+    organization: user?.organizationId || "",
+    role: "member"
   });
 
   // Map wallet transactions to dashboard format
@@ -151,6 +171,104 @@ const OrgDashboard = () => {
       description: ""
     });
     setWithdrawOpen(false);
+  };
+
+  // Staff Management Functions
+  const handleAddStaff = async () => {
+    if (!staffFormData.username || !staffFormData.password || !staffFormData.first_name || 
+        !staffFormData.last_name || !staffFormData.email || !staffFormData.phone_number) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await organizationService.addStaff(staffFormData);
+      toast({
+        title: "Staff Added Successfully",
+        description: `${staffFormData.first_name} ${staffFormData.last_name} has been added to the organization`
+      });
+      setStaffFormData({
+        username: "",
+        password: "",
+        first_name: "",
+        last_name: "",
+        email: "",
+        phone_number: "",
+        organization: user?.organizationId || "",
+        role: "member"
+      });
+      setAddStaffOpen(false);
+      fetchStaff(); // Refresh staff list
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to add staff member";
+      toast({
+        title: "Error Adding Staff",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleEditStaff = (staffMember: { id: string; user: { first_name: string; last_name: string; email: string; phone_number: string; username: string }; role: string }) => {
+    setSelectedStaff(staffMember);
+    setEditStaffOpen(true);
+  };
+
+  const handleUpdateStaffRole = async (staffId: string, newRole: "owner" | "manager" | "member") => {
+    try {
+      await organizationService.updateStaffRole(staffId, { role: newRole });
+      toast({
+        title: "Staff Role Updated",
+        description: "Staff member role has been updated successfully"
+      });
+      fetchStaff(); // Refresh staff list
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update staff role";
+      toast({
+        title: "Error Updating Role",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeleteStaff = async (staffId: string) => {
+    if (!confirm("Are you sure you want to remove this staff member?")) {
+      return;
+    }
+
+    try {
+      await organizationService.deleteStaff(staffId);
+      toast({
+        title: "Staff Removed",
+        description: "Staff member has been removed from the organization"
+      });
+      fetchStaff(); // Refresh staff list
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to remove staff member";
+      toast({
+        title: "Error Removing Staff",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'owner':
+        return 'bg-purple-100 text-purple-800';
+      case 'manager':
+        return 'bg-blue-100 text-blue-800';
+      case 'member':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
   return <div className="min-h-screen bg-white">
       {/* Mobile Header */}
@@ -607,7 +725,171 @@ const OrgDashboard = () => {
                 </Button>
               </div>
             </div>}
-          
+
+          {/* Staff Management Section */}
+          {hasPermission('manage_team') && <div className="mt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-black">Team Management</h2>
+                <Dialog open={addStaffOpen} onOpenChange={setAddStaffOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add Staff
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Add New Staff Member</DialogTitle>
+                      <DialogDescription>Add a new team member to your organization</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>First Name</Label>
+                          <Input
+                            placeholder="John"
+                            value={staffFormData.first_name}
+                            onChange={(e) => setStaffFormData({...staffFormData, first_name: e.target.value})}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Last Name</Label>
+                          <Input
+                            placeholder="Doe"
+                            value={staffFormData.last_name}
+                            onChange={(e) => setStaffFormData({...staffFormData, last_name: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Username</Label>
+                        <Input
+                          placeholder="johndoe"
+                          value={staffFormData.username}
+                          onChange={(e) => setStaffFormData({...staffFormData, username: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Email</Label>
+                        <Input
+                          type="email"
+                          placeholder="john@example.com"
+                          value={staffFormData.email}
+                          onChange={(e) => setStaffFormData({...staffFormData, email: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Phone Number</Label>
+                        <Input
+                          placeholder="+256701234567"
+                          value={staffFormData.phone_number}
+                          onChange={(e) => setStaffFormData({...staffFormData, phone_number: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Password</Label>
+                        <Input
+                          type="password"
+                          placeholder="Enter password"
+                          value={staffFormData.password}
+                          onChange={(e) => setStaffFormData({...staffFormData, password: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Role</Label>
+                        <Select value={staffFormData.role} onValueChange={(value: "owner" | "manager" | "member") => setStaffFormData({...staffFormData, role: value})}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="member">Member</SelectItem>
+                            <SelectItem value="manager">Manager</SelectItem>
+                            <SelectItem value="owner">Owner</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button onClick={handleAddStaff} className="w-full bg-blue-600 hover:bg-blue-700">
+                        Add Staff Member
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              {/* Staff List */}
+              <Card className="bg-white border border-gray-100 shadow-lg">
+                <CardContent className="p-0">
+                  {staffLoading ? (
+                    <div className="p-8 text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                      <p className="text-sm text-gray-500 mt-2">Loading staff...</p>
+                    </div>
+                  ) : staff.length === 0 ? (
+                    <div className="p-8 text-center">
+                      <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                      <p className="text-gray-500">No staff members found</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Phone</TableHead>
+                            <TableHead>Role</TableHead>
+                            <TableHead>Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {staff.map((staffMember) => (
+                            <TableRow key={staffMember.id}>
+                              <TableCell className="font-medium">
+                                {staffMember.user.first_name} {staffMember.user.last_name}
+                              </TableCell>
+                              <TableCell>{staffMember.user.email}</TableCell>
+                              <TableCell>{staffMember.user.phone_number}</TableCell>
+                              <TableCell>
+                                <Badge className={getRoleColor(staffMember.role || 'member')}>
+                                  {staffMember.role || 'member'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <Select
+                                    value={staffMember.role || 'member'}
+                                    onValueChange={(value: "owner" | "manager" | "member") => 
+                                      handleUpdateStaffRole(staffMember.id, value)
+                                    }
+                                  >
+                                    <SelectTrigger className="w-24 h-8">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="member">Member</SelectItem>
+                                      <SelectItem value="manager">Manager</SelectItem>
+                                      <SelectItem value="owner">Owner</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleDeleteStaff(staffMember.id)}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>}
 
         </div>
       </div>

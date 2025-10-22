@@ -6,6 +6,8 @@ export interface Staff {
   user: {
     id: string;
     username: string;
+    first_name: string;
+    last_name: string;
     email: string;
     phone_number: string;
     groups: string[];
@@ -127,6 +129,222 @@ export interface UpdateWalletRequest {
   updated_by?: string;
 }
 
+// Bill Payment Types
+export interface BillPayment {
+  id: string;
+  organization: Organization;
+  currency: {
+    id: number;
+    name: string;
+    symbol: string;
+    created_at: string;
+    updated_at: string;
+  };
+  wallet_transaction?: WalletTransaction;
+  petty_cash_transaction?: PettyCashTransaction;
+  biller_name: string;
+  account_number: string;
+  amount: number;
+  status?: "pending" | "successful" | "failed";
+  type?: "electricity" | "water" | "internet" | "airtime";
+  wallet_type?: "main_wallet" | "petty_cash_wallet";
+  reference?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateBillPaymentRequest {
+  organization: string;
+  currency: number;
+  wallet_transaction?: string;
+  petty_cash_transaction?: string;
+  biller_name: string;
+  account_number: string;
+  amount: number;
+  status?: "pending" | "successful" | "failed";
+  type?: "electricity" | "water" | "internet" | "airtime";
+  wallet_type?: "main_wallet" | "petty_cash_wallet";
+  reference?: string;
+}
+
+// Petty Cash Types
+export interface PettyCashWallet {
+  id: string;
+  organization: Organization;
+  currency: {
+    id: number;
+    name: string;
+    symbol: string;
+    created_at: string;
+    updated_at: string;
+  };
+  updated_by: {
+    id: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string;
+    groups: string[];
+    is_email_verified: boolean;
+    is_phone_verified: boolean;
+    permissions: string;
+  };
+  balance: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PettyCashTransaction {
+  id: string;
+  petty_cash_wallet: PettyCashWallet;
+  currency: {
+    id: number;
+    name: string;
+    symbol: string;
+    created_at: string;
+    updated_at: string;
+  };
+  updated_by: {
+    id: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string;
+    groups: string[];
+    is_email_verified: boolean;
+    is_phone_verified: boolean;
+    permissions: string;
+  };
+  type?: "debit" | "credit";
+  status?: "pending_approval" | "approved" | "rejected";
+  amount: number;
+  title?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PettyCashExpense {
+  id: string;
+  petty_cash_wallet: PettyCashWallet;
+  currency: {
+    id: number;
+    name: string;
+    symbol: string;
+    created_at: string;
+    updated_at: string;
+  };
+  petty_cash_transaction?: PettyCashTransaction;
+  approved_by?: {
+    id: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string;
+    groups: string[];
+    is_email_verified: boolean;
+    is_phone_verified: boolean;
+    permissions: string;
+  };
+  updated_by?: {
+    id: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string;
+    groups: string[];
+    is_email_verified: boolean;
+    is_phone_verified: boolean;
+    permissions: string;
+  };
+  category?: "office_supplies" | "travel" | "meals" | "entertainment" | "utilities" | "maintenance" | "emergency" | "other";
+  amount: number;
+  description?: string;
+  receipt_number?: string;
+  requestor_name?: string;
+  requestor_phone_number?: string;
+  is_approved?: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PettyCashFundRequest {
+  id: string;
+  petty_cash_wallet: PettyCashWallet;
+  currency: {
+    id: number;
+    name: string;
+    symbol: string;
+    created_at: string;
+    updated_at: string;
+  };
+  petty_cash_transaction?: PettyCashTransaction;
+  approved_by?: {
+    id: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string;
+    groups: string[];
+    is_email_verified: boolean;
+    is_phone_verified: boolean;
+    permissions: string;
+  };
+  updated_by?: {
+    id: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string;
+    groups: string[];
+    is_email_verified: boolean;
+    is_phone_verified: boolean;
+    permissions: string;
+  };
+  amount: number;
+  urgency_level?: "low" | "normal" | "high" | "urgent";
+  reason?: string;
+  requestor_name?: string;
+  requestor_phone_number?: string;
+  is_approved?: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// OTP Types
+export interface OTPResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    user: any;
+    access_token: string;
+    refresh_token: string;
+  };
+}
+
+export interface ForgotPasswordRequest {
+  email?: string;
+  phone_number?: string;
+}
+
+export interface ResetPasswordRequest {
+  email_code?: string;
+  sms_code?: string;
+  new_password: string;
+}
+
+export interface VerifyOTPRequest {
+  email_code?: string;
+  sms_code?: string;
+  email?: string;
+  phone_number?: string;
+}
+
 class OrganizationService {
   private getAuthHeaders() {
     const accessToken = localStorage.getItem("access_token");
@@ -149,10 +367,22 @@ class OrganizationService {
     }
   }
 
+  private checkOwnerPermission(): boolean {
+    const userStr = localStorage.getItem("user");
+    if (!userStr) return false;
+    
+    try {
+      const user = JSON.parse(userStr);
+      return user.isSuperuser === true || user.role === 'admin' || user.role === 'owner';
+    } catch {
+      return false;
+    }
+  }
+
   // Staff Management
   async addStaff(staffData: CreateStaffRequest): Promise<CreateStaffRequest> {
-    if (!this.checkAdminPermission()) {
-      throw new Error("Unauthorized: Only admins can add staff to organizations");
+    if (!this.checkOwnerPermission()) {
+      throw new Error("Unauthorized: Only organization owners and admins can add staff");
     }
 
     try {
@@ -537,6 +767,484 @@ class OrganizationService {
       return await response.json();
     } catch (error) {
       console.error("Get wallet transaction error:", error);
+      throw error;
+    }
+  }
+
+  // Bill Payment Management
+  async getBillPayments(params?: {
+    organization?: string;
+    status?: string;
+    type?: string;
+    wallet_type?: string;
+    currency?: string;
+    petty_cash_transaction?: string;
+    reference?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ count: number; next: string | null; previous: string | null; results: BillPayment[] }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.organization) queryParams.append("organization", params.organization);
+      if (params?.status) queryParams.append("status", params.status);
+      if (params?.type) queryParams.append("type", params.type);
+      if (params?.wallet_type) queryParams.append("wallet_type", params.wallet_type);
+      if (params?.currency) queryParams.append("currency", params.currency);
+      if (params?.petty_cash_transaction) queryParams.append("petty_cash_transaction", params.petty_cash_transaction);
+      if (params?.reference) queryParams.append("reference", params.reference);
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.offset) queryParams.append("offset", params.offset.toString());
+
+      const response = await fetch(`${API_BASE_URL}/organizations/bill_payment/?${queryParams}`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get bill payments error:", error);
+      throw error;
+    }
+  }
+
+  async createBillPayment(billData: CreateBillPaymentRequest): Promise<BillPayment> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/bill_payment/`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(billData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Create bill payment error:", error);
+      throw error;
+    }
+  }
+
+  async getBillPayment(billId: string): Promise<BillPayment> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/bill_payment/${billId}/`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get bill payment error:", error);
+      throw error;
+    }
+  }
+
+  async updateBillPayment(billId: string, billData: CreateBillPaymentRequest): Promise<BillPayment> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/bill_payment/${billId}/`, {
+        method: "PUT",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(billData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Update bill payment error:", error);
+      throw error;
+    }
+  }
+
+  // Petty Cash Wallet Management
+  async getPettyCashWallets(params?: {
+    organization?: string;
+    currency?: string;
+    updated_by?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ count: number; next: string | null; previous: string | null; results: PettyCashWallet[] }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.organization) queryParams.append("organization", params.organization);
+      if (params?.currency) queryParams.append("currency", params.currency);
+      if (params?.updated_by) queryParams.append("updated_by", params.updated_by);
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.offset) queryParams.append("offset", params.offset.toString());
+
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_wallet/?${queryParams}`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get petty cash wallets error:", error);
+      throw error;
+    }
+  }
+
+  async getPettyCashWallet(walletId: string): Promise<PettyCashWallet> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_wallet/${walletId}/`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get petty cash wallet error:", error);
+      throw error;
+    }
+  }
+
+  // Petty Cash Transaction Management
+  async getPettyCashTransactions(params?: {
+    petty_cash_wallet?: string;
+    type?: string;
+    status?: string;
+    currency?: string;
+    updated_by?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ count: number; next: string | null; previous: string | null; results: PettyCashTransaction[] }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.petty_cash_wallet) queryParams.append("petty_cash_wallet", params.petty_cash_wallet);
+      if (params?.type) queryParams.append("type", params.type);
+      if (params?.status) queryParams.append("status", params.status);
+      if (params?.currency) queryParams.append("currency", params.currency);
+      if (params?.updated_by) queryParams.append("updated_by", params.updated_by);
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.offset) queryParams.append("offset", params.offset.toString());
+
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_transaction/?${queryParams}`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get petty cash transactions error:", error);
+      throw error;
+    }
+  }
+
+  async createPettyCashTransaction(transactionData: {
+    petty_cash_wallet: string;
+    currency: number;
+    updated_by: string;
+    type?: "debit" | "credit";
+    status?: "pending_approval" | "approved" | "rejected";
+    amount: number;
+    title?: string;
+  }): Promise<PettyCashTransaction> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_transaction/`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(transactionData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Create petty cash transaction error:", error);
+      throw error;
+    }
+  }
+
+  async getPettyCashTransaction(transactionId: string): Promise<PettyCashTransaction> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_transaction/${transactionId}/`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get petty cash transaction error:", error);
+      throw error;
+    }
+  }
+
+  // Petty Cash Expense Management
+  async getPettyCashExpenses(params?: {
+    petty_cash_wallet?: string;
+    petty_cash_transaction?: string;
+    currency?: string;
+    approved_by?: string;
+    updated_by?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ count: number; next: string | null; previous: string | null; results: PettyCashExpense[] }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.petty_cash_wallet) queryParams.append("petty_cash_wallet", params.petty_cash_wallet);
+      if (params?.petty_cash_transaction) queryParams.append("petty_cash_transaction", params.petty_cash_transaction);
+      if (params?.currency) queryParams.append("currency", params.currency);
+      if (params?.approved_by) queryParams.append("approved_by", params.approved_by);
+      if (params?.updated_by) queryParams.append("updated_by", params.updated_by);
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.offset) queryParams.append("offset", params.offset.toString());
+
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_expense/?${queryParams}`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get petty cash expenses error:", error);
+      throw error;
+    }
+  }
+
+  async createPettyCashExpense(expenseData: {
+    petty_cash_wallet: string;
+    currency: number;
+    petty_cash_transaction?: string;
+    approved_by?: string;
+    updated_by?: string;
+    category?: "office_supplies" | "travel" | "meals" | "entertainment" | "utilities" | "maintenance" | "emergency" | "other";
+    amount: number;
+    description?: string;
+    receipt_number?: string;
+    requestor_name?: string;
+    requestor_phone_number?: string;
+    is_approved?: boolean;
+  }): Promise<PettyCashExpense> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_expense/`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(expenseData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Create petty cash expense error:", error);
+      throw error;
+    }
+  }
+
+  async getPettyCashExpense(expenseId: string): Promise<PettyCashExpense> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_expense/${expenseId}/`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get petty cash expense error:", error);
+      throw error;
+    }
+  }
+
+  async updatePettyCashExpense(expenseId: string, expenseData: {
+    petty_cash_wallet?: string;
+    currency?: number;
+    petty_cash_transaction?: string;
+    approved_by?: string;
+    updated_by?: string;
+    category?: "office_supplies" | "travel" | "meals" | "entertainment" | "utilities" | "maintenance" | "emergency" | "other";
+    amount: number;
+    description?: string;
+    receipt_number?: string;
+    requestor_name?: string;
+    requestor_phone_number?: string;
+    is_approved?: boolean;
+  }): Promise<PettyCashExpense> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_expense/${expenseId}/`, {
+        method: "PUT",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(expenseData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Update petty cash expense error:", error);
+      throw error;
+    }
+  }
+
+  // Petty Cash Fund Request Management
+  async getPettyCashFundRequests(params?: {
+    petty_cash_wallet?: string;
+    petty_cash_transaction?: string;
+    currency?: string;
+    approved_by?: string;
+    updated_by?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ count: number; next: string | null; previous: string | null; results: PettyCashFundRequest[] }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.petty_cash_wallet) queryParams.append("petty_cash_wallet", params.petty_cash_wallet);
+      if (params?.petty_cash_transaction) queryParams.append("petty_cash_transaction", params.petty_cash_transaction);
+      if (params?.currency) queryParams.append("currency", params.currency);
+      if (params?.approved_by) queryParams.append("approved_by", params.approved_by);
+      if (params?.updated_by) queryParams.append("updated_by", params.updated_by);
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      if (params?.offset) queryParams.append("offset", params.offset.toString());
+
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_fund_request/?${queryParams}`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get petty cash fund requests error:", error);
+      throw error;
+    }
+  }
+
+  async createPettyCashFundRequest(fundRequestData: {
+    petty_cash_wallet: string;
+    currency: number;
+    petty_cash_transaction?: string;
+    approved_by?: string;
+    updated_by?: string;
+    amount: number;
+    urgency_level?: "low" | "normal" | "high" | "urgent";
+    reason?: string;
+    requestor_name?: string;
+    requestor_phone_number?: string;
+    is_approved?: boolean;
+  }): Promise<PettyCashFundRequest> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_fund_request/`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(fundRequestData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Create petty cash fund request error:", error);
+      throw error;
+    }
+  }
+
+  async getPettyCashFundRequest(fundRequestId: string): Promise<PettyCashFundRequest> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_fund_request/${fundRequestId}/`, {
+        method: "GET",
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Get petty cash fund request error:", error);
+      throw error;
+    }
+  }
+
+  async updatePettyCashFundRequest(fundRequestId: string, fundRequestData: {
+    petty_cash_wallet?: string;
+    currency?: number;
+    petty_cash_transaction?: string;
+    approved_by?: string;
+    updated_by?: string;
+    amount: number;
+    urgency_level?: "low" | "normal" | "high" | "urgent";
+    reason?: string;
+    requestor_name?: string;
+    requestor_phone_number?: string;
+    is_approved?: boolean;
+  }): Promise<PettyCashFundRequest> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_fund_request/${fundRequestId}/`, {
+        method: "PUT",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(fundRequestData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Update petty cash fund request error:", error);
       throw error;
     }
   }

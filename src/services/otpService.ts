@@ -1,7 +1,7 @@
 const API_BASE_URL = "https://bulksrv.almaredagencyuganda.com";
 
-// Types based on the API documentation
-export interface OtpResponse {
+// OTP Types
+export interface OTPResponse {
   success: boolean;
   message: string;
   data?: {
@@ -11,43 +11,25 @@ export interface OtpResponse {
   };
 }
 
-export interface ForgotPasswordEmailRequest {
-  email: string;
+export interface ForgotPasswordRequest {
+  email?: string;
+  phone_number?: string;
 }
 
-export interface ForgotPasswordSmsRequest {
-  phone_number: string;
-}
-
-export interface ResendEmailRequest {
-  email: string;
-}
-
-export interface ResendSmsRequest {
-  phone_number: string;
-}
-
-export interface ResetPasswordEmailRequest {
-  email_code: string;
+export interface ResetPasswordRequest {
+  email_code?: string;
+  sms_code?: string;
   new_password: string;
 }
 
-export interface ResetPasswordSmsRequest {
-  sms_code: string;
-  new_password: string;
+export interface VerifyOTPRequest {
+  email_code?: string;
+  sms_code?: string;
+  email?: string;
+  phone_number?: string;
 }
 
-export interface VerifyEmailRequest {
-  email_code: string;
-  email: string;
-}
-
-export interface VerifyPhoneRequest {
-  sms_code: string;
-  phone_number: string;
-}
-
-class OtpService {
+class OTPService {
   private getAuthHeaders() {
     const accessToken = localStorage.getItem("access_token");
     const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -58,12 +40,12 @@ class OtpService {
   }
 
   // Forgot Password - Email
-  async forgotPasswordEmail(data: ForgotPasswordEmailRequest): Promise<OtpResponse> {
+  async forgotPasswordEmail(request: { email: string }): Promise<OTPResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/otp/forgot_password/email/`, {
         method: "POST",
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(request),
       });
 
       if (!response.ok) {
@@ -79,12 +61,12 @@ class OtpService {
   }
 
   // Forgot Password - SMS
-  async forgotPasswordSms(data: ForgotPasswordSmsRequest): Promise<OtpResponse> {
+  async forgotPasswordSMS(request: { phone_number: string }): Promise<OTPResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/otp/forgot_password/sms/`, {
         method: "POST",
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(request),
       });
 
       if (!response.ok) {
@@ -99,13 +81,13 @@ class OtpService {
     }
   }
 
-  // Resend Email OTP
-  async resendEmailOtp(data: ResendEmailRequest): Promise<OtpResponse> {
+  // Resend OTP - Email
+  async resendEmailOTP(request: { email: string }): Promise<OTPResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/otp/resend/email/`, {
         method: "POST",
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(request),
       });
 
       if (!response.ok) {
@@ -120,13 +102,13 @@ class OtpService {
     }
   }
 
-  // Resend SMS OTP
-  async resendSmsOtp(data: ResendSmsRequest): Promise<OtpResponse> {
+  // Resend OTP - SMS
+  async resendSMSOTP(request: { phone_number: string }): Promise<OTPResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/otp/resend/sms/`, {
         method: "POST",
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(request),
       });
 
       if (!response.ok) {
@@ -141,13 +123,13 @@ class OtpService {
     }
   }
 
-  // Reset Password with Email Code
-  async resetPasswordWithEmailCode(data: ResetPasswordEmailRequest): Promise<OtpResponse> {
+  // Reset Password - Email Code
+  async resetPasswordEmailCode(request: { email_code: string; new_password: string }): Promise<OTPResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/otp/reset_password/email_code/`, {
         method: "POST",
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(request),
       });
 
       if (!response.ok) {
@@ -157,18 +139,18 @@ class OtpService {
 
       return await response.json();
     } catch (error) {
-      console.error("Reset password with email code error:", error);
+      console.error("Reset password email code error:", error);
       throw error;
     }
   }
 
-  // Reset Password with SMS Code
-  async resetPasswordWithSmsCode(data: ResetPasswordSmsRequest): Promise<OtpResponse> {
+  // Reset Password - SMS Code
+  async resetPasswordSMSCode(request: { sms_code: string; new_password: string }): Promise<OTPResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/otp/reset_password/sms_code/`, {
         method: "POST",
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(request),
       });
 
       if (!response.ok) {
@@ -178,18 +160,18 @@ class OtpService {
 
       return await response.json();
     } catch (error) {
-      console.error("Reset password with SMS code error:", error);
+      console.error("Reset password SMS code error:", error);
       throw error;
     }
   }
 
   // Verify Email Address
-  async verifyEmailAddress(data: VerifyEmailRequest): Promise<OtpResponse> {
+  async verifyEmailAddress(request: { email_code: string; email: string }): Promise<OTPResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/otp/verify/email_address/`, {
         method: "POST",
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(request),
       });
 
       if (!response.ok) {
@@ -197,22 +179,7 @@ class OtpService {
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
-      
-      // Store tokens if verification is successful
-      if (result.success && result.data) {
-        if (result.data.access_token) {
-          localStorage.setItem("access_token", result.data.access_token);
-        }
-        if (result.data.refresh_token) {
-          localStorage.setItem("refresh_token", result.data.refresh_token);
-        }
-        if (result.data.user) {
-          localStorage.setItem("user", JSON.stringify(result.data.user));
-        }
-      }
-
-      return result;
+      return await response.json();
     } catch (error) {
       console.error("Verify email address error:", error);
       throw error;
@@ -220,12 +187,12 @@ class OtpService {
   }
 
   // Verify Phone Number
-  async verifyPhoneNumber(data: VerifyPhoneRequest): Promise<OtpResponse> {
+  async verifyPhoneNumber(request: { sms_code: string; phone_number: string }): Promise<OTPResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/otp/verify/phone_number/`, {
         method: "POST",
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(data),
+        body: JSON.stringify(request),
       });
 
       if (!response.ok) {
@@ -233,22 +200,7 @@ class OtpService {
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
-      
-      // Store tokens if verification is successful
-      if (result.success && result.data) {
-        if (result.data.access_token) {
-          localStorage.setItem("access_token", result.data.access_token);
-        }
-        if (result.data.refresh_token) {
-          localStorage.setItem("refresh_token", result.data.refresh_token);
-        }
-        if (result.data.user) {
-          localStorage.setItem("user", JSON.stringify(result.data.user));
-        }
-      }
-
-      return result;
+      return await response.json();
     } catch (error) {
       console.error("Verify phone number error:", error);
       throw error;
@@ -256,4 +208,4 @@ class OtpService {
   }
 }
 
-export const otpService = new OtpService();
+export const otpService = new OTPService();
