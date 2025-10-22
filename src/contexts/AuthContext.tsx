@@ -168,9 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         permissions: isSuperuser
           ? (['system_admin', ...rolePermissions.admin] as Permission[])
-          : (staffRole === 'owner' 
-            ? rolePermissions.manager 
-            : rolePermissions[userRole]),
+          : rolePermissions[userRole],
         position: isSuperuser ? 'System Administrator' : (staffRole || 'Staff Member'),
         firstName: firstName,
         lastName: lastName,
