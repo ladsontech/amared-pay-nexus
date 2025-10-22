@@ -56,8 +56,12 @@ export interface BulkPayment {
   total_amount: number;
   reference: string;
   charge: number;
+  status: 'pending_approval' | 'approved' | 'rejected' | null;
+  is_approved: boolean;
+  comments: string | null;
   created_at: string;
   updated_at: string;
+  approved_by: string | null;
 }
 
 export interface Transaction {
@@ -96,6 +100,7 @@ export interface Link {
 export interface Collection {
   id: string;
   reason: string | null;
+  reference: string;
   amount: number;
   phone_number: string | null;
   status: 'pending' | 'successful' | 'failed' | null;
@@ -137,6 +142,10 @@ export interface ProfitConfiguration {
 export interface CreateBulkPaymentRequest {
   organization: string;
   total_amount: number;
+  status?: 'pending_approval' | 'approved' | 'rejected' | null;
+  is_approved?: boolean;
+  comments?: string | null;
+  approved_by?: string | null;
 }
 
 export interface ProcessBulkPaymentRequest {
@@ -150,6 +159,59 @@ export interface InitiateCollectionRequest {
   amount: number;
   phone_number?: string | null;
   reason?: string | null;
+}
+
+export interface UpdateProfitConfigurationRequest {
+  name?: 'sms_fee' | 'whatsapp_fee' | 'cash_out_fee' | 'bank_transfer_fee' | 'mobile_money_disbursement_fee' | 'mobile_money_collection_fee' | null;
+  fee?: number | null;
+  percentage?: string | null;
+  use_percentage?: boolean;
+  currency?: number | null;
+  updated_by?: string | null;
+}
+
+export interface BulkPaymentCheckResponse {
+  success: boolean;
+  message: string;
+  data: {
+    currency: Currency;
+    bulk_payment: BulkPayment;
+    transaction: Transaction;
+    amount: number | null;
+    url: string;
+    beneficiary_name: string;
+    beneficiary_email: string;
+    beneficiary_phone_number: string;
+    beneficiary_bank_name: string;
+    beneficiary_bank_branch: string;
+    beneficiary_account_number: string;
+    expiry_date: string | null;
+    verification_code: string;
+    status: string | null;
+  };
+  phone_info_verification_results: {
+    phone_number: string;
+    first_name: string;
+    last_name: string;
+  };
+}
+
+export interface CollectionResponse {
+  success: boolean;
+  message: string;
+  data: Collection;
+}
+
+export interface WithdrawResponse {
+  success: boolean;
+  message: string;
+  data: MoMoWithdraw;
+}
+
+export interface ProcessPaymentResponse {
+  success: boolean;
+  message: string;
+  data: Link;
 }
 
 export interface MobileMoneyWithdrawRequest {
@@ -182,7 +244,12 @@ export interface ApiResponse<T> {
 
 class PaymentService {
   async getCurrencies(params?: QueryParams): Promise<PaginatedResponse<Currency>> {
-    return apiClient.get<PaginatedResponse<Currency>>(API_CONFIG.endpoints.payments.currency.list, params);
+    try {
+      return await apiClient.get<PaginatedResponse<Currency>>(API_CONFIG.endpoints.payments.currency.list, params);
+    } catch (error) {
+      console.error('Error fetching currencies:', error);
+      throw new Error('Failed to fetch currencies. Please try again.');
+    }
   }
 
   async getCurrency(id: number): Promise<Currency> {
@@ -206,7 +273,12 @@ class PaymentService {
   }
 
   async getBulkPayments(params?: QueryParams): Promise<PaginatedResponse<BulkPayment>> {
-    return apiClient.get<PaginatedResponse<BulkPayment>>(API_CONFIG.endpoints.payments.bulkPayment.list, params);
+    try {
+      return await apiClient.get<PaginatedResponse<BulkPayment>>(API_CONFIG.endpoints.payments.bulkPayment.list, params);
+    } catch (error) {
+      console.error('Error fetching bulk payments:', error);
+      throw new Error('Failed to fetch bulk payments. Please try again.');
+    }
   }
 
   async getBulkPayment(id: string): Promise<BulkPayment> {
@@ -214,17 +286,22 @@ class PaymentService {
   }
 
   async createBulkPayment(data: CreateBulkPaymentRequest): Promise<BulkPayment> {
-    return apiClient.post<BulkPayment>(API_CONFIG.endpoints.payments.bulkPayment.create, data);
+    try {
+      return await apiClient.post<BulkPayment>(API_CONFIG.endpoints.payments.bulkPayment.create, data);
+    } catch (error) {
+      console.error('Error creating bulk payment:', error);
+      throw new Error('Failed to create bulk payment. Please check your data and try again.');
+    }
   }
 
-  async checkBulkPayment(linkId: string): Promise<ApiResponse<Link & { phone_info_verification_results?: any }>> {
-    return apiClient.get<ApiResponse<Link & { phone_info_verification_results?: any }>>(
+  async checkBulkPayment(linkId: string): Promise<BulkPaymentCheckResponse> {
+    return apiClient.get<BulkPaymentCheckResponse>(
       API_CONFIG.endpoints.payments.bulkPayment.check(linkId)
     );
   }
 
-  async processBulkPayment(data: ProcessBulkPaymentRequest): Promise<ApiResponse<Link>> {
-    return apiClient.post<ApiResponse<Link>>(API_CONFIG.endpoints.payments.bulkPayment.process, data);
+  async processBulkPayment(data: ProcessBulkPaymentRequest): Promise<ProcessPaymentResponse> {
+    return apiClient.post<ProcessPaymentResponse>(API_CONFIG.endpoints.payments.bulkPayment.process, data);
   }
 
   async getLinks(params?: QueryParams): Promise<PaginatedResponse<Link>> {
@@ -244,31 +321,59 @@ class PaymentService {
   }
 
   async getCollections(params?: QueryParams): Promise<PaginatedResponse<Collection>> {
-    return apiClient.get<PaginatedResponse<Collection>>(API_CONFIG.endpoints.payments.collections.list, params);
+    try {
+      return await apiClient.get<PaginatedResponse<Collection>>(API_CONFIG.endpoints.payments.collections.list, params);
+    } catch (error) {
+      console.error('Error fetching collections:', error);
+      throw new Error('Failed to fetch collections. Please try again.');
+    }
   }
 
   async getCollection(id: string): Promise<Collection> {
     return apiClient.get<Collection>(API_CONFIG.endpoints.payments.collections.detail(id));
   }
 
-  async initiateCollection(data: InitiateCollectionRequest): Promise<ApiResponse<Collection>> {
-    return apiClient.post<ApiResponse<Collection>>(API_CONFIG.endpoints.payments.collections.initiate, data);
+  async initiateCollection(data: InitiateCollectionRequest): Promise<CollectionResponse> {
+    try {
+      return await apiClient.post<CollectionResponse>(API_CONFIG.endpoints.payments.collections.initiate, data);
+    } catch (error) {
+      console.error('Error initiating collection:', error);
+      throw new Error('Failed to initiate collection. Please check your data and try again.');
+    }
   }
 
   async getMoMoWithdraws(params?: QueryParams): Promise<PaginatedResponse<MoMoWithdraw>> {
-    return apiClient.get<PaginatedResponse<MoMoWithdraw>>(API_CONFIG.endpoints.payments.momoWithdraws.list, params);
+    try {
+      return await apiClient.get<PaginatedResponse<MoMoWithdraw>>(API_CONFIG.endpoints.payments.momoWithdraws.list, params);
+    } catch (error) {
+      console.error('Error fetching mobile money withdraws:', error);
+      throw new Error('Failed to fetch mobile money withdraws. Please try again.');
+    }
   }
 
   async getMoMoWithdraw(id: string): Promise<MoMoWithdraw> {
     return apiClient.get<MoMoWithdraw>(API_CONFIG.endpoints.payments.momoWithdraws.detail(id));
   }
 
-  async mobileMoneyWithdraw(data: MobileMoneyWithdrawRequest): Promise<ApiResponse<MoMoWithdraw>> {
-    return apiClient.post<ApiResponse<MoMoWithdraw>>(API_CONFIG.endpoints.payments.mobileMoneyWithdraw, data);
+  async mobileMoneyWithdraw(data: MobileMoneyWithdrawRequest): Promise<WithdrawResponse> {
+    try {
+      return await apiClient.post<WithdrawResponse>(API_CONFIG.endpoints.payments.mobileMoneyWithdraw, data);
+    } catch (error) {
+      console.error('Error processing mobile money withdraw:', error);
+      throw new Error('Failed to process mobile money withdraw. Please check your data and try again.');
+    }
   }
 
-  async getPhoneNumberInfo(phoneNumber: string): Promise<any> {
-    return apiClient.get<any>(`/payments/mobile_money/phone_number_info/${phoneNumber}`);
+  async getPhoneNumberInfo(phoneNumber: string): Promise<{
+    phone_number: string;
+    first_name: string;
+    last_name: string;
+  }> {
+    return apiClient.get<{
+      phone_number: string;
+      first_name: string;
+      last_name: string;
+    }>(`/payments/mobile_money/phone_number_info/${phoneNumber}`);
   }
 
   async getProfits(params?: QueryParams): Promise<PaginatedResponse<Profit>> {
@@ -287,7 +392,7 @@ class PaymentService {
     return apiClient.get<ProfitConfiguration>(API_CONFIG.endpoints.payments.profitConfig.detail(id));
   }
 
-  async updateProfitConfiguration(id: string, data: UpdateProfitConfigRequest): Promise<ProfitConfiguration> {
+  async updateProfitConfiguration(id: string, data: UpdateProfitConfigurationRequest): Promise<ProfitConfiguration> {
     return apiClient.put<ProfitConfiguration>(API_CONFIG.endpoints.payments.profitConfig.update(id), data);
   }
 }

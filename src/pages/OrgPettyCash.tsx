@@ -29,11 +29,74 @@ const PettyCash = () => {
     pettyCashWallets,
     pettyCashTransactions,
     pettyCashExpenses,
-    loading
+    loading,
+    error
   } = useOrganization();
 
   // Calculate current balance from petty cash wallets
   const currentBalance = pettyCashWallets.reduce((sum, wallet) => sum + (wallet.balance || 0), 0);
+
+  // Debug logging
+  console.log('PettyCash Debug:', {
+    loading,
+    error,
+    pettyCashWallets: pettyCashWallets.length,
+    pettyCashTransactions: pettyCashTransactions.length,
+    pettyCashExpenses: pettyCashExpenses.length,
+    currentBalance
+  });
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-2 text-gray-600">Loading petty cash data...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state with fallback
+  if (error) {
+    return (
+      <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 className="text-red-800 font-medium">Error Loading Petty Cash Data</h3>
+          <p className="text-red-700 text-sm mt-1">{error}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="mt-2 bg-red-600 hover:bg-red-700"
+          >
+            Retry
+          </Button>
+        </div>
+        
+        {/* Fallback petty cash overview */}
+        <div className="bg-white border border-gray-100 rounded-lg p-6">
+          <h2 className="text-lg font-bold text-black mb-4">Petty Cash Overview (Offline Mode)</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 className="text-blue-800 font-medium">Current Balance</h3>
+              <p className="text-blue-700 text-2xl font-bold">UGX 0</p>
+              <p className="text-blue-600 text-xs">Unable to load data</p>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 className="text-blue-800 font-medium">Monthly Spending</h3>
+              <p className="text-blue-700 text-2xl font-bold">UGX 0</p>
+              <p className="text-blue-600 text-xs">Unable to load data</p>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 className="text-blue-800 font-medium">Pending Approvals</h3>
+              <p className="text-blue-700 text-2xl font-bold">0</p>
+              <p className="text-blue-600 text-xs">Unable to load data</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b border-gray-100 -mx-6 px-6 py-4 mb-4">

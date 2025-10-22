@@ -54,7 +54,7 @@ const OrgDashboard = () => {
   // Staff Management States
   const [addStaffOpen, setAddStaffOpen] = useState(false);
   const [editStaffOpen, setEditStaffOpen] = useState(false);
-  const [selectedStaff, setSelectedStaff] = useState<{ id: string; user: { first_name: string; last_name: string; email: string; phone_number: string; username: string }; role: string } | null>(null);
+  const [selectedStaff, setSelectedStaff] = useState<{ id: string; user: { first_name: string; last_name: string; email: string; phone_number: string; username?: string }; role: string } | null>(null);
   const [staffFormData, setStaffFormData] = useState<CreateStaffRequest>({
     username: "",
     password: "",
@@ -80,6 +80,18 @@ const OrgDashboard = () => {
   const collectionsWallet = wallets.find(w => w.organization.name.toLowerCase().includes('collection')) || wallets[0];
   const pettyCashWallet = wallets.find(w => w.organization.name.toLowerCase().includes('petty') || w.organization.name.toLowerCase().includes('cash')) || wallets[1];
 
+  // Calculate payment metrics
+  const totalBulkPayments = bulkPayments.reduce((sum, payment) => sum + payment.total_amount, 0);
+  const pendingBulkPayments = bulkPayments.filter(payment => payment.status === 'pending_approval').length;
+  const approvedBulkPayments = bulkPayments.filter(payment => payment.is_approved).length;
+  
+  const totalCollections = collections.reduce((sum, collection) => sum + collection.amount, 0);
+  const successfulCollections = collections.filter(collection => collection.status === 'successful').length;
+  const pendingCollections = collections.filter(collection => collection.status === 'pending').length;
+  
+  const totalWithdraws = momoWithdraws.reduce((sum, withdraw) => sum + withdraw.amount, 0);
+  const successfulWithdraws = momoWithdraws.filter(withdraw => withdraw.status === 'successful').length;
+
   const dashboardData = {
     totalCollections: collectionsWallet?.balance || 0,
     walletBalance: totalWalletBalance,
@@ -87,6 +99,16 @@ const OrgDashboard = () => {
     monthlyTransactions,
     pendingApprovals,
     recentTransactions,
+    paymentMetrics: {
+      totalBulkPayments,
+      pendingBulkPayments,
+      approvedBulkPayments,
+      totalCollections,
+      successfulCollections,
+      pendingCollections,
+      totalWithdraws,
+      successfulWithdraws
+    },
     teamMetrics: {
       totalStaff,
       activeStaff,
@@ -213,7 +235,7 @@ const OrgDashboard = () => {
     }
   };
 
-  const handleEditStaff = (staffMember: { id: string; user: { first_name: string; last_name: string; email: string; phone_number: string }; role: string }) => {
+  const handleEditStaff = (staffMember: { id: string; user: { first_name: string; last_name: string; email: string; phone_number: string; username?: string }; role: string }) => {
     setSelectedStaff(staffMember);
     setEditStaffOpen(true);
   };
@@ -462,6 +484,14 @@ const OrgDashboard = () => {
                     <span className="text-sm text-gray-600">Petty Cash</span>
                     <span className="text-lg font-bold text-black">UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K</span>
                   </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Successful Collections</span>
+                    <span className="text-sm font-medium text-green-600">{dashboardData.paymentMetrics.successfulCollections}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Pending Collections</span>
+                    <span className="text-sm font-medium text-yellow-600">{dashboardData.paymentMetrics.pendingCollections}</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -493,6 +523,75 @@ const OrgDashboard = () => {
                         </div>
                       </div>;
                 })}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Payment Metrics Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <Card className="bg-white border border-gray-100 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold text-black">Bulk Payments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Total Amount</span>
+                    <span className="text-lg font-bold text-black">UGX {(dashboardData.paymentMetrics.totalBulkPayments / 1000000).toFixed(1)}M</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Approved</span>
+                    <span className="text-sm font-medium text-green-600">{dashboardData.paymentMetrics.approvedBulkPayments}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Pending Approval</span>
+                    <span className="text-sm font-medium text-yellow-600">{dashboardData.paymentMetrics.pendingBulkPayments}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border border-gray-100 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold text-black">Mobile Money</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Total Withdraws</span>
+                    <span className="text-lg font-bold text-black">UGX {(dashboardData.paymentMetrics.totalWithdraws / 1000000).toFixed(1)}M</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Successful</span>
+                    <span className="text-sm font-medium text-green-600">{dashboardData.paymentMetrics.successfulWithdraws}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Total Transactions</span>
+                    <span className="text-sm font-medium text-blue-600">{momoWithdraws.length}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border border-gray-100 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold text-black">Payment Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Total Collections</span>
+                    <span className="text-sm font-bold text-green-600">UGX {(dashboardData.paymentMetrics.totalCollections / 1000000).toFixed(1)}M</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Total Bulk Payments</span>
+                    <span className="text-sm font-bold text-blue-600">UGX {(dashboardData.paymentMetrics.totalBulkPayments / 1000000).toFixed(1)}M</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Total Withdraws</span>
+                    <span className="text-sm font-bold text-purple-600">UGX {(dashboardData.paymentMetrics.totalWithdraws / 1000000).toFixed(1)}M</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -321,7 +321,14 @@ export interface OTPResponse {
   success: boolean;
   message: string;
   data?: {
-    user: any;
+    user: {
+      id: string;
+      username: string;
+      email: string;
+      first_name: string;
+      last_name: string;
+      phone_number: string;
+    };
     access_token: string;
     refresh_token: string;
   };
@@ -385,15 +392,43 @@ class OrganizationService {
       throw new Error("Unauthorized: Only organization owners and admins can add staff");
     }
 
+    // Validate required fields
+    if (!staffData.username || !staffData.password || !staffData.first_name || 
+        !staffData.last_name || !staffData.email || !staffData.phone_number) {
+      throw new Error("All required fields must be provided");
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(staffData.email)) {
+      throw new Error("Please provide a valid email address");
+    }
+
+    // Validate phone number format (basic validation)
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(staffData.phone_number)) {
+      throw new Error("Please provide a valid phone number");
+    }
+
     try {
+      console.log('Adding staff with data:', staffData);
       const response = await fetch(`${API_BASE_URL}/organizations/add_staff/`, {
         method: "POST",
-        headers: this.getAuthHeaders(),
+        headers: {
+          ...this.getAuthHeaders(),
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(staffData),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error('Staff addition error:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorText: errorText.substring(0, 500) // Log first 500 chars
+        });
+        
         let errorMessage = "";
         
         try {
@@ -420,9 +455,17 @@ class OrganizationService {
               errorMessage = "This user data already exists. Please check phone number, email, or username.";
             }
           } else if (errorText.includes('<!DOCTYPE html>')) {
-            errorMessage = "Server error occurred. Please check all fields and try again.";
+            errorMessage = `Server error (${response.status}): The server returned an HTML page instead of JSON. This usually indicates a server-side error. Please try again or contact support.`;
+          } else if (response.status === 400) {
+            errorMessage = "Bad Request: Please check all fields and ensure they are valid.";
+          } else if (response.status === 401) {
+            errorMessage = "Unauthorized: Please log in again.";
+          } else if (response.status === 403) {
+            errorMessage = "Forbidden: You don't have permission to add staff members.";
+          } else if (response.status === 500) {
+            errorMessage = "Internal Server Error: The server encountered an error. Please try again later.";
           } else {
-            errorMessage = errorText;
+            errorMessage = `Server error (${response.status}): ${errorText.substring(0, 200)}`;
           }
         }
         
@@ -430,7 +473,7 @@ class OrganizationService {
       }
 
       return await response.json();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Add staff error:", error);
       throw error;
     }
@@ -580,7 +623,7 @@ class OrganizationService {
       }
 
       return await response.json();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Create organization error:", error);
       throw error;
     }
