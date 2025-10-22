@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { organizationService, Staff, Organization, Wallet, WalletTransaction } from '@/services/organizationService';
+import { organizationService, Staff, Organization, Wallet, WalletTransaction, PettyCashWallet, PettyCashTransaction, PettyCashExpense } from '@/services/organizationService';
 import { paymentService, BulkPayment, Collection, MoMoWithdraw } from '@/services/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -24,6 +24,11 @@ export const useOrganization = () => {
   const [bulkPayments, setBulkPayments] = useState<BulkPayment[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [momoWithdraws, setMomoWithdraws] = useState<MoMoWithdraw[]>([]);
+
+  // Petty Cash Management
+  const [pettyCashWallets, setPettyCashWallets] = useState<PettyCashWallet[]>([]);
+  const [pettyCashTransactions, setPettyCashTransactions] = useState<PettyCashTransaction[]>([]);
+  const [pettyCashExpenses, setPettyCashExpenses] = useState<PettyCashExpense[]>([]);
 
   // Fetch staff for current organization
   const fetchStaff = async () => {
@@ -91,7 +96,7 @@ export const useOrganization = () => {
     setError(null);
 
     try {
-      const params: any = { limit: 50 };
+      const params: { limit: number; wallet?: string } = { limit: 50 };
       if (walletId) {
         params.wallet = walletId;
       } else if (user?.organizationId) {
@@ -173,6 +178,67 @@ export const useOrganization = () => {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch mobile money withdraws');
       console.error('Error fetching momo withdraws:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch petty cash wallets for current organization
+  const fetchPettyCashWallets = async () => {
+    if (!user?.organizationId) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await organizationService.getPettyCashWallets({
+        organization: user.organizationId,
+        limit: 10
+      });
+      setPettyCashWallets(response.results);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch petty cash wallets');
+      console.error('Error fetching petty cash wallets:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch petty cash transactions for current organization
+  const fetchPettyCashTransactions = async () => {
+    if (!user?.organizationId) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await organizationService.getPettyCashTransactions({
+        limit: 50
+      });
+      setPettyCashTransactions(response.results);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch petty cash transactions');
+      console.error('Error fetching petty cash transactions:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch petty cash expenses for current organization
+  const fetchPettyCashExpenses = async () => {
+    if (!user?.organizationId) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await organizationService.getPettyCashExpenses({
+        limit: 50
+      });
+      setPettyCashExpenses(response.results);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch petty cash expenses');
+      console.error('Error fetching petty cash expenses:', err);
     } finally {
       setLoading(false);
     }
@@ -312,7 +378,11 @@ export const useOrganization = () => {
       fetchBulkPayments();
       fetchCollections();
       fetchMomoWithdraws();
+      fetchPettyCashWallets();
+      fetchPettyCashTransactions();
+      fetchPettyCashExpenses();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.organizationId]);
 
   return {
@@ -328,6 +398,9 @@ export const useOrganization = () => {
     bulkPayments,
     collections,
     momoWithdraws,
+    pettyCashWallets,
+    pettyCashTransactions,
+    pettyCashExpenses,
 
     // Actions
     fetchStaff,
@@ -337,6 +410,9 @@ export const useOrganization = () => {
     fetchBulkPayments,
     fetchCollections,
     fetchMomoWithdraws,
+    fetchPettyCashWallets,
+    fetchPettyCashTransactions,
+    fetchPettyCashExpenses,
     addStaff,
     updateStaffRole,
     deleteStaff,

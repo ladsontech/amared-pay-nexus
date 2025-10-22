@@ -2,14 +2,33 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wallet, TrendingUp, TrendingDown, AlertTriangle, Bell } from "lucide-react";
+import { PettyCashWallet, PettyCashTransaction, PettyCashExpense } from "@/services/organizationService";
 
 interface PettyCashOverviewProps {
   currentBalance: number;
+  pettyCashWallets: PettyCashWallet[];
+  pettyCashTransactions: PettyCashTransaction[];
+  pettyCashExpenses: PettyCashExpense[];
 }
 
-const PettyCashOverview = ({ currentBalance }: PettyCashOverviewProps) => {
-  const monthlySpending = 45000;
-  const pendingApprovals = 3;
+const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransactions, pettyCashExpenses }: PettyCashOverviewProps) => {
+  // Calculate monthly spending from petty cash expenses
+  const monthlySpending = pettyCashExpenses
+    .filter(expense => {
+      const expenseDate = new Date(expense.created_at);
+      const now = new Date();
+      return expenseDate.getMonth() === now.getMonth() && 
+             expenseDate.getFullYear() === now.getFullYear() &&
+             expense.is_approved;
+    })
+    .reduce((sum, expense) => sum + expense.amount, 0);
+
+  // Calculate pending approvals from petty cash transactions and expenses
+  const pendingApprovals = [
+    ...pettyCashTransactions.filter(t => t.status === 'pending_approval'),
+    ...pettyCashExpenses.filter(e => !e.is_approved)
+  ].length;
+
   const lowBalanceThreshold = 50000;
   const isLowBalance = currentBalance < lowBalanceThreshold;
 
@@ -72,21 +91,38 @@ const PettyCashOverview = ({ currentBalance }: PettyCashOverviewProps) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {[
-                { description: "Office Supplies", amount: -2500, category: "Office", date: "Today" },
-                { description: "Cash Added", amount: +50000, category: "Addition", date: "Yesterday" },
-                { description: "Transport", amount: -5000, category: "Travel", date: "2 days ago" }
-              ].map((transaction, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium">{transaction.description}</p>
-                    <p className="text-sm text-muted-foreground">{transaction.category} • {transaction.date}</p>
+              {pettyCashTransactions.slice(0, 3).map((transaction, index) => {
+                const isCredit = transaction.type === 'credit';
+                const amount = isCredit ? transaction.amount : -transaction.amount;
+                const date = new Date(transaction.created_at);
+                const now = new Date();
+                const diffTime = Math.abs(now.getTime() - date.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                let dateText = '';
+                if (diffDays === 0) dateText = 'Today';
+                else if (diffDays === 1) dateText = 'Yesterday';
+                else dateText = `${diffDays} days ago`;
+
+                return (
+                  <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium">{transaction.title || (isCredit ? 'Cash Added' : 'Expense')}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {isCredit ? 'Addition' : 'Expense'} • {dateText}
+                      </p>
+                    </div>
+                    <div className={`font-medium text-blue-700`}>
+                      {amount > 0 ? '+' : ''}UGX {Math.abs(amount).toLocaleString()}
+                    </div>
                   </div>
-                  <div className={`font-medium text-blue-700`}>
-                    {transaction.amount > 0 ? '+' : ''}UGX {Math.abs(transaction.amount).toLocaleString()}
-                  </div>
+                );
+              })}
+              {pettyCashTransactions.length === 0 && (
+                <div className="text-center py-4 text-muted-foreground">
+                  No recent transactions
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>

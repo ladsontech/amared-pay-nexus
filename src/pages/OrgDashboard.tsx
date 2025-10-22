@@ -213,7 +213,7 @@ const OrgDashboard = () => {
     }
   };
 
-  const handleEditStaff = (staffMember: { id: string; user: { first_name: string; last_name: string; email: string; phone_number: string; username: string }; role: string }) => {
+  const handleEditStaff = (staffMember: { id: string; user: { first_name: string; last_name: string; email: string; phone_number: string }; role: string }) => {
     setSelectedStaff(staffMember);
     setEditStaffOpen(true);
   };

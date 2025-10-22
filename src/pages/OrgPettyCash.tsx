@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Wallet, Plus, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useOrganization } from "@/hooks/useOrganization";
 import AddTransaction from "@/components/petty-cash/AddTransaction";
 import TransactionHistory from "@/components/petty-cash/TransactionHistory";
 import PettyCashOverview from "@/components/petty-cash/PettyCashOverview";
@@ -17,7 +18,6 @@ const PettyCash = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") as string || "overview";
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [currentBalance, setCurrentBalance] = useState(150000); // Initial petty cash balance
   const [isPayBillsOpen, setIsPayBillsOpen] = useState(false);
   const {
     toast
@@ -25,6 +25,15 @@ const PettyCash = () => {
   const {
     hasPermission
   } = useAuth();
+  const {
+    pettyCashWallets,
+    pettyCashTransactions,
+    pettyCashExpenses,
+    loading
+  } = useOrganization();
+
+  // Calculate current balance from petty cash wallets
+  const currentBalance = pettyCashWallets.reduce((sum, wallet) => sum + (wallet.balance || 0), 0);
   return <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b border-gray-100 -mx-6 px-6 py-4 mb-4">
@@ -115,7 +124,12 @@ const PettyCash = () => {
 
         <TabsContent value="overview" className="space-y-4 mt-6">
           <div className="bg-white">
-            <PettyCashOverview currentBalance={currentBalance} />
+            <PettyCashOverview 
+              currentBalance={currentBalance} 
+              pettyCashWallets={pettyCashWallets}
+              pettyCashTransactions={pettyCashTransactions}
+              pettyCashExpenses={pettyCashExpenses}
+            />
           </div>
         </TabsContent>
 
