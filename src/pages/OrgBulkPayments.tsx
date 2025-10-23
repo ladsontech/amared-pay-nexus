@@ -13,6 +13,8 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
+import { useOrganization } from "@/hooks/useOrganization";
+import { BulkPayment } from "@/services/paymentService";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
 
 // Add shared bank names used for selection
@@ -23,14 +25,7 @@ const BANK_NAMES = [
   "Equity Bank",
 ];
 
-interface BulkPayment {
-  id: string;
-  amount: number;
-  recipients: number;
-  status: "pending" | "processing" | "completed" | "failed";
-  createdAt: string;
-  description: string;
-}
+// Using BulkPayment interface from paymentService
 
 interface PaymentRow {
   id: string;
@@ -50,60 +45,14 @@ const BulkPayments = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = (searchParams.get("tab") as string) || "overview";
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [payments, setPayments] = useState<BulkPayment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [bankPaymentRows, setBankPaymentRows] = useState<PaymentRow[]>([]);
   const [mobilePaymentRows, setMobilePaymentRows] = useState<PaymentRow[]>([]);
   const [bulkDescription, setBulkDescription] = useState("");
   const { toast } = useToast();
+  const { bulkPayments, loading, error, fetchBulkPayments } = useOrganization();
 
-  useEffect(() => {
-    // Simulate fetching bulk payments
-    const fetchPayments = async () => {
-      try {
-        setIsLoading(true);
-        setTimeout(() => {
-          setPayments([
-            {
-              id: "BP001",
-              amount: 250000,
-              recipients: 150,
-              status: "completed",
-              createdAt: "2024-01-15T10:30:00Z",
-              description: "Monthly Salary Payment",
-            },
-            {
-              id: "BP002",
-              amount: 75000,
-              recipients: 50,
-              status: "processing",
-              createdAt: "2024-01-14T14:20:00Z",
-              description: "Vendor Payments Q1",
-            },
-            {
-              id: "BP003",
-              amount: 180000,
-              recipients: 120,
-              status: "pending",
-              createdAt: "2024-01-13T09:15:00Z",
-              description: "Commission Payments",
-            },
-          ]);
-          setIsLoading(false);
-        }, 1000);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load bulk payments",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-      }
-    };
-
-    fetchPayments();
-  }, [toast]);
+  // Bulk payments data is now provided by useOrganization hook
 
   // Initialize with 10 empty rows for each payment type
   useEffect(() => {

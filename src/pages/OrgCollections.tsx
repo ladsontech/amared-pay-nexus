@@ -16,18 +16,11 @@ import { Link } from "react-router-dom";
 const PaymentLinkForm = lazy(() => import("@/components/PaymentLinkForm"));
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useOrganization } from "@/hooks/useOrganization";
+import { paymentService } from "@/services/paymentService";
+import { Collection } from "@/services/paymentService";
 
-interface Collection {
-  id: string;
-  amount: number;
-  phoneNumber: string;
-  status: "pending" | "successful" | "failed";
-  method: "mobile_money" | "bank_transfer";
-  createdAt: string;
-  reference: string;
-  description?: string;
-  currency: string;
-}
+// Using Collection interface from paymentService
 
 interface PaymentLink {
   id: string;
@@ -52,10 +45,8 @@ interface PaymentLink {
 }
 
 const Collections = () => {
-  const [collections, setCollections] = useState<Collection[]>([]);
   const [paymentLinks, setPaymentLinks] = useState<PaymentLink[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"collections" | "links">("collections");
   const [formData, setFormData] = useState({
     phoneNumber: "+256",
@@ -77,62 +68,13 @@ const Collections = () => {
   });
   const { toast } = useToast();
   const { hasPermission } = useAuth();
+  const { collections, loading, error, fetchCollections } = useOrganization();
 
   useEffect(() => {
-    fetchCollections();
     fetchPaymentLinks();
   }, []);
 
-  const fetchCollections = async () => {
-    try {
-      setIsLoading(true);
-      const token = localStorage.getItem("auth_token");
-      const response = await fetch("https://bulksrv.almaredagencyuganda.com/payments/collections/", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setCollections(data);
-      } else {
-        // Fallback to mock data for demo
-        setCollections([
-          {
-            id: "COL001",
-            amount: 50000,
-            phoneNumber: "+256701234567",
-            status: "successful",
-            method: "mobile_money",
-            createdAt: "2024-01-15T10:30:00Z",
-            reference: "REF001",
-            currency: "UGX",
-          },
-          {
-            id: "COL002",
-            amount: 25000,
-            phoneNumber: "+256789012345",
-            status: "pending",
-            method: "mobile_money",
-            createdAt: "2024-01-14T14:20:00Z",
-            reference: "REF002",
-            currency: "UGX",
-          },
-        ]);
-      }
-    } catch (error) {
-      console.error("Error fetching collections:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load collections",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Collections data is now provided by useOrganization hook
 
   const fetchPaymentLinks = async () => {
     // Mock data for payment links
@@ -300,7 +242,7 @@ const Collections = () => {
   const filteredCollections = collections.filter(
     (collection) =>
       collection.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      collection.phoneNumber.includes(searchTerm) ||
+      (collection.phone_number && collection.phone_number.includes(searchTerm)) ||
       collection.reference.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -310,6 +252,36 @@ const Collections = () => {
       link.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
       link.paymentReason.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-2 text-gray-600">Loading collections...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 className="text-red-800 font-medium">Error Loading Collections</h3>
+          <p className="text-red-700 text-sm mt-1">{error}</p>
+          <Button 
+            onClick={() => fetchCollections()} 
+            className="mt-2 bg-red-600 hover:bg-red-700"
+          >
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
       <div className="space-y-4 md:space-y-6">
@@ -680,10 +652,10 @@ const Collections = () => {
                           </Badge>
                         </div>
                         <p className="text-xs sm:text-sm text-muted-foreground break-all">
-                          {collection.phoneNumber} • {collection.reference}
+                          {collection.phone_number || 'N/A'} • {collection.reference}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(collection.createdAt).toLocaleString()}
+                          {new Date(collection.created_at).toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -920,7 +892,7 @@ const Collections = () => {
         )}
 
         {((activeTab === "collections" && filteredCollections.length === 0) || 
-          (activeTab === "links" && filteredPaymentLinks.length === 0)) && !isLoading && (
+          (activeTab === "links" && filteredPaymentLinks.length === 0)) && !loading && (
           <Card>
             <CardContent className="text-center py-12">
               <div className="text-muted-foreground">
