@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Plus, Search, Filter, Building, Wallet, Users, Edit, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { organizationService, Organization, CreateOrganizationRequest } from "@/services/organizationService";
+import { otpService } from "@/services/otpService";
 
 const SystemOrganizations = () => {
   const navigate = useNavigate();
@@ -17,6 +18,11 @@ const SystemOrganizations = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState<null | Organization>(null);
+  const [otpVerificationOpen, setOtpVerificationOpen] = useState(false);
+  const [pendingOrganization, setPendingOrganization] = useState<CreateOrganizationRequest | null>(null);
+  const [otpCode, setOtpCode] = useState("");
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [isResendingOtp, setIsResendingOtp] = useState(false);
   const { toast } = useToast();
 
   const fetchOrganizations = async () => {
@@ -54,20 +60,19 @@ const SystemOrganizations = () => {
       const result = await organizationService.createOrganization(data);
       console.log('Organization created successfully:', result);
       
-      // Wait a bit for backend to process
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Store the organization data for OTP verification
+      setPendingOrganization(data);
+      setOtpCode("");
       
-      // Refresh the list
-      await fetchOrganizations();
-      
-      // Close dialog first
+      // Close the create dialog and open OTP verification
       setCreateOpen(false);
+      setOtpVerificationOpen(true);
       
-      // Show success toast after closing
+      // Show info toast
       toast({ 
-        title: "Success", 
-        description: `Organization "${data.org_name}" created successfully. The owner can now log in.`,
-        duration: 5000
+        title: "Email Verification Required", 
+        description: `Please check your email (${data.email}) for the verification code to complete organization setup.`,
+        duration: 8000
       });
     } catch (error: any) {
       console.error('Create organization error:', error);
@@ -90,6 +95,108 @@ const SystemOrganizations = () => {
     } catch (error) {
       toast({ title: "Error", description: "Failed to update organization", variant: "destructive" });
     }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!pendingOrganization || !otpCode) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter the verification code",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (otpCode.length !== 6) {
+      toast({
+        title: "Invalid Code",
+        description: "Please enter a 6-digit verification code",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsVerifyingOtp(true);
+      console.log('Verifying OTP for email:', pendingOrganization.email);
+      
+      const result = await otpService.verifyEmailAddress({
+        email_code: otpCode,
+        email: pendingOrganization.email
+      });
+
+      console.log('Email verified successfully:', result);
+      
+      // Refresh the organizations list
+      await fetchOrganizations();
+      
+      // Close OTP dialog
+      setOtpVerificationOpen(false);
+      setPendingOrganization(null);
+      setOtpCode("");
+      
+      // Show success toast
+      toast({
+        title: "Email Verified Successfully",
+        description: `Organization "${pendingOrganization.org_name}" is now fully set up and ready to use!`,
+        duration: 5000
+      });
+    } catch (error: any) {
+      console.error('OTP verification error:', error);
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Failed to verify email. Please check the code and try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!pendingOrganization) {
+      toast({
+        title: "Error",
+        description: "No pending organization found",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsResendingOtp(true);
+      console.log('Resending OTP to email:', pendingOrganization.email);
+      
+      await otpService.resendEmailOTP({
+        email: pendingOrganization.email
+      });
+      
+      toast({
+        title: "Code Resent",
+        description: "A new verification code has been sent to your email",
+        duration: 5000
+      });
+    } catch (error: any) {
+      console.error('Resend OTP error:', error);
+      toast({
+        title: "Resend Failed",
+        description: error.message || "Failed to resend verification code. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsResendingOtp(false);
+    }
+  };
+
+  const handleCancelOtpVerification = () => {
+    setOtpVerificationOpen(false);
+    setPendingOrganization(null);
+    setOtpCode("");
+    toast({
+      title: "Verification Cancelled",
+      description: "Organization creation was cancelled. You can try again later.",
+      variant: "destructive"
+    });
   };
 
   return (
@@ -241,6 +348,97 @@ const SystemOrganizations = () => {
               onCancel={() => setEditOpen(null)} 
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* OTP Verification Dialog */}
+      <Dialog open={otpVerificationOpen} onOpenChange={setOtpVerificationOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              Email Verification Required
+            </DialogTitle>
+            <DialogDescription>
+              Please check your email for the verification code to complete organization setup.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {pendingOrganization && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Organization:</strong> {pendingOrganization.org_name}
+                </p>
+                <p className="text-sm text-blue-800">
+                  <strong>Email:</strong> {pendingOrganization.email}
+                </p>
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <Label htmlFor="otp-code">Verification Code</Label>
+              <Input
+                id="otp-code"
+                type="text"
+                placeholder="Enter 6-digit code"
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                maxLength={6}
+                className="text-center text-lg tracking-widest"
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter the 6-digit code sent to your email address
+              </p>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button
+                onClick={handleResendOtp}
+                variant="outline"
+                disabled={isResendingOtp || isVerifyingOtp}
+                className="flex-1"
+              >
+                {isResendingOtp ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Resending...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Resend Code
+                  </>
+                )}
+              </Button>
+              
+              <Button
+                onClick={handleVerifyOtp}
+                disabled={!otpCode || otpCode.length !== 6 || isVerifyingOtp || isResendingOtp}
+                className="flex-1"
+              >
+                {isVerifyingOtp ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  'Verify Email'
+                )}
+              </Button>
+            </div>
+            
+            <div className="text-center">
+              <Button
+                onClick={handleCancelOtpVerification}
+                variant="ghost"
+                size="sm"
+                disabled={isVerifyingOtp || isResendingOtp}
+              >
+                Cancel Organization Creation
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </>
