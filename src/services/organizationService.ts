@@ -94,6 +94,15 @@ export interface CreateStaffRequest {
   phone_number: string;
   organization: string;
   role?: "owner" | "manager" | "member";
+  // Function-specific roles
+  permissions?: {
+    petty_cash?: boolean;
+    bulk_payments?: boolean;
+    collections?: boolean;
+    approvals?: boolean;
+    users?: boolean;
+    reports?: boolean;
+  };
 }
 
 export interface UpdateStaffRequest {
@@ -393,9 +402,14 @@ class OrganizationService {
     }
 
     // Validate required fields
-    if (!staffData.username || !staffData.password || !staffData.first_name || 
+    if (!staffData.username || !staffData.password || !staffData.first_name ||
         !staffData.last_name || !staffData.email || !staffData.phone_number) {
       throw new Error("All required fields must be provided");
+    }
+
+    // Validate organization field
+    if (!staffData.organization) {
+      throw new Error("Organization ID is required");
     }
 
     // Validate email format
@@ -410,8 +424,22 @@ class OrganizationService {
       throw new Error("Please provide a valid phone number");
     }
 
+    // Validate password length
+    if (staffData.password.length < 8 || staffData.password.length > 40) {
+      throw new Error("Password must be between 8 and 40 characters");
+    }
+
+    // Validate phone number length
+    if (staffData.phone_number.length < 10) {
+      throw new Error("Phone number must be at least 10 characters");
+    }
+
     try {
-      console.log('Adding staff with data:', staffData);
+      console.log('Adding staff with data:', {
+        ...staffData,
+        password: '[HIDDEN]' // Don't log password
+      });
+      
       const response = await fetch(`${API_BASE_URL}/organizations/add_staff/`, {
         method: "POST",
         headers: {
@@ -421,6 +449,8 @@ class OrganizationService {
         body: JSON.stringify(staffData),
       });
 
+      console.log('Staff addition response status:', response.status);
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Staff addition error:', {
@@ -428,9 +458,9 @@ class OrganizationService {
           statusText: response.statusText,
           errorText: errorText.substring(0, 500) // Log first 500 chars
         });
-        
+
         let errorMessage = "";
-        
+
         try {
           const errorData = JSON.parse(errorText);
           if (typeof errorData === 'object' && !errorData.message) {
@@ -468,11 +498,13 @@ class OrganizationService {
             errorMessage = `Server error (${response.status}): ${errorText.substring(0, 200)}`;
           }
         }
-        
+
         throw new Error(errorMessage || `Server error: ${response.status}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      console.log('Staff added successfully:', result);
+      return result;
     } catch (error: unknown) {
       console.error("Add staff error:", error);
       throw error;
