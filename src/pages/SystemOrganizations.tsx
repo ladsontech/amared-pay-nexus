@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Search, Filter, Building, Wallet, Users, Edit, Eye } from "lucide-react";
+import { Plus, Search, Filter, Building, Wallet, Users, Edit, Eye, RefreshCw, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { organizationService, Organization, CreateOrganizationRequest } from "@/services/organizationService";
 import { otpService } from "@/services/otpService";

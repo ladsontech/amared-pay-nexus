@@ -13,6 +13,9 @@ interface AuthContextType extends AuthState {
   hasPermission: (permission: Permission) => boolean;
   hasAnyPermission: (permissions: Permission[]) => boolean;
   isRole: (role: string) => boolean;
+  impersonateOrganization: (organizationId: string, organizationName: string) => void;
+  stopImpersonating: () => void;
+  isImpersonating: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,10 +34,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAuthenticated: false,
     loading: true,
   });
+  const [originalAdmin, setOriginalAdmin] = useState<User | null>(null);
 
   useEffect(() => {
     // Load user from localStorage
     const storedUser = localStorage.getItem('user');
+    const isImpersonating = localStorage.getItem('impersonating') === 'true';
+    
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
@@ -45,14 +51,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             isAuthenticated: true,
             loading: false,
           });
+          
+          // If impersonating, restore the original admin state
+          if (isImpersonating) {
+            const storedAdmin = localStorage.getItem('original_admin');
+            if (storedAdmin) {
+              try {
+                const adminUser = JSON.parse(storedAdmin);
+                setOriginalAdmin(adminUser);
+              } catch (e) {
+                console.error('Failed to parse original admin:', e);
+              }
+            }
+          }
         } else {
           // Invalid user data, clear localStorage
           localStorage.removeItem('user');
+          localStorage.removeItem('impersonating');
+          localStorage.removeItem('original_admin');
           setAuthState(prev => ({ ...prev, loading: false }));
         }
       } catch (error) {
         // Invalid JSON, clear localStorage
         localStorage.removeItem('user');
+        localStorage.removeItem('impersonating');
+        localStorage.removeItem('original_admin');
         setAuthState(prev => ({ ...prev, loading: false }));
       }
     } else {
@@ -202,7 +225,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const stopImpersonating = () => {
+    const storedAdmin = localStorage.getItem('original_admin');
+    if (storedAdmin) {
+      try {
+        const adminUser = JSON.parse(storedAdmin);
+        localStorage.setItem('user', JSON.stringify(adminUser));
+        setAuthState({
+          user: adminUser,
+          isAuthenticated: true,
+          loading: false,
+        });
+      } catch (e) {
+        console.error('Failed to restore admin user:', e);
+      }
+    }
+    
+    localStorage.removeItem('impersonating');
+    localStorage.removeItem('original_admin');
+    setOriginalAdmin(null);
+  };
+
+  const impersonateOrganization = (organizationId: string, organizationName: string) => {
+    const currentUser = authState.user;
+    if (!currentUser) return;
+    
+    // Check if user is super admin
+    if (currentUser.role !== 'admin' && !currentUser.isSuperuser) {
+      console.error('Only super admins can impersonate organizations');
+      return;
+    }
+
+    // Store original admin info
+    if (!originalAdmin) {
+      setOriginalAdmin(currentUser);
+    }
+
+    // Create impersonated user with owner permissions
+    const impersonatedUser: User = {
+      ...currentUser,
+      organizationId,
+      organization: {
+        id: organizationId,
+        name: organizationName,
+        description: organizationName,
+        industry: 'Finance'
+      },
+      role: 'owner',
+      position: 'Organization Owner',
+      permissions: rolePermissions.owner,
+      isSuperuser: false, // Temporarily hide admin status
+    };
+
+    localStorage.setItem('user', JSON.stringify(impersonatedUser));
+    localStorage.setItem('impersonating', 'true');
+    localStorage.setItem('original_admin', JSON.stringify(currentUser));
+    
+    setAuthState({
+      user: impersonatedUser,
+      isAuthenticated: true,
+      loading: false,
+    });
+  };
+
   const logout = async () => {
+    // If impersonating, return to admin dashboard
+    if (originalAdmin || localStorage.getItem('impersonating') === 'true') {
+      stopImpersonating();
+      return;
+    }
     await authService.logout();
     setAuthState({
       user: null,
@@ -241,6 +332,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return authState.user?.role === role;
   };
 
+  const isImpersonating = localStorage.getItem('impersonating') === 'true';
+
   return (
     <AuthContext.Provider
       value={{
@@ -254,6 +347,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         hasPermission,
         hasAnyPermission,
         isRole,
+        impersonateOrganization,
+        stopImpersonating,
+        isImpersonating,
       }}
     >
       {children}

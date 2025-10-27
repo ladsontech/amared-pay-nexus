@@ -5,14 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Building, Wallet, Users, Mail, Phone, Shield, Calendar } from "lucide-react";
+import { ArrowLeft, Building, Wallet, Users, Mail, Phone, Shield, Calendar, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { organizationService, Organization, Staff, Wallet as WalletType, WalletTransaction } from "@/services/organizationService";
 
 const SystemOrganizationView = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { impersonateOrganization } = useAuth();
   
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [staff, setStaff] = useState<Staff[]>([]);
@@ -114,7 +116,24 @@ const SystemOrganizationView = () => {
             <p className="text-sm text-muted-foreground">View and manage organization details</p>
           </div>
         </div>
-        <Badge className="bg-green-100 text-green-800">Active</Badge>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={() => {
+              impersonateOrganization(organization.id, organization.name);
+              toast({
+                title: "Impersonating Organization",
+                description: `Now viewing as ${organization.name}. You can make changes just like the organization owner.`,
+              });
+              setTimeout(() => navigate("/org/dashboard"), 500);
+            }}
+          >
+            <LogIn className="h-4 w-4 mr-2" />
+            Login as Organization
+          </Button>
+          <Badge className="bg-green-100 text-green-800">Active</Badge>
+        </div>
       </div>
 
       {/* Organization Details Cards */}

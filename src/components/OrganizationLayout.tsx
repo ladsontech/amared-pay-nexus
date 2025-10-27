@@ -1,24 +1,36 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
-import { Navigate } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Building, LogOut, Crown, User, CreditCard } from "lucide-react";
+import { Building, LogOut, Crown, User, CreditCard, Shield } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppOrgSidebar from "./AppOrgSidebar";
 import MobileBottomNav from "./MobileBottomNav";
 const OrganizationLayout = () => {
   const {
     user,
-    logout
+    logout,
+    isImpersonating,
+    stopImpersonating
   } = useAuth();
-  // Redirect system admins to the system dashboard
-  if (user?.role === 'admin') {
+  
+  // Redirect system admins to the system dashboard (unless impersonating)
+  if (user?.role === 'admin' && !isImpersonating) {
     return <Navigate to="/system/organizations" replace />;
   }
+
+  const handleLogout = async () => {
+    if (isImpersonating) {
+      stopImpersonating();
+      // Navigate to admin dashboard after stopping impersonation
+      window.location.href = '/system/organizations';
+    } else {
+      await logout();
+    }
+  };
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case "manager":
@@ -54,6 +66,12 @@ const OrganizationLayout = () => {
               </div>
 
               <div className="flex items-center gap-2">
+                {isImpersonating && (
+                  <Badge className="bg-orange-100 text-orange-800 border-orange-300">
+                    <Shield className="h-3 w-3 mr-1" />
+                    Impersonating
+                  </Badge>
+                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-blue-50 border-2 border-transparent hover:border-blue-200 transition-all duration-200">
@@ -68,6 +86,14 @@ const OrganizationLayout = () => {
                   <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-sm border-blue-200 shadow-xl" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-2 p-2">
+                        {isImpersonating && (
+                          <div className="mb-2 p-2 bg-orange-50 border border-orange-200 rounded-lg">
+                            <p className="text-xs font-semibold text-orange-800 flex items-center gap-1">
+                              <Shield className="h-3 w-3" />
+                              Viewing as Organization Owner
+                            </p>
+                          </div>
+                        )}
                         <p className="text-base font-bold leading-none text-slate-900">{user?.name || 'User'}</p>
                         <p className="text-sm leading-none text-slate-600 font-medium">{user?.email || 'No email'}</p>
                         {user?.department && <p className="text-sm leading-none text-slate-500 font-medium">{user.department}</p>}
@@ -79,10 +105,18 @@ const OrganizationLayout = () => {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="text-red-600 font-medium">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
+                    {isImpersonating && (
+                      <DropdownMenuItem onClick={handleLogout} className="text-orange-600 font-medium">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Return to Admin Dashboard</span>
+                      </DropdownMenuItem>
+                    )}
+                    {!isImpersonating && (
+                      <DropdownMenuItem onClick={handleLogout} className="text-red-600 font-medium">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
