@@ -52,16 +52,6 @@ export const API_CONFIG = {
       pettyCashFundRequests: '/organizations/petty_cash_fund_request/',
       pettyCashFundRequestDetail: (id: string) => `/organizations/petty_cash_fund_request/${id}/`
     },
-    otp: {
-      forgotPasswordEmail: '/otp/forgot_password/email/',
-      forgotPasswordSMS: '/otp/forgot_password/sms/',
-      resendEmail: '/otp/resend/email/',
-      resendSMS: '/otp/resend/sms/',
-      resetPasswordEmailCode: '/otp/reset_password/email_code/',
-      resetPasswordSMSCode: '/otp/reset_password/sms_code/',
-      verifyEmailAddress: '/otp/verify/email_address/',
-      verifyPhoneNumber: '/otp/verify/phone_number/'
-    },
     payments: {
       bulkPayment: {
         list: '/payments/bulk_payment/',
@@ -123,6 +113,17 @@ export const API_CONFIG = {
         verify: 'users/otp/verify/phone_number/',
         resetPassword: 'users/otp/reset_password/sms_code/'
       }
+    },
+    // Legacy OTP endpoints for backward compatibility
+    _otp: {
+      forgotPasswordEmail: '/otp/forgot_password/email/',
+      forgotPasswordSMS: '/otp/forgot_password/sms/',
+      resendEmail: '/otp/resend/email/',
+      resendSMS: '/otp/resend/sms/',
+      resetPasswordEmailCode: '/otp/reset_password/email_code/',
+      resetPasswordSMSCode: '/otp/reset_password/sms_code/',
+      verifyEmailAddress: '/otp/verify/email_address/',
+      verifyPhoneNumber: '/otp/verify/phone_number/'
     }
   }
 } as const;
