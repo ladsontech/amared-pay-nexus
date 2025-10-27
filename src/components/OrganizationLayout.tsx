@@ -1,11 +1,13 @@
 import React from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useOrganization } from "@/hooks/useOrganization";
+import { Organization as OrgType } from "@/types/auth";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Building, LogOut, Crown, User, CreditCard, Shield } from "lucide-react";
+import { Building, LogOut, Crown, User, CreditCard, Shield, Users } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppOrgSidebar from "./AppOrgSidebar";
 import MobileBottomNav from "./MobileBottomNav";
@@ -16,6 +18,7 @@ const OrganizationLayout = () => {
     isImpersonating,
     stopImpersonating
   } = useAuth();
+  const { activeStaff, totalStaff } = useOrganization();
   
   // Redirect system admins to the system dashboard (unless impersonating)
   if (user?.role === 'admin' && !isImpersonating) {
@@ -53,19 +56,35 @@ const OrganizationLayout = () => {
             <div className="container flex h-16 items-center justify-between px-6">
               <div className="flex items-center gap-4">
                 <SidebarTrigger className="md:ml-0" />
-                <img src="/images/Almaredpay_logo.png" alt="Alma Pay logo" className="h-12 w-auto object-contain" />
-                <div className="hidden sm:flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 shadow-md">
-                    <Building className="h-5 w-5 text-blue-600" />
+                {/* Organization Logo */}
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <img 
+                      src={(user?.organization as OrgType)?.logo || "/images/default-logo.png"} 
+                      alt={user?.organization?.name || 'Organization logo'} 
+                      className="h-12 w-12 rounded-lg object-cover border-2 border-blue-200"
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/default-logo.png';
+                      }}
+                    />
                   </div>
-                  <div>
-                    <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Organization</span>
-                    <p className="text-xs text-blue-600 font-medium">Financial Management</p>
+                  <div className="hidden sm:block">
+                    <h2 className="font-bold text-lg text-slate-900">{user?.organization?.name || 'Organization'}</h2>
+                    <p className="text-xs text-slate-600">Financial Management</p>
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
+                {/* Active Users Indicator */}
+                <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 border border-blue-200">
+                  <Users className="h-4 w-4 text-blue-600" />
+                  <div className="text-xs">
+                    <span className="font-semibold text-blue-900">{activeStaff}</span>
+                    <span className="text-blue-600 ml-1">active staff</span>
+                  </div>
+                </div>
+                
                 {isImpersonating && (
                   <Badge className="bg-orange-100 text-orange-800 border-orange-300">
                     <Shield className="h-3 w-3 mr-1" />

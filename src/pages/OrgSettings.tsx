@@ -19,7 +19,8 @@ import {
   Plus,
   Trash2,
   Edit,
-  Layout
+  Layout,
+  Upload
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -441,14 +442,58 @@ const OrgSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Logo Upload Section */}
+              <div className="space-y-4">
+                <Label>Organization Logo</Label>
+                <div className="flex items-start gap-4">
+                  <div className="relative">
+                    <img 
+                      src={user?.organization?.id ? `/api/organizations/${user.organization.id}/logo/` : '/images/default-logo.png'} 
+                      alt={user?.organization?.name || 'Organization logo'} 
+                      className="h-20 w-20 rounded-lg object-cover border-2 border-blue-200"
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/default-logo.png';
+                      }}
+                    />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <label htmlFor="logo-upload" className="cursor-pointer">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Upload Logo
+                      </label>
+                    </Button>
+                    <input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          // TODO: Implement logo upload
+                          toast({
+                            title: "Logo Upload",
+                            description: "Logo upload feature coming soon!",
+                          });
+                        }
+                      }}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      JPG, PNG or GIF. Max size 2MB. Recommended: 200x200px
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Organization Name</Label>
-                  <Input value="Tech Solutions Ltd" disabled />
+                  <Input value={user?.organization?.name || 'Tech Solutions Ltd'} disabled />
                 </div>
                 <div className="space-y-2">
                   <Label>Organization ID</Label>
-                  <Input value="ORG-001" disabled />
+                  <Input value={user?.organizationId || 'ORG-001'} disabled />
                 </div>
               </div>
 

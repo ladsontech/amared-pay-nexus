@@ -3,6 +3,7 @@ export interface Organization {
   name: string;
   description: string;
   industry: string;
+  logo?: string | null;
 }
 
 export interface User {
