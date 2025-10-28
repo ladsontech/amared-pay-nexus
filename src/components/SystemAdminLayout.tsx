@@ -15,6 +15,7 @@ import {
 import { Shield, LogOut, Crown } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSystemSidebar from "./AppSystemSidebar";
+import AdminMobileBottomNav from "./AdminMobileBottomNav";
 
 const SystemAdminLayout = () => {
   const { user, logout } = useAuth();
@@ -82,12 +83,15 @@ const SystemAdminLayout = () => {
           </header>
 
           {/* Main Content */}
-          <main className="flex-1 bg-gradient-to-br from-red-50/20 via-white to-slate-50/30">
+          <main className="flex-1 pb-16 md:pb-0 bg-gradient-to-br from-red-50/20 via-white to-slate-50/30">
             <div className="container py-8 px-6">
               <Outlet />
             </div>
           </main>
         </div>
+
+        {/* Mobile Bottom Navigation */}
+        <AdminMobileBottomNav />
       </div>
     </SidebarProvider>
   );

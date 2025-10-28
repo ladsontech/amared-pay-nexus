@@ -1,7 +1,8 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Building2, Users, Settings, Crown } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const adminItems = [
   { title: "Organizations", url: "/system/organizations", icon: Building2 },
@@ -12,7 +13,14 @@ const adminItems = [
 
 export default function AppSystemSidebar() {
   const location = useLocation();
+  const { setOpenMobile } = useSidebar();
+  const isMobile = useIsMobile();
   const isActive = (path: string) => location.pathname === path;
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <Sidebar className="w-64 border-r border-red-200/60 bg-gradient-to-b from-red-50/80 to-white/95 backdrop-blur-sm" collapsible="icon">
@@ -35,7 +43,7 @@ export default function AppSystemSidebar() {
                     isActive={isActive(item.url)}
                     className="hover:bg-red-50 data-[active=true]:bg-red-100 data-[active=true]:text-red-700 data-[active=true]:border-r-3 data-[active=true]:border-red-500 data-[active=true]:font-bold transition-all duration-200"
                   >
-                    <NavLink to={item.url} end>
+                    <NavLink to={item.url} end onClick={handleNavClick}>
                       <item.icon className="mr-3 h-5 w-5" />
                       <span className="font-semibold">{item.title}</span>
                     </NavLink>

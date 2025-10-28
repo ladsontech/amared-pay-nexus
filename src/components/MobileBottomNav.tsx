@@ -17,7 +17,20 @@ import { authService } from "@/services/authService";
 import { useAuth } from "@/contexts/AuthContext";
 import { Permission } from "@/types/auth";
 
-const MobileBottomNav = () => {
+type NavItem = {
+  path: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  show?: boolean;
+};
+
+interface MobileBottomNavProps {
+  items?: NavItem[];
+  extraActions?: React.ReactNode | ((closeDrawer: () => void) => React.ReactNode);
+  onLogout?: () => Promise<void> | void;
+}
+
+const MobileBottomNav = ({ items, extraActions, onLogout }: MobileBottomNavProps) => {
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { toast } = useToast();
@@ -25,9 +38,9 @@ const MobileBottomNav = () => {
   const { hasPermission } = useAuth();
 
   // Calculate available nav items based on permissions
-  const navItems = [
+  const navItems: NavItem[] = items ?? [
     { 
-      path: "/dashboard", 
+      path: "/org/dashboard", 
       icon: Home, 
       label: "Home", 
       show: true 
@@ -58,12 +71,16 @@ const MobileBottomNav = () => {
     }
   ];
 
-  const visibleNavItems = navItems.filter(item => item.show);
+  const visibleNavItems = navItems.filter(item => item.show !== false);
   const gridCols = Math.min(visibleNavItems.length + 1, 6); // +1 for More button, max 6 columns
 
   const handleLogout = async () => {
     try {
-      await authService.logout();
+      if (onLogout) {
+        await onLogout();
+      } else {
+        await authService.logout();
+      }
       toast({
         title: "Logged Out",
         description: "You have been successfully logged out."
@@ -117,6 +134,9 @@ const MobileBottomNav = () => {
           <div className="p-4 space-y-4">
             <h3 className="text-lg font-bold text-black">Quick Actions</h3>
             
+            {typeof extraActions === 'function' 
+              ? extraActions(() => setDrawerOpen(false))
+              : (extraActions ?? (
             <div className="grid grid-cols-2 gap-3">
               <button 
                 className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"
@@ -154,6 +174,7 @@ const MobileBottomNav = () => {
                 <p className="text-xs text-gray-500">Account settings</p>
               </button>
             </div>
+            )}
             
             <button 
               onClick={handleLogout}
