@@ -1,0 +1,130 @@
+{
+  "name": "Alma Pay - Bulk Payment System",
+  "short_name": "Alma Pay",
+  "description": "Advanced Bulk Payment System for Organizations. Secure, efficient, and scalable payment processing solution.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "id": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    {
+      "src": "/images/Almaredpay_logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/Almaredpay_logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/pay_safe.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Alma Pay Dashboard"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Bulk Payments",
+      "short_name": "Bulk Pay",
+      "description": "Create and manage bulk payments",
+      "url": "/org/bulk-payments",
+      "icons": [
+        {
+          "src": "/images/Almaredpay_logo.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Collections",
+      "short_name": "Collect",
+      "description": "Manage payment collections",
+      "url": "/org/collections",
+      "icons": [
+        {
+          "src": "/images/Almaredpay_logo.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Petty Cash",
+      "short_name": "Petty",
+      "description": "Manage petty cash transactions",
+      "url": "/org/petty-cash",
+      "icons": [
+        {
+          "src": "/images/Almaredpay_logo.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "short_name": "Reports",
+      "description": "View financial reports",
+      "url": "/org/reports",
+      "icons": [
+        {
+          "src": "/images/Almaredpay_logo.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/org/bulk-payments",
+      "accept": {
+        "text/csv": [".csv"],
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+        "application/vnd.ms-excel": [".xls"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+almapay",
+      "url": "/?action=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/org/bulk-payments",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "file",
+          "accept": ["text/csv", ".csv", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx"]
+        }
+      ]
+    }
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "prefer_related_applications": false,
+  "related_applications": []
+}
+

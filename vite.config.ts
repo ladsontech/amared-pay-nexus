@@ -68,6 +68,8 @@ export default defineConfig(({ mode }) => ({
     },
     sourcemap: mode !== 'production',
     minify: 'esbuild',
+    // Ensure service worker and manifest are copied
+    copyPublicDir: true,
   },
   esbuild: {
     drop: mode === 'production' ? ['console', 'debugger'] : [],
