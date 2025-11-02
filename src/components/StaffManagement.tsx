@@ -125,7 +125,7 @@ export const StaffManagement = () => {
             <h2 className="text-xl font-semibold text-slate-900">Staff Management</h2>
             <p className="text-sm text-muted-foreground">Manage your organization's staff members and their roles</p>
           </div>
-          {user?.role === 'owner' && (
+          {(user?.role === 'owner' || user?.isSuperuser) && (
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Add Staff Member
@@ -181,21 +181,27 @@ export const StaffManagement = () => {
                         </div>
                       </div>
                     </div>
-                    {user?.role === 'owner' && member.role !== 'owner' && (
+                    {(user?.role === 'owner' || user?.isSuperuser) && (
                       <div className="flex items-center space-x-2">
-                        <Button variant="outline" size="sm" onClick={() => setEditOpen(member)}>
-                          <Edit className="h-4 w-4 mr-1" />
-                          Change Role
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-600 hover:text-red-700"
-                          onClick={() => setDeleteConfirm(member)}
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          Remove
-                        </Button>
+                        {(member.role !== 'owner' || user?.isSuperuser) && (
+                          <>
+                            <Button variant="outline" size="sm" onClick={() => setEditOpen(member)}>
+                              <Edit className="h-4 w-4 mr-1" />
+                              Change Role
+                            </Button>
+                            {member.role !== 'owner' && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-red-600 hover:text-red-700"
+                                onClick={() => setDeleteConfirm(member)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-1" />
+                                Remove
+                              </Button>
+                            )}
+                          </>
+                        )}
                       </div>
                     )}
                   </div>

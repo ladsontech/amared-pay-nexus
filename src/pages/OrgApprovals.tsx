@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,84 +20,264 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PageHeader from "@/components/PageHeader";
+import { useAuth } from "@/contexts/AuthContext";
+import { organizationService, PettyCashExpense, PettyCashFundRequest, BillPayment } from "@/services/organizationService";
+
+interface ApprovalItem {
+  id: string;
+  type: 'transaction' | 'funding' | 'bill';
+  requester: string;
+  amount: number;
+  description: string;
+  date: string;
+  category?: string;
+  receipt?: string;
+  department?: string;
+  currentBalance?: number;
+  requestedBalance?: number;
+  originalData: PettyCashExpense | PettyCashFundRequest | BillPayment;
+}
 
 const OrgApprovals = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [pendingTransactions, setPendingTransactions] = useState<ApprovalItem[]>([]);
+  const [pendingFunding, setPendingFunding] = useState<ApprovalItem[]>([]);
+  const [pendingBills, setPendingBills] = useState<ApprovalItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const pendingTransactions = [
-    {
-      id: '1',
-      type: 'Petty Cash',
-      requester: 'John Doe',
-      amount: 125000,
-      description: 'Office supplies purchase',
-      date: '2024-01-20',
-      category: 'Office Supplies',
-      receipt: 'receipt_001.pdf',
-      department: 'Operations'
-    },
-    {
-      id: '2',
-      type: 'Petty Cash',
-      requester: 'Jane Smith',
-      amount: 75000,
-      description: 'Client meeting refreshments',
-      date: '2024-01-20',
-      category: 'Entertainment',
-      receipt: 'receipt_002.jpg',
-      department: 'Sales'
-    },
-    {
-      id: '3',
-      type: 'Petty Cash',
-      requester: 'Bob Wilson',
-      amount: 200000,
-      description: 'Emergency office repairs',
-      date: '2024-01-19',
-      category: 'Maintenance',
-      receipt: 'receipt_003.pdf',
-      department: 'Facilities'
+  useEffect(() => {
+    const fetchApprovals = async () => {
+      if (!user?.organizationId) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+
+        // Fetch petty cash wallet
+        const walletsResponse = await organizationService.getPettyCashWallets({
+          organization: user.organizationId,
+          limit: 1
+        });
+
+        const walletId = walletsResponse.results.length > 0 ? walletsResponse.results[0].id : null;
+        const transactions: ApprovalItem[] = [];
+        const funding: ApprovalItem[] = [];
+
+        if (walletId) {
+          // Fetch pending expenses
+          const expensesResponse = await organizationService.getPettyCashExpenses({
+            petty_cash_wallet: walletId,
+            limit: 100
+          });
+
+          expensesResponse.results.forEach(expense => {
+            if (!expense.is_approved) {
+              transactions.push({
+                id: expense.id,
+                type: 'transaction',
+                requester: expense.requestor_name || (expense.updated_by?.first_name && expense.updated_by?.last_name
+                  ? `${expense.updated_by.first_name} ${expense.updated_by.last_name}`
+                  : expense.updated_by?.username || "Unknown"),
+                amount: expense.amount,
+                description: expense.description || "Petty cash expense",
+                date: expense.created_at.split('T')[0],
+                category: expense.category || "Other",
+                receipt: expense.receipt_number,
+                department: "Operations",
+                originalData: expense
+              });
+            }
+          });
+
+          // Fetch pending fund requests
+          const fundRequestsResponse = await organizationService.getPettyCashFundRequests({
+            petty_cash_wallet: walletId,
+            limit: 100
+          });
+
+          fundRequestsResponse.results.forEach(fundRequest => {
+            if (!fundRequest.is_approved) {
+              const currentBalance = fundRequest.petty_cash_wallet.balance || 0;
+              funding.push({
+                id: fundRequest.id,
+                type: 'funding',
+                requester: fundRequest.requestor_name || (fundRequest.updated_by?.first_name && fundRequest.updated_by?.last_name
+                  ? `${fundRequest.updated_by.first_name} ${fundRequest.updated_by.last_name}`
+                  : fundRequest.updated_by?.username || "Unknown"),
+                amount: fundRequest.amount,
+                description: fundRequest.reason || "Petty cash fund request",
+                date: fundRequest.created_at.split('T')[0],
+                currentBalance,
+                requestedBalance: currentBalance + fundRequest.amount,
+                department: "Finance",
+                originalData: fundRequest
+              });
+            }
+          });
+        }
+
+        // Fetch pending bill payments
+        const billPaymentsResponse = await organizationService.getBillPayments({
+          organization: user.organizationId,
+          status: "pending",
+          limit: 100
+        });
+
+        const bills: ApprovalItem[] = [];
+        billPaymentsResponse.results.forEach(bill => {
+          if (bill.status === "pending") {
+            bills.push({
+              id: bill.id,
+              type: 'bill',
+              requester: "System",
+              amount: bill.amount,
+              description: `${bill.biller_name} - ${bill.account_number}`,
+              date: bill.created_at.split('T')[0],
+              category: bill.type || "Bill Payment",
+              department: "Finance",
+              originalData: bill
+            });
+          }
+        });
+
+        setPendingTransactions(transactions);
+        setPendingFunding(funding);
+        setPendingBills(bills);
+      } catch (error) {
+        console.error("Error fetching approvals:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load pending approvals. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchApprovals();
+  }, [user?.organizationId]);
+
+  const handleApprove = async (id: string, type: 'transaction' | 'funding' | 'bill') => {
+    try {
+      const allItems = [...pendingTransactions, ...pendingFunding, ...pendingBills];
+      const item = allItems.find(i => i.id === id);
+      if (!item) return;
+
+      if (type === 'transaction') {
+        const expense = item.originalData as PettyCashExpense;
+        await organizationService.updatePettyCashExpense(expense.id, {
+          is_approved: true,
+          amount: expense.amount,
+          category: expense.category,
+          description: expense.description,
+          receipt_number: expense.receipt_number,
+          requestor_name: expense.requestor_name,
+          requestor_phone_number: expense.requestor_phone_number
+        });
+        setPendingTransactions(prev => prev.filter(t => t.id !== id));
+      } else if (type === 'funding') {
+        const fundRequest = item.originalData as PettyCashFundRequest;
+        await organizationService.updatePettyCashFundRequest(fundRequest.id, {
+          is_approved: true,
+          amount: fundRequest.amount,
+          urgency_level: fundRequest.urgency_level,
+          reason: fundRequest.reason,
+          requestor_name: fundRequest.requestor_name,
+          requestor_phone_number: fundRequest.requestor_phone_number
+        });
+        setPendingFunding(prev => prev.filter(f => f.id !== id));
+      } else if (type === 'bill') {
+        const bill = item.originalData as BillPayment;
+        await organizationService.updateBillPayment(bill.id, {
+          organization: bill.organization.id,
+          currency: bill.currency.id,
+          biller_name: bill.biller_name,
+          account_number: bill.account_number,
+          amount: bill.amount,
+          status: "successful",
+          type: bill.type,
+          wallet_type: bill.wallet_type,
+          reference: bill.reference
+        });
+        setPendingBills(prev => prev.filter(b => b.id !== id));
+      }
+
+      toast({
+        title: "Approved",
+        description: `${type === 'transaction' ? 'Transaction' : type === 'funding' ? 'Funding request' : 'Bill payment'} has been approved successfully.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to approve request. Please try again.",
+        variant: "destructive",
+      });
     }
-  ];
-
-  const pendingFunding = [
-    {
-      id: 'f1',
-      requester: 'Finance Team',
-      amount: 2000000,
-      description: 'Monthly petty cash replenishment',
-      date: '2024-01-20',
-      currentBalance: 250000,
-      requestedBalance: 2250000,
-      department: 'Finance'
-    },
-    {
-      id: 'f2',
-      requester: 'Operations',
-      amount: 500000,
-      description: 'Additional budget for Q1 activities',
-      date: '2024-01-19',
-      currentBalance: 100000,
-      requestedBalance: 600000,
-      department: 'Operations'
-    }
-  ];
-
-  const handleApprove = (id: string, type: 'transaction' | 'funding') => {
-    toast({
-      title: "Approved",
-      description: `${type === 'transaction' ? 'Transaction' : 'Funding request'} has been approved successfully.`,
-    });
   };
 
-  const handleReject = (id: string, type: 'transaction' | 'funding') => {
-    toast({
-      title: "Rejected", 
-      description: `${type === 'transaction' ? 'Transaction' : 'Funding request'} has been rejected.`,
-      variant: "destructive",
-    });
+  const handleReject = async (id: string, type: 'transaction' | 'funding' | 'bill') => {
+    try {
+      const allItems = [...pendingTransactions, ...pendingFunding, ...pendingBills];
+      const item = allItems.find(i => i.id === id);
+      if (!item) return;
+
+      if (type === 'transaction') {
+        const expense = item.originalData as PettyCashExpense;
+        await organizationService.updatePettyCashExpense(expense.id, {
+          is_approved: false,
+          amount: expense.amount,
+          category: expense.category,
+          description: expense.description,
+          receipt_number: expense.receipt_number,
+          requestor_name: expense.requestor_name,
+          requestor_phone_number: expense.requestor_phone_number
+        });
+        setPendingTransactions(prev => prev.filter(t => t.id !== id));
+      } else if (type === 'funding') {
+        const fundRequest = item.originalData as PettyCashFundRequest;
+        await organizationService.updatePettyCashFundRequest(fundRequest.id, {
+          is_approved: false,
+          amount: fundRequest.amount,
+          urgency_level: fundRequest.urgency_level,
+          reason: fundRequest.reason,
+          requestor_name: fundRequest.requestor_name,
+          requestor_phone_number: fundRequest.requestor_phone_number
+        });
+        setPendingFunding(prev => prev.filter(f => f.id !== id));
+      } else if (type === 'bill') {
+        const bill = item.originalData as BillPayment;
+        await organizationService.updateBillPayment(bill.id, {
+          organization: bill.organization.id,
+          currency: bill.currency.id,
+          biller_name: bill.biller_name,
+          account_number: bill.account_number,
+          amount: bill.amount,
+          status: "failed",
+          type: bill.type,
+          wallet_type: bill.wallet_type,
+          reference: bill.reference
+        });
+        setPendingBills(prev => prev.filter(b => b.id !== id));
+      }
+
+      toast({
+        title: "Rejected", 
+        description: `${type === 'transaction' ? 'Transaction' : type === 'funding' ? 'Funding request' : 'Bill payment'} has been rejected.`,
+        variant: "destructive",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reject request. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredTransactions = pendingTransactions.filter(transaction =>
@@ -135,7 +315,7 @@ const OrgApprovals = () => {
       />
 
       <Tabs defaultValue="transactions" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 h-auto">
+        <TabsList className="grid w-full grid-cols-3 h-auto">
           <TabsTrigger value="transactions" className="relative">
             Transaction Approvals
             <Badge variant="secondary" className="ml-2">
@@ -148,11 +328,23 @@ const OrgApprovals = () => {
               {pendingFunding.length}
             </Badge>
           </TabsTrigger>
+          <TabsTrigger value="bills" className="relative">
+            Bill Payments
+            <Badge variant="secondary" className="ml-2">
+              {pendingBills.length}
+            </Badge>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="transactions">
-          <div className="grid gap-4">
-            {filteredTransactions.map((transaction) => (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-sm text-muted-foreground mt-2">Loading approvals...</p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {filteredTransactions.map((transaction) => (
               <Card key={transaction.id}>
                 <CardContent className="p-6">
                   <div className="flex flex-col lg:flex-row justify-between gap-4">
@@ -230,23 +422,30 @@ const OrgApprovals = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
-            
-            {filteredTransactions.length === 0 && (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium">No pending transactions</h3>
-                  <p className="text-muted-foreground">All transaction requests have been processed.</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+              ))}
+              
+              {filteredTransactions.length === 0 && (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-medium">No pending transactions</h3>
+                    <p className="text-muted-foreground">All transaction requests have been processed.</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="funding">
-          <div className="grid gap-4">
-            {filteredFunding.map((funding) => (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-sm text-muted-foreground mt-2">Loading approvals...</p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {filteredFunding.map((funding) => (
               <Card key={funding.id}>
                 <CardContent className="p-6">
                   <div className="flex flex-col lg:flex-row justify-between gap-4">
@@ -326,18 +525,108 @@ const OrgApprovals = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
-            
-            {filteredFunding.length === 0 && (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <Wallet className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium">No pending funding requests</h3>
-                  <p className="text-muted-foreground">All funding requests have been processed.</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+              ))}
+              
+              {filteredFunding.length === 0 && (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <Wallet className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-medium">No pending funding requests</h3>
+                    <p className="text-muted-foreground">All funding requests have been processed.</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="bills">
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-sm text-muted-foreground mt-2">Loading approvals...</p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {pendingBills.filter(bill =>
+                bill.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                bill.category?.toLowerCase().includes(searchTerm.toLowerCase())
+              ).map((bill) => (
+                <Card key={bill.id}>
+                  <CardContent className="p-6">
+                    <div className="flex flex-col lg:flex-row justify-between gap-4">
+                      <div className="flex-1 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                              <DollarSign className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold">Bill Payment</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {bill.requester} • {bill.department}
+                              </p>
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="text-orange-600 bg-orange-50">
+                            Pending
+                          </Badge>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <Label className="text-muted-foreground">Amount</Label>
+                            <p className="font-medium">UGX {bill.amount.toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <Label className="text-muted-foreground">Category</Label>
+                            <p className="font-medium">{bill.category}</p>
+                          </div>
+                          <div>
+                            <Label className="text-muted-foreground">Date</Label>
+                            <p className="font-medium">{bill.date}</p>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-muted-foreground">Description</Label>
+                          <p className="font-medium">{bill.description}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col gap-2 lg:w-48">
+                        <Button 
+                          onClick={() => handleApprove(bill.id, 'bill')}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Approve
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => handleReject(bill.id, 'bill')}
+                          className="text-red-600 border-red-600 hover:bg-red-50"
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Reject
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              {pendingBills.length === 0 && (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-medium">No pending bill payments</h3>
+                    <p className="text-muted-foreground">All bill payment requests have been processed.</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

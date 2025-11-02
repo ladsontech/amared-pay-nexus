@@ -468,13 +468,88 @@ const OrgSettings = () => {
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const file = e.target.files?.[0];
-                        if (file) {
-                          // TODO: Implement logo upload
+                        if (!file) return;
+
+                        // Validate file size (2MB)
+                        if (file.size > 2 * 1024 * 1024) {
                           toast({
-                            title: "Logo Upload",
-                            description: "Logo upload feature coming soon!",
+                            title: "File too large",
+                            description: "Logo must be less than 2MB",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+
+                        // Validate file type
+                        if (!file.type.startsWith('image/')) {
+                          toast({
+                            title: "Invalid file type",
+                            description: "Please upload an image file",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+
+                        try {
+                          const formData = new FormData();
+                          formData.append('logo', file);
+
+                          // Get organization ID
+                          const orgId = user?.organization?.id || user?.organizationId;
+                          if (!orgId) {
+                            throw new Error("Organization ID not found");
+                          }
+
+                          const accessToken = localStorage.getItem("access_token");
+                          const API_BASE_URL = "https://bulksrv.almaredagencyuganda.com";
+
+                          const response = await fetch(`${API_BASE_URL}/organizations/org/${orgId}/`, {
+                            method: "PATCH",
+                            headers: {
+                              ...(accessToken ? { "Authorization": `Bearer ${accessToken}` } : {}),
+                            },
+                            body: formData,
+                          });
+
+                          if (!response.ok) {
+                            // If PATCH doesn't work, try PUT with form data
+                            const putResponse = await fetch(`${API_BASE_URL}/organizations/org/${orgId}/`, {
+                              method: "PUT",
+                              headers: {
+                                ...(accessToken ? { "Authorization": `Bearer ${accessToken}` } : {}),
+                              },
+                              body: formData,
+                            });
+
+                            if (!putResponse.ok) {
+                              const errorData = await putResponse.json().catch(() => ({}));
+                              throw new Error(errorData.message || `Failed to upload logo: ${putResponse.status}`);
+                            }
+
+                            const updatedOrg = await putResponse.json();
+                            toast({
+                              title: "Logo uploaded",
+                              description: "Organization logo has been updated successfully",
+                            });
+                            // Refresh page to show new logo
+                            window.location.reload();
+                          } else {
+                            const updatedOrg = await response.json();
+                            toast({
+                              title: "Logo uploaded",
+                              description: "Organization logo has been updated successfully",
+                            });
+                            // Refresh page to show new logo
+                            window.location.reload();
+                          }
+                        } catch (error: any) {
+                          console.error("Logo upload error:", error);
+                          toast({
+                            title: "Upload failed",
+                            description: error.message || "Failed to upload logo. Please try again.",
+                            variant: "destructive",
                           });
                         }
                       }}

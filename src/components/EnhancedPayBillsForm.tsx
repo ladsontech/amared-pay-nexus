@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { organizationService } from '@/services/organizationService';
 
 interface EnhancedPayBillsFormProps {
   isOpen: boolean;
@@ -45,6 +47,7 @@ interface BillProvider {
 
 const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onClose }) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedProvider, setSelectedProvider] = useState<string>('');
   const [accountNumber, setAccountNumber] = useState('');
@@ -52,6 +55,44 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
   const [paymentSource, setPaymentSource] = useState<'wallet' | 'petty-cash'>('wallet');
   const [isProcessing, setIsProcessing] = useState(false);
   const [customerInfo, setCustomerInfo] = useState<any>(null);
+  const [balances, setBalances] = useState({ wallet: 0, 'petty-cash': 0 });
+  const [isLoadingBalances, setIsLoadingBalances] = useState(false);
+
+  useEffect(() => {
+    const fetchBalances = async () => {
+      if (!user?.organizationId || !isOpen) return;
+
+      try {
+        setIsLoadingBalances(true);
+
+        // Fetch main wallet
+        const walletsResponse = await organizationService.getWallets({
+          organization: user.organizationId,
+          limit: 1
+        });
+
+        if (walletsResponse.results.length > 0) {
+          setBalances(prev => ({ ...prev, wallet: walletsResponse.results[0].balance || 0 }));
+        }
+
+        // Fetch petty cash wallet
+        const pettyCashWalletsResponse = await organizationService.getPettyCashWallets({
+          organization: user.organizationId,
+          limit: 1
+        });
+
+        if (pettyCashWalletsResponse.results.length > 0) {
+          setBalances(prev => ({ ...prev, 'petty-cash': pettyCashWalletsResponse.results[0].balance || 0 }));
+        }
+      } catch (error) {
+        console.error("Error fetching balances:", error);
+      } finally {
+        setIsLoadingBalances(false);
+      }
+    };
+
+    fetchBalances();
+  }, [user?.organizationId, isOpen]);
 
   const billCategories: BillCategory[] = [
     {
@@ -111,11 +152,6 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
     }
   ];
 
-  const balances = {
-    wallet: 2500000,
-    'petty-cash': 850000
-  };
-
   const selectedCategoryData = billCategories.find(cat => cat.id === selectedCategory);
   const selectedProviderData = selectedCategoryData?.providers.find(prov => prov.id === selectedProvider);
 
@@ -164,8 +200,55 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
     setIsProcessing(true);
 
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      if (!user?.organizationId) {
+        throw new Error("Organization ID not found");
+      }
+
+      // Get currency from wallet
+      const walletsResponse = await organizationService.getWallets({
+        organization: user.organizationId,
+        limit: 1
+      });
+
+      if (walletsResponse.results.length === 0) {
+        throw new Error("No wallet found for organization");
+      }
+
+      const currencyId = walletsResponse.results[0].currency.id;
+      const walletId = walletsResponse.results[0].id;
+
+      // Get petty cash wallet if using petty cash
+      let pettyCashWalletId: string | undefined;
+      if (paymentSource === 'petty-cash') {
+        const pettyCashWalletsResponse = await organizationService.getPettyCashWallets({
+          organization: user.organizationId,
+          limit: 1
+        });
+        if (pettyCashWalletsResponse.results.length > 0) {
+          pettyCashWalletId = pettyCashWalletsResponse.results[0].id;
+        }
+      }
+
+      // Map category to bill type
+      const billTypeMap: Record<string, "electricity" | "water" | "internet" | "airtime" | undefined> = {
+        'airtime': 'airtime',
+        'utilities': selectedProvider === 'umeme' ? 'electricity' : selectedProvider === 'nwsc' ? 'water' : undefined,
+      };
+
+      const billType = billTypeMap[selectedCategory] || undefined;
+
+      // Create bill payment
+      await organizationService.createBillPayment({
+        organization: user.organizationId,
+        currency: currencyId,
+        biller_name: selectedProviderData?.name || selectedCategoryData?.name || "",
+        account_number: accountNumber,
+        amount: numAmount,
+        status: "pending",
+        type: billType,
+        wallet_type: paymentSource === 'wallet' ? 'main_wallet' : 'petty_cash_wallet',
+        reference: `${selectedProvider || selectedCategory}-${Date.now()}`
+      });
       
       toast({
         title: "Payment Sent for Approval",
@@ -179,10 +262,10 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
       setAmount('');
       setCustomerInfo(null);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Payment Failed",
-        description: "There was an error processing your payment. Please try again.",
+        description: error.message || "There was an error processing your payment. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -219,7 +302,9 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
                     <span>Main Wallet</span>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold">UGX {balances.wallet.toLocaleString()}</div>
+                    <div className="font-bold">
+                      {isLoadingBalances ? 'Loading...' : `UGX ${balances.wallet.toLocaleString()}`}
+                    </div>
                   </div>
                 </Button>
                 <Button
@@ -232,7 +317,9 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
                     <span>Petty Cash</span>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold">UGX {balances['petty-cash'].toLocaleString()}</div>
+                    <div className="font-bold">
+                      {isLoadingBalances ? 'Loading...' : `UGX ${balances['petty-cash'].toLocaleString()}`}
+                    </div>
                   </div>
                 </Button>
               </div>

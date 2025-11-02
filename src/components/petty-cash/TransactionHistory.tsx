@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -7,92 +7,142 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Receipt, Check, Eye, Printer, Filter, Search } from "lucide-react";
 import TransactionDetailModal from "./TransactionDetailModal";
+import { useAuth } from "@/contexts/AuthContext";
+import { organizationService, PettyCashTransaction, PettyCashExpense } from "@/services/organizationService";
+import { useToast } from "@/hooks/use-toast";
+
+interface TransactionItem {
+  id: string;
+  date: string;
+  type: "expense" | "addition";
+  amount: number;
+  description: string;
+  category: string;
+  receipt?: string;
+  status: "approved" | "pending" | "rejected";
+  approvedBy?: string;
+  payee?: string;
+  paymentMethod?: string;
+  referenceNo?: string;
+  location?: string;
+  memo?: string;
+}
 
 const TransactionHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterDateRange, setFilterDateRange] = useState("all");
-  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [transactions, setTransactions] = useState<TransactionItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
-  // Enhanced mock transaction data
-  const transactions = [
-    {
-      id: "TXN001",
-      date: "2024-06-12",
-      type: "expense",
-      amount: 2500,
-      description: "Office supplies - printer paper",
-      category: "Office Supplies",
-      receipt: "RCP001",
-      status: "approved",
-      approvedBy: "John Doe",
-      payee: "Office Depot Uganda",
-      paymentMethod: "Cash",
-      referenceNo: "811",
-      location: "Kampala Branch",
-      memo: "Monthly office supplies purchase for admin department"
-    },
-    {
-      id: "TXN002",
-      date: "2024-06-11",
-      type: "addition",
-      amount: 50000,
-      description: "Monthly petty cash addition",
-      category: "Cash Addition",
-      receipt: "ADD001",
-      status: "approved",
-      approvedBy: "Jane Smith",
-      payee: "Finance Department",
-      paymentMethod: "Bank Transfer",
-      referenceNo: "ADN002",
-      location: "Head Office"
-    },
-    {
-      id: "TXN003",
-      date: "2024-06-10",
-      type: "expense",
-      amount: 5000,
-      description: "Transport for office errands",
-      category: "Travel & Transport",
-      receipt: "RCP002",
-      status: "pending",
-      approvedBy: "",
-      payee: "Uber Uganda",
-      paymentMethod: "Mobile Money",
-      referenceNo: "UB789",
-      memo: "Transportation for document delivery"
-    },
-    {
-      id: "TXN004",
-      date: "2024-06-09",
-      type: "expense",
-      amount: 1200,
-      description: "Tea and coffee for meeting",
-      category: "Meals & Entertainment",
-      receipt: "RCP003",
-      status: "approved",
-      approvedBy: "John Doe",
-      payee: "Java House",
-      paymentMethod: "Cash",
-      referenceNo: "JH456"
-    },
-    {
-      id: "TXN005",
-      date: "2024-06-08",
-      type: "expense",
-      amount: 15000,
-      description: "Maintenance and repairs",
-      category: "Maintenance",
-      receipt: "RCP004",
-      status: "approved",
-      approvedBy: "Jane Smith",
-      payee: "Fix-It Services",
-      paymentMethod: "Cash",
-      referenceNo: "FX123"
-    }
-  ];
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!user?.organizationId) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+
+        // Fetch petty cash wallet
+        const walletsResponse = await organizationService.getPettyCashWallets({
+          organization: user.organizationId,
+          limit: 1
+        });
+
+        if (walletsResponse.results.length === 0) {
+          setTransactions([]);
+          setIsLoading(false);
+          return;
+        }
+
+        const walletId = walletsResponse.results[0].id;
+
+        // Fetch transactions
+        const transactionsResponse = await organizationService.getPettyCashTransactions({
+          petty_cash_wallet: walletId,
+          limit: 100
+        });
+
+        // Fetch expenses
+        const expensesResponse = await organizationService.getPettyCashExpenses({
+          petty_cash_wallet: walletId,
+          limit: 100
+        });
+
+        // Combine and format
+        const formattedTransactions: TransactionItem[] = [];
+
+        // Add transactions
+        transactionsResponse.results.forEach(transaction => {
+          const date = new Date(transaction.created_at);
+          formattedTransactions.push({
+            id: transaction.id,
+            date: date.toISOString().split('T')[0],
+            type: transaction.type === "credit" ? "addition" : "expense",
+            amount: Math.abs(transaction.amount),
+            description: transaction.title || `${transaction.type === "credit" ? "Cash addition" : "Expense"}`,
+            category: transaction.type === "credit" ? "Cash Addition" : "Expense",
+            receipt: undefined,
+            status: transaction.status === "approved" ? "approved" : transaction.status === "rejected" ? "rejected" : "pending",
+            approvedBy: transaction.status === "approved" ? (transaction.updated_by?.first_name && transaction.updated_by?.last_name 
+              ? `${transaction.updated_by.first_name} ${transaction.updated_by.last_name}`
+              : transaction.updated_by?.username) : undefined,
+            payee: undefined,
+            paymentMethod: undefined,
+            referenceNo: transaction.id.substring(0, 8).toUpperCase(),
+            memo: transaction.title || undefined
+          });
+        });
+
+        // Add expenses
+        expensesResponse.results.forEach(expense => {
+          const date = new Date(expense.created_at);
+          formattedTransactions.push({
+            id: expense.id,
+            date: date.toISOString().split('T')[0],
+            type: "expense",
+            amount: expense.amount,
+            description: expense.description || "Petty cash expense",
+            category: expense.category || "Other",
+            receipt: expense.receipt_number || undefined,
+            status: expense.is_approved ? "approved" : "pending",
+            approvedBy: expense.is_approved && expense.approved_by 
+              ? (expense.approved_by.first_name && expense.approved_by.last_name
+                ? `${expense.approved_by.first_name} ${expense.approved_by.last_name}`
+                : expense.approved_by.username)
+              : undefined,
+            payee: expense.requestor_name || undefined,
+            paymentMethod: "Cash",
+            referenceNo: expense.id.substring(0, 8).toUpperCase(),
+            memo: expense.description || undefined
+          });
+        });
+
+        // Sort by date (newest first)
+        formattedTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+        setTransactions(formattedTransactions);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load transaction history. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, [user?.organizationId]);
 
   const categories = [
     "Office Supplies",
@@ -327,7 +377,13 @@ const TransactionHistory = () => {
 
           {/* Mobile Transaction List */}
           <div className="md:hidden space-y-3">
-            {filteredTransactions.map((transaction) => (
+            {isLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="text-sm text-muted-foreground mt-2">Loading transactions...</p>
+              </div>
+            ) : (
+              filteredTransactions.map((transaction) => (
               <div key={transaction.id} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -352,75 +408,77 @@ const TransactionHistory = () => {
                   </Button>
                 </div>
               </div>
-            ))}
+            )))}
           </div>
 
           {/* Desktop Table */}
           <div className="hidden md:block">
-            <div className="rounded-lg border border-gray-200 overflow-hidden">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gray-50">
-                      <TableHead className="font-semibold text-black">Date</TableHead>
-                      <TableHead className="font-semibold text-black">ID</TableHead>
-                      <TableHead className="font-semibold text-black">Description</TableHead>
-                      <TableHead className="font-semibold text-black">Payee</TableHead>
-                      <TableHead className="font-semibold text-black">Category</TableHead>
-                      <TableHead className="font-semibold text-black">Amount</TableHead>
-                      <TableHead className="font-semibold text-black">Receipt</TableHead>
-                      <TableHead className="font-semibold text-black">Status</TableHead>
-                      <TableHead className="font-semibold text-black">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredTransactions.map((transaction) => (
-                      <TableRow key={transaction.id} className="hover:bg-gray-50">
-                        <TableCell className="text-black">{transaction.date}</TableCell>
-                        <TableCell className="font-medium text-black">{transaction.id}</TableCell>
-                        <TableCell className="text-black">{transaction.description}</TableCell>
-                        <TableCell className="text-black">{transaction.payee || "-"}</TableCell>
-                        <TableCell className="text-black">{transaction.category}</TableCell>
-                        <TableCell className={transaction.type === "expense" ? "text-red-600" : "text-green-600"}>
-                          {transaction.type === "expense" ? "-" : "+"}UGX {transaction.amount.toLocaleString()}
-                        </TableCell>
-                        <TableCell>
-                          {transaction.receipt ? (
-                            <div className="flex items-center gap-1">
-                              <Receipt className="h-4 w-4" />
-                              {transaction.receipt}
-                            </div>
-                          ) : (
-                            "-"
-                          )}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(transaction.status)}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleViewTransaction(transaction)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white border-0"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            {transaction.status === "pending" && (
-                              <Button variant="outline" size="sm" className="text-green-600 border-green-200">
-                                <Check className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+            {isLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="text-sm text-muted-foreground mt-2">Loading transactions...</p>
               </div>
-            </div>
+            ) : (
+              <div className="rounded-lg border border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gray-50">
+                        <TableHead className="font-semibold text-black">Date</TableHead>
+                        <TableHead className="font-semibold text-black">ID</TableHead>
+                        <TableHead className="font-semibold text-black">Description</TableHead>
+                        <TableHead className="font-semibold text-black">Payee</TableHead>
+                        <TableHead className="font-semibold text-black">Category</TableHead>
+                        <TableHead className="font-semibold text-black">Amount</TableHead>
+                        <TableHead className="font-semibold text-black">Receipt</TableHead>
+                        <TableHead className="font-semibold text-black">Status</TableHead>
+                        <TableHead className="font-semibold text-black">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredTransactions.map((transaction) => (
+                        <TableRow key={transaction.id} className="hover:bg-gray-50">
+                          <TableCell className="text-black">{transaction.date}</TableCell>
+                          <TableCell className="font-medium text-black">{transaction.id.substring(0, 8)}</TableCell>
+                          <TableCell className="text-black">{transaction.description}</TableCell>
+                          <TableCell className="text-black">{transaction.payee || "-"}</TableCell>
+                          <TableCell className="text-black">{transaction.category}</TableCell>
+                          <TableCell className={transaction.type === "expense" ? "text-red-600" : "text-green-600"}>
+                            {transaction.type === "expense" ? "-" : "+"}UGX {transaction.amount.toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            {transaction.receipt ? (
+                              <div className="flex items-center gap-1">
+                                <Receipt className="h-4 w-4" />
+                                {transaction.receipt}
+                              </div>
+                            ) : (
+                              "-"
+                            )}
+                          </TableCell>
+                          <TableCell>{getStatusBadge(transaction.status)}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleViewTransaction(transaction)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white border-0"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
           </div>
 
-          {filteredTransactions.length === 0 && (
+          {!isLoading && filteredTransactions.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               No transactions found matching your criteria.
             </div>
