@@ -1,4 +1,6 @@
-import { API_BASE_URL } from './api';
+import { API_CONFIG } from './api-config';
+
+const API_BASE_URL = API_CONFIG.baseURL.replace(/\/$/, '');
 
 export interface OTPResponse {
   success: boolean;
@@ -309,6 +311,67 @@ class OTPService {
       console.error("Reset password with SMS error:", error);
       throw error;
     }
+  }
+
+  // Forgot password - email
+  async forgotPasswordEmail(data: { email: string }): Promise<OTPResponse> {
+    try {
+      console.log('Sending forgot password email to:', data.email);
+      const response = await fetch(`${API_BASE_URL}/otp/forgot_password/email/`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to send password reset email: ${errorText}`);
+      }
+
+      return await response.json();
+    } catch (error: unknown) {
+      console.error("Forgot password email error:", error);
+      throw error;
+    }
+  }
+
+  // Forgot password - SMS
+  async forgotPasswordSms(data: { phone_number: string }): Promise<OTPResponse> {
+    try {
+      console.log('Sending forgot password SMS to:', data.phone_number);
+      const response = await fetch(`${API_BASE_URL}/otp/forgot_password/sms/`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to send password reset SMS: ${errorText}`);
+      }
+
+      return await response.json();
+    } catch (error: unknown) {
+      console.error("Forgot password SMS error:", error);
+      throw error;
+    }
+  }
+
+  // Alias methods for backward compatibility
+  async resendEmailOtp(data: ResendEmailRequest): Promise<OTPResponse> {
+    return this.resendEmailOTP(data);
+  }
+
+  async resendSmsOtp(data: ResendSMSRequest): Promise<OTPResponse> {
+    return this.resendSMSOTP(data);
+  }
+
+  async resetPasswordWithEmailCode(data: ResetPasswordEmailRequest): Promise<OTPResponse> {
+    return this.resetPasswordWithEmail(data);
+  }
+
+  async resetPasswordWithSmsCode(data: ResetPasswordSMSRequest): Promise<OTPResponse> {
+    return this.resetPasswordWithSMS(data);
   }
 }
 

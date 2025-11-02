@@ -109,10 +109,10 @@ const BulkPayments = () => {
     return "Unknown";
   };
 
-  const filteredPayments = payments.filter(
+  const filteredPayments = bulkPayments.filter(
     (payment) =>
       payment.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.description.toLowerCase().includes(searchTerm.toLowerCase())
+      (payment.reference && payment.reference.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const updatePaymentRow = (type: "bank" | "mobile", id: string, field: keyof PaymentRow, value: PaymentRow[keyof PaymentRow]) => {
@@ -201,7 +201,7 @@ const BulkPayments = () => {
     reader.readAsText(file);
   };
 
-  const handleSubmitBulkPayment = (type: "bank" | "mobile") => {
+  const handleSubmitBulkPayment = async (type: "bank" | "mobile") => {
     const rows = type === "bank" ? bankPaymentRows : mobilePaymentRows;
     const filledRows = rows.filter(row => row.recipientName && row.amount > 0);
     
@@ -224,17 +224,9 @@ const BulkPayments = () => {
       return;
     }
 
-    // Add new payment to the list
-    const newPayment: BulkPayment = {
-      id: `BP${Date.now()}`,
-      amount: filledRows.reduce((sum, row) => sum + row.amount, 0),
-      recipients: filledRows.length,
-      status: "pending",
-      createdAt: new Date().toISOString(),
-      description: bulkDescription || `${type} bulk payment`,
-    };
-
-    setPayments(prev => [newPayment, ...prev]);
+    // Note: In production, this would create a bulk payment via the API
+    // with proper structure matching the BulkPayment interface
+    await fetchBulkPayments(); // Refresh the list
     
     toast({
       title: "Bulk Payment Submitted",
@@ -319,7 +311,7 @@ const BulkPayments = () => {
             </div>
           </div>
 
-          {isLoading ? (
+          {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {[1, 2, 3].map((i) => (
                 <Card key={i} className="animate-pulse border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
@@ -349,22 +341,22 @@ const BulkPayments = () => {
                         {payment.status}
                       </Badge>
                     </div>
-                    <CardDescription className="text-sm">{payment.description}</CardDescription>
+                    <CardDescription className="text-sm">{payment.reference || `BP-${payment.id}`}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex justify-between">
                         <span className="text-xs sm:text-sm text-muted-foreground">Amount</span>
-                        <span className="text-sm sm:text-base font-medium">UGX {payment.amount.toLocaleString()}</span>
+                        <span className="text-sm sm:text-base font-medium">UGX {payment.total_amount.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-xs sm:text-sm text-muted-foreground">Recipients</span>
-                        <span className="text-sm sm:text-base font-medium">{payment.recipients}</span>
+                        <span className="text-xs sm:text-sm text-muted-foreground">Reference</span>
+                        <span className="text-sm sm:text-base font-medium">{payment.reference || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-xs sm:text-sm text-muted-foreground">Created</span>
                         <span className="text-sm sm:text-base font-medium">
-                          {new Date(payment.createdAt).toLocaleDateString()}
+                          {new Date(payment.created_at).toLocaleDateString()}
                         </span>
                       </div>
                       <Button variant="outline" size="sm" className="w-full mt-4 text-xs sm:text-sm">
@@ -378,7 +370,7 @@ const BulkPayments = () => {
             </div>
           ) : null}
 
-          {filteredPayments.length === 0 && !isLoading && (
+          {filteredPayments.length === 0 && !loading && (
             <Card>
               <CardContent className="text-center py-8 sm:py-12">
                 <div className="text-muted-foreground">

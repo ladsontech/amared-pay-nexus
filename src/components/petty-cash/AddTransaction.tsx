@@ -12,7 +12,7 @@ import { Receipt, Wallet, Plus } from "lucide-react";
 
 interface AddTransactionProps {
   currentBalance: number;
-  setCurrentBalance: (balance: number) => void;
+  setCurrentBalance?: (balance: number) => void;
 }
 
 const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionProps) => {
