@@ -1,5 +1,5 @@
 import { API_CONFIG } from './api-config';
-import { otpService, OtpResponse } from "./otpService";
+import { otpService, OTPResponse } from "./otpService";
 
 const API_BASE_URL = API_CONFIG.baseURL.replace(/\/$/, '');
 
@@ -263,44 +263,44 @@ class AuthService {
   }
 
   // OTP-related methods
-  async forgotPasswordEmail(email: string): Promise<OtpResponse> {
+  async forgotPasswordEmail(email: string): Promise<OTPResponse> {
     return await otpService.forgotPasswordEmail({ email });
   }
 
-  async forgotPasswordSms(phoneNumber: string): Promise<OtpResponse> {
+  async forgotPasswordSms(phoneNumber: string): Promise<OTPResponse> {
     return await otpService.forgotPasswordSms({ phone_number: phoneNumber });
   }
 
-  async resendEmailOtp(email: string): Promise<OtpResponse> {
+  async resendEmailOtp(email: string): Promise<OTPResponse> {
     return await otpService.resendEmailOtp({ email });
   }
 
-  async resendSmsOtp(phoneNumber: string): Promise<OtpResponse> {
+  async resendSmsOtp(phoneNumber: string): Promise<OTPResponse> {
     return await otpService.resendSmsOtp({ phone_number: phoneNumber });
   }
 
-  async resetPasswordWithEmailCode(emailCode: string, newPassword: string): Promise<OtpResponse> {
+  async resetPasswordWithEmailCode(emailCode: string, newPassword: string): Promise<OTPResponse> {
     return await otpService.resetPasswordWithEmailCode({ 
       email_code: emailCode, 
       new_password: newPassword 
     });
   }
 
-  async resetPasswordWithSmsCode(smsCode: string, newPassword: string): Promise<OtpResponse> {
+  async resetPasswordWithSmsCode(smsCode: string, newPassword: string): Promise<OTPResponse> {
     return await otpService.resetPasswordWithSmsCode({ 
       sms_code: smsCode, 
       new_password: newPassword 
     });
   }
 
-  async verifyEmailAddress(emailCode: string, email: string): Promise<OtpResponse> {
+  async verifyEmailAddress(emailCode: string, email: string): Promise<OTPResponse> {
     return await otpService.verifyEmailAddress({ 
       email_code: emailCode, 
       email: email 
     });
   }
 
-  async verifyPhoneNumber(smsCode: string, phoneNumber: string): Promise<OtpResponse> {
+  async verifyPhoneNumber(smsCode: string, phoneNumber: string): Promise<OTPResponse> {
     return await otpService.verifyPhoneNumber({ 
       sms_code: smsCode, 
       phone_number: phoneNumber 

@@ -208,7 +208,7 @@ const PettyCash = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <AddTransaction currentBalance={currentBalance} setCurrentBalance={setCurrentBalance} />
+              <AddTransaction currentBalance={currentBalance} />
             </CardContent>
           </Card>
         </TabsContent>

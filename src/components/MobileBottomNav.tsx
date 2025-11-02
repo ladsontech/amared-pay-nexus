@@ -174,7 +174,7 @@ const MobileBottomNav = ({ items, extraActions, onLogout }: MobileBottomNavProps
                 <p className="text-xs text-gray-500">Account settings</p>
               </button>
             </div>
-            )}
+            ))}
             
             <button 
               onClick={handleLogout}
