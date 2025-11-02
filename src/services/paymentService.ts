@@ -1,6 +1,18 @@
 import { apiClient, QueryParams } from './apiClient';
 import { API_CONFIG } from './api-config';
 
+function getAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { 
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
+  const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 export interface Currency {
   id: number;
   name: string;
@@ -148,6 +160,19 @@ export interface CreateBulkPaymentRequest {
   approved_by?: string | null;
 }
 
+export interface CreateBulkPaymentResponse {
+  id: string;
+  organization: string;
+  sheet: string;
+  total_amount: number;
+  status: 'pending_approval' | 'approved' | 'rejected' | null;
+  is_approved: boolean;
+  comments: string | null;
+  created_at: string;
+  updated_at: string;
+  approved_by: string | null;
+}
+
 export interface ProcessBulkPaymentRequest {
   link: string;
   verification_code: string;
@@ -285,12 +310,40 @@ class PaymentService {
     return apiClient.get<BulkPayment>(API_CONFIG.endpoints.payments.bulkPayment.detail(id));
   }
 
-  async createBulkPayment(data: CreateBulkPaymentRequest): Promise<BulkPayment> {
+  async createBulkPayment(data: CreateBulkPaymentRequest): Promise<CreateBulkPaymentResponse> {
     try {
-      return await apiClient.post<BulkPayment>(API_CONFIG.endpoints.payments.bulkPayment.create, data);
+      return await apiClient.post<CreateBulkPaymentResponse>(API_CONFIG.endpoints.payments.bulkPayment.create, data);
     } catch (error) {
       console.error('Error creating bulk payment:', error);
       throw new Error('Failed to create bulk payment. Please check your data and try again.');
+    }
+  }
+
+  async updateBulkPayment(id: string, data: {
+    status?: 'pending_approval' | 'approved' | 'rejected' | null;
+    is_approved?: boolean;
+    comments?: string | null;
+    approved_by?: string | null;
+  }): Promise<BulkPayment> {
+    try {
+      // Try PUT first (standard REST)
+      const url = API_CONFIG.endpoints.payments.bulkPayment.detail(id);
+      const response = await fetch(`${API_CONFIG.baseURL}${url}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data),
+        mode: 'cors'
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to update bulk payment: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating bulk payment:', error);
+      throw error;
     }
   }
 
@@ -335,10 +388,11 @@ class PaymentService {
 
   async initiateCollection(data: InitiateCollectionRequest): Promise<CollectionResponse> {
     try {
-      return await apiClient.post<CollectionResponse>(API_CONFIG.endpoints.payments.collections.initiate, data);
-    } catch (error) {
+      const endpoint = API_CONFIG.endpoints.payments.collections.initiate;
+      return await apiClient.post<CollectionResponse>(endpoint, data);
+    } catch (error: any) {
       console.error('Error initiating collection:', error);
-      throw new Error('Failed to initiate collection. Please check your data and try again.');
+      throw new Error(error.message || 'Failed to initiate collection. Please check your data and try again.');
     }
   }
 
@@ -357,10 +411,11 @@ class PaymentService {
 
   async mobileMoneyWithdraw(data: MobileMoneyWithdrawRequest): Promise<WithdrawResponse> {
     try {
-      return await apiClient.post<WithdrawResponse>(API_CONFIG.endpoints.payments.mobileMoneyWithdraw, data);
-    } catch (error) {
+      const endpoint = API_CONFIG.endpoints.payments.mobileMoneyWithdraw;
+      return await apiClient.post<WithdrawResponse>(endpoint, data);
+    } catch (error: any) {
       console.error('Error processing mobile money withdraw:', error);
-      throw new Error('Failed to process mobile money withdraw. Please check your data and try again.');
+      throw new Error(error.message || 'Failed to process mobile money withdraw. Please check your data and try again.');
     }
   }
 

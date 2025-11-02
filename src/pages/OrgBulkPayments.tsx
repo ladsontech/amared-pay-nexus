@@ -14,7 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
 import { useOrganization } from "@/hooks/useOrganization";
-import { BulkPayment } from "@/services/paymentService";
+import { BulkPayment, paymentService } from "@/services/paymentService";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
 
 // Add shared bank names used for selection
@@ -73,20 +73,6 @@ const BulkPayments = () => {
     setMobilePaymentRows(createEmptyRows("mobile"));
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "processing":
-        return "bg-blue-100 text-blue-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "failed":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
 
   const normalizeUgPhone = (input: string) => {
     const digits = (input || '').replace(/\D/g, '');
@@ -112,8 +98,22 @@ const BulkPayments = () => {
   const filteredPayments = bulkPayments.filter(
     (payment) =>
       payment.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (payment.reference && payment.reference.toLowerCase().includes(searchTerm.toLowerCase()))
+      (payment.reference && payment.reference.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      payment.total_amount.toString().includes(searchTerm)
   );
+
+  const getStatusColor = (status: string | null) => {
+    switch (status) {
+      case "approved":
+        return "bg-green-100 text-green-800";
+      case "pending_approval":
+        return "bg-yellow-100 text-yellow-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
 
   const updatePaymentRow = (type: "bank" | "mobile", id: string, field: keyof PaymentRow, value: PaymentRow[keyof PaymentRow]) => {
     const updateFunction = (prev: PaymentRow[]) => prev.map(row => 
@@ -224,39 +224,101 @@ const BulkPayments = () => {
       return;
     }
 
-    // Note: In production, this would create a bulk payment via the API
-    // with proper structure matching the BulkPayment interface
-    await fetchBulkPayments(); // Refresh the list
-    
-    toast({
-      title: "Bulk Payment Submitted",
-      description: `${type === "bank" ? "Bank" : "Mobile money"} payment for ${filledRows.length} recipients submitted for approval`,
-    });
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const organizationId = user.organizationId || user.organization?.id;
+      
+      if (!organizationId) {
+        throw new Error("Organization ID not found");
+      }
 
-    // Reset the form
-    if (type === "bank") {
-      setBankPaymentRows(Array.from({ length: 10 }, (_, i) => ({
-        id: `bank-${Date.now()}-${i}`,
-        recipientName: '',
-        recipientAccount: '',
-        bankName: '',
-        amount: 0,
-        description: '',
-        verified: false,
-      })));
-    } else {
-      setMobilePaymentRows(Array.from({ length: 10 }, (_, i) => ({
-        id: `mobile-${Date.now()}-${i}`,
-        recipientName: '',
-        phoneNumber: '+256',
-        mobileProvider: 'Unknown' as const,
-        amount: 0,
-        description: '',
-        verified: false,
-      })));
+      // Calculate total amount
+      const totalAmount = filledRows.reduce((sum, row) => sum + row.amount, 0);
+
+      // Create CSV content
+      const csvContent = type === "bank"
+        ? "Recipient Name,Bank Name,Account Number,Amount,Description\n" +
+          filledRows.map(row => 
+            `"${row.recipientName}","${row.bankName || ''}","${row.recipientAccount || ''}","${row.amount}","${row.description || ''}"`
+          ).join("\n")
+        : "Recipient Name,Phone Number,Amount,Description\n" +
+          filledRows.map(row => 
+            `"${row.recipientName}","${row.phoneNumber || ''}","${row.amount}","${row.description || ''}"`
+          ).join("\n");
+
+      // Create bulk payment via API
+      const bulkPayment = await paymentService.createBulkPayment({
+        organization: organizationId,
+        total_amount: totalAmount,
+        status: "pending_approval",
+        is_approved: false,
+        comments: bulkDescription || `${type === "bank" ? "Bank" : "Mobile money"} bulk payment for ${filledRows.length} recipients`
+      });
+
+      // Upload CSV to sheet URL if provided
+      if (bulkPayment.sheet) {
+        try {
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const formData = new FormData();
+          formData.append('file', blob, `bulk_payment_${type}_${Date.now()}.csv`);
+          
+          const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+          const uploadResponse = await fetch(bulkPayment.sheet, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            body: formData
+          });
+
+          if (!uploadResponse.ok) {
+            console.warn('Failed to upload CSV to sheet URL, but bulk payment was created');
+          }
+        } catch (uploadError) {
+          console.warn('Error uploading CSV:', uploadError);
+          // Don't fail the whole operation if CSV upload fails
+        }
+      }
+
+      await fetchBulkPayments(); // Refresh the list
+      
+      toast({
+        title: "Bulk Payment Submitted",
+        description: `${type === "bank" ? "Bank" : "Mobile money"} payment for ${filledRows.length} recipients (Total: UGX ${totalAmount.toLocaleString()}) submitted for approval`,
+      });
+
+      // Reset the form
+      if (type === "bank") {
+        setBankPaymentRows(Array.from({ length: 10 }, (_, i) => ({
+          id: `bank-${Date.now()}-${i}`,
+          recipientName: '',
+          recipientAccount: '',
+          bankName: '',
+          amount: 0,
+          description: '',
+          verified: false,
+        })));
+      } else {
+        setMobilePaymentRows(Array.from({ length: 10 }, (_, i) => ({
+          id: `mobile-${Date.now()}-${i}`,
+          recipientName: '',
+          phoneNumber: '+256',
+          mobileProvider: 'Unknown' as const,
+          amount: 0,
+          description: '',
+          verified: false,
+        })));
+      }
+      setBulkDescription("");
+      setActiveTab("overview");
+    } catch (error: any) {
+      console.error("Error creating bulk payment:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit bulk payment. Please try again.",
+        variant: "destructive",
+      });
     }
-    setBulkDescription("");
-    setActiveTab("overview");
   };
 
   return (
@@ -336,22 +398,22 @@ const BulkPayments = () => {
                 <Card key={payment.id} className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-base sm:text-lg">{payment.id}</CardTitle>
+                      <CardTitle className="text-base sm:text-lg">{payment.reference || `BP-${payment.id.substring(0, 8)}`}</CardTitle>
                       <Badge className={getStatusColor(payment.status)}>
-                        {payment.status}
+                        {payment.status === "pending_approval" ? "Pending" : payment.status === "approved" ? "Approved" : payment.status === "rejected" ? "Rejected" : payment.status || "Unknown"}
                       </Badge>
                     </div>
-                    <CardDescription className="text-sm">{payment.reference || `BP-${payment.id}`}</CardDescription>
+                    <CardDescription className="text-sm">{payment.comments || `Bulk Payment - ${payment.id.substring(0, 8)}`}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex justify-between">
                         <span className="text-xs sm:text-sm text-muted-foreground">Amount</span>
-                        <span className="text-sm sm:text-base font-medium">UGX {payment.total_amount.toLocaleString()}</span>
+                        <span className="text-sm sm:text-base font-medium">{payment.currency.symbol} {payment.total_amount.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-xs sm:text-sm text-muted-foreground">Reference</span>
-                        <span className="text-sm sm:text-base font-medium">{payment.reference || 'N/A'}</span>
+                        <span className="text-xs sm:text-sm text-muted-foreground">Charge</span>
+                        <span className="text-sm sm:text-base font-medium">{payment.currency.symbol} {payment.charge.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-xs sm:text-sm text-muted-foreground">Created</span>
@@ -359,7 +421,18 @@ const BulkPayments = () => {
                           {new Date(payment.created_at).toLocaleDateString()}
                         </span>
                       </div>
-                      <Button variant="outline" size="sm" className="w-full mt-4 text-xs sm:text-sm">
+                      {payment.sheet && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full mt-2 text-xs sm:text-sm"
+                          onClick={() => window.open(payment.sheet || '', '_blank')}
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download Sheet
+                        </Button>
+                      )}
+                      <Button variant="outline" size="sm" className="w-full mt-2 text-xs sm:text-sm">
                         <Eye className="h-4 w-4 mr-2" />
                         View Details
                       </Button>

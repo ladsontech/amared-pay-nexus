@@ -45,6 +45,7 @@ interface PaymentLink {
 }
 
 const Collections = () => {
+  const { user } = useAuth();
   const [paymentLinks, setPaymentLinks] = useState<PaymentLink[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState<"collections" | "links">("collections");
@@ -69,56 +70,66 @@ const Collections = () => {
   const { toast } = useToast();
   const { hasPermission } = useAuth();
   const { collections, loading, error, fetchCollections } = useOrganization();
+  const [linksLoading, setLinksLoading] = useState(false);
 
   useEffect(() => {
+    fetchCollections();
     fetchPaymentLinks();
-  }, []);
+  }, [user?.organizationId]);
 
   // Collections data is now provided by useOrganization hook
 
   const fetchPaymentLinks = async () => {
-    // Mock data for payment links
-    setPaymentLinks([
-      {
-        id: "PL001",
-        amount: 50000,
-        reference: "SCHOOL_FEES_2024",
-        paymentReason: "School Fees Payment for Q1 2024",
-        link: "https://pay.almaredpay.com/link/PL001",
-        status: "active",
-        createdAt: "2024-01-15T10:30:00Z",
-        totalPayees: 50,
-        successfulPayments: 30,
-        pendingPayments: 20,
-        currency: "UGX",
-        paymentHistory: [
-          {
-            id: "PAY001",
-            payerName: "John Doe",
-            phoneNumber: "+256701234567",
-            amount: 50000,
-            status: "completed",
-            paidAt: "2024-01-15T10:30:00Z"
-          },
-          {
-            id: "PAY002",
-            payerName: "Jane Smith", 
-            phoneNumber: "+256789012345",
-            amount: 50000,
-            status: "completed",
-            paidAt: "2024-01-15T11:15:00Z"
-          },
-          {
-            id: "PAY003",
-            payerName: "Michael Johnson",
-            phoneNumber: "+256700111222",
-            amount: 50000,
-            status: "pending",
-            paidAt: "2024-01-15T12:00:00Z"
-          }
-        ]
-      },
-    ]);
+    if (!user?.organizationId) return;
+
+    try {
+      setLinksLoading(true);
+      // Fetch bulk payments to get links
+      const bulkPaymentsResponse = await paymentService.getBulkPayments({
+        organization: user.organizationId,
+        limit: 50
+      });
+
+      // Fetch links for the organization
+      const linksResponse = await paymentService.getLinks({
+        bulk_payment: bulkPaymentsResponse.results.map(bp => bp.id).join(','),
+        limit: 100
+      });
+
+      // Transform links to PaymentLink format
+      const transformedLinks: PaymentLink[] = linksResponse.results.map(link => {
+        // Count transactions for this link
+        const transactions = bulkPaymentsResponse.results
+          .filter(bp => bp.id === link.bulk_payment.id)
+          .flatMap(() => []); // This would need transaction data
+
+        return {
+          id: link.id,
+          amount: link.amount,
+          reference: link.bulk_payment.reference,
+          paymentReason: link.beneficiary_name || "Payment Link",
+          link: link.url || "",
+          status: link.status === "sent" ? "active" : link.status === "processed" ? "completed" : "expired",
+          createdAt: link.created_at,
+          totalPayees: 1,
+          successfulPayments: link.status === "processed" ? 1 : 0,
+          pendingPayments: link.status === "sent" ? 1 : 0,
+          currency: link.currency.symbol,
+          paymentHistory: [] // Would need to fetch transaction history
+        };
+      });
+
+      setPaymentLinks(transformedLinks);
+    } catch (error) {
+      console.error("Error fetching payment links:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load payment links. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLinksLoading(false);
+    }
   };
 
   const handleInitiateCollection = async () => {
@@ -142,37 +153,35 @@ const Collections = () => {
     }
 
     try {
-      const token = localStorage.getItem("auth_token");
-      const response = await fetch("https://bulksrv.almaredagencyuganda.com/payments/mobile-money/initiate-collection/", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          phone_number: formData.phoneNumber,
-          amount: parseFloat(formData.amount),
-          currency: "UGX",
-          description: formData.description,
-        }),
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const organizationId = user.organizationId || user.organization?.id;
+      
+      if (!organizationId) {
+        throw new Error("Organization ID not found");
+      }
+
+      const response = await paymentService.initiateCollection({
+        organization: organizationId,
+        amount: parseInt(formData.amount),
+        phone_number: formData.phoneNumber,
+        reason: formData.description || undefined
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.success) {
         toast({
           title: "Collection Initiated",
-          description: "Mobile money collection has been initiated successfully.",
+          description: response.message || "Mobile money collection has been initiated successfully.",
         });
         setFormData({ phoneNumber: "+256", amount: "", description: "" });
         fetchCollections();
       } else {
-        throw new Error("Failed to initiate collection");
+        throw new Error(response.message || "Failed to initiate collection");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error initiating collection:", error);
       toast({
         title: "Error",
-        description: "Failed to initiate collection. Please try again.",
+        description: error.message || "Failed to initiate collection. Please try again.",
         variant: "destructive",
       });
     }
@@ -204,7 +213,7 @@ const Collections = () => {
     setSendToBankOpen(false);
   };
 
-  const handleWithdraw = () => {
+  const handleWithdraw = async () => {
     if (!withdrawData.amount || !withdrawData.phoneNumber) {
       toast({
         title: "Missing Information",
@@ -214,12 +223,38 @@ const Collections = () => {
       return;
     }
 
-    toast({
-      title: "Withdrawal Initiated",
-      description: `Withdrawal of UGX ${parseFloat(withdrawData.amount).toLocaleString()} to ${withdrawData.phoneNumber} has been submitted`,
-    });
-    setWithdrawData({ amount: "", phoneNumber: "+256", description: "" });
-    setWithdrawOpen(false);
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const organizationId = user.organizationId || user.organization?.id;
+      
+      if (!organizationId) {
+        throw new Error("Organization ID not found");
+      }
+
+      const response = await paymentService.mobileMoneyWithdraw({
+        organization: organizationId,
+        amount: parseInt(withdrawData.amount),
+        phone_number: withdrawData.phoneNumber
+      });
+
+      if (response.success) {
+        toast({
+          title: "Withdrawal Initiated",
+          description: response.message || `Withdrawal of UGX ${parseFloat(withdrawData.amount).toLocaleString()} to ${withdrawData.phoneNumber} has been submitted`,
+        });
+        setWithdrawData({ amount: "", phoneNumber: "+256", description: "" });
+        setWithdrawOpen(false);
+      } else {
+        throw new Error(response.message || "Failed to initiate withdrawal");
+      }
+    } catch (error: any) {
+      console.error("Error initiating withdrawal:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to initiate withdrawal. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusColor = (status: string) => {
