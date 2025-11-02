@@ -706,12 +706,25 @@ class OrganizationService {
     }
   }
 
-  async updateOrganization(orgId: string, orgData: UpdateOrganizationRequest): Promise<Organization> {
+  async updateOrganization(orgId: string, orgData: UpdateOrganizationRequest | FormData): Promise<Organization> {
     try {
+      const isFormData = orgData instanceof FormData;
+      const accessToken = localStorage.getItem("access_token");
+      
+      const headers: Record<string, string> = {};
+      if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+      
+      // Only add Content-Type for JSON, let browser set it for FormData
+      if (!isFormData) {
+        headers["Content-Type"] = "application/json";
+      }
+
       const response = await fetch(`${API_BASE_URL}/organizations/org/${orgId}/`, {
-        method: "PUT",
-        headers: this.getAuthHeaders(),
-        body: JSON.stringify(orgData),
+        method: "PATCH",
+        headers,
+        body: isFormData ? orgData : JSON.stringify(orgData),
       });
 
       if (!response.ok) {

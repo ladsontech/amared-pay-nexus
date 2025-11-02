@@ -49,12 +49,12 @@ export const StaffManagement = () => {
     try {
       await organizationService.addStaff(data);
       await fetchStaff();
+      setCreateOpen(false);
       toast({ 
         title: "Success", 
         description: "Staff member added successfully",
         duration: 5000
       });
-      setCreateOpen(false);
     } catch (error: any) {
       toast({ 
         title: "Error", 
@@ -62,7 +62,6 @@ export const StaffManagement = () => {
         variant: "destructive",
         duration: 5000
       });
-      throw error;
     }
   };
 
@@ -222,7 +221,8 @@ export const StaffManagement = () => {
           <StaffForm 
             organizationId={user?.organizationId || ''} 
             onSubmit={handleCreate} 
-            onCancel={() => setCreateOpen(false)} 
+            onCancel={() => setCreateOpen(false)}
+            isSuperuser={user?.isSuperuser}
           />
         </DialogContent>
       </Dialog>
@@ -238,7 +238,8 @@ export const StaffManagement = () => {
             <RoleForm 
               currentRole={editOpen.role || 'member'} 
               onSubmit={(role) => handleUpdateRole(editOpen.id, role)} 
-              onCancel={() => setEditOpen(null)} 
+              onCancel={() => setEditOpen(null)}
+              isSuperuser={user?.isSuperuser}
             />
           )}
         </DialogContent>
@@ -275,9 +276,10 @@ interface StaffFormProps {
   organizationId: string;
   onSubmit: (data: CreateStaffRequest) => Promise<void>;
   onCancel: () => void;
+  isSuperuser?: boolean;
 }
 
-const StaffForm = ({ organizationId, onSubmit, onCancel }: StaffFormProps) => {
+const StaffForm = ({ organizationId, onSubmit, onCancel, isSuperuser }: StaffFormProps) => {
   const [form, setForm] = useState<CreateStaffRequest>({
     username: "",
     password: "",
@@ -295,6 +297,19 @@ const StaffForm = ({ organizationId, onSubmit, onCancel }: StaffFormProps) => {
     setIsSubmitting(true);
     try {
       await onSubmit(form);
+      // Reset form on success
+      setForm({
+        username: "",
+        password: "",
+        first_name: "",
+        last_name: "",
+        email: "",
+        phone_number: "",
+        organization: organizationId,
+        role: "member",
+      });
+    } catch (error) {
+      // Error is handled by parent component
     } finally {
       setIsSubmitting(false);
     }
@@ -366,6 +381,7 @@ const StaffForm = ({ organizationId, onSubmit, onCancel }: StaffFormProps) => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            {isSuperuser && <SelectItem value="owner">Owner</SelectItem>}
             <SelectItem value="manager">Manager</SelectItem>
             <SelectItem value="member">Member</SelectItem>
           </SelectContent>
@@ -388,9 +404,10 @@ interface RoleFormProps {
   currentRole: string;
   onSubmit: (role: "owner" | "manager" | "member") => void;
   onCancel: () => void;
+  isSuperuser?: boolean;
 }
 
-const RoleForm = ({ currentRole, onSubmit, onCancel }: RoleFormProps) => {
+const RoleForm = ({ currentRole, onSubmit, onCancel, isSuperuser }: RoleFormProps) => {
   const [role, setRole] = useState<"owner" | "manager" | "member">(currentRole as any);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -407,6 +424,7 @@ const RoleForm = ({ currentRole, onSubmit, onCancel }: RoleFormProps) => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            {isSuperuser && <SelectItem value="owner">Owner</SelectItem>}
             <SelectItem value="manager">Manager</SelectItem>
             <SelectItem value="member">Member</SelectItem>
           </SelectContent>

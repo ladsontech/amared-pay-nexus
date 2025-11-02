@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useOrganization } from "@/hooks/useOrganization";
-import { Building, Save, Loader2, MapPin, FileText, Hash, Edit } from "lucide-react";
+import { Building, Save, Loader2, FileText, Hash, Edit, Upload, Image as ImageIcon } from "lucide-react";
+import { organizationService } from "@/services/organizationService";
 
 const OrganizationSettings = () => {
   const { toast } = useToast();
@@ -24,6 +25,8 @@ const OrganizationSettings = () => {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
@@ -59,6 +62,58 @@ const OrganizationSettings = () => {
       tin: organization?.tin || ""
     });
     setIsEditing(false);
+  };
+
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !organization) return;
+
+    // Validate file size (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please upload an image smaller than 2MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please upload an image file",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setUploadingLogo(true);
+      const formData = new FormData();
+      formData.append('logo', file);
+
+      await organizationService.updateOrganization(organization.id, formData);
+      
+      toast({
+        title: "Logo Updated",
+        description: "Organization logo has been updated successfully"
+      });
+
+      // Refresh the page to show new logo
+      window.location.reload();
+    } catch (error) {
+      toast({
+        title: "Upload Failed",
+        description: error instanceof Error ? error.message : "Failed to upload logo",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingLogo(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   if (loading && !organization) {
@@ -217,18 +272,51 @@ const OrganizationSettings = () => {
                   </p>
                 </div>
                 
-                {organization.logo && (
-                  <div>
-                    <Label className="text-sm font-medium text-slate-600">Logo</Label>
-                    <div className="mt-2">
+                <div>
+                  <Label className="text-sm font-medium text-slate-600">Organization Logo</Label>
+                  <div className="mt-2 flex items-center gap-4">
+                    {organization.logo ? (
                       <img 
                         src={organization.logo} 
                         alt="Organization logo" 
                         className="h-16 w-16 object-cover rounded-lg border border-slate-200"
                       />
+                    ) : (
+                      <div className="h-16 w-16 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center">
+                        <ImageIcon className="h-6 w-6 text-slate-400" />
+                      </div>
+                    )}
+                    <div className="flex flex-col gap-2">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingLogo}
+                      >
+                        {uploadingLogo ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 mr-2" />
+                            Upload Logo
+                          </>
+                        )}
+                      </Button>
+                      <p className="text-xs text-slate-500">Max 2MB, image files only</p>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </CardContent>
