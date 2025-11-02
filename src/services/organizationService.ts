@@ -37,6 +37,7 @@ export interface Organization {
   address: string | null;
   company_reg_id: string | null;
   tin: string | null;
+  static_collection_link: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -55,6 +56,7 @@ export interface Wallet {
   is_pin_set: boolean;
   created_at: string;
   updated_at: string;
+  petty_cash_wallet: string | null;
   updated_by: string | null;
 }
 
@@ -75,6 +77,7 @@ export interface WalletTransaction {
     updated_at: string;
     organization: string;
     currency: number;
+    petty_cash_wallet: string | null;
     updated_by: string | null;
   };
   type: "debit" | "credit" | null;
@@ -126,16 +129,18 @@ export interface CreateOrganizationRequest {
 
 export interface UpdateOrganizationRequest {
   name: string;
-  address?: string;
-  company_reg_id?: string;
-  tin?: string;
+  address?: string | null;
+  company_reg_id?: string | null;
+  tin?: string | null;
+  static_collection_link?: string | null;
 }
 
 export interface UpdateWalletRequest {
-  balance?: number;
+  balance?: number | null;
   is_pin_set?: boolean;
-  currency?: number;
-  updated_by?: string;
+  currency?: number | null;
+  petty_cash_wallet?: string | null;
+  updated_by?: string | null;
 }
 
 // Bill Payment Types
@@ -721,8 +726,9 @@ class OrganizationService {
         headers["Content-Type"] = "application/json";
       }
 
+      // API spec requires PUT method
       const response = await fetch(`${API_BASE_URL}/organizations/org/${orgId}/`, {
-        method: "PATCH",
+        method: "PUT",
         headers,
         body: isFormData ? orgData : JSON.stringify(orgData),
       });
