@@ -97,11 +97,11 @@ const PettyCash = () => {
     );
   }
 
-  return <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
-      {/* Mobile Header */}
-      <div className="md:hidden bg-white border-b border-gray-100 -mx-6 px-6 py-4 mb-4">
-        <h1 className="text-xl font-bold text-black">Petty Cash</h1>
-        <p className="text-sm text-gray-600">Manage petty cash transactions</p>
+  return <div className="space-y-3 sm:space-y-6 pb-20 md:pb-0 bg-gray-50 md:bg-white">
+      {/* Mobile Header - Compact */}
+      <div className="md:hidden sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm -mx-2 px-3 py-2.5 mb-3">
+        <h1 className="text-lg font-bold text-black">Petty Cash</h1>
+        <p className="text-xs text-gray-500 mt-0.5">Manage transactions</p>
       </div>
 
       {/* Desktop Header */}
@@ -135,29 +135,29 @@ const PettyCash = () => {
         return p;
       });
     }} className="w-full">
-        {/* Mobile Tabs */}
+        {/* Mobile Tabs - Compact */}
         <div className="md:hidden">
-          <TabsList className="grid w-full grid-cols-4 h-12 bg-gray-50 rounded-xl p-1">
-            <TabsTrigger value="overview" className="text-xs font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600">
+          <TabsList className="grid w-full grid-cols-4 h-10 bg-gray-50 rounded-lg p-0.5 gap-0.5">
+            <TabsTrigger value="overview" className="text-[11px] font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm h-9">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="add" className="text-xs font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600">
+            <TabsTrigger value="add" className="text-[11px] font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm h-9">
               Add
             </TabsTrigger>
-            <TabsTrigger value="bills" className="text-xs font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600">
+            <TabsTrigger value="bills" className="text-[11px] font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm h-9">
               Bills
             </TabsTrigger>
-            <TabsTrigger value="history" className="text-xs font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600">
+            <TabsTrigger value="history" className="text-[11px] font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm h-9">
               History
             </TabsTrigger>
           </TabsList>
           
           {/* Mobile Secondary Tabs */}
-          {(activeTab === "approvals" || activeTab === "reconciliation") && <div className="flex gap-2 mt-3">
-              <Button variant={activeTab === "approvals" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("approvals")} className="flex-1">
+          {(activeTab === "approvals" || activeTab === "reconciliation") && <div className="flex gap-2 mt-2">
+              <Button variant={activeTab === "approvals" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("approvals")} className="flex-1 h-9 text-xs">
                 Approvals
               </Button>
-              <Button variant={activeTab === "reconciliation" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("reconciliation")} className="flex-1">
+              <Button variant={activeTab === "reconciliation" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("reconciliation")} className="flex-1 h-9 text-xs">
                 Reconciliation
               </Button>
             </div>}
@@ -175,17 +175,17 @@ const PettyCash = () => {
           </TabsList>
         </div>
 
-        {/* Mobile Action Buttons */}
-        <div className="md:hidden flex gap-2 mt-4">
-          {hasPermission("approve_transactions") && <Button variant="outline" size="sm" onClick={() => setActiveTab("approvals")} className="flex-1">
+        {/* Mobile Action Buttons - Compact */}
+        <div className="md:hidden flex gap-2 mt-2">
+          {hasPermission("approve_transactions") && <Button variant="outline" size="sm" onClick={() => setActiveTab("approvals")} className="flex-1 h-9 text-xs">
               Approvals
             </Button>}
-          <Button variant="outline" size="sm" onClick={() => setActiveTab("reconciliation")} className="flex-1">
+          <Button variant="outline" size="sm" onClick={() => setActiveTab("reconciliation")} className="flex-1 h-9 text-xs">
             Reconciliation
           </Button>
         </div>
 
-        <TabsContent value="overview" className="space-y-4 mt-6">
+        <TabsContent value="overview" className="space-y-3 md:space-y-4 mt-4 md:mt-6">
           <div className="bg-white">
             <PettyCashOverview 
               currentBalance={currentBalance} 
@@ -196,80 +196,78 @@ const PettyCash = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="add" className="space-y-4 mt-6">
-          <Card className="bg-white border border-gray-100">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold text-black flex items-center gap-2">
-                <Wallet className="h-5 w-5 text-blue-600" />
+        <TabsContent value="add" className="space-y-3 md:space-y-4 mt-4 md:mt-6">
+          <Card className="bg-white border border-gray-100 shadow-sm md:shadow-lg">
+            <CardHeader className="pb-3 md:pb-4">
+              <CardTitle className="text-base md:text-lg font-bold text-black flex items-center gap-2">
+                <Wallet className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
                 Add New Transaction
               </CardTitle>
-              <CardDescription className="text-gray-600">
+              <CardDescription className="text-xs md:text-sm text-gray-600">
                 Submit a new petty cash request for approval
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
               <AddTransaction currentBalance={currentBalance} />
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="bills" className="space-y-4 mt-6">
-          <Card className="bg-white border border-gray-100">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold text-black flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-600" />
-                Pay Bills Demo
+        <TabsContent value="bills" className="space-y-3 md:space-y-4 mt-4 md:mt-6">
+          <Card className="bg-white border border-gray-100 shadow-sm md:shadow-lg">
+            <CardHeader className="pb-3 md:pb-4">
+              <CardTitle className="text-base md:text-lg font-bold text-black flex items-center gap-2">
+                <FileText className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
+                Pay Bills
               </CardTitle>
-              <CardDescription className="text-gray-600">
+              <CardDescription className="text-xs md:text-sm text-gray-600">
                 Pay utility bills using your Main Wallet or Petty Cash funds
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Balance Cards */}
-                <Card className="border-2 border-blue-100">
-                  <CardContent className="p-4 text-center">
-                    <Wallet className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-                    <p className="text-sm font-semibold text-black">Main Wallet</p>
-                    <p className="text-2xl font-bold text-blue-600">UGX 12.3M</p>
-                    <p className="text-xs text-gray-600">Available for bills</p>
+            <CardContent className="space-y-3 md:space-y-4 px-3 md:px-6 pb-3 md:pb-6">
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-2 md:gap-4">
+                {/* Balance Cards - Compact */}
+                <Card className="border border-blue-200 bg-blue-50/50">
+                  <CardContent className="p-2.5 md:p-4 text-center">
+                    <Wallet className="h-5 w-5 md:h-8 md:w-8 mx-auto mb-1 md:mb-2 text-blue-600" />
+                    <p className="text-[10px] md:text-sm font-semibold text-black">Main Wallet</p>
+                    <p className="text-base md:text-2xl font-bold text-blue-600 mt-0.5 md:mt-1">UGX 12.3M</p>
+                    <p className="text-[9px] md:text-xs text-gray-600 mt-0.5">Available</p>
                   </CardContent>
                 </Card>
                 
-                <Card className="border-2 border-green-100">
-                  <CardContent className="p-4 text-center">
-                    <Wallet className="h-8 w-8 mx-auto mb-2 text-green-600" />
-                    <p className="text-sm font-semibold text-black">Petty Cash</p>
-                    <p className="text-2xl font-bold text-green-600">UGX 850K</p>
-                    <p className="text-xs text-gray-600">Available for bills</p>
+                <Card className="border border-green-200 bg-green-50/50">
+                  <CardContent className="p-2.5 md:p-4 text-center">
+                    <Wallet className="h-5 w-5 md:h-8 md:w-8 mx-auto mb-1 md:mb-2 text-green-600" />
+                    <p className="text-[10px] md:text-sm font-semibold text-black">Petty Cash</p>
+                    <p className="text-base md:text-2xl font-bold text-green-600 mt-0.5 md:mt-1">UGX 850K</p>
+                    <p className="text-[9px] md:text-xs text-gray-600 mt-0.5">Available</p>
                   </CardContent>
                 </Card>
               </div>
               
-              <Button onClick={() => setIsPayBillsOpen(true)} className="w-full" size="lg">
-                <FileText className="h-4 w-4 mr-2" />
+              <Button onClick={() => setIsPayBillsOpen(true)} className="w-full h-10 md:h-12 text-sm md:text-base" size="lg">
+                <FileText className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
                 Start Bill Payment
               </Button>
-              
-              
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="history" className="space-y-4 mt-6">
-          <div className="bg-white">
+        <TabsContent value="history" className="space-y-3 md:space-y-4 mt-4 md:mt-6">
+          <div className="bg-white rounded-lg border border-gray-100 shadow-sm md:shadow-lg">
             <TransactionHistory />
           </div>
         </TabsContent>
 
-        <TabsContent value="approvals" className="space-y-4 mt-6">
-          <div className="bg-white">
+        <TabsContent value="approvals" className="space-y-3 md:space-y-4 mt-4 md:mt-6">
+          <div className="bg-white rounded-lg border border-gray-100 shadow-sm md:shadow-lg">
             <PendingApprovals />
           </div>
         </TabsContent>
         
-        <TabsContent value="reconciliation" className="space-y-4 mt-6">
-          <div className="bg-white">
+        <TabsContent value="reconciliation" className="space-y-3 md:space-y-4 mt-4 md:mt-6">
+          <div className="bg-white rounded-lg border border-gray-100 shadow-sm md:shadow-lg">
             <PettyCashReconciliation currentBalance={currentBalance} />
           </div>
         </TabsContent>

@@ -330,19 +330,17 @@ const OrgDashboard = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-  return <div className="min-h-screen bg-white">
-      {/* Mobile Header */}
-      <div className="md:hidden sticky top-0 z-50 bg-white border-b border-gray-100">
-        <div className="px-4 py-4">
-          <div>
-            <h1 className="text-xl font-bold text-black">Dashboard</h1>
-            <p className="text-sm text-gray-600">Welcome back, {user?.name}</p>
-          </div>
+  return <div className="min-h-screen bg-gray-50">
+      {/* Mobile Header - Compact */}
+      <div className="md:hidden sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+        <div className="px-3 py-2.5">
+          <h1 className="text-lg font-bold text-black">Dashboard</h1>
+          <p className="text-xs text-gray-500 mt-0.5">{user?.name}</p>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="pb-20 px-[5px]">
+      {/* Content - Compact spacing for mobile */}
+      <div className="pb-20 px-2 md:px-6 md:pb-0">
         {/* Desktop View */}
         <div className="hidden md:block space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -636,30 +634,30 @@ const OrgDashboard = () => {
           </div>
         </div>
 
-        {/* Mobile View */}
-        <div className="md:hidden space-y-4">
-          {/* Balance Cards - Compact */}
-          <div className="bg-blue-600 rounded-2xl p-4 text-white">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Wallet className="h-5 w-5" />
-                <span className="text-sm font-medium">Total Balance</span>
+        {/* Mobile View - Binance-style Compact */}
+        <div className="md:hidden space-y-3">
+          {/* Main Balance Card - Hero style */}
+          <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-3.5 text-white shadow-lg">
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center gap-1.5">
+                <Wallet className="h-4 w-4 opacity-90" />
+                <span className="text-xs font-medium opacity-90">Total Balance</span>
               </div>
-              <Eye className="h-4 w-4 opacity-70" />
+              <Eye className="h-3.5 w-3.5 opacity-70" />
             </div>
-            <div className="space-y-1 mb-4">
-              <p className="text-2xl font-bold">UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M</p>
+            <div className="space-y-0.5 mb-3">
+              <p className="text-xl font-bold">UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M</p>
               <div className="flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" />
-                <span className="text-xs">+12.5% this month</span>
+                <span className="text-[10px] opacity-90">+12.5%</span>
               </div>
             </div>
             
-            {/* Mobile Quick Actions */}
+            {/* Mobile Quick Actions - Compact */}
             <div className="grid grid-cols-2 gap-2">
               <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs py-2">
+                  <Button className="bg-white/20 hover:bg-white/30 text-white border-0 text-[11px] py-2 h-9">
                     <Building className="h-3 w-3 mr-1" />
                     Send to Bank
                   </Button>
@@ -709,7 +707,7 @@ const OrgDashboard = () => {
 
               <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs py-2">
+                  <Button className="bg-white/20 hover:bg-white/30 text-white border-0 text-[11px] py-2 h-9">
                     <Phone className="h-3 w-3 mr-1" />
                     Withdraw
                   </Button>
@@ -750,123 +748,164 @@ const OrgDashboard = () => {
             </div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white border border-gray-100 rounded-xl p-3">
-              <div className="flex items-center justify-between mb-2">
-                <Activity className="h-4 w-4 text-blue-600" />
-
+          {/* Stats Grid - Compact 2x2 */}
+          <div className="grid grid-cols-2 gap-2">
+            {/* Collections Card */}
+            <div className="bg-white border border-gray-100 rounded-lg p-2.5 shadow-sm">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <DollarSign className="h-3.5 w-3.5 text-blue-600" />
+                <span className="text-[10px] text-gray-500 font-medium">Collections</span>
               </div>
-              <p className="text-lg font-bold text-black">{dashboardData.monthlyTransactions}</p>
-              <p className="text-xs text-gray-500">Transactions</p>
+              <p className="text-base font-bold text-black leading-tight">UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M</p>
+              <div className="flex items-center gap-0.5 mt-0.5">
+                <TrendingUp className="h-2.5 w-2.5 text-green-600" />
+                <span className="text-[9px] text-gray-500">+8.2%</span>
+              </div>
+            </div>
+
+            {/* Petty Cash Card */}
+            <div className="bg-white border border-gray-100 rounded-lg p-2.5 shadow-sm">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Wallet className="h-3.5 w-3.5 text-green-600" />
+                <span className="text-[10px] text-gray-500 font-medium">Petty Cash</span>
+              </div>
+              <p className="text-base font-bold text-black leading-tight">UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K</p>
+              <div className="flex items-center gap-0.5 mt-0.5">
+                <TrendingUp className="h-2.5 w-2.5 text-green-600" />
+                <span className="text-[9px] text-gray-500">+5.3%</span>
+              </div>
+            </div>
+
+            {/* Transactions */}
+            <div className="bg-white border border-gray-100 rounded-lg p-2.5 shadow-sm">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Activity className="h-3.5 w-3.5 text-purple-600" />
+                <span className="text-[10px] text-gray-500 font-medium">Transactions</span>
+              </div>
+              <p className="text-base font-bold text-black leading-tight">{dashboardData.monthlyTransactions}</p>
+              <span className="text-[9px] text-gray-500">This month</span>
             </div>
             
-            {hasPermission('approve_transactions') && <div className="bg-white border border-gray-100 rounded-xl p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <Clock className="h-4 w-4 text-blue-600" />
-                  <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full font-medium">
+            {/* Pending Approvals */}
+            {hasPermission('approve_transactions') && (
+              <div className="bg-white border border-gray-100 rounded-lg p-2.5 shadow-sm">
+                <div className="flex items-center justify-between mb-1.5">
+                  <Clock className="h-3.5 w-3.5 text-orange-600" />
+                  <span className="text-[9px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded-full font-semibold">
                     {dashboardData.pendingApprovals}
                   </span>
                 </div>
-                <p className="text-lg font-bold text-black">Pending</p>
-                <p className="text-xs text-gray-500">Approvals</p>
-              </div>}
+                <p className="text-base font-bold text-black leading-tight">Pending</p>
+                <span className="text-[9px] text-gray-500">Approvals</span>
+              </div>
+            )}
+            
+            {!hasPermission('approve_transactions') && (
+              <div className="bg-white border border-gray-100 rounded-lg p-2.5 shadow-sm">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <Users className="h-3.5 w-3.5 text-indigo-600" />
+                  <span className="text-[10px] text-gray-500 font-medium">Team</span>
+                </div>
+                <p className="text-base font-bold text-black leading-tight">{dashboardData.teamMetrics.totalStaff}</p>
+                <span className="text-[9px] text-gray-500">Members</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Shared Content for Both Views */}
-        <div className="py-4">
-          {/* Recent Transactions */}
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-black">Recent Activity</h2>
-            <Button variant="ghost" size="sm" className="text-blue-600 font-medium">
+        <div className="py-3 md:py-4">
+          {/* Recent Transactions - Compact */}
+          <div className="flex items-center justify-between mb-2.5 md:mb-3">
+            <h2 className="text-base md:text-lg font-bold text-black">Recent Activity</h2>
+            <Button variant="ghost" size="sm" className="text-blue-600 font-medium text-xs h-7 px-2">
               View All
-              <ChevronRight className="h-4 w-4 ml-1" />
+              <ChevronRight className="h-3 w-3 ml-1" />
             </Button>
           </div>
           
-          <div className="space-y-2">
+          <div className="space-y-1.5 md:space-y-2">
             {dashboardData.recentTransactions.slice(0, 5).map(transaction => {
             const StatusIcon = getStatusIcon(transaction.status);
             const TransactionIcon = getTransactionIcon(transaction.type);
-            return <div key={transaction.id} className="bg-white border border-gray-100 rounded-xl p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
-                        <TransactionIcon className="h-4 w-4 text-blue-600" />
+            return <div key={transaction.id} className="bg-white border border-gray-100 rounded-lg p-2.5 md:p-3 active:bg-gray-50 transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <TransactionIcon className="h-3.5 w-3.5 md:h-4 md:w-4 text-blue-600" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-black truncate">{transaction.type}</p>
-                          <Badge className={`text-xs px-2 py-0.5 ${getStatusColor(transaction.status)}`}>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <p className="text-xs md:text-sm font-semibold text-black truncate">{transaction.type}</p>
+                          <Badge className={`text-[9px] md:text-xs px-1.5 py-0 ${getStatusColor(transaction.status)}`}>
                             {transaction.status}
                           </Badge>
                         </div>
-                        <p className="text-xs text-gray-500 truncate">{transaction.description}</p>
-                        <p className="text-xs text-gray-400">{transaction.date}</p>
+                        <p className="text-[10px] md:text-xs text-gray-500 truncate">{transaction.description}</p>
+                        <p className="text-[9px] md:text-xs text-gray-400">{transaction.date}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-black">
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-xs md:text-sm font-bold text-black">
                         UGX {(transaction.amount / 1000).toFixed(0)}K
                       </p>
-                      <StatusIcon className="h-3 w-3 text-gray-400 ml-auto mt-1" />
+                      <StatusIcon className="h-2.5 w-2.5 md:h-3 md:w-3 text-gray-400 ml-auto mt-0.5" />
                     </div>
                   </div>
                 </div>;
           })}
           </div>
 
-          {/* Team Budget Progress */}
-          {hasPermission('manage_team') && <div className="mt-4">
-              <div className="bg-white border border-gray-100 rounded-xl p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-base font-bold text-black">Monthly Budget</h3>
-                  <span className="text-sm font-medium text-blue-600">
+          {/* Team Budget Progress - Compact Mobile */}
+          {hasPermission('manage_team') && <div className="mt-3">
+              <div className="bg-white border border-gray-100 rounded-lg p-2.5 md:p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-2 md:mb-3">
+                  <h3 className="text-xs md:text-base font-bold text-black">Monthly Budget</h3>
+                  <span className="text-[10px] md:text-sm font-semibold text-blue-600">
                     {Math.round(dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100)}%
                   </span>
                 </div>
-                <Progress value={dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100} className="h-2 mb-3" />
-                <div className="flex justify-between text-xs text-gray-500">
+                <Progress value={dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100} className="h-1.5 md:h-2 mb-2 md:mb-3" />
+                <div className="flex justify-between text-[9px] md:text-xs text-gray-500">
                   <span>Used: UGX {(dashboardData.teamMetrics.budgetUsed / 1000000).toFixed(1)}M</span>
                   <span>Total: UGX {(dashboardData.teamMetrics.monthlyBudget / 1000000).toFixed(1)}M</span>
                 </div>
               </div>
             </div>}
 
-          {/* Pending Approvals */}
-          {hasPermission('approve_transactions') && dashboardData.pendingApprovals > 0 && <div className="mt-4">
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-blue-600" />
-                    <h3 className="text-base font-bold text-black">Pending Approvals</h3>
+          {/* Pending Approvals - Compact Mobile */}
+          {hasPermission('approve_transactions') && dashboardData.pendingApprovals > 0 && <div className="mt-3">
+              <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-lg p-2.5 md:p-4">
+                <div className="flex items-center justify-between mb-2 md:mb-3">
+                  <div className="flex items-center gap-1.5 md:gap-2">
+                    <Clock className="h-3.5 w-3.5 md:h-5 md:w-5 text-orange-600" />
+                    <h3 className="text-xs md:text-base font-bold text-black">Pending Approvals</h3>
                   </div>
-                  <Badge className="bg-blue-600 text-white text-xs px-2 py-1">
+                  <Badge className="bg-orange-600 text-white text-[9px] md:text-xs px-1.5 md:px-2 py-0.5 md:py-1 font-semibold">
                     {dashboardData.pendingApprovals}
                   </Badge>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1 md:space-y-2 mb-2 md:mb-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-700">Transactions</span>
-                    <span className="text-sm font-medium text-black">5</span>
+                    <span className="text-[10px] md:text-sm text-gray-700">Transactions</span>
+                    <span className="text-[10px] md:text-sm font-semibold text-black">5</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-700">Funding Requests</span>
-                    <span className="text-sm font-medium text-black">3</span>
+                    <span className="text-[10px] md:text-sm text-gray-700">Funding Requests</span>
+                    <span className="text-[10px] md:text-sm font-semibold text-black">3</span>
                   </div>
                 </div>
-                <Button className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white">
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                <Button className="w-full h-8 md:h-10 mt-2 md:mt-3 bg-orange-600 hover:bg-orange-700 text-white text-xs md:text-sm">
+                  <CheckCircle className="h-3 w-3 md:h-4 md:w-4 mr-1.5 md:mr-2" />
                   Review All
                 </Button>
               </div>
             </div>}
 
-          {/* Staff Management Section */}
-          {hasPermission('manage_team') && <div className="mt-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-black">Team Management</h2>
+          {/* Staff Management Section - Compact Mobile */}
+          {hasPermission('manage_team') && <div className="mt-4 md:mt-6">
+              <div className="flex items-center justify-between mb-3 md:mb-4 px-2 md:px-0">
+                <h2 className="text-base md:text-lg font-bold text-black">Team Management</h2>
                 <Dialog open={addStaffOpen} onOpenChange={setAddStaffOpen}>
                   <DialogTrigger asChild>
                     <Button className="bg-blue-600 hover:bg-blue-700 text-white">
@@ -1056,76 +1095,124 @@ const OrgDashboard = () => {
                 </Dialog>
               </div>
 
-              {/* Staff List */}
-              <Card className="bg-white border border-gray-100 shadow-lg">
+              {/* Staff List - Mobile Responsive */}
+              <Card className="bg-white border border-gray-100 shadow-sm md:shadow-lg">
                 <CardContent className="p-0">
                   {staffLoading ? (
-                    <div className="p-8 text-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                      <p className="text-sm text-gray-500 mt-2">Loading staff...</p>
+                    <div className="p-6 md:p-8 text-center">
+                      <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-blue-600 mx-auto"></div>
+                      <p className="text-xs md:text-sm text-gray-500 mt-2">Loading staff...</p>
                     </div>
                   ) : staff.length === 0 ? (
-                    <div className="p-8 text-center">
-                      <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                      <p className="text-gray-500">No staff members found</p>
+                    <div className="p-6 md:p-8 text-center">
+                      <Users className="h-8 w-8 md:h-12 md:w-12 text-gray-300 mx-auto mb-3 md:mb-4" />
+                      <p className="text-xs md:text-sm text-gray-500">No staff members found</p>
                     </div>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {staff.map((staffMember) => (
-                            <TableRow key={staffMember.id}>
-                              <TableCell className="font-medium">
-                                {staffMember.user.first_name} {staffMember.user.last_name}
-                              </TableCell>
-                              <TableCell>{staffMember.user.email}</TableCell>
-                              <TableCell>{staffMember.user.phone_number}</TableCell>
-                              <TableCell>
-                                <Badge className={getRoleColor(staffMember.role || 'member')}>
-                                  {staffMember.role || 'member'}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>
-                                <div className="flex items-center gap-2">
-                                  <Select
-                                    value={staffMember.role || 'member'}
-                                    onValueChange={(value: "owner" | "manager" | "member") => 
-                                      handleUpdateStaffRole(staffMember.id, value)
-                                    }
-                                  >
-                                    <SelectTrigger className="w-24 h-8">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="member">Member</SelectItem>
-                                      <SelectItem value="manager">Manager</SelectItem>
-                                      <SelectItem value="owner">Owner</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleDeleteStaff(staffMember.id)}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </TableCell>
+                    <>
+                      {/* Mobile View - Card Layout */}
+                      <div className="md:hidden space-y-2 p-2">
+                        {staff.map((staffMember) => (
+                          <div key={staffMember.id} className="bg-gray-50 border border-gray-100 rounded-lg p-2.5">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-black truncate">
+                                  {staffMember.user.first_name} {staffMember.user.last_name}
+                                </p>
+                                <p className="text-[10px] text-gray-500 truncate mt-0.5">{staffMember.user.email}</p>
+                                <p className="text-[10px] text-gray-500 truncate">{staffMember.user.phone_number}</p>
+                              </div>
+                              <Badge className={`text-[9px] px-1.5 py-0.5 flex-shrink-0 ${getRoleColor(staffMember.role || 'member')}`}>
+                                {staffMember.role || 'member'}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Select
+                                value={staffMember.role || 'member'}
+                                onValueChange={(value: "owner" | "manager" | "member") => 
+                                  handleUpdateStaffRole(staffMember.id, value)
+                                }
+                              >
+                                <SelectTrigger className="w-full h-8 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="member">Member</SelectItem>
+                                  <SelectItem value="manager">Manager</SelectItem>
+                                  <SelectItem value="owner">Owner</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteStaff(staffMember.id)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Desktop View - Table */}
+                      <div className="hidden md:block overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Name</TableHead>
+                              <TableHead>Email</TableHead>
+                              <TableHead>Phone</TableHead>
+                              <TableHead>Role</TableHead>
+                              <TableHead>Actions</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+                          </TableHeader>
+                          <TableBody>
+                            {staff.map((staffMember) => (
+                              <TableRow key={staffMember.id}>
+                                <TableCell className="font-medium">
+                                  {staffMember.user.first_name} {staffMember.user.last_name}
+                                </TableCell>
+                                <TableCell>{staffMember.user.email}</TableCell>
+                                <TableCell>{staffMember.user.phone_number}</TableCell>
+                                <TableCell>
+                                  <Badge className={getRoleColor(staffMember.role || 'member')}>
+                                    {staffMember.role || 'member'}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <Select
+                                      value={staffMember.role || 'member'}
+                                      onValueChange={(value: "owner" | "manager" | "member") => 
+                                        handleUpdateStaffRole(staffMember.id, value)
+                                      }
+                                    >
+                                      <SelectTrigger className="w-24 h-8">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="member">Member</SelectItem>
+                                        <SelectItem value="manager">Manager</SelectItem>
+                                        <SelectItem value="owner">Owner</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleDeleteStaff(staffMember.id)}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </>
                   )}
                 </CardContent>
               </Card>

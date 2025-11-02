@@ -177,11 +177,12 @@ const Collections = () => {
       } else {
         throw new Error(response.message || "Failed to initiate collection");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error initiating collection:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to initiate collection. Please try again.";
       toast({
         title: "Error",
-        description: error.message || "Failed to initiate collection. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -247,11 +248,12 @@ const Collections = () => {
       } else {
         throw new Error(response.message || "Failed to initiate withdrawal");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error initiating withdrawal:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to initiate withdrawal. Please try again.";
       toast({
         title: "Error",
-        description: error.message || "Failed to initiate withdrawal. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -319,9 +321,15 @@ const Collections = () => {
   }
 
   return (
-      <div className="space-y-4 md:space-y-6">
-        <div className="flex flex-col space-y-3">
-          <div>
+      <div className="space-y-3 md:space-y-6 bg-gray-50 md:bg-white pb-20 md:pb-0">
+        {/* Mobile Header - Compact */}
+        <div className="md:hidden sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm -mx-2 px-3 py-2.5 mb-3">
+          <h1 className="text-lg font-bold text-black">Collections</h1>
+          <p className="text-xs text-gray-500 mt-0.5">Mobile money & payment links</p>
+        </div>
+
+        <div className="flex flex-col space-y-3 px-2 md:px-0">
+          <div className="hidden md:block">
             <h1 className="text-xl md:text-2xl font-semibold text-slate-900">Collections & Payment Links</h1>
             <p className="text-sm text-muted-foreground">Manage mobile money collections and payment links (UGX only)</p>
           </div>
@@ -411,69 +419,70 @@ const Collections = () => {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex space-x-1 bg-muted p-1 rounded-lg w-full sm:w-fit overflow-x-auto">
+        {/* Tabs - Compact Mobile */}
+        <div className="flex space-x-1 bg-gray-50 md:bg-muted p-0.5 md:p-1 rounded-lg w-full sm:w-fit overflow-x-auto">
           <button
             onClick={() => setActiveTab("collections")}
-            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap flex-1 sm:flex-none ${
+            className={`px-3 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-1 sm:flex-none h-8 md:h-auto ${
               activeTab === "collections"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-white md:bg-background text-blue-600 md:text-foreground shadow-sm"
+                : "text-gray-600 md:text-muted-foreground hover:text-blue-600 md:hover:text-foreground"
             }`}
           >
             Collections
           </button>
           <button
             onClick={() => setActiveTab("links")}
-            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap flex-1 sm:flex-none ${
+            className={`px-3 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-1 sm:flex-none h-8 md:h-auto ${
               activeTab === "links"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-white md:bg-background text-blue-600 md:text-foreground shadow-sm"
+                : "text-gray-600 md:text-muted-foreground hover:text-blue-600 md:hover:text-foreground"
             }`}
           >
             Payment Links
           </button>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        {/* Summary Cards - Compact Mobile */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4 lg:gap-6">
           {activeTab === "collections" ? (
             <>
-              <Card className="border border-slate-100 bg-white">
-                <CardHeader>
-                  <CardTitle className="text-base sm:text-lg">Total Collections</CardTitle>
+              <Card className="border border-slate-100 bg-white shadow-sm">
+                <CardHeader className="pb-2 md:pb-4">
+                  <CardTitle className="text-xs md:text-base sm:text-lg">Total Collections</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">{collections.length}</div>
-                  <p className="text-sm text-muted-foreground">All time</p>
+                <CardContent className="pt-0 pb-2.5 md:pb-4">
+                  <div className="text-base md:text-xl sm:text-2xl font-bold">{collections.length}</div>
+                  <p className="text-[9px] md:text-sm text-muted-foreground">All time</p>
                 </CardContent>
               </Card>
-              <Card className="border border-slate-100 bg-white">
-                <CardHeader>
-                  <CardTitle className="text-base sm:text-lg">Successful</CardTitle>
+              <Card className="border border-slate-100 bg-white shadow-sm">
+                <CardHeader className="pb-2 md:pb-4">
+                  <CardTitle className="text-xs md:text-base sm:text-lg">Successful</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold text-green-600">
+                <CardContent className="pt-0 pb-2.5 md:pb-4">
+                  <div className="text-base md:text-xl sm:text-2xl font-bold text-green-600">
                     {collections.filter(c => c.status === "successful").length}
                   </div>
-                  <p className="text-sm text-muted-foreground">Completed collections</p>
+                  <p className="text-[9px] md:text-sm text-muted-foreground">Completed</p>
                 </CardContent>
               </Card>
-              <Card className="border border-slate-100 bg-white">
-                <CardHeader>
-                  <CardTitle className="text-base sm:text-lg">Total Amount</CardTitle>
+              <Card className="border border-slate-100 bg-white shadow-sm col-span-2 lg:col-span-1">
+                <CardHeader className="pb-2 md:pb-4">
+                  <CardTitle className="text-xs md:text-base sm:text-lg">Total Amount</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">
-                    UGX {collections.reduce((sum, c) => sum + c.amount, 0).toLocaleString()}
+                <CardContent className="pt-0 pb-2.5 md:pb-4">
+                  <div className="text-base md:text-xl sm:text-2xl font-bold">
+                    UGX {(collections.reduce((sum, c) => sum + c.amount, 0) / 1000).toFixed(0)}K
                   </div>
-                  <p className="text-sm text-muted-foreground">Total collected</p>
-                  <div className="flex gap-2 mt-3">
+                  <p className="text-[9px] md:text-sm text-muted-foreground mb-2 md:mb-3">Total collected</p>
+                  <div className="flex gap-1.5 md:gap-2 mt-2 md:mt-3">
                     <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
                       <DialogTrigger asChild>
-                        <Button size="sm" variant="outline" className="flex-1">
-                          <Building className="h-3 w-3 mr-1" />
-                          Send to Bank
+                        <Button size="sm" variant="outline" className="flex-1 h-8 md:h-9 text-[10px] md:text-sm">
+                          <Building className="h-2.5 w-2.5 md:h-3 md:w-3 mr-0.5 md:mr-1" />
+                          <span className="hidden sm:inline">Send to Bank</span>
+                          <span className="sm:hidden">Bank</span>
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
@@ -529,8 +538,8 @@ const Collections = () => {
 
                     <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                       <DialogTrigger asChild>
-                        <Button size="sm" variant="outline" className="flex-1">
-                          <Phone className="h-3 w-3 mr-1" />
+                        <Button size="sm" variant="outline" className="flex-1 h-8 md:h-9 text-[10px] md:text-sm">
+                          <Phone className="h-2.5 w-2.5 md:h-3 md:w-3 mr-0.5 md:mr-1" />
                           Withdraw
                         </Button>
                       </DialogTrigger>
@@ -628,24 +637,24 @@ const Collections = () => {
           )}
         </div>
 
-        {/* Search and Filter */}
-        <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:gap-4">
+        {/* Search and Filter - Compact Mobile */}
+        <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:gap-4 px-2 md:px-0">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Search className="absolute left-2.5 md:left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-3.5 w-3.5 md:h-4 md:w-4" />
             <Input
               placeholder={`Search ${activeTab}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-9 md:pl-10 h-9 md:h-10 text-xs md:text-sm"
             />
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
-              <Filter className="h-4 w-4 mr-2" />
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-9 md:h-10 text-xs md:text-sm px-3">
+              <Filter className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-2" />
               Filter
             </Button>
-            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
-              <Download className="h-4 w-4 mr-2" />
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-9 md:h-10 text-xs md:text-sm px-3">
+              <Download className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-2" />
               Export
             </Button>
           </div>
@@ -670,35 +679,35 @@ const Collections = () => {
             ))}
           </div>
         ) : activeTab === "collections" ? (
-          <div className="space-y-4">
+          <div className="space-y-2 md:space-y-4 px-2 md:px-0">
             {filteredCollections.map((collection) => (
-              <Card key={collection.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-4 md:p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-start space-x-3 sm:space-x-4">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Smartphone className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              <Card key={collection.id} className="hover:shadow-lg transition-shadow bg-white border border-gray-100 shadow-sm">
+                <CardContent className="p-2.5 md:p-4 lg:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-4">
+                    <div className="flex items-start space-x-2 md:space-x-3 sm:space-x-4 min-w-0 flex-1">
+                      <div className="w-8 h-8 md:w-10 md:h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Smartphone className="h-3.5 w-3.5 md:h-5 md:w-5 sm:h-6 sm:w-6 text-blue-600" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-                          <h3 className="font-semibold text-sm sm:text-base truncate">{collection.id}</h3>
-                          <Badge className={`${getStatusColor(collection.status)} text-xs w-fit`}>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-0.5 md:mb-1">
+                          <h3 className="font-semibold text-xs md:text-sm sm:text-base truncate">{collection.id}</h3>
+                          <Badge className={`${getStatusColor(collection.status)} text-[9px] md:text-xs w-fit`}>
                             {collection.status}
                           </Badge>
                         </div>
-                        <p className="text-xs sm:text-sm text-muted-foreground break-all">
+                        <p className="text-[10px] md:text-xs sm:text-sm text-muted-foreground break-all line-clamp-1">
                           {collection.phone_number || 'N/A'} • {collection.reference}
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-[9px] md:text-xs text-muted-foreground">
                           {new Date(collection.created_at).toLocaleString()}
                         </p>
                       </div>
                     </div>
                     <div className="text-left sm:text-right flex-shrink-0">
-                      <div className="text-lg font-bold">
-                        UGX {collection.amount.toLocaleString()}
+                      <div className="text-sm md:text-lg font-bold">
+                        UGX {(collection.amount / 1000).toFixed(0)}K
                       </div>
-                      <div className="text-xs sm:text-sm text-muted-foreground capitalize">
+                      <div className="text-[9px] md:text-xs sm:text-sm text-muted-foreground capitalize">
                         {collection.status || 'pending'}
                       </div>
                     </div>

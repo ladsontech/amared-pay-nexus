@@ -28,19 +28,19 @@ const SystemAdminLayout = () => {
 
         {/* Content */}
         <div className="flex-1 flex flex-col">
-          {/* Header */}
-          <header className="sticky top-0 z-50 w-full border-b border-red-200/60 bg-white/90 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 shadow-lg">
-            <div className="container flex h-16 items-center justify-between px-6">
-              <div className="flex items-center gap-4">
-                <SidebarTrigger className="md:ml-0" />
-                <img src="/images/Almaredpay_logo.png" alt="Alma Pay logo" className="h-12 w-auto object-contain" />
-                <div className="hidden sm:flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-gradient-to-br from-red-100 to-red-200 shadow-md">
-                    <Crown className="h-5 w-5 text-red-600" />
+          {/* Header - Compact Mobile */}
+          <header className="sticky top-0 z-50 w-full border-b border-red-200/60 bg-white/90 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 shadow-sm md:shadow-lg">
+            <div className="container flex h-12 md:h-16 items-center justify-between px-3 md:px-6">
+              <div className="flex items-center gap-2 md:gap-4">
+                <SidebarTrigger className="md:ml-0 h-8 w-8 md:h-10 md:w-10" />
+                <img src="/images/Almaredpay_logo.png" alt="Alma Pay logo" className="h-8 md:h-12 w-auto object-contain" />
+                <div className="hidden sm:flex items-center gap-2 md:gap-3">
+                  <div className="p-1.5 md:p-2 rounded-lg md:rounded-xl bg-gradient-to-br from-red-100 to-red-200 shadow-sm md:shadow-md">
+                    <Crown className="h-3.5 w-3.5 md:h-5 md:w-5 text-red-600" />
                   </div>
                   <div>
-                    <span className="font-bold text-xl bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">System Admin</span>
-                    <p className="text-xs text-red-600 font-medium">Platform Control Center</p>
+                    <span className="font-bold text-sm md:text-xl bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">System Admin</span>
+                    <p className="text-[9px] md:text-xs text-red-600 font-medium">Platform Control</p>
                   </div>
                 </div>
               </div>
