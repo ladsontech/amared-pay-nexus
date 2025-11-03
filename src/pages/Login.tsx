@@ -72,9 +72,9 @@ const Login = () => {
           <div className="flex items-center justify-center">
             <div className="p-4 rounded-2xl bg-white">
               <img 
-                src="/images/Almaredpay_logo.png" 
+                src="/Almapay_appbar_logo.png" 
                 alt="Alma Pay Logo" 
-                className="w-24 h-12 sm:w-32 sm:h-16 object-contain"
+                className="w-48 h-24 sm:w-64 sm:h-32 md:w-80 md:h-40 object-contain"
               />
             </div>
           </div>

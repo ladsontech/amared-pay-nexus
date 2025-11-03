@@ -62,8 +62,23 @@ export const useOrganization = () => {
       const org = await organizationService.getOrganization(user.organizationId);
       setOrganization(org);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch organization');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch organization';
+      setError(errorMessage);
       console.error('Error fetching organization:', err);
+      // Don't throw - allow the app to continue with user.organization data
+      // Set a default organization object from user data if available
+      if (user.organization) {
+        setOrganization({
+          id: user.organizationId,
+          name: user.organization.name || 'Organization',
+          address: user.organization.address || '',
+          company_reg_id: '',
+          tin: '',
+          static_collection_link: '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        } as Organization);
+      }
     } finally {
       setLoading(false);
     }

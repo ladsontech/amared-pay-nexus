@@ -19,7 +19,7 @@ const SystemAdminLayout = () => {
           <header className="fixed top-0 left-0 md:right-64 right-0 z-50 border-b border-gray-200 bg-white backdrop-blur-xl supports-[backdrop-filter]:bg-white shadow-sm md:shadow-lg transition-[right] duration-200">
             <div className="w-full flex h-12 md:h-16 items-stretch justify-between px-3 md:px-6">
               <div className="flex items-center gap-2 md:gap-4">
-                <img src="/images/Almaredpay_logo.png" alt="Alma Pay logo" className="h-full w-auto object-contain" />
+                <img src="/Almapay_appbar_logo.png" alt="Alma Pay logo" className="h-full w-auto object-contain" />
                 <div className="hidden sm:flex items-center gap-2 md:gap-3">
                   <div className="p-1.5 md:p-2 rounded-lg md:rounded-xl bg-blue-100 shadow-sm md:shadow-md">
                     <Crown className="h-3.5 w-3.5 md:h-5 md:w-5 text-blue-600" />

@@ -121,13 +121,23 @@ const SystemOrganizationView = () => {
             variant="default" 
             size="sm" 
             className="w-full sm:w-auto text-xs sm:text-sm"
-            onClick={() => {
-              impersonateOrganization(organization.id, organization.name);
-              toast({
-                title: "Impersonating Organization",
-                description: `Now viewing as ${organization.name}. You can make changes just like the organization owner.`,
-              });
-              setTimeout(() => navigate("/org/dashboard"), 500);
+            onClick={async () => {
+              try {
+                impersonateOrganization(organization.id, organization.name);
+                toast({
+                  title: "Impersonating Organization",
+                  description: `Now viewing as ${organization.name}. You can make changes just like the organization owner.`,
+                });
+                // Use window.location for a full reload to ensure state is properly set
+                window.location.href = "/org/dashboard";
+              } catch (error) {
+                console.error("Error during impersonation:", error);
+                toast({
+                  title: "Error",
+                  description: "Failed to impersonate organization. Please try again.",
+                  variant: "destructive",
+                });
+              }
             }}
           >
             <LogIn className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />

@@ -33,6 +33,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading: true,
   });
   const [originalAdmin, setOriginalAdmin] = useState<User | null>(null);
+  const [isImpersonating, setIsImpersonating] = useState<boolean>(
+    localStorage.getItem('impersonating') === 'true'
+  );
 
   useEffect(() => {
     // Load user from localStorage
@@ -52,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           // If impersonating, restore the original admin state
           if (isImpersonating) {
+            setIsImpersonating(true);
             const storedAdmin = localStorage.getItem('original_admin');
             if (storedAdmin) {
               try {
@@ -229,6 +233,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     localStorage.removeItem('impersonating');
     localStorage.removeItem('original_admin');
+    setIsImpersonating(false);
     setOriginalAdmin(null);
   };
 
@@ -267,6 +272,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('impersonating', 'true');
     localStorage.setItem('original_admin', JSON.stringify(currentUser));
     
+    setIsImpersonating(true);
     setAuthState({
       user: impersonatedUser,
       isAuthenticated: true,
@@ -317,8 +323,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isRole = (role: string): boolean => {
     return authState.user?.role === role;
   };
-
-  const isImpersonating = localStorage.getItem('impersonating') === 'true';
 
   return (
     <AuthContext.Provider

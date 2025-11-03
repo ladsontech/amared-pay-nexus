@@ -51,9 +51,31 @@ const OrganizationLayout = () => {
     }
   }, [user, organization, orgLoading, isImpersonating]);
   
+  // Show loading state while checking user and organization
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   // Redirect system admins to the system dashboard (unless impersonating)
   if (user?.role === 'admin' && !isImpersonating) {
     return <Navigate to="/system/organizations" replace />;
+  }
+
+  // When impersonating, ensure organizationId is set
+  if (isImpersonating && !user.organizationId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold mb-2">Error</h2>
+          <p className="text-muted-foreground mb-4">Organization ID is missing during impersonation.</p>
+          <Button onClick={stopImpersonating}>Return to Admin Dashboard</Button>
+        </div>
+      </div>
+    );
   }
 
   const handleLogout = async () => {
@@ -86,6 +108,19 @@ const OrganizationLayout = () => {
     );
   }
 
+  // Show loading state if organization is still loading (but allow impersonation to proceed)
+  if (orgLoading && !isImpersonating && !organization) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Get organization name from user object if organization data is still loading
+  const orgName = organization?.name || user?.organization?.name || 'Organization';
+  const orgLogo = organization?.logo || user?.organization?.logo;
+
   return <SidebarProvider>
       <div className="min-h-screen bg-background flex w-full overflow-x-hidden">
         {/* Fixed Sidebar */}
@@ -104,7 +139,7 @@ const OrganizationLayout = () => {
                   <div className="relative flex-shrink-0">
                     <img 
                       src={getOrganizationLogoUrl(user?.organization as OrgType)} 
-                      alt={user?.organization?.name || 'Organization logo'} 
+                      alt={orgName} 
                       className="h-8 w-8 md:h-12 md:w-12 rounded-lg object-cover border-2 border-blue-200"
                       onError={(e) => {
                         // If image fails to load, use default avatar
@@ -114,7 +149,7 @@ const OrganizationLayout = () => {
                     />
                   </div>
                   <div className="min-w-0">
-                    <h2 className="font-bold text-sm md:text-lg text-foreground truncate">{user?.organization?.name || 'Organization'}</h2>
+                    <h2 className="font-bold text-sm md:text-lg text-foreground truncate">{orgName}</h2>
                     <p className="hidden md:block text-xs text-muted-foreground">Financial Management</p>
                   </div>
                 </div>
