@@ -11,11 +11,23 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Home, Wallet, Send, DollarSign, BarChart3, Shield, CheckCircle, Building, Users, Crown, User, Settings } from "lucide-react";
+import { Home, Wallet, Send, DollarSign, BarChart3, Shield, CheckCircle, Building, Users, Crown, User, Settings, LogOut } from "lucide-react";
 import NewActionButton from "./NewActionButton";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type NavItem = { 
   title: string; 
@@ -44,13 +56,28 @@ export default function AppOrgSidebar() {
   const { setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
   const location = useLocation();
-  const { hasPermission, hasAnyPermission } = useAuth();
+  const { user, hasPermission, hasAnyPermission, logout, isImpersonating, stopImpersonating } = useAuth();
   const isActive = (path: string) => location.pathname === path;
   const items = orgItems; // Always show all items; disable ones without permission
 
   const handleNavClick = () => {
     if (isMobile) {
       setOpenMobile(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    if (isImpersonating) {
+      stopImpersonating();
+      if (isMobile) {
+        setOpenMobile(false);
+      }
+      window.location.href = '/system/organizations';
+    } else {
+      await logout();
+      if (isMobile) {
+        setOpenMobile(false);
+      }
     }
   };
 
@@ -97,6 +124,54 @@ export default function AppOrgSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      {/* User Account Section - Shows on mobile, hidden on desktop */}
+      <SidebarFooter className="md:hidden border-t border-border p-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="w-full justify-start h-auto p-3 hover:bg-secondary">
+              <div className="flex items-center gap-3 w-full">
+                <Avatar className="h-10 w-10 shadow-md flex-shrink-0">
+                  <AvatarImage src={user?.avatar} alt={user?.name} />
+                  <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                    {user?.name?.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="font-semibold text-sm text-foreground truncate">{user?.name || 'User'}</p>
+                  <p className="text-xs text-muted-foreground truncate">{user?.email || 'No email'}</p>
+                </div>
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-sm border-border shadow-xl" align="start" side="right" forceMount>
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-2 p-2">
+                {isImpersonating && (
+                  <div className="mb-2 p-2 bg-orange-50 border border-orange-200 rounded-lg">
+                    <p className="text-xs font-semibold text-orange-800 flex items-center gap-1">
+                      <Shield className="h-3 w-3" />
+                      Viewing as Organization Owner
+                    </p>
+                  </div>
+                )}
+                <p className="text-base font-bold leading-none text-foreground">{user?.name || 'User'}</p>
+                <p className="text-sm leading-none text-muted-foreground font-medium">{user?.email || 'No email'}</p>
+                {user?.department && <p className="text-sm leading-none text-muted-foreground font-medium">{user.department}</p>}
+                {user?.position && <p className="text-xs leading-none text-muted-foreground">{user.position}</p>}
+                <Badge className={`w-fit capitalize mt-1 font-bold shadow-sm ${user?.role === 'manager' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' : 'bg-primary text-primary-foreground'}`}>
+                  {user?.role === 'manager' ? <Crown className="h-3 w-3 mr-1" /> : <User className="h-3 w-3 mr-1" />}
+                  {user?.role || 'staff'}
+                </Badge>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout} className={isImpersonating ? "text-orange-600 font-medium" : "text-red-600 font-medium"}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>{isImpersonating ? 'Return to Admin Dashboard' : 'Log out'}</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

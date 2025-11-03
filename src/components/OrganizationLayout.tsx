@@ -54,16 +54,16 @@ const OrganizationLayout = () => {
         <div className="flex-1 flex flex-col">
           {/* Header */}
           <header className="sticky top-0 z-50 w-full border-b border-blue-200/50 bg-blue-50/95 backdrop-blur-xl supports-[backdrop-filter]:bg-blue-50/95 shadow-sm">
-            <div className="container flex h-16 items-center justify-between px-6">
-              <div className="flex items-center gap-4">
-                <SidebarTrigger className="md:ml-0" />
-                {/* Organization Logo */}
-                <div className="flex items-center gap-3">
-                  <div className="relative">
+            <div className="container flex h-12 md:h-16 items-center justify-between px-3 md:px-6">
+              <div className="flex items-center gap-2 md:gap-4">
+                <SidebarTrigger className="md:ml-0 h-8 w-8 md:h-10 md:w-10" />
+                {/* Organization Logo and Name */}
+                <div className="flex items-center gap-2 md:gap-3 min-w-0">
+                  <div className="relative flex-shrink-0">
                     <img 
                       src={getOrganizationLogoUrl(user?.organization as OrgType)} 
                       alt={user?.organization?.name || 'Organization logo'} 
-                      className="h-12 w-12 rounded-lg object-cover border-2 border-blue-200"
+                      className="h-8 w-8 md:h-12 md:w-12 rounded-lg object-cover border-2 border-blue-200"
                       onError={(e) => {
                         // If image fails to load, use default avatar
                         const target = e.currentTarget as HTMLImageElement;
@@ -71,16 +71,17 @@ const OrganizationLayout = () => {
                       }}
                     />
                   </div>
-                  <div className="hidden sm:block">
-                    <h2 className="font-bold text-lg text-foreground">{user?.organization?.name || 'Organization'}</h2>
-                    <p className="text-xs text-muted-foreground">Financial Management</p>
+                  <div className="min-w-0">
+                    <h2 className="font-bold text-sm md:text-lg text-foreground truncate">{user?.organization?.name || 'Organization'}</h2>
+                    <p className="hidden md:block text-xs text-muted-foreground">Financial Management</p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* Desktop Only: Active Users, Impersonating Badge, and Account Menu */}
+              <div className="hidden md:flex items-center gap-2">
                 {/* Active Users Indicator */}
-                <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary border border-border">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary border border-border">
                   <Users className="h-4 w-4 text-primary" />
                   <div className="text-xs">
                     <span className="font-semibold text-foreground">{activeStaff}</span>
