@@ -175,50 +175,50 @@ const SystemOrganizationView = () => {
       </div>
 
       {/* Organization Details Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <Card className="border border-slate-100 bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Staff</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-xs sm:text-sm font-medium">Total Staff</CardTitle>
+            <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{staff.length}</div>
-            <p className="text-xs text-muted-foreground">Active members</p>
+            <div className="text-lg sm:text-2xl font-bold">{staff.length}</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Active members</p>
           </CardContent>
         </Card>
 
         <Card className="border border-slate-100 bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Wallet Balance</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-xs sm:text-sm font-medium">Wallet Balance</CardTitle>
+            <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-lg sm:text-2xl font-bold">
               {wallet?.currency?.symbol || ''} {wallet?.balance?.toLocaleString() || '0'}
             </div>
-            <p className="text-xs text-muted-foreground">{wallet?.currency?.name || 'N/A'}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">{wallet?.currency?.name || 'N/A'}</p>
           </CardContent>
         </Card>
 
         <Card className="border border-slate-100 bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Transactions</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-xs sm:text-sm font-medium">Transactions</CardTitle>
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{transactions.length}</div>
-            <p className="text-xs text-muted-foreground">Total transactions</p>
+            <div className="text-lg sm:text-2xl font-bold">{transactions.length}</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Total transactions</p>
           </CardContent>
         </Card>
 
         <Card className="border border-slate-100 bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Status</CardTitle>
-            <Building className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-xs sm:text-sm font-medium">Status</CardTitle>
+            <Building className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Active</div>
-            <p className="text-xs text-muted-foreground">Operational</p>
+            <div className="text-lg sm:text-2xl font-bold">Active</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Operational</p>
           </CardContent>
         </Card>
       </div>

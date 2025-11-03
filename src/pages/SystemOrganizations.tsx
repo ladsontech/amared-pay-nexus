@@ -218,32 +218,32 @@ const SystemOrganizations = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6">
           <Card className="border border-slate-100 bg-white">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base sm:text-lg">Total Organizations</CardTitle>
+              <CardTitle className="text-xs sm:text-base lg:text-lg">Total Organizations</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">{organizations.length}</div>
-              <p className="text-xs sm:text-sm text-muted-foreground">Registered</p>
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold">{organizations.length}</div>
+              <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground">Registered</p>
             </CardContent>
           </Card>
           <Card className="border border-slate-100 bg-white">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base sm:text-lg">Active</CardTitle>
+              <CardTitle className="text-xs sm:text-base lg:text-lg">Active</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold text-green-600">{organizations.length}</div>
-              <p className="text-xs sm:text-sm text-muted-foreground">Currently active</p>
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600">{organizations.length}</div>
+              <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground">Currently active</p>
             </CardContent>
           </Card>
-          <Card className="border border-slate-100 bg-white sm:col-span-2 lg:col-span-1">
+          <Card className="border border-slate-100 bg-white">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base sm:text-lg">Total Staff</CardTitle>
+              <CardTitle className="text-xs sm:text-base lg:text-lg">Total Staff</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">-</div>
-              <p className="text-xs sm:text-sm text-muted-foreground">All organizations</p>
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold">-</div>
+              <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground">All organizations</p>
             </CardContent>
           </Card>
         </div>
