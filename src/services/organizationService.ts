@@ -684,17 +684,59 @@ class OrganizationService {
       if (params?.limit) queryParams.append("limit", params.limit.toString());
       if (params?.offset) queryParams.append("offset", params.offset.toString());
 
-      const response = await fetch(`${API_BASE_URL}/organizations/org/?${queryParams}`, {
+      const queryString = queryParams.toString();
+      const url = queryString 
+        ? `${API_BASE_URL}/organizations/org/?${queryString}`
+        : `${API_BASE_URL}/organizations/org/`;
+      const response = await fetch(url, {
         method: "GET",
         headers: this.getAuthHeaders(),
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        let errorMessage = "";
+
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.message || errorData.detail || `HTTP error! status: ${response.status}`;
+        } catch {
+          // If response is HTML or not JSON
+          if (errorText.includes('<!DOCTYPE html>')) {
+            errorMessage = `Server error (${response.status}): The server returned an HTML page instead of JSON. This usually indicates a server-side error.`;
+          } else if (response.status === 401) {
+            errorMessage = "Unauthorized: Please log in again.";
+          } else if (response.status === 403) {
+            errorMessage = "Forbidden: You don't have permission to view organizations.";
+          } else if (response.status === 500) {
+            errorMessage = "Internal Server Error: The server encountered an error.";
+          } else {
+            errorMessage = `Server error (${response.status}): ${errorText.substring(0, 200)}`;
+          }
+        }
+
+        throw new Error(errorMessage);
       }
 
-      return await response.json();
+      const data = await response.json();
+      
+      // Ensure we always return the expected structure
+      if (!data || typeof data !== 'object') {
+        throw new Error("Invalid response format from server");
+      }
+
+      // Handle case where response might not have results array
+      if (!Array.isArray(data.results)) {
+        console.warn("API response missing results array, returning empty array:", data);
+        return {
+          count: 0,
+          next: null,
+          previous: null,
+          results: []
+        };
+      }
+
+      return data;
     } catch (error) {
       console.error("Get organizations error:", error);
       throw error;

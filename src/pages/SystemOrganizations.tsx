@@ -16,6 +16,7 @@ const SystemOrganizations = () => {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState<null | Organization>(null);
   const [otpVerificationOpen, setOtpVerificationOpen] = useState(false);
@@ -28,17 +29,21 @@ const SystemOrganizations = () => {
   const fetchOrganizations = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       console.log('Fetching organizations...');
       const response = await organizationService.getOrganizations();
       console.log('Organizations fetched:', response);
-      setOrganizations(response.results);
+      setOrganizations(response.results || []);
     } catch (error: any) {
       console.error('Failed to load organizations:', error);
+      const errorMessage = error.message || "Failed to load organizations";
+      setError(errorMessage);
       toast({
         title: "Error",
-        description: error.message || "Failed to load organizations",
+        description: errorMessage,
         variant: "destructive",
       });
+      setOrganizations([]); // Set empty array on error to prevent UI issues
     } finally {
       setIsLoading(false);
     }
@@ -275,6 +280,38 @@ const SystemOrganizations = () => {
               </Card>
             ))}
           </div>
+        ) : error ? (
+          <Card className="border border-red-200 bg-red-50">
+            <CardContent className="p-12 text-center">
+              <Building className="h-12 w-12 mx-auto mb-4 text-red-400 opacity-50" />
+              <h3 className="text-lg font-medium mb-2 text-red-900">Error Loading Organizations</h3>
+              <p className="text-red-700 mb-4">{error}</p>
+              <Button onClick={fetchOrganizations} variant="outline">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        ) : filteredOrganizations.length === 0 ? (
+          <Card className="border border-slate-100 bg-white">
+            <CardContent className="p-12 text-center">
+              <Building className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <h3 className="text-lg font-medium mb-2">No organizations found</h3>
+              <p className="text-muted-foreground mb-4">
+                {searchTerm 
+                  ? `No organizations match your search "${searchTerm}"` 
+                  : organizations.length === 0
+                    ? "Get started by creating your first organization."
+                    : "Try adjusting your search or filters."}
+              </p>
+              {organizations.length === 0 && !searchTerm && (
+                <Button onClick={() => setCreateOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Organization
+                </Button>
+              )}
+            </CardContent>
+          </Card>
         ) : (
           <div className="space-y-4">
             {filteredOrganizations.map((org) => (
