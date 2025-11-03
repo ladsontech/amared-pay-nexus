@@ -79,6 +79,7 @@ const AppRoutes = () => {
           <Route path="organizations/:id" element={<SystemOrganizationView />} />
           <Route path="users" element={<SystemUsers />} />
           <Route path="sub-admins" element={<SystemSubAdmins />} />
+          <Route path="account" element={<OrgAccount />} />
           <Route path="settings" element={<SystemSettings />} />
         </Route>
 
