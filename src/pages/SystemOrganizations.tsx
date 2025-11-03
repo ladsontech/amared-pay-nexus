@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Search, Filter, Building, Wallet, Users, Edit, Eye, RefreshCw, Mail } from "lucide-react";
+import { Plus, Search, Filter, Building, Wallet, Users, Edit, RefreshCw, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { organizationService, Organization, CreateOrganizationRequest } from "@/services/organizationService";
 import { otpService } from "@/services/otpService";
@@ -313,51 +313,32 @@ const SystemOrganizations = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-4">
-            {filteredOrganizations.map((org) => (
-              <Card key={org.id} className="border border-slate-100 bg-white">
-                <CardContent className="p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Building className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
+          <Card className="border border-slate-100 bg-white">
+            <CardContent className="p-0">
+              <div className="divide-y divide-slate-100">
+                {filteredOrganizations.map((org) => (
+                  <div
+                    key={org.id}
+                    onClick={() => navigate(`/system/organizations/${org.id}`)}
+                    className="p-4 hover:bg-slate-50 cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Building className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-base sm:text-lg truncate">{org.name}</h3>
-                          <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                          <div>
-                            <p className="truncate"><strong>ID:</strong> <span className="break-all">{org.id}</span></p>
-                            <p className="truncate"><strong>Company Reg:</strong> {org.company_reg_id || "N/A"}</p>
-                          </div>
-                          <div>
-                            <p className="truncate"><strong>TIN:</strong> {org.tin || "N/A"}</p>
-                            <p className="truncate"><strong>Address:</strong> {org.address || "N/A"}</p>
-                          </div>
-                          <div>
-                            <p><strong>Created:</strong> {new Date(org.created_at).toLocaleDateString()}</p>
-                          </div>
+                          <p className="text-xs sm:text-sm text-muted-foreground truncate">{org.address || "No address"}</p>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-2 sm:flex-shrink-0">
-                      <Button variant="default" size="sm" className="w-full sm:w-auto text-xs sm:text-sm" onClick={() => navigate(`/system/organizations/${org.id}`)}>
-                        <Eye className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                        <span className="hidden sm:inline">View Details</span>
-                        <span className="sm:hidden">View</span>
-                      </Button>
-                      <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm" onClick={() => setEditOpen(org)}>
-                        <Edit className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                        Edit
-                      </Button>
+                      <Badge className="bg-green-100 text-green-800 text-xs ml-2 flex-shrink-0">Active</Badge>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
 
