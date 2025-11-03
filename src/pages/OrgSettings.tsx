@@ -20,14 +20,17 @@ import {
   Trash2,
   Edit,
   Layout,
-  Upload
+  Upload,
+  Sparkles
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
+import { useNavigate } from "react-router-dom";
 
 const OrgSettings = () => {
   const { user, hasPermission } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const [profileSettings, setProfileSettings] = useState({
     name: user?.name || '',
@@ -434,9 +437,30 @@ const OrgSettings = () => {
         <TabsContent value="organization">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building className="h-5 w-5" />
-                Organization Settings
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Building className="h-5 w-5" />
+                  Organization Settings
+                </div>
+                {user?.role === 'owner' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      localStorage.removeItem(`onboarding_complete_${user?.organizationId}`);
+                      toast({
+                        title: "Onboarding reset",
+                        description: "The onboarding will appear on your next page refresh.",
+                      });
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 1500);
+                    }}
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Restart Setup
+                  </Button>
+                )}
               </CardTitle>
               <CardDescription>
                 View and manage organization-wide settings

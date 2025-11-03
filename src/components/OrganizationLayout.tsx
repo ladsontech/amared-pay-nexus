@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/hooks/useOrganization";
@@ -11,7 +11,9 @@ import { Building, LogOut, Crown, User, CreditCard, Shield, Users } from "lucide
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppOrgSidebar from "./AppOrgSidebar";
 import MobileBottomNav from "./MobileBottomNav";
+import OrganizationOnboarding from "./OrganizationOnboarding";
 import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
+
 const OrganizationLayout = () => {
   const {
     user,
@@ -19,7 +21,35 @@ const OrganizationLayout = () => {
     isImpersonating,
     stopImpersonating
   } = useAuth();
-  const { activeStaff, totalStaff } = useOrganization();
+  const { activeStaff, totalStaff, organization, loading: orgLoading } = useOrganization();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Check if onboarding should be shown
+  useEffect(() => {
+    if (!user || !organization || orgLoading || isImpersonating) return;
+
+    // Only show onboarding for organization owners
+    if (user.role !== 'owner') {
+      return;
+    }
+
+    // Check if onboarding was already completed
+    const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.organizationId}`);
+    if (onboardingComplete === 'true') {
+      return;
+    }
+
+    // Show onboarding if organization name is missing or very basic
+    const orgName = organization.name?.trim() || user.organization?.name?.trim();
+    const needsSetup = !orgName || 
+                       orgName === 'Organization' || 
+                       orgName.length < 3 ||
+                       !organization.logo;
+
+    if (needsSetup) {
+      setShowOnboarding(true);
+    }
+  }, [user, organization, orgLoading, isImpersonating]);
   
   // Redirect system admins to the system dashboard (unless impersonating)
   if (user?.role === 'admin' && !isImpersonating) {
@@ -45,6 +75,17 @@ const OrganizationLayout = () => {
         return "outline" as const;
     }
   };
+  // Show onboarding if needed
+  if (showOnboarding && user?.role === 'owner') {
+    return (
+      <SidebarProvider>
+        <div className="min-h-screen bg-background">
+          <OrganizationOnboarding />
+        </div>
+      </SidebarProvider>
+    );
+  }
+
   return <SidebarProvider>
       <div className="min-h-screen bg-background flex w-full overflow-x-hidden">
         {/* Fixed Sidebar */}
