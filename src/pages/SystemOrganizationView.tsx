@@ -128,8 +128,20 @@ const SystemOrganizationView = () => {
                   throw new Error('Invalid organization data');
                 }
 
-                // Perform impersonation
+                console.log('Starting impersonation for:', organization.id, organization.name);
+
+                // Perform impersonation - this sets localStorage and state
                 impersonateOrganization(organization.id, organization.name);
+                
+                // Verify impersonation was set
+                const impersonating = localStorage.getItem('impersonating');
+                const storedUser = localStorage.getItem('user');
+                
+                if (impersonating !== 'true' || !storedUser) {
+                  throw new Error('Failed to set impersonation state');
+                }
+
+                console.log('Impersonation state set, redirecting...');
                 
                 // Show success message
                 toast({
@@ -137,11 +149,11 @@ const SystemOrganizationView = () => {
                   description: `Now viewing as ${organization.name}. You can make changes just like the organization owner.`,
                 });
 
-                // Small delay to ensure state is set before redirect
-                setTimeout(() => {
-                  // Use window.location for a full reload to ensure state is properly set
-                  window.location.href = "/org/dashboard";
-                }, 100);
+                // Use a longer delay and ensure localStorage is persisted
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Force a full page reload to ensure all state is reset
+                window.location.href = "/org/dashboard";
               } catch (error) {
                 console.error("Error during impersonation:", error);
                 const errorMessage = error instanceof Error ? error.message : "Failed to impersonate organization";
@@ -149,6 +161,7 @@ const SystemOrganizationView = () => {
                   title: "Error",
                   description: errorMessage + ". Please try again.",
                   variant: "destructive",
+                  duration: 5000,
                 });
               }
             }}

@@ -19,10 +19,24 @@ const OrganizationLayout = () => {
     user,
     logout,
     isImpersonating,
-    stopImpersonating
+    stopImpersonating,
+    loading: authLoading
   } = useAuth();
   const { activeStaff, totalStaff, organization, loading: orgLoading } = useOrganization();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Debug logging for impersonation
+  useEffect(() => {
+    if (isImpersonating) {
+      console.log('OrganizationLayout - Impersonation mode:', {
+        userId: user?.id,
+        orgId: user?.organizationId,
+        orgName: user?.organization?.name,
+        hasOrg: !!organization,
+      });
+    }
+  }, [isImpersonating, user, organization]);
 
   // Check if onboarding should be shown
   useEffect(() => {
@@ -51,11 +65,23 @@ const OrganizationLayout = () => {
     }
   }, [user, organization, orgLoading, isImpersonating]);
   
-  // Show loading state while checking user and organization
-  if (!user) {
+  // Show loading state while auth is loading
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Show loading state while checking user
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading user data...</p>
+        </div>
       </div>
     );
   }
@@ -69,7 +95,7 @@ const OrganizationLayout = () => {
   if (isImpersonating && !user.organizationId) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center p-6">
           <h2 className="text-2xl font-semibold mb-2">Error</h2>
           <p className="text-muted-foreground mb-4">Organization ID is missing during impersonation.</p>
           <Button onClick={stopImpersonating}>Return to Admin Dashboard</Button>
@@ -109,6 +135,7 @@ const OrganizationLayout = () => {
   }
 
   // Show loading state if organization is still loading (but allow impersonation to proceed)
+  // During impersonation, we should proceed even if organization is loading to avoid blocking
   if (orgLoading && !isImpersonating && !organization) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -118,8 +145,9 @@ const OrganizationLayout = () => {
   }
 
   // Get organization name from user object if organization data is still loading
-  const orgName = organization?.name || user?.organization?.name || 'Organization';
-  const orgLogo = organization?.logo || user?.organization?.logo;
+  // During impersonation, always use user.organization data since API fetch might fail
+  const orgName = (isImpersonating ? user?.organization?.name : organization?.name) || user?.organization?.name || 'Organization';
+  const orgLogo = (isImpersonating ? user?.organization?.logo : organization?.logo) || user?.organization?.logo;
 
   return <SidebarProvider>
       <div className="min-h-screen bg-background flex w-full overflow-x-hidden">

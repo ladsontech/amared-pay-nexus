@@ -386,16 +386,23 @@ export const useOrganization = () => {
   // Load initial data when user changes
   useEffect(() => {
     if (user?.organizationId) {
-      fetchOrganization();
-      fetchStaff();
-      fetchWallets();
-      fetchWalletTransactions();
-      fetchBulkPayments();
-      fetchCollections();
-      fetchMomoWithdraws();
-      fetchPettyCashWallets();
-      fetchPettyCashTransactions();
-      fetchPettyCashExpenses();
+      // During impersonation, make fetching non-blocking
+      // If organization fetch fails, continue with user.organization data
+      fetchOrganization().catch(err => {
+        console.warn('Failed to fetch organization during impersonation:', err);
+        // Continue without throwing - organization data from user object will be used
+      });
+      
+      // Fetch other data - these are less critical and can fail silently during impersonation
+      fetchStaff().catch(console.error);
+      fetchWallets().catch(console.error);
+      fetchWalletTransactions().catch(console.error);
+      fetchBulkPayments().catch(console.error);
+      fetchCollections().catch(console.error);
+      fetchMomoWithdraws().catch(console.error);
+      fetchPettyCashWallets().catch(console.error);
+      fetchPettyCashTransactions().catch(console.error);
+      fetchPettyCashExpenses().catch(console.error);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.organizationId]);
