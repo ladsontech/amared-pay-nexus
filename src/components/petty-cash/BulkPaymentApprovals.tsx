@@ -273,4 +273,3 @@ const BulkPaymentApprovals = () => {
 };
 
 export default BulkPaymentApprovals;
-export default BulkPaymentApprovals;

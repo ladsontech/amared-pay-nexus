@@ -76,6 +76,7 @@ export async function requestBackgroundSync(tag: string = 'sync-pending-requests
 
   try {
     const registration = await navigator.serviceWorker.ready;
+    // @ts-ignore - Background Sync API
     await registration.sync.register(tag);
     console.log('[PWA] Background sync requested:', tag);
     return true;
