@@ -22,14 +22,14 @@ const SystemAdminLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-blue-50/20 flex w-full">
+      <div className="min-h-screen bg-white flex w-full">
         {/* Fixed Sidebar */}
         <AppSystemSidebar />
 
         {/* Content */}
         <div className="flex-1 flex flex-col">
           {/* Header - Compact Mobile */}
-          <header className="sticky top-0 z-50 w-full border-b border-blue-200/50 bg-blue-50/95 backdrop-blur-xl supports-[backdrop-filter]:bg-blue-50/95 shadow-sm md:shadow-lg">
+          <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white backdrop-blur-xl supports-[backdrop-filter]:bg-white shadow-sm md:shadow-lg">
             <div className="container flex h-12 md:h-16 items-center justify-between px-3 md:px-6">
               <div className="flex items-center gap-2 md:gap-4">
                 <SidebarTrigger className="md:ml-0 h-8 w-8 md:h-10 md:w-10" />

@@ -66,12 +66,11 @@ const Login = () => {
   // Single login flow only; test/dummy buttons removed
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-blue-100/30 to-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-blue-100/20 via-transparent to-transparent"></div>
-      <Card className="relative w-full max-w-md shadow-xl border border-blue-100/50 bg-white/95 backdrop-blur-sm">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-white">
+      <Card className="relative w-full max-w-md shadow-xl border border-gray-200 bg-white">
         <CardHeader className="text-center space-y-6 pb-6">
           <div className="flex items-center justify-center">
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-400/5">
+            <div className="p-4 rounded-2xl bg-white">
               <img 
                 src="/images/Almaredpay_logo.png" 
                 alt="Alma Pay Logo" 
@@ -80,10 +79,10 @@ const Login = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <CardTitle className="text-2xl sm:text-3xl font-bold text-blue-900">
+            <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-900">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-sm sm:text-base text-blue-600/70">
+            <CardDescription className="text-sm sm:text-base text-gray-600">
               Sign in to access your Alma Pay account
             </CardDescription>
           </div>
@@ -137,7 +136,7 @@ const Login = () => {
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-6 text-base shadow-lg hover:shadow-xl transition-all duration-200" 
+              className="w-full bg-[#0000FF] hover:bg-[#0000CC] text-white font-medium py-6 text-base shadow-lg hover:shadow-xl transition-all duration-200" 
               disabled={isLoading}
             >
               {isLoading ? (

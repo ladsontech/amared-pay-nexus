@@ -94,7 +94,7 @@ const OrganizationLayout = () => {
         {/* Content */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header - Fixed during navigation, doesn't stretch */}
-          <header className="fixed top-0 left-0 md:left-64 right-0 z-50 border-b border-blue-200/50 bg-blue-50/95 backdrop-blur-xl supports-[backdrop-filter]:bg-blue-50/95 shadow-sm transition-[left] duration-200">
+          <header className="fixed top-0 left-0 md:left-64 right-0 z-50 border-b border-gray-200 bg-white backdrop-blur-xl supports-[backdrop-filter]:bg-white shadow-sm transition-[left] duration-200">
             <div className="w-full flex h-12 md:h-16 items-center justify-between px-3 md:px-6 overflow-hidden">
               <div className="flex items-center gap-2 md:gap-4">
                 {/* Desktop Only: Sidebar Trigger */}
