@@ -2,11 +2,11 @@ export const API_CONFIG = {
   baseURL: 'https://bulksrv.almaredagencyuganda.com/',
   endpoints: {
     auth: {
-      login: 'users/auth/login/',
-      logout: 'users/auth/logout/',
-      changePassword: 'users/auth/password/change/',
-      refresh: 'users/auth/token/refresh/',
-      verify: 'users/auth/token/verify/'
+      login: 'auth/login/',
+      logout: 'auth/logout/',
+      changePassword: 'auth/password/change/',
+      refresh: 'auth/token/refresh/',
+      verify: 'auth/token/verify/'
     },
     user: {
       list: 'user/', // GET /user/ - list all users

@@ -43,10 +43,11 @@ class AuthService {
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
+      // Use username or email for Basic auth
       const usernameForBasic = (credentials.username || credentials.email || '').toString();
       const basicToken = typeof btoa === 'function' ? btoa(`${usernameForBasic}:${credentials.password}`) : '';
 
-      const loginPath = API_CONFIG.endpoints.auth.login; // e.g. 'users/auth/login/'
+      const loginPath = API_CONFIG.endpoints.auth.login; // 'auth/login/'
       const LOGIN_URL = `${API_BASE_URL}/${loginPath}`;
 
       // Build payload per API docs: username, email, password (all can be non-empty)
@@ -64,7 +65,7 @@ class AuthService {
         payload.email = credentials.email.trim();
       }
 
-      // Attempt login with Basic auth header
+      // Attempt login with Basic auth header (per API spec)
       let response = await fetch(LOGIN_URL, {
         method: "POST",
         headers: {
@@ -73,20 +74,30 @@ class AuthService {
           ...(basicToken ? { "Authorization": `Basic ${basicToken}` } : {}),
         },
         body: JSON.stringify(payload),
+        mode: 'cors'
       });
 
       // Parse response
-      const data: any = await response.json().catch(() => ({}));
+      let data: any = {};
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          data = await response.json();
+        } catch (e) {
+          console.warn('Failed to parse JSON response:', e);
+        }
+      }
 
       if (!response.ok) {
         const errText = typeof data === 'object' 
           ? (data.message || data.detail || data.error || JSON.stringify(data)) 
-          : String(data);
+          : await response.text().catch(() => `HTTP error! status: ${response.status}`);
         throw new Error(errText || `HTTP error! status: ${response.status}`);
       }
 
       // Store tokens (support multiple API shapes)
-      const accessToken = data.access_token || data.access || data.token;
+      // API might return access/refresh tokens or just a token
+      const accessToken = data.access_token || data.access || data.token || data.key;
       const refreshToken = data.refresh_token || data.refresh;
 
       if (accessToken) {
@@ -100,12 +111,18 @@ class AuthService {
 
       // Return enriched payload so AuthContext can derive roles and details
       return {
-        username: data.username,
-        email: data.email,
+        username: data.username || credentials.username || '',
+        email: data.email || credentials.email || '',
         token: accessToken,
         access: accessToken,
         refresh: refreshToken,
-        user: data.user, // critical: nested user from API
+        user: data.user || { 
+          id: data.id,
+          username: data.username || credentials.username,
+          email: data.email || credentials.email,
+          is_superuser: data.is_superuser,
+          is_staff: data.is_staff,
+        }, // nested user from API or constructed
         // passthrough fields used by AuthContext (if login returns them)
         is_superuser: data.is_superuser,
         is_staff: data.is_staff,
@@ -126,18 +143,32 @@ class AuthService {
     // Attempt backend logout - try POST first, then GET (per API docs both are supported)
     try {
       const logoutUrl = `${API_BASE_URL}/${API_CONFIG.endpoints.auth.logout}`;
+      const accessToken = localStorage.getItem("access_token") || localStorage.getItem("auth_token");
+      
+      // Use Basic auth with token as per API spec (or Bearer if Basic doesn't work)
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      };
+      
+      // Try Bearer token first (more common), fall back to Basic if needed
+      if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
+      }
       
       // Try POST first
       let response = await fetch(logoutUrl, {
         method: "POST",
-        headers: this.getAuthHeaders(),
+        headers,
+        mode: 'cors'
       });
       
       // If POST fails, try GET
       if (!response.ok && response.status !== 200 && response.status !== 201) {
         response = await fetch(logoutUrl, {
           method: "GET",
-          headers: this.getAuthHeaders(),
+          headers,
+          mode: 'cors'
         });
       }
     } catch (e) {
@@ -171,6 +202,7 @@ class AuthService {
           current_password: passwordData.current_password,
           new_password: passwordData.new_password,
         }),
+        mode: 'cors'
       });
 
       const data = await response.json();
@@ -201,6 +233,7 @@ class AuthService {
           "Accept": "application/json",
         },
         body: JSON.stringify({ refresh: refreshToken.trim() }),
+        mode: 'cors'
       });
 
       const data = await response.json();
@@ -244,6 +277,7 @@ class AuthService {
           "Accept": "application/json",
         },
         body: JSON.stringify({ token: token.trim() }),
+        mode: 'cors'
       });
 
       const data = await response.json();
