@@ -86,10 +86,9 @@ const OrganizationLayout = () => {
     );
   }
 
-  // Redirect system admins to the system dashboard (unless impersonating)
-  if (user?.role === 'admin' && !isImpersonating) {
-    return <Navigate to="/system/organizations" replace />;
-  }
+  // Allow superusers to access organization dashboard - don't redirect them away
+  // Only redirect non-superuser admins (if any exist)
+  // Note: Superusers should be able to access both system and organization dashboards
 
   // When impersonating, ensure organizationId is set
   if (isImpersonating && !user.organizationId) {

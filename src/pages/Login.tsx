@@ -31,20 +31,14 @@ const Login = () => {
         className: "border-green-200 bg-green-50 text-green-800",
       });
       
-      // Smooth transition to dashboard - check user role
+      // Smooth transition to dashboard - all users go to organization dashboard
       setTimeout(() => {
         const userStr = localStorage.getItem('user');
         if (userStr) {
           const user = JSON.parse(userStr);
-          // Super admin (is_superuser = true) goes to system dashboard
-          if (user.isSuperuser === true || user.role === 'admin') {
-            console.log('Redirecting superuser to system dashboard');
-            navigate('/system/organizations');
-          } else {
-            // Regular organization users go to organization dashboard
-            console.log('Redirecting regular user to org dashboard');
-            navigate('/org/dashboard');
-          }
+          // All users including superusers go to organization dashboard
+          console.log('Redirecting user to org dashboard', { isSuperuser: user.isSuperuser, role: user.role });
+          navigate('/org/dashboard');
         } else {
           navigate('/org/dashboard');
         }
