@@ -315,22 +315,25 @@ const OrgApprovals = () => {
       />
 
       <Tabs defaultValue="transactions" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3 h-auto">
-          <TabsTrigger value="transactions" className="relative">
-            Transaction Approvals
-            <Badge variant="secondary" className="ml-2">
+        <TabsList className="grid w-full grid-cols-3 h-auto gap-1">
+          <TabsTrigger value="transactions" className="text-xs sm:text-sm py-2 px-2 sm:px-4 relative">
+            <span className="hidden sm:inline">Transaction</span>
+            <span className="sm:hidden">Transactions</span>
+            <Badge variant="secondary" className="ml-1 sm:ml-2 text-xs px-1 sm:px-2">
               {pendingTransactions.length}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="funding" className="relative">
-            Funding Approvals
-            <Badge variant="secondary" className="ml-2">
+          <TabsTrigger value="funding" className="text-xs sm:text-sm py-2 px-2 sm:px-4 relative">
+            <span className="hidden sm:inline">Funding</span>
+            <span className="sm:hidden">Funding</span>
+            <Badge variant="secondary" className="ml-1 sm:ml-2 text-xs px-1 sm:px-2">
               {pendingFunding.length}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="bills" className="relative">
-            Bill Payments
-            <Badge variant="secondary" className="ml-2">
+          <TabsTrigger value="bills" className="text-xs sm:text-sm py-2 px-2 sm:px-4 relative">
+            <span className="hidden sm:inline">Bill Payments</span>
+            <span className="sm:hidden">Bills</span>
+            <Badge variant="secondary" className="ml-1 sm:ml-2 text-xs px-1 sm:px-2">
               {pendingBills.length}
             </Badge>
           </TabsTrigger>
@@ -346,76 +349,80 @@ const OrgApprovals = () => {
             <div className="grid gap-4">
               {filteredTransactions.map((transaction) => (
               <Card key={transaction.id}>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex flex-col lg:flex-row justify-between gap-4">
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-orange-100 rounded-lg">
-                            <Clock className="h-4 w-4 text-orange-600" />
+                    <div className="flex-1 space-y-3 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex items-center space-x-2 sm:space-x-3">
+                          <div className="p-1.5 sm:p-2 bg-orange-100 rounded-lg flex-shrink-0">
+                            <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
                           </div>
-                          <div>
-                            <h3 className="font-semibold">{transaction.type}</h3>
-                            <p className="text-sm text-muted-foreground">
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-semibold text-sm sm:text-base truncate">{transaction.type}</h3>
+                            <p className="text-xs sm:text-sm text-muted-foreground truncate">
                               Requested by {transaction.requester} • {transaction.department}
                             </p>
                           </div>
                         </div>
-                        <Badge variant="outline" className="text-orange-600 bg-orange-50">
+                        <Badge variant="outline" className="text-orange-600 bg-orange-50 text-xs sm:text-sm w-fit">
                           Pending
                         </Badge>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm">
                         <div>
-                          <Label className="text-muted-foreground">Amount</Label>
-                          <p className="font-medium">UGX {transaction.amount.toLocaleString()}</p>
+                          <Label className="text-muted-foreground text-xs">Amount</Label>
+                          <p className="font-medium text-sm sm:text-base">UGX {transaction.amount.toLocaleString()}</p>
                         </div>
                         <div>
-                          <Label className="text-muted-foreground">Category</Label>
-                          <p className="font-medium">{transaction.category}</p>
+                          <Label className="text-muted-foreground text-xs">Category</Label>
+                          <p className="font-medium text-sm sm:text-base">{transaction.category}</p>
                         </div>
                         <div>
-                          <Label className="text-muted-foreground">Date</Label>
-                          <p className="font-medium">{transaction.date}</p>
+                          <Label className="text-muted-foreground text-xs">Date</Label>
+                          <p className="font-medium text-sm sm:text-base">{transaction.date}</p>
                         </div>
                       </div>
                       
                       <div>
-                        <Label className="text-muted-foreground">Description</Label>
-                        <p className="font-medium">{transaction.description}</p>
+                        <Label className="text-muted-foreground text-xs sm:text-sm">Description</Label>
+                        <p className="font-medium text-sm sm:text-base break-words">{transaction.description}</p>
                       </div>
                       
-                      <div className="flex items-center space-x-2">
-                        <Label className="text-muted-foreground">Receipt:</Label>
-                        <Button variant="link" size="sm" className="p-0 h-auto">
-                          {transaction.receipt}
-                        </Button>
-                      </div>
+                      {transaction.receipt && (
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                          <Label className="text-muted-foreground text-xs sm:text-sm">Receipt:</Label>
+                          <Button variant="link" size="sm" className="p-0 h-auto text-xs sm:text-sm">
+                            {transaction.receipt}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                     
-                    <div className="flex flex-col gap-2 lg:w-48">
+                    <div className="flex flex-row sm:flex-col gap-2 lg:w-48">
                       <Button 
                         onClick={() => handleApprove(transaction.id, 'transaction')}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm flex-1 sm:flex-none"
                       >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Approve
+                        <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Approve</span>
+                        <span className="sm:hidden">✓</span>
                       </Button>
                       <Button 
                         variant="outline" 
                         onClick={() => handleReject(transaction.id, 'transaction')}
-                        className="text-red-600 border-red-600 hover:bg-red-50"
+                        className="text-red-600 border-red-600 hover:bg-red-50 text-xs sm:text-sm flex-1 sm:flex-none"
                       >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Reject
+                        <XCircle className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Reject</span>
+                        <span className="sm:hidden">✗</span>
                       </Button>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4 mr-2" />
+                      <Button variant="ghost" size="sm" className="text-xs sm:text-sm hidden sm:flex">
+                        <Eye className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
                         View Details
                       </Button>
-                      <Button variant="ghost" size="sm">
-                        <MessageSquare className="h-4 w-4 mr-2" />
+                      <Button variant="ghost" size="sm" className="text-xs sm:text-sm hidden sm:flex">
+                        <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
                         Comment
                       </Button>
                     </div>
@@ -447,48 +454,48 @@ const OrgApprovals = () => {
             <div className="grid gap-4">
               {filteredFunding.map((funding) => (
               <Card key={funding.id}>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex flex-col lg:flex-row justify-between gap-4">
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-blue-100 rounded-lg">
-                            <Wallet className="h-4 w-4 text-blue-600" />
+                    <div className="flex-1 space-y-3 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex items-center space-x-2 sm:space-x-3">
+                          <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                            <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                           </div>
-                          <div>
-                            <h3 className="font-semibold">Funding Request</h3>
-                            <p className="text-sm text-muted-foreground">
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-semibold text-sm sm:text-base">Funding Request</h3>
+                            <p className="text-xs sm:text-sm text-muted-foreground truncate">
                               Requested by {funding.requester} • {funding.department}
                             </p>
                           </div>
                         </div>
-                        <Badge variant="outline" className="text-orange-600 bg-orange-50">
+                        <Badge variant="outline" className="text-orange-600 bg-orange-50 text-xs sm:text-sm w-fit">
                           Pending
                         </Badge>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm">
                         <div>
-                          <Label className="text-muted-foreground">Requested Amount</Label>
-                          <p className="font-medium">UGX {funding.amount.toLocaleString()}</p>
+                          <Label className="text-muted-foreground text-xs">Requested Amount</Label>
+                          <p className="font-medium text-sm sm:text-base">UGX {funding.amount.toLocaleString()}</p>
                         </div>
                         <div>
-                          <Label className="text-muted-foreground">Current Balance</Label>
-                          <p className="font-medium">UGX {funding.currentBalance.toLocaleString()}</p>
+                          <Label className="text-muted-foreground text-xs">Current Balance</Label>
+                          <p className="font-medium text-sm sm:text-base">UGX {funding.currentBalance.toLocaleString()}</p>
                         </div>
                         <div>
-                          <Label className="text-muted-foreground">Date</Label>
-                          <p className="font-medium">{funding.date}</p>
+                          <Label className="text-muted-foreground text-xs">Date</Label>
+                          <p className="font-medium text-sm sm:text-base">{funding.date}</p>
                         </div>
                       </div>
                       
                       <div>
-                        <Label className="text-muted-foreground">Justification</Label>
-                        <p className="font-medium">{funding.description}</p>
+                        <Label className="text-muted-foreground text-xs sm:text-sm">Justification</Label>
+                        <p className="font-medium text-sm sm:text-base break-words">{funding.description}</p>
                       </div>
                       
-                      <div className="bg-muted/50 p-3 rounded-lg">
-                        <div className="flex justify-between items-center text-sm">
+                      <div className="bg-muted/50 p-2 sm:p-3 rounded-lg">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 text-xs sm:text-sm">
                           <span>New Balance After Approval:</span>
                           <span className="font-bold text-green-600">
                             UGX {funding.requestedBalance.toLocaleString()}
@@ -497,28 +504,30 @@ const OrgApprovals = () => {
                       </div>
                     </div>
                     
-                    <div className="flex flex-col gap-2 lg:w-48">
+                    <div className="flex flex-row sm:flex-col gap-2 lg:w-48">
                       <Button 
                         onClick={() => handleApprove(funding.id, 'funding')}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm flex-1 sm:flex-none"
                       >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Approve
+                        <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Approve</span>
+                        <span className="sm:hidden">✓</span>
                       </Button>
                       <Button 
                         variant="outline" 
                         onClick={() => handleReject(funding.id, 'funding')}
-                        className="text-red-600 border-red-600 hover:bg-red-50"
+                        className="text-red-600 border-red-600 hover:bg-red-50 text-xs sm:text-sm flex-1 sm:flex-none"
                       >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Reject
+                        <XCircle className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Reject</span>
+                        <span className="sm:hidden">✗</span>
                       </Button>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4 mr-2" />
+                      <Button variant="ghost" size="sm" className="text-xs sm:text-sm hidden sm:flex">
+                        <Eye className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
                         View Details
                       </Button>
-                      <Button variant="ghost" size="sm">
-                        <MessageSquare className="h-4 w-4 mr-2" />
+                      <Button variant="ghost" size="sm" className="text-xs sm:text-sm hidden sm:flex">
+                        <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
                         Comment
                       </Button>
                     </div>
@@ -553,62 +562,64 @@ const OrgApprovals = () => {
                 bill.category?.toLowerCase().includes(searchTerm.toLowerCase())
               ).map((bill) => (
                 <Card key={bill.id}>
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-6">
                     <div className="flex flex-col lg:flex-row justify-between gap-4">
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-blue-100 rounded-lg">
-                              <DollarSign className="h-4 w-4 text-blue-600" />
+                      <div className="flex-1 space-y-3 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="flex items-center space-x-2 sm:space-x-3">
+                            <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
                             </div>
-                            <div>
-                              <h3 className="font-semibold">Bill Payment</h3>
-                              <p className="text-sm text-muted-foreground">
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-semibold text-sm sm:text-base">Bill Payment</h3>
+                              <p className="text-xs sm:text-sm text-muted-foreground truncate">
                                 {bill.requester} • {bill.department}
                               </p>
                             </div>
                           </div>
-                          <Badge variant="outline" className="text-orange-600 bg-orange-50">
+                          <Badge variant="outline" className="text-orange-600 bg-orange-50 text-xs sm:text-sm w-fit">
                             Pending
                           </Badge>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm">
                           <div>
-                            <Label className="text-muted-foreground">Amount</Label>
-                            <p className="font-medium">UGX {bill.amount.toLocaleString()}</p>
+                            <Label className="text-muted-foreground text-xs">Amount</Label>
+                            <p className="font-medium text-sm sm:text-base">UGX {bill.amount.toLocaleString()}</p>
                           </div>
                           <div>
-                            <Label className="text-muted-foreground">Category</Label>
-                            <p className="font-medium">{bill.category}</p>
+                            <Label className="text-muted-foreground text-xs">Category</Label>
+                            <p className="font-medium text-sm sm:text-base">{bill.category}</p>
                           </div>
                           <div>
-                            <Label className="text-muted-foreground">Date</Label>
-                            <p className="font-medium">{bill.date}</p>
+                            <Label className="text-muted-foreground text-xs">Date</Label>
+                            <p className="font-medium text-sm sm:text-base">{bill.date}</p>
                           </div>
                         </div>
                         
                         <div>
-                          <Label className="text-muted-foreground">Description</Label>
-                          <p className="font-medium">{bill.description}</p>
+                          <Label className="text-muted-foreground text-xs sm:text-sm">Description</Label>
+                          <p className="font-medium text-sm sm:text-base break-words">{bill.description}</p>
                         </div>
                       </div>
                       
-                      <div className="flex flex-col gap-2 lg:w-48">
+                      <div className="flex flex-row sm:flex-col gap-2 lg:w-48">
                         <Button 
                           onClick={() => handleApprove(bill.id, 'bill')}
-                          className="bg-green-600 hover:bg-green-700"
+                          className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm flex-1 sm:flex-none"
                         >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Approve
+                          <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Approve</span>
+                          <span className="sm:hidden">✓</span>
                         </Button>
                         <Button 
                           variant="outline" 
                           onClick={() => handleReject(bill.id, 'bill')}
-                          className="text-red-600 border-red-600 hover:bg-red-50"
+                          className="text-red-600 border-red-600 hover:bg-red-50 text-xs sm:text-sm flex-1 sm:flex-none"
                         >
-                          <XCircle className="h-4 w-4 mr-2" />
-                          Reject
+                          <XCircle className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Reject</span>
+                          <span className="sm:hidden">✗</span>
                         </Button>
                       </div>
                     </div>

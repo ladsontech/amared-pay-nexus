@@ -129,9 +129,9 @@ const BulkPaymentApprovals = () => {
     <div className="space-y-6">
       {/* Pending Approvals */}
       <div>
-        <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-          <Send className="h-5 w-5 text-primary" />
-          <span>Pending Bulk Payment Approvals ({pendingPayments.length})</span>
+        <h3 className="text-base sm:text-lg font-semibold mb-4 flex flex-wrap items-center gap-2">
+          <Send className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+          <span className="text-sm sm:text-base">Pending Bulk Payment Approvals ({pendingPayments.length})</span>
         </h3>
         
         {isLoading ? (
@@ -152,34 +152,42 @@ const BulkPaymentApprovals = () => {
             {pendingPayments.map((payment) => (
               <Card key={payment.id} className="bg-blue-50 border border-blue-200">
                 <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <CardTitle className="text-base">{payment.reference || `Bulk Payment ${payment.id.substring(0, 8)}`}</CardTitle>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="flex items-center space-x-2 min-w-0">
+                      <CardTitle className="text-sm sm:text-base truncate">{payment.reference || `Bulk Payment ${payment.id.substring(0, 8)}`}</CardTitle>
                     </div>
                     {getStatusBadge(payment.status)}
                   </div>
-                  <CardDescription>{payment.comments || `Bulk payment for ${payment.organization.name}`}</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm mt-2 break-words">{payment.comments || `Bulk payment for ${payment.organization.name}`}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Organization:</span>
-                      <span className="font-medium">{payment.organization.name}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <div className="flex items-center space-x-1 sm:space-x-2">
+                        <User className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-muted-foreground">Organization:</span>
+                      </div>
+                      <span className="font-medium break-words">{payment.organization.name}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Amount:</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <div className="flex items-center space-x-1 sm:space-x-2">
+                        <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-muted-foreground">Amount:</span>
+                      </div>
                       <span className="font-medium">{payment.currency.symbol} {payment.total_amount.toLocaleString()}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Date:</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <div className="flex items-center space-x-1 sm:space-x-2">
+                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-muted-foreground">Date:</span>
+                      </div>
                       <span className="font-medium">{new Date(payment.created_at).toLocaleDateString()}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Charge:</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <div className="flex items-center space-x-1 sm:space-x-2">
+                        <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-muted-foreground">Charge:</span>
+                      </div>
                       <span className="font-medium">{payment.currency.symbol} {payment.charge.toLocaleString()}</span>
                     </div>
                   </div>
@@ -190,29 +198,30 @@ const BulkPaymentApprovals = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => window.open(payment.sheet || '', '_blank')}
+                        className="text-xs sm:text-sm w-full sm:w-auto"
                       >
-                        <Send className="h-4 w-4 mr-1" />
+                        <Send className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                         View Sheet
                       </Button>
                     </div>
                   )}
                   
-                  <div className="flex items-center justify-end space-x-2 pt-2">
+                  <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:space-x-2 pt-2">
                     <Button 
                       variant="outline" 
                       size="sm"
                       onClick={() => handleReject(payment.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-red-600 hover:text-red-700 text-xs sm:text-sm w-full sm:w-auto"
                     >
-                      <XCircle className="h-4 w-4 mr-1" />
+                      <XCircle className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                       Reject
                     </Button>
                     <Button 
                       size="sm"
                       onClick={() => handleApprove(payment.id)}
-                      className="bg-green-600 hover:bg-green-700"
+                      className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm w-full sm:w-auto"
                     >
-                      <CheckCircle className="h-4 w-4 mr-1" />
+                      <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                       Approve
                     </Button>
                   </div>
@@ -226,39 +235,47 @@ const BulkPaymentApprovals = () => {
       {/* Processed Payments */}
       {processedPayments.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold mb-4">Recent Processed Payments</h3>
+          <h3 className="text-base sm:text-lg font-semibold mb-4">Recent Processed Payments</h3>
           <div className="grid grid-cols-1 gap-4">
             {processedPayments.slice(0, 10).map((payment) => (
               <Card key={payment.id} className="opacity-75 bg-blue-50 border border-blue-200">
                 <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <CardTitle className="text-base">{payment.reference || `Bulk Payment ${payment.id.substring(0, 8)}`}</CardTitle>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="flex items-center space-x-2 min-w-0">
+                      <CardTitle className="text-sm sm:text-base truncate">{payment.reference || `Bulk Payment ${payment.id.substring(0, 8)}`}</CardTitle>
                     </div>
                     {getStatusBadge(payment.status)}
                   </div>
-                  <CardDescription>{payment.comments || `Bulk payment for ${payment.organization.name}`}</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm mt-2 break-words">{payment.comments || `Bulk payment for ${payment.organization.name}`}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Organization:</span>
-                      <span className="font-medium">{payment.organization.name}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <div className="flex items-center space-x-1 sm:space-x-2">
+                        <User className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-muted-foreground">Organization:</span>
+                      </div>
+                      <span className="font-medium break-words">{payment.organization.name}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Amount:</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <div className="flex items-center space-x-1 sm:space-x-2">
+                        <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-muted-foreground">Amount:</span>
+                      </div>
                       <span className="font-medium">{payment.currency.symbol} {payment.total_amount.toLocaleString()}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Date:</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <div className="flex items-center space-x-1 sm:space-x-2">
+                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-muted-foreground">Date:</span>
+                      </div>
                       <span className="font-medium">{new Date(payment.created_at).toLocaleDateString()}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Charge:</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <div className="flex items-center space-x-1 sm:space-x-2">
+                        <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-muted-foreground">Charge:</span>
+                      </div>
                       <span className="font-medium">{payment.currency.symbol} {payment.charge.toLocaleString()}</span>
                     </div>
                   </div>
