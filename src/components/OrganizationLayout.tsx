@@ -46,15 +46,15 @@ const OrganizationLayout = () => {
     }
   };
   return <SidebarProvider>
-      <div className="min-h-screen bg-background flex w-full">
+      <div className="min-h-screen bg-background flex w-full overflow-x-hidden">
         {/* Fixed Sidebar */}
         <AppOrgSidebar />
 
         {/* Content */}
-        <div className="flex-1 flex flex-col">
-          {/* Header - Fixed during navigation */}
-          <header className="fixed top-0 left-0 md:left-0 right-0 z-50 border-b border-blue-200/50 bg-blue-50/95 backdrop-blur-xl supports-[backdrop-filter]:bg-blue-50/95 shadow-sm transition-[left] duration-200 will-change-[left]">
-            <div className="container flex h-12 md:h-16 items-center justify-between px-3 md:px-6">
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Header - Fixed during navigation, doesn't stretch */}
+          <header className="fixed top-0 left-0 md:left-64 right-0 z-50 border-b border-blue-200/50 bg-blue-50/95 backdrop-blur-xl supports-[backdrop-filter]:bg-blue-50/95 shadow-sm transition-[left] duration-200">
+            <div className="w-full flex h-12 md:h-16 items-center justify-between px-3 md:px-6 overflow-hidden">
               <div className="flex items-center gap-2 md:gap-4">
                 <SidebarTrigger className="md:ml-0 h-8 w-8 md:h-10 md:w-10" />
                 {/* Organization Logo and Name */}
@@ -147,8 +147,8 @@ const OrganizationLayout = () => {
           </header>
 
           {/* Main Content - Add padding top to account for fixed header */}
-          <main className="flex-1 pt-12 md:pt-16 pb-16 md:pb-0 bg-background">
-            <div className="container py-8 px-[15px]">
+          <main className="flex-1 pt-12 md:pt-16 pb-16 md:pb-0 bg-background min-w-0">
+            <div className="container py-4 md:py-8 px-3 sm:px-4 md:px-6 max-w-full">
               <Outlet />
             </div>
           </main>

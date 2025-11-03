@@ -81,8 +81,9 @@ export default function AppOrgSidebar() {
     }
   };
 
+  // Desktop sidebar on left, mobile drawer on right
   return (
-    <Sidebar className="w-64 border-r border-border bg-white backdrop-blur-sm" collapsible="icon" side="right">
+    <Sidebar className="w-64 border-r border-border bg-white backdrop-blur-sm" collapsible="icon" side="left">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
