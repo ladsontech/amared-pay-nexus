@@ -16,13 +16,13 @@ const AdminMobileBottomNav = () => {
       onLogout={async () => {
         await authService.logout();
       }}
-      extraActions={
+      extraActions={(closeDrawer) => (
         <div className="grid grid-cols-2 gap-3">
           <button 
-            className="bg-red-50 border border-red-100 rounded-xl p-4 text-left"
-            onClick={(e) => {
-              const drawer = e.currentTarget.closest('.drawer-content')?.parentElement;
+            className="bg-red-50 border border-red-100 rounded-xl p-4 text-left hover:bg-red-100 transition-colors"
+            onClick={() => {
               navigate("/system/users");
+              closeDrawer();
             }}
           >
             <Users className="h-5 w-5 text-red-600 mb-2" />
@@ -30,9 +30,10 @@ const AdminMobileBottomNav = () => {
             <p className="text-xs text-gray-500">Create, edit, disable</p>
           </button>
           <button 
-            className="bg-red-50 border border-red-100 rounded-xl p-4 text-left"
-            onClick={(e) => {
+            className="bg-red-50 border border-red-100 rounded-xl p-4 text-left hover:bg-red-100 transition-colors"
+            onClick={() => {
               navigate("/system/settings");
+              closeDrawer();
             }}
           >
             <Settings className="h-5 w-5 text-red-600 mb-2" />
@@ -40,7 +41,7 @@ const AdminMobileBottomNav = () => {
             <p className="text-xs text-gray-500">Branding, security</p>
           </button>
         </div>
-      }
+      )}
     />
   );
 };

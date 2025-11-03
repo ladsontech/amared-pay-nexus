@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Building, Wallet, Users, Mail, Phone, Shield, Calendar, LogIn, Edit, Trash2 } from "lucide-react";
+import { ArrowLeft, Building, Wallet, Users, Mail, Phone, Shield, Calendar, LogIn, Edit, Trash2, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { organizationService, Organization, Staff, Wallet as WalletType, WalletTransaction } from "@/services/organizationService";
@@ -171,41 +171,32 @@ const SystemOrganizationView = () => {
           </Button>
         </div>
         
-        {/* Title and Actions - Desktop */}
+        {/* Title and Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => navigate("/system/organizations")}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
-            <div>
+            <div className="flex items-center gap-2 flex-1 min-w-0">
               <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 break-words">{organization.name}</h1>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0 hover:bg-slate-100 flex-shrink-0"
+                onClick={() => setEditOpen(true)}
+                title="Edit organization"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="hidden sm:block">
               <p className="text-xs sm:text-sm text-muted-foreground">View and manage organization details</p>
             </div>
           </div>
           
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-1 sm:flex-none"
-                onClick={() => setEditOpen(true)}
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Edit</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-1 sm:flex-none text-red-600 hover:text-red-700 hover:bg-red-50"
-                onClick={() => setDeleteOpen(true)}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Delete</span>
-              </Button>
-            </div>
             <Button 
               variant="default" 
               size="sm" 
@@ -255,8 +246,9 @@ const SystemOrganizationView = () => {
           </div>
         </div>
         
-        {/* Active Badge - Mobile */}
-        <div className="sm:hidden">
+        {/* Description and Active Badge - Mobile */}
+        <div className="sm:hidden space-y-2">
+          <p className="text-xs text-muted-foreground">View and manage organization details</p>
           <Badge className="bg-green-100 text-green-800 w-fit">Active</Badge>
         </div>
       </div>
@@ -495,6 +487,19 @@ const SystemOrganizationView = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Delete Button at Bottom */}
+      <div className="pt-4 border-t border-slate-200">
+        <Button 
+          variant="destructive" 
+          size="sm" 
+          className="w-full sm:w-auto text-xs sm:text-sm"
+          onClick={() => setDeleteOpen(true)}
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Delete Organization
+        </Button>
+      </div>
 
       {/* Edit Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
