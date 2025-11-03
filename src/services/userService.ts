@@ -1,6 +1,5 @@
 import { API_CONFIG } from './api-config';
 import { apiClient, QueryParams } from './apiClient';
-import { allDemoUsers } from '@/data/demoData';
 
 export interface UserQuery extends QueryParams {
   phone_number?: string;
@@ -87,18 +86,8 @@ class UserService {
       
       return [];
     } catch (error) {
-      console.warn('API call failed, using demo data:', error);
-      // Fallback to demo data
-      return allDemoUsers.map(user => ({
-        id: user.id,
-        username: user.email.split('@')[0],
-        email: user.email,
-        first_name: user.name.split(' ')[0],
-        last_name: user.name.split(' ')[1] || '',
-        phone_number: '+256700000000',
-        is_active: true,
-        date_joined: new Date().toISOString()
-      }));
+      console.error('API call failed:', error);
+      throw error;
     }
   }
 
@@ -106,22 +95,8 @@ class UserService {
     try {
       return await apiClient.get<UserResponse>(API_CONFIG.endpoints.user.userDetail(id));
     } catch (error) {
-      console.warn('API call failed, using demo data:', error);
-      // Fallback to demo data
-      const demoUser = allDemoUsers.find(u => u.id === id);
-      if (demoUser) {
-        return {
-          id: demoUser.id,
-          username: demoUser.email.split('@')[0],
-          email: demoUser.email,
-          first_name: demoUser.name.split(' ')[0],
-          last_name: demoUser.name.split(' ')[1] || '',
-          phone_number: '+256700000000',
-          is_active: true,
-          date_joined: new Date().toISOString()
-        };
-      }
-      throw new Error('User not found');
+      console.error('API call failed:', error);
+      throw error;
     }
   }
 

@@ -52,7 +52,7 @@ const OrganizationLayout = () => {
         {/* Content */}
         <div className="flex-1 flex flex-col">
           {/* Header */}
-          <header className="sticky top-0 z-50 w-full border-b border-border bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/95 shadow-sm">
+          <header className="sticky top-0 z-50 w-full border-b border-blue-200/50 bg-blue-50/95 backdrop-blur-xl supports-[backdrop-filter]:bg-blue-50/95 shadow-sm">
             <div className="container flex h-16 items-center justify-between px-6">
               <div className="flex items-center gap-4">
                 <SidebarTrigger className="md:ml-0" />

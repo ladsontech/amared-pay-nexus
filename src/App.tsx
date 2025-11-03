@@ -13,9 +13,7 @@ const SystemAdminLayout = lazy(() => import("./components/SystemAdminLayout"));
 const OrganizationLayout = lazy(() => import("./components/OrganizationLayout"));
 
 // Pages (lazy)
-const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
-const AuthTest = lazy(() => import("./pages/AuthTest"));
 // Removed: SystemAnalytics
 const SystemOrganizations = lazy(() => import("./pages/SystemOrganizations"));
 const SystemOrganizationView = lazy(() => import("./pages/SystemOrganizationView"));
@@ -35,14 +33,10 @@ const OrgBulkPaymentsReport = lazy(() => import("./pages/OrgBulkPaymentsReport")
 const OrgCollectionsReport = lazy(() => import("./pages/OrgCollectionsReport"));
 const OrgSettings = lazy(() => import("./pages/OrgSettings"));
 const OrgAccount = lazy(() => import("./pages/OrgAccount"));
-const OrgBulkPaymentsDemo = lazy(() => import("./pages/OrgBulkPaymentsDemo"));
-const OrgSecurityDemo = lazy(() => import("./pages/OrgSecurityDemo"));
 const OrgUsers = lazy(() => import("./pages/OrgUsers"));
 const PayBills = lazy(() => import("./pages/PayBills"));
 const Unauthorized = lazy(() => import("./pages/Unauthorized"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const TestAuth = lazy(() => import("./pages/TestAuth"));
-const AdminTest = lazy(() => import("./pages/AdminTest"));
 
 const queryClient = new QueryClient();
 
@@ -65,12 +59,8 @@ const AppRoutes = () => {
     }>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/demo" element={<Index />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/auth-test" element={<AuthTest />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
-        <Route path="/test-auth" element={<TestAuth />} />
-        <Route path="/admin-test" element={<AdminTest />} />
 
         {/* Role Dashboard Aliases */}
 
@@ -147,8 +137,6 @@ const AppRoutes = () => {
           } />
           <Route path="account" element={<OrgAccount />} />
           <Route path="settings" element={<OrgSettings />} />
-          <Route path="bulk-payments-demo" element={<OrgBulkPaymentsDemo />} />
-          <Route path="security-demo" element={<OrgSecurityDemo />} />
           <Route path="users" element={
             <ProtectedRoute requiredPermissions={["manage_team"]}>
               <OrgUsers />

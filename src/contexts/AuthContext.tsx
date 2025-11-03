@@ -1,11 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthState, Permission, rolePermissions } from '@/types/auth';
-import { demoUsers } from '@/data/demoData';
 import { authService } from '@/services/authService';
 import { userService } from '@/services/userService';
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
-  loginAsUser: (userId: string) => void;
   logout: () => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message: string }>;
   refreshToken: () => Promise<{ access: string; refresh: string }>;
@@ -82,18 +80,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setAuthState(prev => ({ ...prev, loading: false }));
     }
   }, []);
-
-  const loginAsUser = (userId: string) => {
-    const user = demoUsers.find(u => u.id === userId);
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-      setAuthState({
-        user,
-        isAuthenticated: true,
-        loading: false,
-      });
-    }
-  };
 
   const login = async (identity: string, password: string) => {
     try {
@@ -339,7 +325,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         ...authState,
         login,
-        loginAsUser,
         logout,
         changePassword,
         refreshToken,

@@ -11,7 +11,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { Plus, UserCircle, Search, ShieldCheck, Pencil, Trash2 } from "lucide-react";
 import { Permission, User, rolePermissions } from "@/types/auth";
 import { useAuth } from "@/contexts/AuthContext";
-import { demoUsers } from "@/data/demoData";
 import { organizationService } from "@/services/organizationService";
 import { StaffManagement } from "@/components/StaffManagement";
 import { 
@@ -71,7 +70,7 @@ function LegacyDemoUsersUI() {
         // ignore
       }
     }
-    return demoUsers.filter(u => u.organizationId === orgId);
+    return [] as OrgUser[];
   }, [currentUser?.organizationId]);
 
   useEffect(() => {

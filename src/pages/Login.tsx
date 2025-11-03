@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,58 +66,57 @@ const Login = () => {
   // Single login flow only; test/dummy buttons removed
 
   return (
-    <div className="min-h-screen trust-gradient flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
-      <Card className="relative w-full max-w-sm sm:max-w-md shadow-2xl border-0 glass-gradient backdrop-blur-sm">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/80 to-white/60 rounded-lg"></div>
-        <CardHeader className="relative text-center space-y-6">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-blue-100/30 to-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-blue-100/20 via-transparent to-transparent"></div>
+      <Card className="relative w-full max-w-md shadow-xl border border-blue-100/50 bg-white/95 backdrop-blur-sm">
+        <CardHeader className="text-center space-y-6 pb-6">
           <div className="flex items-center justify-center">
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 backdrop-blur-sm">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-400/5">
               <img 
                 src="/images/Almaredpay_logo.png" 
                 alt="Alma Pay Logo" 
-                className="w-20 h-10 sm:w-28 sm:h-14 object-contain"
+                className="w-24 h-12 sm:w-32 sm:h-16 object-contain"
               />
             </div>
           </div>
           <div className="space-y-2">
-            <CardTitle className="text-xl sm:text-2xl bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent font-bold">
+            <CardTitle className="text-2xl sm:text-3xl font-bold text-blue-900">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-sm sm:text-base text-muted-foreground">
+            <CardDescription className="text-sm sm:text-base text-blue-600/70">
               Sign in to access your Alma Pay account
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="relative space-y-6">
+        <CardContent className="space-y-5">
           <form onSubmit={handleLogin} className="space-y-5">
-            <div className="space-y-3">
-              <Label htmlFor="identity" className="text-sm font-medium">Email or Username</Label>
+            <div className="space-y-2">
+              <Label htmlFor="identity" className="text-sm font-medium text-blue-900">Email or Username</Label>
               <div className="relative group">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 transition-colors group-focus-within:text-primary" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 w-4 h-4 transition-colors group-focus-within:text-blue-600" />
                 <Input
                   id="identity"
                   type="text"
                   placeholder="Enter your email or username"
                   value={identity}
                   onChange={(e) => setIdentity(e.target.value)}
-                  className="pl-10 bg-white/50 border-border/50 focus:bg-white/80 transition-all duration-200"
+                  className="pl-10 bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400 transition-all duration-200"
                   autoComplete="username"
                   required
                 />
               </div>
             </div>
-            <div className="space-y-3">
-              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium text-blue-900">Password</Label>
               <div className="relative group">
-                <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 transition-colors group-focus-within:text-primary" />
+                <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 w-4 h-4 transition-colors group-focus-within:text-blue-600" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 bg-white/50 border-border/50 focus:bg-white/80 transition-all duration-200"
+                  className="pl-10 pr-10 bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400 transition-all duration-200"
                   autoComplete="current-password"
                   required
                 />
@@ -129,16 +128,16 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
+                    <EyeOff className="h-4 w-4 text-blue-400 hover:text-blue-600 transition-colors" />
                   ) : (
-                    <Eye className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
+                    <Eye className="h-4 w-4 text-blue-400 hover:text-blue-600 transition-colors" />
                   )}
                 </Button>
               </div>
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white font-medium py-3 transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl" 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-6 text-base shadow-lg hover:shadow-xl transition-all duration-200" 
               disabled={isLoading}
             >
               {isLoading ? (
@@ -147,37 +146,10 @@ const Login = () => {
                   <span>Signing in...</span>
                 </div>
               ) : (
-                "Sign In to Dashboard"
+                "Sign In"
               )}
             </Button>
           </form>
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
-              <span className="text-xs text-muted-foreground">or</span>
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
-            </div>
-            <div className="flex flex-col gap-2 text-center text-sm">
-              <Link 
-                to="/" 
-                className="text-primary hover:text-primary/80 underline-offset-4 hover:underline transition-colors"
-              >
-                Explore the demo
-              </Link>
-              <Link 
-                to="/auth-test" 
-                className="text-muted-foreground hover:text-primary underline-offset-4 hover:underline transition-colors"
-              >
-                API Testing Interface
-              </Link>
-              <p className="text-gray-600 mt-2">
-                Want to see the demo?{' '}
-                <Link to="/demo" className="text-blue-600 hover:text-blue-500 font-medium">
-                  View Demo Organizations
-                </Link>
-              </p>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
