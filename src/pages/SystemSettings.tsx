@@ -41,24 +41,24 @@ const SystemSettings = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-semibold text-slate-900">System Settings</h1>
           <p className="text-sm text-muted-foreground">Configure global system settings and preferences</p>
         </div>
-        <Button onClick={handleSave}>
+        <Button onClick={handleSave} className="w-full sm:w-auto">
           <Save className="h-4 w-4 mr-2" />
           Save Changes
         </Button>
       </div>
 
       <Tabs defaultValue="general" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="database">Database</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto">
+          <TabsTrigger value="general" className="text-xs sm:text-sm py-2">General</TabsTrigger>
+          <TabsTrigger value="notifications" className="text-xs sm:text-sm py-2">Notifications</TabsTrigger>
+          <TabsTrigger value="security" className="text-xs sm:text-sm py-2">Security</TabsTrigger>
+          <TabsTrigger value="database" className="text-xs sm:text-sm py-2">Database</TabsTrigger>
+          <TabsTrigger value="integrations" className="text-xs sm:text-sm py-2 col-span-2 sm:col-span-1">Integrations</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
@@ -135,10 +135,10 @@ const SystemSettings = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="space-y-0.5 flex-1">
                     <Label>Maintenance Mode</Label>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Enable maintenance mode to prevent user access
                     </p>
                   </div>
@@ -148,10 +148,10 @@ const SystemSettings = () => {
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="space-y-0.5 flex-1">
                     <Label>User Registration</Label>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Allow new users to register accounts
                     </p>
                   </div>
@@ -177,10 +177,10 @@ const SystemSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div className="space-y-0.5 flex-1">
                   <Label>Email Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Send email notifications for important events
                   </p>
                 </div>
@@ -190,10 +190,10 @@ const SystemSettings = () => {
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div className="space-y-0.5 flex-1">
                   <Label>SMS Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Send SMS notifications for critical alerts
                   </p>
                 </div>

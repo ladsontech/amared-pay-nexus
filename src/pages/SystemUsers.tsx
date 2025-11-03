@@ -52,47 +52,47 @@ const SystemUsers = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
         <Card className="border border-slate-100 bg-white">
-          <CardHeader>
-            <CardTitle className="text-lg">Total Users</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base sm:text-lg">Total Users</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{users.length}</div>
-            <p className="text-sm text-muted-foreground">System wide</p>
+            <div className="text-xl sm:text-2xl font-bold">{users.length}</div>
+            <p className="text-xs sm:text-sm text-muted-foreground">System wide</p>
           </CardContent>
         </Card>
         <Card className="border border-slate-100 bg-white">
-          <CardHeader>
-            <CardTitle className="text-lg">Active Users</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base sm:text-lg">Active Users</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-xl sm:text-2xl font-bold text-green-600">
               {users.filter(user => user.is_active).length}
             </div>
-            <p className="text-sm text-muted-foreground">Currently active</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Currently active</p>
           </CardContent>
         </Card>
         <Card className="border border-slate-100 bg-white">
-          <CardHeader>
-            <CardTitle className="text-lg">Organizations</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base sm:text-lg">Organizations</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-xl sm:text-2xl font-bold text-blue-600">
               {new Set(users.filter(u => u.organization).map(u => u.organization?.id)).size}
             </div>
-            <p className="text-sm text-muted-foreground">With users</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">With users</p>
           </CardContent>
         </Card>
         <Card className="border border-slate-100 bg-white">
-          <CardHeader>
-            <CardTitle className="text-lg">Inactive</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base sm:text-lg">Inactive</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
+            <div className="text-xl sm:text-2xl font-bold text-yellow-600">
               {users.filter(user => !user.is_active).length}
             </div>
-            <p className="text-sm text-muted-foreground">Inactive accounts</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Inactive accounts</p>
           </CardContent>
         </Card>
       </div>
@@ -133,36 +133,36 @@ const SystemUsers = () => {
         <div className="space-y-4">
           {filteredUsers.map((user) => (
             <Card key={user.id} className="border border-slate-100 bg-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                      <UserCircle className="h-6 w-6 text-primary" />
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-start sm:items-center space-x-3 sm:space-x-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <UserCircle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                     </div>
-                    <div>
-                      <div className="flex items-center space-x-2 mb-1">
-                        <h3 className="font-semibold text-lg">{user.first_name} {user.last_name}</h3>
-                        <Badge className={user.is_active ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <h3 className="font-semibold text-base sm:text-lg">{user.first_name} {user.last_name}</h3>
+                        <Badge className={user.is_active ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"} variant="outline">
                           {user.is_active ? "Active" : "Inactive"}
                         </Badge>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                         <div>
-                          <div className="flex items-center space-x-1 mb-1">
-                            <Mail className="h-3 w-3" />
-                            <span>{user.email}</span>
+                          <div className="flex items-center space-x-1 mb-1 break-words">
+                            <Mail className="h-3 w-3 flex-shrink-0" />
+                            <span className="break-all">{user.email}</span>
                           </div>
                           <div className="flex items-center space-x-1">
-                            <Phone className="h-3 w-3" />
+                            <Phone className="h-3 w-3 flex-shrink-0" />
                             <span>{user.phone_number || "N/A"}</span>
                           </div>
                         </div>
                         <div>
-                          <div className="flex items-center space-x-1 mb-1">
-                            <Building className="h-3 w-3" />
-                            <span>{user.organization?.name || "No Organization"}</span>
+                          <div className="flex items-start space-x-1 mb-1">
+                            <Building className="h-3 w-3 flex-shrink-0 mt-0.5" />
+                            <span className="break-words">{user.organization?.name || "No Organization"}</span>
                           </div>
-                          <p><strong>Username:</strong> {user.username}</p>
+                          <p><strong>Username:</strong> <span className="break-all">{user.username}</span></p>
                         </div>
                         <div>
                           <p><strong>Last Login:</strong> {user.last_login ? new Date(user.last_login).toLocaleDateString() : "Never"}</p>

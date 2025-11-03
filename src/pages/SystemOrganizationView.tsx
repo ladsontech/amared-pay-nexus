@@ -104,22 +104,23 @@ const SystemOrganizationView = () => {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" size="sm" onClick={() => navigate("/system/organizations")}>
+    <div className="space-y-4 sm:space-y-6 p-3 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:space-x-4">
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => navigate("/system/organizations")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">{organization.name}</h1>
-            <p className="text-sm text-muted-foreground">View and manage organization details</p>
+            <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 break-words">{organization.name}</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">View and manage organization details</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <Button 
             variant="default" 
             size="sm" 
+            className="w-full sm:w-auto text-xs sm:text-sm"
             onClick={() => {
               impersonateOrganization(organization.id, organization.name);
               toast({
@@ -129,15 +130,16 @@ const SystemOrganizationView = () => {
               setTimeout(() => navigate("/org/dashboard"), 500);
             }}
           >
-            <LogIn className="h-4 w-4 mr-2" />
-            Login as Organization
+            <LogIn className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Login as Organization</span>
+            <span className="sm:hidden">Login as Org</span>
           </Button>
-          <Badge className="bg-green-100 text-green-800">Active</Badge>
+          <Badge className="bg-green-100 text-green-800 w-fit">Active</Badge>
         </div>
       </div>
 
       {/* Organization Details Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card className="border border-slate-100 bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Total Staff</CardTitle>
@@ -187,10 +189,10 @@ const SystemOrganizationView = () => {
 
       {/* Tabs for different sections */}
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="staff">Staff Members ({staff.length})</TabsTrigger>
-          <TabsTrigger value="transactions">Transactions ({transactions.length})</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 h-auto">
+          <TabsTrigger value="overview" className="text-xs sm:text-sm py-2">Overview</TabsTrigger>
+          <TabsTrigger value="staff" className="text-xs sm:text-sm py-2">Staff ({staff.length})</TabsTrigger>
+          <TabsTrigger value="transactions" className="text-xs sm:text-sm py-2">Transactions ({transactions.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -199,7 +201,7 @@ const SystemOrganizationView = () => {
               <CardTitle>Organization Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Organization ID</p>
                   <p className="text-sm font-mono">{organization.id}</p>
@@ -234,7 +236,7 @@ const SystemOrganizationView = () => {
                 <CardTitle>Wallet Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Balance</p>
                     <p className="text-lg font-bold">{wallet.currency.symbol} {wallet.balance?.toLocaleString() || '0'}</p>
@@ -268,53 +270,59 @@ const SystemOrganizationView = () => {
               {staff.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8">No staff members found</p>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Phone</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {staff.map((member) => (
-                      <TableRow key={member.id}>
-                        <TableCell className="font-medium">{member.user.username}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-1">
-                            <Mail className="h-3 w-3 text-muted-foreground" />
-                            <span>{member.user.email}</span>
-                            {member.user.is_email_verified && (
-                              <Badge variant="outline" className="ml-2 text-xs">Verified</Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-1">
-                            <Phone className="h-3 w-3 text-muted-foreground" />
-                            <span>{member.user.phone_number}</span>
-                            {member.user.is_phone_verified && (
-                              <Badge variant="outline" className="ml-2 text-xs">Verified</Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getRoleColor(member.role)}>
-                            <div className="flex items-center space-x-1">
-                              {getRoleIcon(member.role)}
-                              <span>{member.role || 'member'}</span>
-                            </div>
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className="bg-green-100 text-green-800">Active</Badge>
-                        </TableCell>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs sm:text-sm">Name</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Email</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Phone</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Role</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Status</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {staff.map((member) => (
+                        <TableRow key={member.id}>
+                          <TableCell className="font-medium text-xs sm:text-sm">{member.user.username}</TableCell>
+                          <TableCell className="text-xs sm:text-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:space-x-1 min-w-0">
+                              <div className="flex items-center space-x-1">
+                                <Mail className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                                <span className="break-all">{member.user.email}</span>
+                              </div>
+                              {member.user.is_email_verified && (
+                                <Badge variant="outline" className="text-xs w-fit">Verified</Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:space-x-1">
+                              <div className="flex items-center space-x-1">
+                                <Phone className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                                <span>{member.user.phone_number}</span>
+                              </div>
+                              {member.user.is_phone_verified && (
+                                <Badge variant="outline" className="text-xs w-fit">Verified</Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm">
+                            <Badge className={getRoleColor(member.role)}>
+                              <div className="flex items-center space-x-1">
+                                {getRoleIcon(member.role)}
+                                <span>{member.role || 'member'}</span>
+                              </div>
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm">
+                            <Badge className="bg-green-100 text-green-800">Active</Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -329,34 +337,36 @@ const SystemOrganizationView = () => {
               {transactions.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8">No transactions found</p>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Title</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Currency</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transactions.map((tx) => (
-                      <TableRow key={tx.id}>
-                        <TableCell>{new Date(tx.created_at).toLocaleDateString()}</TableCell>
-                        <TableCell>{tx.title || 'N/A'}</TableCell>
-                        <TableCell>
-                          <Badge className={tx.type === 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                            {tx.type}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className={tx.type === 'credit' ? 'text-green-600' : 'text-red-600'}>
-                          {tx.type === 'credit' ? '+' : '-'} {tx.currency.symbol} {tx.amount.toLocaleString()}
-                        </TableCell>
-                        <TableCell>{tx.currency.name}</TableCell>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs sm:text-sm">Date</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Title</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Type</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Amount</TableHead>
+                        <TableHead className="text-xs sm:text-sm">Currency</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {transactions.map((tx) => (
+                        <TableRow key={tx.id}>
+                          <TableCell className="text-xs sm:text-sm">{new Date(tx.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell className="text-xs sm:text-sm">{tx.title || 'N/A'}</TableCell>
+                          <TableCell className="text-xs sm:text-sm">
+                            <Badge className={tx.type === 'credit' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                              {tx.type}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className={`text-xs sm:text-sm ${tx.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
+                            {tx.type === 'credit' ? '+' : '-'} {tx.currency.symbol} {tx.amount.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm">{tx.currency.name}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </CardContent>
           </Card>

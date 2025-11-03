@@ -45,19 +45,19 @@ const SystemAdminLayout = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 md:gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-red-50 border-2 border-transparent hover:border-red-200 transition-all duration-200">
-                      <Avatar className="h-10 w-10 shadow-lg">
+                    <Button variant="ghost" className="relative h-8 w-8 md:h-10 md:w-10 rounded-full hover:bg-red-50 border-2 border-transparent hover:border-red-200 transition-all duration-200">
+                      <Avatar className="h-8 w-8 md:h-10 md:w-10 shadow-lg">
                         <AvatarImage src={user?.avatar} alt={user?.name} />
-                        <AvatarFallback className="bg-gradient-to-br from-red-500 to-red-600 text-white font-bold text-lg">
+                        <AvatarFallback className="bg-gradient-to-br from-red-500 to-red-600 text-white font-bold text-sm md:text-lg">
                           {user?.name?.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-sm border-red-200 shadow-xl" align="end" forceMount>
+                  <DropdownMenuContent className="w-56 md:w-64 bg-white/95 backdrop-blur-sm border-red-200 shadow-xl" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-2 p-2">
                         <p className="text-base font-bold leading-none text-slate-900">{user?.name || 'Admin User'}</p>
@@ -84,7 +84,7 @@ const SystemAdminLayout = () => {
 
           {/* Main Content */}
           <main className="flex-1 pb-16 md:pb-0 bg-gradient-to-br from-red-50/20 via-white to-slate-50/30">
-            <div className="container py-8 px-6">
+            <div className="container py-4 md:py-8 px-3 sm:px-4 md:px-6 max-w-full overflow-x-hidden">
               <Outlet />
             </div>
           </main>
