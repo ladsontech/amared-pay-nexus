@@ -12,7 +12,6 @@ const AdminMobileBottomNav = () => {
         { path: "/system/organizations", icon: Building2, label: "Orgs" },
         { path: "/system/users", icon: Users, label: "Users" },
         { path: "/system/sub-admins", icon: Crown, label: "Admins" },
-        { path: "/system/settings", icon: Settings, label: "Settings" },
       ]}
       onLogout={async () => {
         await authService.logout();
