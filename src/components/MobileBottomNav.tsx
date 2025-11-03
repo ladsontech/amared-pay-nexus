@@ -100,7 +100,7 @@ const MobileBottomNav = ({ items, extraActions, onLogout }: MobileBottomNavProps
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border md:hidden shadow-lg">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border md:hidden shadow-lg will-change-transform">
       <div className={`grid px-2 py-2`} style={{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }}>
         {/* Dynamic Navigation Items */}
         {visibleNavItems.map((item) => (
