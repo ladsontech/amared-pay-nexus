@@ -3,18 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, UserCircle, Mail, Phone, Building, Edit, Trash2, ChevronDown, ChevronRight } from "lucide-react";
+import { Search, Filter, UserCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
 import { userService, UserResponse } from "@/services/userService";
 
 const SystemUsers = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
   const { toast } = useToast();
-  const { user: currentUser } = useAuth();
 
   const fetchUsers = async () => {
     try {
@@ -53,47 +50,47 @@ const SystemUsers = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6">
         <Card className="border border-slate-100 bg-white">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base sm:text-lg">Total Users</CardTitle>
+            <CardTitle className="text-xs sm:text-base lg:text-lg">Total Users</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">{users.length}</div>
-            <p className="text-xs sm:text-sm text-muted-foreground">System wide</p>
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold">{users.length}</div>
+            <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground">System wide</p>
           </CardContent>
         </Card>
         <Card className="border border-slate-100 bg-white">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base sm:text-lg">Active Users</CardTitle>
+            <CardTitle className="text-xs sm:text-base lg:text-lg">Active Users</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-green-600">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600">
               {users.filter(user => user.is_active).length}
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground">Currently active</p>
+            <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground">Currently active</p>
           </CardContent>
         </Card>
         <Card className="border border-slate-100 bg-white">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base sm:text-lg">Organizations</CardTitle>
+            <CardTitle className="text-xs sm:text-base lg:text-lg">Organizations</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-blue-600">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-600">
               {new Set(users.filter(u => u.organization).map(u => u.organization?.id)).size}
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground">With users</p>
+            <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground">With users</p>
           </CardContent>
         </Card>
         <Card className="border border-slate-100 bg-white">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base sm:text-lg">Inactive</CardTitle>
+            <CardTitle className="text-xs sm:text-base lg:text-lg">Inactive</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-yellow-600">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-600">
               {users.filter(user => !user.is_active).length}
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground">Inactive accounts</p>
+            <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground">Inactive accounts</p>
           </CardContent>
         </Card>
       </div>
@@ -131,109 +128,40 @@ const SystemUsers = () => {
           ))}
         </div>
       ) : (
-        <div className="space-y-2">
-          {filteredUsers.map((user) => {
-            const isExpanded = expandedUserId === user.id;
-            const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username;
-            
-            return (
-              <Card 
-                key={user.id} 
-                className="border border-gray-200 bg-white hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => setExpandedUserId(isExpanded ? null : user.id)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="flex-shrink-0">
-                        {isExpanded ? (
-                          <ChevronDown className="h-5 w-5 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="h-5 w-5 text-gray-400" />
-                        )}
+        <Card className="border border-slate-100 bg-white">
+          <CardContent className="p-0">
+            <div className="divide-y divide-slate-100">
+              {filteredUsers.map((user) => {
+                const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username;
+                
+                return (
+                  <div
+                    key={user.id}
+                    className="p-4 hover:bg-slate-50 cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                          <UserCircle className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-base sm:text-lg truncate">{fullName || user.username}</h3>
+                          <p className="text-xs sm:text-sm text-muted-foreground truncate">{user.email}</p>
+                        </div>
                       </div>
-                      <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
-                        <UserCircle className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <h3 className="font-semibold text-base text-gray-900 truncate">{fullName || user.username}</h3>
                       <Badge 
-                        className={`${user.is_active ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"} flex-shrink-0`} 
+                        className={`${user.is_active ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"} ml-2 flex-shrink-0`} 
                         variant="outline"
                       >
                         {user.is_active ? "Active" : "Inactive"}
                       </Badge>
                     </div>
                   </div>
-
-                  {isExpanded && (
-                    <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                        <div className="space-y-2">
-                          <div className="flex items-center space-x-2 text-gray-700">
-                            <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                            <span className="break-all">{user.email}</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-gray-700">
-                            <Phone className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                            <span>{user.phone_number || "N/A"}</span>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="flex items-start space-x-2 text-gray-700">
-                            <Building className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                            <span className="break-words">{user.organization?.name || "No Organization"}</span>
-                          </div>
-                          <p className="text-gray-700"><strong>Username:</strong> <span className="break-all">{user.username}</span></p>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-gray-700"><strong>Last Login:</strong> {user.last_login ? new Date(user.last_login).toLocaleDateString() : "Never"}</p>
-                          <p className="text-gray-700"><strong>Joined:</strong> {new Date(user.date_joined).toLocaleDateString()}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 pt-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // TODO: Implement edit functionality
-                            toast({
-                              title: "Edit User",
-                              description: `Edit functionality for ${fullName} will be implemented soon.`,
-                            });
-                          }}
-                          className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                        >
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (window.confirm(`Are you sure you want to delete ${fullName}?`)) {
-                              // TODO: Implement delete functionality
-                              toast({
-                                title: "Delete User",
-                                description: `Delete functionality for ${fullName} will be implemented soon.`,
-                              });
-                            }
-                          }}
-                          className="border-red-200 text-red-600 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

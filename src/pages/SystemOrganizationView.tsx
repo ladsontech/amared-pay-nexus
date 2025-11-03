@@ -5,7 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Building, Wallet, Users, Mail, Phone, Shield, Calendar, LogIn } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Building, Wallet, Users, Mail, Phone, Shield, Calendar, LogIn, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { organizationService, Organization, Staff, Wallet as WalletType, WalletTransaction } from "@/services/organizationService";
@@ -21,6 +24,9 @@ const SystemOrganizationView = () => {
   const [wallet, setWallet] = useState<WalletType | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -103,73 +109,154 @@ const SystemOrganizationView = () => {
     );
   }
 
+  const handleUpdate = async (data: { name: string; address?: string; company_reg_id?: string; tin?: string }) => {
+    if (!organization) return;
+    
+    try {
+      const updatedOrg = await organizationService.updateOrganization(organization.id, data);
+      setOrganization(updatedOrg);
+      toast({ title: "Success", description: "Organization updated successfully" });
+      setEditOpen(false);
+    } catch (error: any) {
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to update organization", 
+        variant: "destructive" 
+      });
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!organization) return;
+    
+    try {
+      setIsDeleting(true);
+      const accessToken = localStorage.getItem("access_token");
+      const response = await fetch(`https://bulksrv.almaredagencyuganda.com/organizations/org/${organization.id}/`, {
+        method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || errorData.detail || 'Delete endpoint not available or failed');
+      }
+
+      toast({ title: "Success", description: "Organization deleted successfully" });
+      setDeleteOpen(false);
+      navigate("/system/organizations");
+    } catch (error: any) {
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to delete organization. The delete endpoint may not be available.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6 p-3 sm:p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:space-x-4">
-          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => navigate("/system/organizations")}>
+      {/* Header Section - Improved Mobile Layout */}
+      <div className="space-y-3 sm:space-y-0">
+        {/* Back Button - Mobile First */}
+        <div className="sm:hidden">
+          <Button variant="outline" size="sm" className="w-full" onClick={() => navigate("/system/organizations")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 break-words">{organization.name}</h1>
-            <p className="text-xs sm:text-sm text-muted-foreground">View and manage organization details</p>
+        </div>
+        
+        {/* Title and Actions - Desktop */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => navigate("/system/organizations")}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 break-words">{organization.name}</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground">View and manage organization details</p>
+            </div>
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1 sm:flex-none"
+                onClick={() => setEditOpen(true)}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Edit</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1 sm:flex-none text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={() => setDeleteOpen(true)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Delete</span>
+              </Button>
+            </div>
+            <Button 
+              variant="default" 
+              size="sm" 
+              className="w-full sm:w-auto text-xs sm:text-sm"
+              onClick={async () => {
+                try {
+                  if (!organization?.id || !organization?.name) {
+                    throw new Error('Invalid organization data');
+                  }
+
+                  console.log('Starting impersonation for:', organization.id, organization.name);
+                  await impersonateOrganization(organization.id, organization.name);
+                  
+                  const impersonating = localStorage.getItem('impersonating');
+                  const storedUser = localStorage.getItem('user');
+                  
+                  if (impersonating !== 'true' || !storedUser) {
+                    throw new Error('Failed to set impersonation state');
+                  }
+
+                  console.log('Impersonation state set, redirecting...');
+                  
+                  toast({
+                    title: "Impersonating Organization",
+                    description: `Now viewing as ${organization.name}. You can make changes just like the organization owner.`,
+                  });
+
+                  await new Promise(resolve => setTimeout(resolve, 300));
+                  window.location.href = "/org/dashboard";
+                } catch (error) {
+                  console.error("Error during impersonation:", error);
+                  const errorMessage = error instanceof Error ? error.message : "Failed to impersonate organization";
+                  toast({
+                    title: "Error",
+                    description: errorMessage + ". Please try again.",
+                    variant: "destructive",
+                    duration: 5000,
+                  });
+                }
+              }}
+            >
+              <LogIn className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Login as Organization</span>
+              <span className="sm:hidden">Login as Org</span>
+            </Button>
+            <Badge className="bg-green-100 text-green-800 w-fit hidden sm:inline-flex">Active</Badge>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <Button 
-            variant="default" 
-            size="sm" 
-            className="w-full sm:w-auto text-xs sm:text-sm"
-            onClick={async () => {
-              try {
-                // Validate organization data
-                if (!organization?.id || !organization?.name) {
-                  throw new Error('Invalid organization data');
-                }
-
-                console.log('Starting impersonation for:', organization.id, organization.name);
-
-                // Perform impersonation - this sets localStorage and state
-                await impersonateOrganization(organization.id, organization.name);
-                
-                // Verify impersonation was set
-                const impersonating = localStorage.getItem('impersonating');
-                const storedUser = localStorage.getItem('user');
-                
-                if (impersonating !== 'true' || !storedUser) {
-                  throw new Error('Failed to set impersonation state');
-                }
-
-                console.log('Impersonation state set, redirecting...');
-                
-                // Show success message
-                toast({
-                  title: "Impersonating Organization",
-                  description: `Now viewing as ${organization.name}. You can make changes just like the organization owner.`,
-                });
-
-                // Use a longer delay and ensure localStorage is persisted
-                await new Promise(resolve => setTimeout(resolve, 300));
-                
-                // Force a full page reload to ensure all state is reset
-                window.location.href = "/org/dashboard";
-              } catch (error) {
-                console.error("Error during impersonation:", error);
-                const errorMessage = error instanceof Error ? error.message : "Failed to impersonate organization";
-                toast({
-                  title: "Error",
-                  description: errorMessage + ". Please try again.",
-                  variant: "destructive",
-                  duration: 5000,
-                });
-              }
-            }}
-          >
-            <LogIn className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
-            <span className="hidden sm:inline">Login as Organization</span>
-            <span className="sm:hidden">Login as Org</span>
-          </Button>
+        
+        {/* Active Badge - Mobile */}
+        <div className="sm:hidden">
           <Badge className="bg-green-100 text-green-800 w-fit">Active</Badge>
         </div>
       </div>
@@ -408,7 +495,100 @@ const SystemOrganizationView = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Organization</DialogTitle>
+            <DialogDescription>Update organization details.</DialogDescription>
+          </DialogHeader>
+          {organization && (
+            <OrgEditForm 
+              initial={organization} 
+              onSubmit={handleUpdate} 
+              onCancel={() => setEditOpen(false)} 
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Organization</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{organization?.name}"? This action cannot be undone and will permanently remove the organization and all associated data.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setDeleteOpen(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button" 
+              variant="destructive" 
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Organization"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+};
+
+// Edit Form Component
+interface OrgEditFormProps {
+  initial: Organization;
+  onSubmit: (data: { name: string; address?: string; company_reg_id?: string; tin?: string }) => void;
+  onCancel: () => void;
+}
+
+const OrgEditForm = ({ initial, onSubmit, onCancel }: OrgEditFormProps) => {
+  const [form, setForm] = useState({
+    name: initial.name,
+    address: initial.address || "",
+    company_reg_id: initial.company_reg_id || "",
+    tin: initial.tin || "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(form);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label>Organization Name</Label>
+        <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+      </div>
+      <div>
+        <Label>Address</Label>
+        <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+      </div>
+      <div>
+        <Label>Company Registration ID</Label>
+        <Input value={form.company_reg_id} onChange={(e) => setForm({ ...form, company_reg_id: e.target.value })} />
+      </div>
+      <div>
+        <Label>TIN</Label>
+        <Input value={form.tin} onChange={(e) => setForm({ ...form, tin: e.target.value })} />
+      </div>
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button type="submit">Save Changes</Button>
+      </DialogFooter>
+    </form>
   );
 };
 
