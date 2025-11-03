@@ -191,7 +191,9 @@ const SystemSubAdmins = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-base sm:text-lg">{admin.first_name} {admin.last_name}</h3>
+                          <h3 className="font-semibold text-base sm:text-lg">
+                            {admin.first_name || ''} {admin.last_name || ''}
+                          </h3>
                           <Badge className={admin.is_active ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"} variant="outline">
                             {admin.is_active ? "Active" : "Inactive"}
                           </Badge>
@@ -206,14 +208,19 @@ const SystemSubAdmins = () => {
                               <Mail className="h-3 w-3 flex-shrink-0" />
                               <span className="break-all">{admin.email}</span>
                             </div>
-                            <div className="flex items-center space-x-1">
-                              <Phone className="h-3 w-3 flex-shrink-0" />
-                              <span>{admin.phone_number}</span>
-                            </div>
+                            {admin.phone_number && (
+                              <div className="flex items-center space-x-1">
+                                <Phone className="h-3 w-3 flex-shrink-0" />
+                                <span>{admin.phone_number}</span>
+                              </div>
+                            )}
                           </div>
                           <div>
                             <p><strong>Username:</strong> <span className="break-all">{admin.username}</span></p>
-                            <p><strong>Joined:</strong> {new Date(admin.date_joined).toLocaleDateString()}</p>
+                            <p><strong>Joined:</strong> {admin.date_joined ? new Date(admin.date_joined).toLocaleDateString() : 'N/A'}</p>
+                            {admin.last_login && (
+                              <p><strong>Last Login:</strong> {new Date(admin.last_login).toLocaleDateString()}</p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -363,23 +370,46 @@ const SubAdminForm = ({ initial, onSubmit, onCancel }: SubAdminFormProps) => {
         />
       </div>
       <div>
-        <Label>Username</Label>
+        <Label>Username (Optional)</Label>
         <Input
-          value={form.username}
-          onChange={(e) => setForm({ ...form, username: e.target.value })}
-          required
+          value={form.username || ''}
+          onChange={(e) => setForm({ ...form, username: e.target.value || undefined })}
+          placeholder="Leave empty to auto-generate"
         />
+        <p className="text-xs text-muted-foreground mt-1">
+          If not provided, username will be generated automatically
+        </p>
       </div>
       {!initial && (
         <div>
-          <Label>Password</Label>
+          <Label>Password *</Label>
           <Input
             type="password"
-            value={form.password}
+            value={form.password || ''}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
             minLength={8}
+            maxLength={40}
           />
+          <p className="text-xs text-muted-foreground mt-1">
+            Must be between 8 and 40 characters
+          </p>
+        </div>
+      )}
+      {initial && (
+        <div>
+          <Label>Password (Optional)</Label>
+          <Input
+            type="password"
+            value={form.password || ''}
+            onChange={(e) => setForm({ ...form, password: e.target.value || undefined })}
+            minLength={8}
+            maxLength={40}
+            placeholder="Leave empty to keep current password"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Only enter if you want to change the password (8-40 characters)
+          </p>
         </div>
       )}
       <DialogFooter>

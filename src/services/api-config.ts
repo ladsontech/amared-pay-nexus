@@ -15,12 +15,12 @@ export const API_CONFIG = {
       userDetail: (id: string) => `users/user/${id}/`
     },
     subAdmin: {
-      create: 'users/sub_admin/',
-      list: 'users/sub_admin_list/',
-      search: 'users/search_sub_admins/',
-      detail: (id: string) => `users/sub_admin_list/${id}/`,
-      update: (id: string) => `users/update_sub_admin/${id}/`,
-      delete: (id: string) => `users/sub_admin/${id}/`
+      create: 'sub_admin/',
+      list: 'sub_admin_list/',
+      search: 'search_sub_admins/',
+      detail: (id: string) => `sub_admin_list/${id}/`,
+      update: (id: string) => `update_sub_admin/${id}/`,
+      delete: (id: string) => `sub_admin/${id}/`
     },
     organizations: {
       createWithOwner: '/organizations/create_org/',

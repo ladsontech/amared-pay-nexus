@@ -213,7 +213,7 @@ export const StaffManagement = () => {
               currentRole={editOpen.role || 'member'} 
               onSubmit={(role) => handleUpdateRole(editOpen.id, role)} 
               onCancel={() => setEditOpen(null)}
-              isSuperuser={user?.isSuperuser}
+              isSuperuser={user?.isSuperuser === true || user?.role === 'owner'}
             />
           )}
         </DialogContent>
@@ -250,7 +250,7 @@ interface RoleFormProps {
   currentRole: string;
   onSubmit: (role: "owner" | "manager" | "member") => void;
   onCancel: () => void;
-  isSuperuser?: boolean;
+  isSuperuser?: boolean; // true if user is superuser OR has owner role (including during impersonation)
 }
 
 const RoleForm = ({ currentRole, onSubmit, onCancel, isSuperuser }: RoleFormProps) => {

@@ -201,7 +201,8 @@ export function StaffCreationForm({ open, onOpenChange, onSuccess }: StaffCreati
   };
 
   // Determine if owner role can be assigned (only for superusers or owners)
-  const canAssignOwner = user?.isSuperuser || user?.role === "owner";
+  // During impersonation, isSuperuser is false but role is 'owner', so check both
+  const canAssignOwner = user?.isSuperuser === true || user?.role === "owner";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

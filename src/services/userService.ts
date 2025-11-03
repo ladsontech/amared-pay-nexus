@@ -14,7 +14,7 @@ export interface CreateSubAdminRequest {
   last_name: string;
   email: string;
   phone_number: string;
-  username: string;
+  username?: string; // Optional per API docs
   password: string;
 }
 
@@ -24,6 +24,7 @@ export interface UpdateSubAdminRequest {
   email?: string;
   phone_number?: string;
   username?: string;
+  password?: string; // Optional for update
 }
 
 export interface UserResponse {
@@ -47,12 +48,21 @@ export interface SubAdminResponse {
   id: string;
   username: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  phone_number: string;
+  first_name: string | null;
+  last_name: string | null;
+  phone_number: string | null;
   is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
+  is_email_verified?: boolean;
+  is_phone_verified?: boolean;
   date_joined: string;
-  last_login?: string;
+  last_login: string | null;
+  permissions?: string;
+  avatar?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  groups?: number[];
 }
 
 class UserService {
@@ -100,13 +110,50 @@ class UserService {
     }
   }
 
-  async createSubAdmin(payload: CreateSubAdminRequest): Promise<SubAdminResponse> {
+  async createSubAdmin(payload: CreateSubAdminRequest): Promise<CreateSubAdminRequest & { avatar?: string }> {
     if (!this.checkAdminPermission()) {
       throw new Error("Unauthorized: Only superusers can create sub-admins");
     }
 
+    // Validate required fields
+    if (!payload.first_name || !payload.last_name || !payload.email || !payload.phone_number || !payload.password) {
+      throw new Error("All required fields must be provided");
+    }
+
+    // Validate password length
+    if (payload.password.length < 8 || payload.password.length > 40) {
+      throw new Error("Password must be between 8 and 40 characters");
+    }
+
+    // Validate phone number length
+    if (payload.phone_number.length < 10) {
+      throw new Error("Phone number must be at least 10 characters");
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(payload.email)) {
+      throw new Error("Please provide a valid email address");
+    }
+
+    // Prepare payload - only include username if provided
+    const requestPayload: any = {
+      first_name: payload.first_name.trim(),
+      last_name: payload.last_name.trim(),
+      email: payload.email.trim(),
+      phone_number: payload.phone_number.trim(),
+      password: payload.password,
+    };
+
+    if (payload.username && payload.username.trim()) {
+      requestPayload.username = payload.username.trim();
+    }
+
     try {
-      const response = await apiClient.post<SubAdminResponse>(API_CONFIG.endpoints.subAdmin.create, payload);
+      const response = await apiClient.post<CreateSubAdminRequest & { avatar?: string }>(
+        API_CONFIG.endpoints.subAdmin.create, 
+        requestPayload
+      );
       return response;
     } catch (error: any) {
       console.error('Failed to create sub admin:', error);
@@ -149,29 +196,56 @@ class UserService {
   }
 
   async listSubAdmins(query?: QueryParams): Promise<SubAdminResponse[]> {
+    if (!this.checkAdminPermission()) {
+      throw new Error("Unauthorized: Only superusers can list sub-admins");
+    }
+
     try {
-      const response = await apiClient.get<{ results?: SubAdminResponse[]; data?: SubAdminResponse[] } | SubAdminResponse[]>(
+      const response = await apiClient.get<{ count: number; next: string | null; previous: string | null; results: SubAdminResponse[] }>(
         API_CONFIG.endpoints.subAdmin.list, 
         query
       );
       
-      // Handle different response formats
-      if (Array.isArray(response)) {
-        return response;
-      } else if (response.results) {
-        return response.results;
-      } else if (response.data) {
-        return response.data;
+      // Handle paginated response
+      if (response && typeof response === 'object' && 'results' in response) {
+        return response.results || [];
       }
       
-      return [];
+      // Fallback for non-paginated response
+      return Array.isArray(response) ? response : [];
     } catch (error) {
       console.error('Failed to fetch sub admins:', error);
       throw new Error('Failed to fetch sub admins');
     }
   }
 
+  async searchSubAdmins(query?: QueryParams): Promise<SubAdminResponse[]> {
+    if (!this.checkAdminPermission()) {
+      throw new Error("Unauthorized: Only superusers can search sub-admins");
+    }
+
+    try {
+      const response = await apiClient.get<{ count: number; next: string | null; previous: string | null; results: SubAdminResponse[] }>(
+        API_CONFIG.endpoints.subAdmin.search, 
+        query
+      );
+      
+      if (response && typeof response === 'object' && 'results' in response) {
+        return response.results || [];
+      }
+      
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error('Failed to search sub admins:', error);
+      throw new Error('Failed to search sub admins');
+    }
+  }
+
   async getSubAdmin(id: string): Promise<SubAdminResponse> {
+    if (!this.checkAdminPermission()) {
+      throw new Error("Unauthorized: Only superusers can view sub-admin details");
+    }
+
     try {
       return await apiClient.get<SubAdminResponse>(API_CONFIG.endpoints.subAdmin.detail(id));
     } catch (error) {
@@ -180,18 +254,76 @@ class UserService {
     }
   }
 
-  async updateSubAdmin(id: string, payload: UpdateSubAdminRequest): Promise<SubAdminResponse> {
+  async updateSubAdmin(id: string, payload: UpdateSubAdminRequest): Promise<UpdateSubAdminRequest & { avatar?: string }> {
+    if (!this.checkAdminPermission()) {
+      throw new Error("Unauthorized: Only superusers can update sub-admins");
+    }
+
+    // Validate password if provided
+    if (payload.password !== undefined) {
+      if (payload.password.length < 8 || payload.password.length > 40) {
+        throw new Error("Password must be between 8 and 40 characters");
+      }
+    }
+
+    // Validate phone number if provided
+    if (payload.phone_number !== undefined && payload.phone_number.length < 10) {
+      throw new Error("Phone number must be at least 10 characters");
+    }
+
+    // Validate email if provided
+    if (payload.email !== undefined) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(payload.email)) {
+        throw new Error("Please provide a valid email address");
+      }
+    }
+
+    // Prepare payload - only include fields that are provided
+    const requestPayload: any = {};
+    if (payload.first_name !== undefined) requestPayload.first_name = payload.first_name.trim();
+    if (payload.last_name !== undefined) requestPayload.last_name = payload.last_name.trim();
+    if (payload.email !== undefined) requestPayload.email = payload.email.trim();
+    if (payload.phone_number !== undefined) requestPayload.phone_number = payload.phone_number.trim();
+    if (payload.username !== undefined && payload.username.trim()) {
+      requestPayload.username = payload.username.trim();
+    }
+    if (payload.password !== undefined) requestPayload.password = payload.password;
+
     try {
-      return await apiClient.put<SubAdminResponse>(API_CONFIG.endpoints.subAdmin.update(id), payload);
-    } catch (error) {
+      return await apiClient.put<UpdateSubAdminRequest & { avatar?: string }>(
+        API_CONFIG.endpoints.subAdmin.update(id), 
+        requestPayload
+      );
+    } catch (error: any) {
       console.error(`Failed to update sub admin ${id}:`, error);
-      throw new Error(`Failed to update sub admin ${id}`);
+      
+      let errorMessage = error.message || `Failed to update sub admin`;
+      if (error.details) {
+        if (typeof error.details === 'object') {
+          const errors = Object.entries(error.details)
+            .map(([key, value]) => {
+              const fieldName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+              return `${fieldName}: ${Array.isArray(value) ? value.join(', ') : value}`;
+            })
+            .join('; ');
+          errorMessage = errors || errorMessage;
+        } else if (typeof error.details === 'string') {
+          errorMessage = error.details;
+        }
+      }
+      
+      throw new Error(errorMessage);
     }
   }
 
   async deleteSubAdmin(id: string): Promise<void> {
+    if (!this.checkAdminPermission()) {
+      throw new Error("Unauthorized: Only superusers can delete sub-admins");
+    }
+
     try {
-      await apiClient.delete(API_CONFIG.endpoints.subAdmin.delete(id));
+      await apiClient.delete<void>(API_CONFIG.endpoints.subAdmin.delete(id));
     } catch (error) {
       console.error(`Failed to delete sub admin ${id}:`, error);
       throw new Error(`Failed to delete sub admin ${id}`);
