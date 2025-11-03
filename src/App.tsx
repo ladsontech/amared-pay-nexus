@@ -68,7 +68,7 @@ const AppRoutes = () => {
         {/* System Admin Routes */}
         <Route path="/system" element={
           <ProtectedRoute fallbackRoute="/login">
-            {(user?.role === 'admin' || user?.permissions?.includes('system_admin')) ? (
+            {(user?.isSuperuser || user?.role === 'admin' || user?.permissions?.includes('system_admin')) ? (
               <SystemAdminLayout />
             ) : (
               <Navigate to="/unauthorized" replace />
@@ -149,10 +149,12 @@ const AppRoutes = () => {
           <Route path="pay-bills" element={<PayBills />} />
         </Route>
 
-        {/* Redirect authenticated users to organization dashboard */}
+        {/* Redirect authenticated users to appropriate dashboard */}
         <Route path="/dashboard" element={
           isAuthenticated ? (
-            <Navigate to="/org/dashboard" replace />
+            (user?.role === 'admin' || user?.isSuperuser || user?.permissions?.includes('system_admin')) ?
+              <Navigate to="/system/organizations" replace /> :
+              <Navigate to="/org/dashboard" replace />
           ) : (
             <Navigate to="/login" replace />
           )
