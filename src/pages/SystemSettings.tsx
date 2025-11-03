@@ -40,25 +40,25 @@ const SystemSettings = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+    <div className="space-y-4 sm:space-y-6 p-3 sm:p-0">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-xl md:text-2xl font-semibold text-slate-900">System Settings</h1>
-          <p className="text-sm text-muted-foreground">Configure global system settings and preferences</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">System Settings</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Configure global system settings and preferences</p>
         </div>
-        <Button onClick={handleSave} className="w-full sm:w-auto">
-          <Save className="h-4 w-4 mr-2" />
+        <Button onClick={handleSave} className="w-full sm:w-auto text-xs sm:text-sm">
+          <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
           Save Changes
         </Button>
       </div>
 
       <Tabs defaultValue="general" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto">
-          <TabsTrigger value="general" className="text-xs sm:text-sm py-2">General</TabsTrigger>
-          <TabsTrigger value="notifications" className="text-xs sm:text-sm py-2">Notifications</TabsTrigger>
-          <TabsTrigger value="security" className="text-xs sm:text-sm py-2">Security</TabsTrigger>
-          <TabsTrigger value="database" className="text-xs sm:text-sm py-2">Database</TabsTrigger>
-          <TabsTrigger value="integrations" className="text-xs sm:text-sm py-2 col-span-2 sm:col-span-1">Integrations</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto gap-1">
+          <TabsTrigger value="general" className="text-[10px] sm:text-xs lg:text-sm py-2">General</TabsTrigger>
+          <TabsTrigger value="notifications" className="text-[10px] sm:text-xs lg:text-sm py-2">Notifications</TabsTrigger>
+          <TabsTrigger value="security" className="text-[10px] sm:text-xs lg:text-sm py-2">Security</TabsTrigger>
+          <TabsTrigger value="database" className="text-[10px] sm:text-xs lg:text-sm py-2">Database</TabsTrigger>
+          <TabsTrigger value="integrations" className="text-[10px] sm:text-xs lg:text-sm py-2 col-span-2 sm:col-span-1">Integrations</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
@@ -73,20 +73,21 @@ const SystemSettings = () => {
                   Basic system configuration and preferences
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="siteName">Site Name</Label>
+                    <Label htmlFor="siteName" className="text-xs sm:text-sm">Site Name</Label>
                     <Input
                       id="siteName"
                       value={settings.siteName}
                       onChange={(e) => handleInputChange('siteName', e.target.value)}
+                      className="text-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="defaultCurrency">Default Currency</Label>
+                    <Label htmlFor="defaultCurrency" className="text-xs sm:text-sm">Default Currency</Label>
                     <Select value={settings.defaultCurrency} onValueChange={(value) => handleInputChange('defaultCurrency', value)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -100,20 +101,21 @@ const SystemSettings = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="siteDescription">Site Description</Label>
+                  <Label htmlFor="siteDescription" className="text-xs sm:text-sm">Site Description</Label>
                   <Textarea
                     id="siteDescription"
                     value={settings.siteDescription}
                     onChange={(e) => handleInputChange('siteDescription', e.target.value)}
                     rows={3}
+                    className="text-sm"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="timeZone">Time Zone</Label>
+                    <Label htmlFor="timeZone" className="text-xs sm:text-sm">Time Zone</Label>
                     <Select value={settings.timeZone} onValueChange={(value) => handleInputChange('timeZone', value)}>
-                      <SelectTrigger>
+                      <SelectTrigger className="text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -125,40 +127,45 @@ const SystemSettings = () => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="sessionTimeout">Session Timeout (minutes)</Label>
+                    <Label htmlFor="sessionTimeout" className="text-xs sm:text-sm">Session Timeout (minutes)</Label>
                     <Input
                       id="sessionTimeout"
                       type="number"
                       value={settings.sessionTimeout}
                       onChange={(e) => handleInputChange('sessionTimeout', e.target.value)}
+                      className="text-sm"
                     />
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <div className="space-y-0.5 flex-1">
-                    <Label>Maintenance Mode</Label>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      Enable maintenance mode to prevent user access
-                    </p>
+                <div className="flex flex-col gap-2 p-3 sm:p-0 border border-slate-100 sm:border-0 rounded-lg sm:rounded-none bg-slate-50 sm:bg-transparent">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5 flex-1 pr-4">
+                      <Label className="text-xs sm:text-sm">Maintenance Mode</Label>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">
+                        Enable maintenance mode to prevent user access
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.maintenanceMode}
+                      onCheckedChange={(checked) => handleInputChange('maintenanceMode', checked)}
+                    />
                   </div>
-                  <Switch
-                    checked={settings.maintenanceMode}
-                    onCheckedChange={(checked) => handleInputChange('maintenanceMode', checked)}
-                  />
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <div className="space-y-0.5 flex-1">
-                    <Label>User Registration</Label>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      Allow new users to register accounts
-                    </p>
+                <div className="flex flex-col gap-2 p-3 sm:p-0 border border-slate-100 sm:border-0 rounded-lg sm:rounded-none bg-slate-50 sm:bg-transparent">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5 flex-1 pr-4">
+                      <Label className="text-xs sm:text-sm">User Registration</Label>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">
+                        Allow new users to register accounts
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.userRegistration}
+                      onCheckedChange={(checked) => handleInputChange('userRegistration', checked)}
+                    />
                   </div>
-                  <Switch
-                    checked={settings.userRegistration}
-                    onCheckedChange={(checked) => handleInputChange('userRegistration', checked)}
-                  />
                 </div>
               </CardContent>
             </Card>
@@ -176,51 +183,55 @@ const SystemSettings = () => {
                 Configure system-wide notification preferences
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div className="space-y-0.5 flex-1">
-                  <Label>Email Notifications</Label>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    Send email notifications for important events
-                  </p>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5 flex-1 pr-4">
+                    <Label className="text-xs sm:text-sm">Email Notifications</Label>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">
+                      Send email notifications for important events
+                    </p>
+                  </div>
+                  <Switch
+                    checked={settings.emailNotifications}
+                    onCheckedChange={(checked) => handleInputChange('emailNotifications', checked)}
+                  />
                 </div>
-                <Switch
-                  checked={settings.emailNotifications}
-                  onCheckedChange={(checked) => handleInputChange('emailNotifications', checked)}
-                />
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div className="space-y-0.5 flex-1">
-                  <Label>SMS Notifications</Label>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    Send SMS notifications for critical alerts
-                  </p>
+              <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5 flex-1 pr-4">
+                    <Label className="text-xs sm:text-sm">SMS Notifications</Label>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">
+                      Send SMS notifications for critical alerts
+                    </p>
+                  </div>
+                  <Switch
+                    checked={settings.smsNotifications}
+                    onCheckedChange={(checked) => handleInputChange('smsNotifications', checked)}
+                  />
                 </div>
-                <Switch
-                  checked={settings.smsNotifications}
-                  onCheckedChange={(checked) => handleInputChange('smsNotifications', checked)}
-                />
               </div>
 
-              <div className="space-y-2">
-                <Label>Notification Categories</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <div className="flex items-center space-x-2">
+              <div className="space-y-3 pt-2">
+                <Label className="text-xs sm:text-sm">Notification Categories</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="flex items-center justify-between p-2 border border-slate-100 rounded-lg bg-white">
+                    <Label htmlFor="transaction-alerts" className="text-xs sm:text-sm cursor-pointer flex-1">Transaction Alerts</Label>
                     <Switch id="transaction-alerts" defaultChecked />
-                    <Label htmlFor="transaction-alerts">Transaction Alerts</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-between p-2 border border-slate-100 rounded-lg bg-white">
+                    <Label htmlFor="security-alerts" className="text-xs sm:text-sm cursor-pointer flex-1">Security Alerts</Label>
                     <Switch id="security-alerts" defaultChecked />
-                    <Label htmlFor="security-alerts">Security Alerts</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-between p-2 border border-slate-100 rounded-lg bg-white">
+                    <Label htmlFor="system-updates" className="text-xs sm:text-sm cursor-pointer flex-1">System Updates</Label>
                     <Switch id="system-updates" defaultChecked />
-                    <Label htmlFor="system-updates">System Updates</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-between p-2 border border-slate-100 rounded-lg bg-white">
+                    <Label htmlFor="maintenance-notices" className="text-xs sm:text-sm cursor-pointer flex-1">Maintenance Notices</Label>
                     <Switch id="maintenance-notices" defaultChecked />
-                    <Label htmlFor="maintenance-notices">Maintenance Notices</Label>
                   </div>
                 </div>
               </div>
@@ -239,43 +250,49 @@ const SystemSettings = () => {
                 Configure security policies and access controls
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="maxFileSize">Max File Upload Size (MB)</Label>
+                  <Label htmlFor="maxFileSize" className="text-xs sm:text-sm">Max File Upload Size (MB)</Label>
                   <Input
                     id="maxFileSize"
                     type="number"
                     value={settings.maxFileSize}
                     onChange={(e) => handleInputChange('maxFileSize', e.target.value)}
+                    className="text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Password Policy</Label>
-                  <div className="space-y-1">
-                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">Min 8 characters</Badge>
-                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">Special characters required</Badge>
-                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">Numbers required</Badge>
+                  <Label className="text-xs sm:text-sm">Password Policy</Label>
+                  <div className="flex flex-wrap gap-1.5">
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-[10px] sm:text-xs">Min 8 characters</Badge>
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-[10px] sm:text-xs">Special chars required</Badge>
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-[10px] sm:text-xs">Numbers required</Badge>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Two-Factor Authentication</Label>
-                <p className="text-sm text-muted-foreground">
-                  Require 2FA for admin users
-                </p>
-                <Switch defaultChecked />
+              <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5 flex-1 pr-4">
+                    <Label className="text-xs sm:text-sm">Two-Factor Authentication</Label>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">
+                      Require 2FA for admin users
+                    </p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <Label>IP Restrictions</Label>
-                <p className="text-sm text-muted-foreground">
+                <Label className="text-xs sm:text-sm">IP Restrictions</Label>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
                   Restrict admin access to specific IP addresses
                 </p>
                 <Textarea
                   placeholder="Enter IP addresses (one per line)"
                   rows={3}
+                  className="text-sm"
                 />
               </div>
             </CardContent>
@@ -293,12 +310,12 @@ const SystemSettings = () => {
                 Configure database backup and maintenance settings
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="backupFrequency">Backup Frequency</Label>
+                  <Label htmlFor="backupFrequency" className="text-xs sm:text-sm">Backup Frequency</Label>
                   <Select value={settings.backupFrequency} onValueChange={(value) => handleInputChange('backupFrequency', value)}>
-                    <SelectTrigger>
+                    <SelectTrigger className="text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -310,27 +327,28 @@ const SystemSettings = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="logRetention">Log Retention (days)</Label>
+                  <Label htmlFor="logRetention" className="text-xs sm:text-sm">Log Retention (days)</Label>
                   <Input
                     id="logRetention"
                     type="number"
                     value={settings.logRetention}
                     onChange={(e) => handleInputChange('logRetention', e.target.value)}
+                    className="text-sm"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Database Status</Label>
-                <div className="flex items-center space-x-2">
-                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">Healthy</Badge>
-                  <span className="text-sm text-gray-600">Last backup: 2 hours ago</span>
+                <Label className="text-xs sm:text-sm">Database Status</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs sm:text-sm w-fit">Healthy</Badge>
+                  <span className="text-xs sm:text-sm text-gray-600">Last backup: 2 hours ago</span>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Button variant="outline">
-                  <Database className="h-4 w-4 mr-2" />
+                <Button variant="outline" className="w-full sm:w-auto text-xs sm:text-sm">
+                  <Database className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                   Run Manual Backup
                 </Button>
               </div>
@@ -350,37 +368,37 @@ const SystemSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <h3 className="font-medium">Payment Gateway</h3>
-                    <p className="text-sm text-gray-600">MTN Mobile Money integration</p>
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 sm:p-4 border border-slate-200 rounded-lg bg-white">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-sm sm:text-base">Payment Gateway</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 truncate">MTN Mobile Money integration</p>
                   </div>
-                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">Connected</Badge>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs sm:text-sm w-fit">Connected</Badge>
                 </div>
 
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <h3 className="font-medium">Email Service</h3>
-                    <p className="text-sm text-gray-600">SMTP configuration for notifications</p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 sm:p-4 border border-slate-200 rounded-lg bg-white">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-sm sm:text-base">Email Service</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 truncate">SMTP configuration for notifications</p>
                   </div>
-                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">Active</Badge>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs sm:text-sm w-fit">Active</Badge>
                 </div>
 
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <h3 className="font-medium">SMS Service</h3>
-                    <p className="text-sm text-gray-600">SMS gateway for alerts</p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 sm:p-4 border border-slate-200 rounded-lg bg-white">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-sm sm:text-base">SMS Service</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 truncate">SMS gateway for alerts</p>
                   </div>
-                  <Badge className="bg-gray-100 text-gray-700 border-gray-200">Pending</Badge>
+                  <Badge className="bg-gray-100 text-gray-700 border-gray-200 text-xs sm:text-sm w-fit">Pending</Badge>
                 </div>
 
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <h3 className="font-medium">Analytics</h3>
-                    <p className="text-sm text-gray-600">Third-party analytics integration</p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 sm:p-4 border border-slate-200 rounded-lg bg-white">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-sm sm:text-base">Analytics</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 truncate">Third-party analytics integration</p>
                   </div>
-                  <Badge className="bg-gray-100 text-gray-700 border-gray-200">Disabled</Badge>
+                  <Badge className="bg-gray-100 text-gray-700 border-gray-200 text-xs sm:text-sm w-fit">Disabled</Badge>
                 </div>
               </div>
             </CardContent>

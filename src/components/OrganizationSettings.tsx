@@ -127,43 +127,46 @@ const OrganizationSettings = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-blue-100">
-            <Building className="h-5 w-5 text-blue-600" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="p-1.5 sm:p-2 rounded-lg bg-blue-100">
+            <Building className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">Organization Settings</h2>
-            <p className="text-sm text-slate-600">Manage your organization's information</p>
+            <h2 className="text-base sm:text-lg font-semibold text-slate-900">Organization Settings</h2>
+            <p className="text-xs sm:text-sm text-slate-600">Manage your organization's information</p>
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           {isEditing ? (
             <>
-              <Button variant="outline" onClick={handleCancel}>
+              <Button variant="outline" onClick={handleCancel} className="flex-1 sm:flex-none text-xs sm:text-sm">
                 Cancel
               </Button>
-              <Button onClick={handleSave} disabled={loading}>
+              <Button onClick={handleSave} disabled={loading} className="flex-1 sm:flex-none text-xs sm:text-sm">
                 {loading ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
+                    <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2 animate-spin" />
+                    <span className="hidden sm:inline">Saving...</span>
+                    <span className="sm:hidden">Save</span>
                   </>
                 ) : (
                   <>
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Changes
+                    <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                    <span className="hidden sm:inline">Save Changes</span>
+                    <span className="sm:hidden">Save</span>
                   </>
                 )}
               </Button>
             </>
           ) : (
-            <Button onClick={() => setIsEditing(true)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Settings
+            <Button onClick={() => setIsEditing(true)} className="w-full sm:w-auto text-xs sm:text-sm">
+              <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+              <span className="hidden sm:inline">Edit Settings</span>
+              <span className="sm:hidden">Edit</span>
             </Button>
           )}
         </div>
@@ -177,20 +180,21 @@ const OrganizationSettings = () => {
             Organization Information
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Organization Name *</Label>
+            <Label htmlFor="name" className="text-xs sm:text-sm">Organization Name *</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               disabled={!isEditing}
               placeholder="Enter organization name"
+              className="text-sm"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Address</Label>
+            <Label htmlFor="address" className="text-xs sm:text-sm">Address</Label>
             <Textarea
               id="address"
               value={formData.address}
@@ -198,36 +202,37 @@ const OrganizationSettings = () => {
               disabled={!isEditing}
               placeholder="Enter organization address"
               rows={3}
+              className="text-sm"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="company_reg_id">Company Registration ID</Label>
+              <Label htmlFor="company_reg_id" className="text-xs sm:text-sm">Company Registration ID</Label>
               <div className="relative">
-                <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-slate-400" />
                 <Input
                   id="company_reg_id"
                   value={formData.company_reg_id}
                   onChange={(e) => setFormData({ ...formData, company_reg_id: e.target.value })}
                   disabled={!isEditing}
                   placeholder="Enter registration ID"
-                  className="pl-10"
+                  className="pl-8 sm:pl-10 text-sm"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tin">Tax Identification Number (TIN)</Label>
+              <Label htmlFor="tin" className="text-xs sm:text-sm">Tax Identification Number (TIN)</Label>
               <div className="relative">
-                <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-slate-400" />
                 <Input
                   id="tin"
                   value={formData.tin}
                   onChange={(e) => setFormData({ ...formData, tin: e.target.value })}
                   disabled={!isEditing}
                   placeholder="Enter TIN"
-                  className="pl-10"
+                  className="pl-8 sm:pl-10 text-sm"
                 />
               </div>
             </div>
@@ -242,16 +247,16 @@ const OrganizationSettings = () => {
             <CardTitle>Organization Details</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <Label className="text-sm font-medium text-slate-600">Organization ID</Label>
-                  <p className="text-sm text-slate-900 font-mono">{organization.id}</p>
+                  <Label className="text-xs sm:text-sm font-medium text-slate-600">Organization ID</Label>
+                  <p className="text-xs sm:text-sm text-slate-900 font-mono break-all">{organization.id}</p>
                 </div>
                 
                 <div>
-                  <Label className="text-sm font-medium text-slate-600">Created</Label>
-                  <p className="text-sm text-slate-900">
+                  <Label className="text-xs sm:text-sm font-medium text-slate-600">Created</Label>
+                  <p className="text-xs sm:text-sm text-slate-900">
                     {new Date(organization.created_at).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -261,10 +266,10 @@ const OrganizationSettings = () => {
                 </div>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <Label className="text-sm font-medium text-slate-600">Last Updated</Label>
-                  <p className="text-sm text-slate-900">
+                  <Label className="text-xs sm:text-sm font-medium text-slate-600">Last Updated</Label>
+                  <p className="text-xs sm:text-sm text-slate-900">
                     {new Date(organization.updated_at).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -274,19 +279,19 @@ const OrganizationSettings = () => {
                 </div>
                 
                 <div>
-                  <Label className="text-sm font-medium text-slate-600">Organization Logo</Label>
-                  <div className="mt-2 flex items-center gap-4">
+                  <Label className="text-xs sm:text-sm font-medium text-slate-600">Organization Logo</Label>
+                  <div className="mt-2 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                     <img 
                       src={getOrganizationLogoUrl(organization)} 
                       alt="Organization logo" 
-                      className="h-16 w-16 object-cover rounded-lg border border-slate-200"
+                      className="h-12 w-12 sm:h-16 sm:w-16 object-cover rounded-lg border border-slate-200 flex-shrink-0"
                       onError={(e) => {
                         // Fallback to default avatar if logo fails to load
                         const target = e.currentTarget as HTMLImageElement;
                         target.src = getOrganizationLogoUrl(organization);
                       }}
                     />
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 flex-1 min-w-0">
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -300,20 +305,23 @@ const OrganizationSettings = () => {
                         size="sm"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploadingLogo}
+                        className="w-full sm:w-auto text-xs"
                       >
                         {uploadingLogo ? (
                           <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Uploading...
+                            <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2 animate-spin" />
+                            <span className="hidden sm:inline">Uploading...</span>
+                            <span className="sm:hidden">Uploading</span>
                           </>
                         ) : (
                           <>
-                            <Upload className="h-4 w-4 mr-2" />
-                            Upload Logo
+                            <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                            <span className="hidden sm:inline">Upload Logo</span>
+                            <span className="sm:hidden">Upload</span>
                           </>
                         )}
                       </Button>
-                      <p className="text-xs text-slate-500">Max 2MB, image files only</p>
+                      <p className="text-[10px] sm:text-xs text-slate-500">Max 2MB, image files only</p>
                     </div>
                   </div>
                 </div>

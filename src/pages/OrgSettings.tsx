@@ -102,23 +102,23 @@ const OrgSettings = () => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-3 sm:p-0">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Settings</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
+          <h1 className="text-xl sm:text-2xl font-bold">Settings</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Manage your account and organization preferences
           </p>
         </div>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto gap-1 sm:gap-0">
-          <TabsTrigger value="profile" className="text-xs sm:text-sm">Profile</TabsTrigger>
-          <TabsTrigger value="notifications" className="text-xs sm:text-sm">Notifications</TabsTrigger>
-          <TabsTrigger value="interface" className="text-xs sm:text-sm">Interface</TabsTrigger>
-          <TabsTrigger value="categories" className="text-xs sm:text-sm">Categories</TabsTrigger>
-          <TabsTrigger value="organization" className="text-xs sm:text-sm">Organization</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto gap-1 overflow-x-auto">
+          <TabsTrigger value="profile" className="text-[10px] sm:text-xs lg:text-sm py-2">Profile</TabsTrigger>
+          <TabsTrigger value="notifications" className="text-[10px] sm:text-xs lg:text-sm py-2">Notifications</TabsTrigger>
+          <TabsTrigger value="interface" className="text-[10px] sm:text-xs lg:text-sm py-2">Interface</TabsTrigger>
+          <TabsTrigger value="categories" className="text-[10px] sm:text-xs lg:text-sm py-2">Categories</TabsTrigger>
+          <TabsTrigger value="organization" className="text-[10px] sm:text-xs lg:text-sm py-2">Organization</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile">
@@ -132,74 +132,79 @@ const OrgSettings = () => {
                 Update your personal information and preferences
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <Avatar className="h-20 w-20">
+            <CardContent className="space-y-4 sm:space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
                   <AvatarImage src={user?.avatar} alt={user?.name} />
-                  <AvatarFallback className="text-lg">{user?.name?.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="text-base sm:text-lg">{user?.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <div>
-                  <Button variant="outline" size="sm">
+                <div className="flex-1 w-full sm:w-auto">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
                     Change Photo
                   </Button>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                     JPG, PNG or GIF. Max size 2MB.
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name" className="text-xs sm:text-sm">Full Name</Label>
                   <Input
                     id="name"
                     value={profileSettings.name}
                     onChange={(e) => setProfileSettings({...profileSettings, name: e.target.value})}
+                    className="text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email" className="text-xs sm:text-sm">Email Address</Label>
                   <Input
                     id="email"
                     type="email"
                     value={profileSettings.email}
                     onChange={(e) => setProfileSettings({...profileSettings, email: e.target.value})}
+                    className="text-sm"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="department">Department</Label>
+                  <Label htmlFor="department" className="text-xs sm:text-sm">Department</Label>
                   <Input
                     id="department"
                     value={profileSettings.department}
                     onChange={(e) => setProfileSettings({...profileSettings, department: e.target.value})}
+                    className="text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone" className="text-xs sm:text-sm">Phone Number</Label>
                   <Input
                     id="phone"
                     value={profileSettings.phone}
                     onChange={(e) => setProfileSettings({...profileSettings, phone: e.target.value})}
+                    className="text-sm"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
+                <Label htmlFor="bio" className="text-xs sm:text-sm">Bio</Label>
                 <Textarea
                   id="bio"
                   value={profileSettings.bio}
                   onChange={(e) => setProfileSettings({...profileSettings, bio: e.target.value})}
                   rows={3}
+                  className="text-sm"
                 />
               </div>
 
               <div className="flex justify-end">
-                <Button onClick={handleSaveProfile}>
-                  <Save className="h-4 w-4 mr-2" />
+                <Button onClick={handleSaveProfile} className="w-full sm:w-auto text-xs sm:text-sm">
+                  <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                   Save Changes
                 </Button>
               </div>
@@ -218,89 +223,99 @@ const OrgSettings = () => {
                 Choose how you want to be notified about activities
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Receive email updates about your account activity
-                    </p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.emailNotifications}
-                    onCheckedChange={(checked) => 
-                      setNotificationSettings({...notificationSettings, emailNotifications: checked})
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Transaction Alerts</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Get notified when transactions need your attention
-                    </p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.transactionAlerts}
-                    onCheckedChange={(checked) => 
-                      setNotificationSettings({...notificationSettings, transactionAlerts: checked})
-                    }
-                  />
-                </div>
-
-                {hasPermission('approve_transactions') && (
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
                   <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Approval Reminders</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Reminders for pending approvals
+                    <div className="space-y-0.5 flex-1 pr-4">
+                      <Label className="text-xs sm:text-sm">Email Notifications</Label>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">
+                        Receive email updates about your account activity
                       </p>
                     </div>
                     <Switch
-                      checked={notificationSettings.approvalReminders}
+                      checked={notificationSettings.emailNotifications}
                       onCheckedChange={(checked) => 
-                        setNotificationSettings({...notificationSettings, approvalReminders: checked})
+                        setNotificationSettings({...notificationSettings, emailNotifications: checked})
                       }
                     />
                   </div>
-                )}
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Weekly Reports</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Receive weekly summary reports via email
-                    </p>
-                  </div>
-                  <Switch
-                    checked={notificationSettings.weeklyReports}
-                    onCheckedChange={(checked) => 
-                      setNotificationSettings({...notificationSettings, weeklyReports: checked})
-                    }
-                  />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Push Notifications</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Receive push notifications in your browser
-                    </p>
+                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5 flex-1 pr-4">
+                      <Label className="text-xs sm:text-sm">Transaction Alerts</Label>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">
+                        Get notified when transactions need your attention
+                      </p>
+                    </div>
+                    <Switch
+                      checked={notificationSettings.transactionAlerts}
+                      onCheckedChange={(checked) => 
+                        setNotificationSettings({...notificationSettings, transactionAlerts: checked})
+                      }
+                    />
                   </div>
-                  <Switch
-                    checked={notificationSettings.pushNotifications}
-                    onCheckedChange={(checked) => 
-                      setNotificationSettings({...notificationSettings, pushNotifications: checked})
-                    }
-                  />
+                </div>
+
+                {hasPermission('approve_transactions') && (
+                  <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5 flex-1 pr-4">
+                        <Label className="text-xs sm:text-sm">Approval Reminders</Label>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">
+                          Reminders for pending approvals
+                        </p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.approvalReminders}
+                        onCheckedChange={(checked) => 
+                          setNotificationSettings({...notificationSettings, approvalReminders: checked})
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5 flex-1 pr-4">
+                      <Label className="text-xs sm:text-sm">Weekly Reports</Label>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">
+                        Receive weekly summary reports via email
+                      </p>
+                    </div>
+                    <Switch
+                      checked={notificationSettings.weeklyReports}
+                      onCheckedChange={(checked) => 
+                        setNotificationSettings({...notificationSettings, weeklyReports: checked})
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5 flex-1 pr-4">
+                      <Label className="text-xs sm:text-sm">Push Notifications</Label>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">
+                        Receive push notifications in your browser
+                      </p>
+                    </div>
+                    <Switch
+                      checked={notificationSettings.pushNotifications}
+                      onCheckedChange={(checked) => 
+                        setNotificationSettings({...notificationSettings, pushNotifications: checked})
+                      }
+                    />
+                  </div>
                 </div>
               </div>
 
               <div className="flex justify-end">
-                <Button onClick={handleSaveNotifications}>
-                  <Save className="h-4 w-4 mr-2" />
+                <Button onClick={handleSaveNotifications} className="w-full sm:w-auto text-xs sm:text-sm">
+                  <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                   Save Preferences
                 </Button>
               </div>
@@ -319,15 +334,15 @@ const OrgSettings = () => {
                 Customize your interface layout and appearance
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Menu Placement</Label>
+                  <Label className="text-xs sm:text-sm">Menu Placement</Label>
                   <Select 
                     value={interfaceSettings.menuPlacement} 
                     onValueChange={(value) => setInterfaceSettings({...interfaceSettings, menuPlacement: value})}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -335,45 +350,49 @@ const OrgSettings = () => {
                       <SelectItem value="sidebar">Sidebar Navigation</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Choose where to display the main navigation menu
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Compact Mode</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Reduce spacing and use smaller elements
-                    </p>
+                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5 flex-1 pr-4">
+                      <Label className="text-xs sm:text-sm">Compact Mode</Label>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">
+                        Reduce spacing and use smaller elements
+                      </p>
+                    </div>
+                    <Switch
+                      checked={interfaceSettings.compactMode}
+                      onCheckedChange={(checked) => 
+                        setInterfaceSettings({...interfaceSettings, compactMode: checked})
+                      }
+                    />
                   </div>
-                  <Switch
-                    checked={interfaceSettings.compactMode}
-                    onCheckedChange={(checked) => 
-                      setInterfaceSettings({...interfaceSettings, compactMode: checked})
-                    }
-                  />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Dark Mode</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Use dark theme for the interface
-                    </p>
+                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5 flex-1 pr-4">
+                      <Label className="text-xs sm:text-sm">Dark Mode</Label>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">
+                        Use dark theme for the interface
+                      </p>
+                    </div>
+                    <Switch
+                      checked={interfaceSettings.darkMode}
+                      onCheckedChange={(checked) => 
+                        setInterfaceSettings({...interfaceSettings, darkMode: checked})
+                      }
+                    />
                   </div>
-                  <Switch
-                    checked={interfaceSettings.darkMode}
-                    onCheckedChange={(checked) => 
-                      setInterfaceSettings({...interfaceSettings, darkMode: checked})
-                    }
-                  />
                 </div>
               </div>
 
               <div className="flex justify-end">
-                <Button onClick={handleSaveInterface}>
-                  <Save className="h-4 w-4 mr-2" />
+                <Button onClick={handleSaveInterface} className="w-full sm:w-auto text-xs sm:text-sm">
+                  <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                   Save Interface Settings
                 </Button>
               </div>
@@ -384,14 +403,14 @@ const OrgSettings = () => {
         <TabsContent value="categories">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
-                  Expense Categories
+                  <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="text-base sm:text-lg">Expense Categories</span>
                 </div>
                 {hasPermission('manage_team') && (
-                  <Button onClick={handleAddCategory} size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
+                  <Button onClick={handleAddCategory} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                    <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                     Add Category
                   </Button>
                 )}
@@ -401,29 +420,32 @@ const OrgSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {expenseCategories.map((category) => (
-                  <div key={category.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center space-x-2">
-                        <h3 className="font-medium">{category.name}</h3>
-                        <Badge variant="outline">
+                  <div key={category.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 border border-slate-200 rounded-lg bg-white">
+                    <div className="flex-1 space-y-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <h3 className="font-medium text-sm sm:text-base truncate">{category.name}</h3>
+                        <Badge variant="outline" className="text-xs sm:text-sm w-fit">
                           UGX {category.budget.toLocaleString()}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{category.description}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">{category.description}</p>
                     </div>
                     {hasPermission('manage_team') && (
-                      <div className="flex items-center space-x-2">
-                        <Button variant="ghost" size="sm">
-                          <Edit className="h-4 w-4" />
+                      <div className="flex items-center gap-2 sm:space-x-2">
+                        <Button variant="ghost" size="sm" className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3">
+                          <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline ml-2">Edit</span>
                         </Button>
                         <Button 
                           variant="ghost" 
                           size="sm"
                           onClick={() => handleDeleteCategory(category.id)}
+                          className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 text-red-600 hover:text-red-700"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline ml-2">Delete</span>
                         </Button>
                       </div>
                     )}
@@ -437,10 +459,10 @@ const OrgSettings = () => {
         <TabsContent value="organization">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Building className="h-5 w-5" />
-                  Organization Settings
+                  <Building className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="text-base sm:text-lg">Organization Settings</span>
                 </div>
                 {user?.role === 'owner' && (
                   <Button
@@ -456,8 +478,9 @@ const OrgSettings = () => {
                         window.location.reload();
                       }, 1500);
                     }}
+                    className="w-full sm:w-auto text-xs sm:text-sm"
                   >
-                    <Sparkles className="h-4 w-4 mr-2" />
+                    <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                     Restart Setup
                   </Button>
                 )}
@@ -466,16 +489,16 @@ const OrgSettings = () => {
                 View and manage organization-wide settings
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6">
               {/* Logo Upload Section */}
-              <div className="space-y-4">
-                <Label>Organization Logo</Label>
-                <div className="flex items-start gap-4">
-                  <div className="relative">
+              <div className="space-y-3 sm:space-y-4">
+                <Label className="text-xs sm:text-sm">Organization Logo</Label>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                  <div className="relative flex-shrink-0">
                     <img 
                       src={getOrganizationLogoUrl(user?.organization)} 
                       alt={user?.organization?.name || 'Organization logo'} 
-                      className="h-20 w-20 rounded-lg object-cover border-2 border-blue-200"
+                      className="h-16 w-16 sm:h-20 sm:w-20 rounded-lg object-cover border-2 border-blue-200"
                       onError={(e) => {
                         // Fallback to default avatar if logo fails to load
                         const target = e.currentTarget as HTMLImageElement;
@@ -483,10 +506,10 @@ const OrgSettings = () => {
                       }}
                     />
                   </div>
-                  <div className="flex-1 space-y-2">
-                    <Button variant="outline" size="sm" asChild>
+                  <div className="flex-1 space-y-2 w-full sm:w-auto">
+                    <Button variant="outline" size="sm" asChild className="w-full sm:w-auto text-xs sm:text-sm">
                       <label htmlFor="logo-upload" className="cursor-pointer">
-                        <Plus className="h-4 w-4 mr-2" />
+                        <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                         Upload Logo
                       </label>
                     </Button>
@@ -581,29 +604,29 @@ const OrgSettings = () => {
                         }
                       }}
                     />
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       JPG, PNG or GIF. Max size 2MB. Recommended: 200x200px
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label>Organization Name</Label>
-                  <Input value={user?.organization?.name || 'Tech Solutions Ltd'} disabled />
+                  <Label className="text-xs sm:text-sm">Organization Name</Label>
+                  <Input value={user?.organization?.name || 'Tech Solutions Ltd'} disabled className="text-sm" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Organization ID</Label>
-                  <Input value={user?.organizationId || 'ORG-001'} disabled />
+                  <Label className="text-xs sm:text-sm">Organization ID</Label>
+                  <Input value={user?.organizationId || 'ORG-001'} disabled className="text-sm" />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label>Default Currency</Label>
+                  <Label className="text-xs sm:text-sm">Default Currency</Label>
                   <Select defaultValue="UGX" disabled={!hasPermission('manage_team')}>
-                    <SelectTrigger>
+                    <SelectTrigger className="text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -614,9 +637,9 @@ const OrgSettings = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Time Zone</Label>
+                  <Label className="text-xs sm:text-sm">Time Zone</Label>
                   <Select defaultValue="Africa/Kampala" disabled={!hasPermission('manage_team')}>
-                    <SelectTrigger>
+                    <SelectTrigger className="text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -629,11 +652,12 @@ const OrgSettings = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Organization Address</Label>
+                <Label className="text-xs sm:text-sm">Organization Address</Label>
                 <Textarea
                   value="123 Business District, Kampala, Uganda"
                   disabled={!hasPermission('manage_team')}
                   rows={3}
+                  className="text-sm"
                 />
               </div>
 
