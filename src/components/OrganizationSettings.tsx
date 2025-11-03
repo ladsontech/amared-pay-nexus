@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useOrganization } from "@/hooks/useOrganization";
 import { Building, Save, Loader2, FileText, Hash, Edit, Upload, Image as ImageIcon } from "lucide-react";
 import { organizationService } from "@/services/organizationService";
+import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
 
 const OrganizationSettings = () => {
   const { toast } = useToast();
@@ -275,17 +276,16 @@ const OrganizationSettings = () => {
                 <div>
                   <Label className="text-sm font-medium text-slate-600">Organization Logo</Label>
                   <div className="mt-2 flex items-center gap-4">
-                    {organization.logo ? (
-                      <img 
-                        src={organization.logo} 
-                        alt="Organization logo" 
-                        className="h-16 w-16 object-cover rounded-lg border border-slate-200"
-                      />
-                    ) : (
-                      <div className="h-16 w-16 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center">
-                        <ImageIcon className="h-6 w-6 text-slate-400" />
-                      </div>
-                    )}
+                    <img 
+                      src={getOrganizationLogoUrl(organization)} 
+                      alt="Organization logo" 
+                      className="h-16 w-16 object-cover rounded-lg border border-slate-200"
+                      onError={(e) => {
+                        // Fallback to default avatar if logo fails to load
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.src = getOrganizationLogoUrl(organization);
+                      }}
+                    />
                     <div className="flex flex-col gap-2">
                       <input
                         ref={fileInputRef}

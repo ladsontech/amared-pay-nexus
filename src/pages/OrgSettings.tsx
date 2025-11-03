@@ -23,6 +23,7 @@ import {
   Upload
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
 
 const OrgSettings = () => {
   const { user, hasPermission } = useAuth();
@@ -448,11 +449,13 @@ const OrgSettings = () => {
                 <div className="flex items-start gap-4">
                   <div className="relative">
                     <img 
-                      src={user?.organization?.id ? `/api/organizations/${user.organization.id}/logo/` : '/images/default-logo.png'} 
+                      src={getOrganizationLogoUrl(user?.organization)} 
                       alt={user?.organization?.name || 'Organization logo'} 
                       className="h-20 w-20 rounded-lg object-cover border-2 border-blue-200"
                       onError={(e) => {
-                        e.currentTarget.src = '/images/default-logo.png';
+                        // Fallback to default avatar if logo fails to load
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.src = getOrganizationLogoUrl(user?.organization);
                       }}
                     />
                   </div>

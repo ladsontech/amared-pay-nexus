@@ -11,6 +11,7 @@ import { Building, LogOut, Crown, User, CreditCard, Shield, Users } from "lucide
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppOrgSidebar from "./AppOrgSidebar";
 import MobileBottomNav from "./MobileBottomNav";
+import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
 const OrganizationLayout = () => {
   const {
     user,
@@ -60,11 +61,13 @@ const OrganizationLayout = () => {
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <img 
-                      src={(user?.organization as OrgType)?.logo || "/images/default-logo.png"} 
+                      src={getOrganizationLogoUrl(user?.organization as OrgType)} 
                       alt={user?.organization?.name || 'Organization logo'} 
-                      className="h-12 w-12 rounded-lg object-cover border-2 border-border"
+                      className="h-12 w-12 rounded-lg object-cover border-2 border-blue-200"
                       onError={(e) => {
-                        e.currentTarget.src = '/images/default-logo.png';
+                        // If image fails to load, use default avatar
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.src = getOrganizationLogoUrl(user?.organization as OrgType);
                       }}
                     />
                   </div>
