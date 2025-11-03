@@ -4,6 +4,7 @@ export interface Organization {
   description: string;
   industry: string;
   logo?: string | null;
+  address?: string;
 }
 
 export interface User {
