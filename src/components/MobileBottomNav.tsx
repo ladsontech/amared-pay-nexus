@@ -100,7 +100,7 @@ const MobileBottomNav = ({ items, extraActions, onLogout }: MobileBottomNavProps
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border md:hidden shadow-lg">
       <div className={`grid px-2 py-2`} style={{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }}>
         {/* Dynamic Navigation Items */}
         {visibleNavItems.map((item) => (
@@ -109,8 +109,8 @@ const MobileBottomNav = ({ items, extraActions, onLogout }: MobileBottomNavProps
             to={item.path} 
             className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
               location.pathname === item.path || location.pathname.includes(item.path.split('/').pop() || '') 
-                ? "text-blue-600" 
-                : "text-gray-600"
+                ? "text-primary" 
+                : "text-muted-foreground"
             }`}
           >
             <item.icon className="h-5 w-5" />
@@ -121,7 +121,7 @@ const MobileBottomNav = ({ items, extraActions, onLogout }: MobileBottomNavProps
         {/* More Button */}
         <button 
           onClick={() => setDrawerOpen(true)}
-          className="flex flex-col items-center gap-1 p-2 rounded-lg text-gray-600"
+          className="flex flex-col items-center gap-1 p-2 rounded-lg text-muted-foreground hover:text-primary"
         >
           <Plus className="h-5 w-5" />
           <span className="text-xs font-medium">More</span>
@@ -132,53 +132,53 @@ const MobileBottomNav = ({ items, extraActions, onLogout }: MobileBottomNavProps
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
         <DrawerContent className="bg-white">
           <div className="p-4 space-y-4">
-            <h3 className="text-lg font-bold text-black">Quick Actions</h3>
+            <h3 className="text-lg font-bold text-foreground">Quick Actions</h3>
             
             {typeof extraActions === 'function' 
               ? extraActions(() => setDrawerOpen(false))
               : (extraActions ?? (
             <div className="grid grid-cols-2 gap-3">
               <button 
-                className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"
+                className="bg-secondary border border-border rounded-xl p-4 text-left hover:bg-accent transition-colors"
                 onClick={() => { navigate("/org/approvals"); setDrawerOpen(false); }}
               >
-                <CheckCircle className="h-5 w-5 text-blue-600 mb-2" />
-                <p className="text-sm font-medium text-black">Approvals</p>
-                <p className="text-xs text-gray-500">Review requests</p>
+                <CheckCircle className="h-5 w-5 text-primary mb-2" />
+                <p className="text-sm font-medium text-foreground">Approvals</p>
+                <p className="text-xs text-muted-foreground">Review requests</p>
               </button>
               
               <button 
-                className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"
+                className="bg-secondary border border-border rounded-xl p-4 text-left hover:bg-accent transition-colors"
                 onClick={() => { navigate("/org/reports"); setDrawerOpen(false); }}
               >
-                <BarChart3 className="h-5 w-5 text-blue-600 mb-2" />
-                <p className="text-sm font-medium text-black">Reports</p>
-                <p className="text-xs text-gray-500">View analytics</p>
+                <BarChart3 className="h-5 w-5 text-primary mb-2" />
+                <p className="text-sm font-medium text-foreground">Reports</p>
+                <p className="text-xs text-muted-foreground">View analytics</p>
               </button>
               
               <button 
-                className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"
+                className="bg-secondary border border-border rounded-xl p-4 text-left hover:bg-accent transition-colors"
                 onClick={() => { navigate("/org/users"); setDrawerOpen(false); }}
               >
-                <Users className="h-5 w-5 text-blue-600 mb-2" />
-                <p className="text-sm font-medium text-black">Users</p>
-                <p className="text-xs text-gray-500">Manage team</p>
+                <Users className="h-5 w-5 text-primary mb-2" />
+                <p className="text-sm font-medium text-foreground">Users</p>
+                <p className="text-xs text-muted-foreground">Manage team</p>
               </button>
               
               <button 
-                className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left"
+                className="bg-secondary border border-border rounded-xl p-4 text-left hover:bg-accent transition-colors"
                 onClick={() => { navigate("/org/settings"); setDrawerOpen(false); }}
               >
-                <UserCircle className="h-5 w-5 text-blue-600 mb-2" />
-                <p className="text-sm font-medium text-black">Settings</p>
-                <p className="text-xs text-gray-500">Account settings</p>
+                <UserCircle className="h-5 w-5 text-primary mb-2" />
+                <p className="text-sm font-medium text-foreground">Settings</p>
+                <p className="text-xs text-muted-foreground">Account settings</p>
               </button>
             </div>
             ))}
             
             <button 
               onClick={handleLogout}
-              className="w-full bg-gray-100 text-black rounded-xl p-3 text-center font-medium"
+              className="w-full bg-muted text-foreground rounded-xl p-3 text-center font-medium hover:bg-secondary transition-colors"
             >
               <LogOut className="h-4 w-4 mx-auto mb-1" />
               Logout

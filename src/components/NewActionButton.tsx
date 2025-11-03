@@ -88,26 +88,26 @@ const NewActionButton = () => {
         </Tooltip>
       ) : (
         <DropdownMenuTrigger asChild>
-          <Button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 font-semibold">
+          <Button className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 font-semibold">
             <Plus className="h-4 w-4" />
             <span>New Action</span>
           </Button>
         </DropdownMenuTrigger>
       )}
-      <DropdownMenuContent align="end" className="w-72 bg-white/95 backdrop-blur-sm border-blue-200 shadow-2xl">
-        <DropdownMenuLabel className="text-blue-800 font-bold text-base">Quick Actions</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-72 bg-white/95 backdrop-blur-sm border-border shadow-2xl">
+        <DropdownMenuLabel className="text-foreground font-bold text-base">Quick Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {availableActions.map((action) => (
           <DropdownMenuItem 
             key={action.label} 
             onSelect={() => handleSelect(action.action)}
-            className="hover:bg-blue-50 focus:bg-blue-50 cursor-pointer p-3"
+            className="hover:bg-secondary focus:bg-secondary cursor-pointer p-3"
           >
             <div className="flex items-center gap-4">
-              <div className="p-2 rounded-lg bg-blue-100">
-                <action.icon className="h-4 w-4 text-blue-600" />
+              <div className="p-2 rounded-lg bg-secondary">
+                <action.icon className="h-4 w-4 text-primary" />
               </div>
-              <span className="font-semibold text-slate-800">{action.label}</span>
+              <span className="font-semibold text-foreground">{action.label}</span>
             </div>
           </DropdownMenuItem>
         ))}

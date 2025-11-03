@@ -45,14 +45,14 @@ const OrganizationLayout = () => {
     }
   };
   return <SidebarProvider>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-blue-50/20 flex w-full">
+      <div className="min-h-screen bg-background flex w-full">
         {/* Fixed Sidebar */}
         <AppOrgSidebar />
 
         {/* Content */}
         <div className="flex-1 flex flex-col">
           {/* Header */}
-          <header className="sticky top-0 z-50 w-full border-b border-blue-200/60 bg-white/90 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 shadow-lg">
+          <header className="sticky top-0 z-50 w-full border-b border-border bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/95 shadow-sm">
             <div className="container flex h-16 items-center justify-between px-6">
               <div className="flex items-center gap-4">
                 <SidebarTrigger className="md:ml-0" />
@@ -62,26 +62,26 @@ const OrganizationLayout = () => {
                     <img 
                       src={(user?.organization as OrgType)?.logo || "/images/default-logo.png"} 
                       alt={user?.organization?.name || 'Organization logo'} 
-                      className="h-12 w-12 rounded-lg object-cover border-2 border-blue-200"
+                      className="h-12 w-12 rounded-lg object-cover border-2 border-border"
                       onError={(e) => {
                         e.currentTarget.src = '/images/default-logo.png';
                       }}
                     />
                   </div>
                   <div className="hidden sm:block">
-                    <h2 className="font-bold text-lg text-slate-900">{user?.organization?.name || 'Organization'}</h2>
-                    <p className="text-xs text-slate-600">Financial Management</p>
+                    <h2 className="font-bold text-lg text-foreground">{user?.organization?.name || 'Organization'}</h2>
+                    <p className="text-xs text-muted-foreground">Financial Management</p>
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
                 {/* Active Users Indicator */}
-                <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 border border-blue-200">
-                  <Users className="h-4 w-4 text-blue-600" />
+                <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary border border-border">
+                  <Users className="h-4 w-4 text-primary" />
                   <div className="text-xs">
-                    <span className="font-semibold text-blue-900">{activeStaff}</span>
-                    <span className="text-blue-600 ml-1">active staff</span>
+                    <span className="font-semibold text-foreground">{activeStaff}</span>
+                    <span className="text-muted-foreground ml-1">active staff</span>
                   </div>
                 </div>
                 
@@ -93,16 +93,16 @@ const OrganizationLayout = () => {
                 )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-blue-50 border-2 border-transparent hover:border-blue-200 transition-all duration-200">
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-secondary border-2 border-transparent hover:border-border transition-all duration-200">
                       <Avatar className="h-10 w-10 shadow-lg">
                         <AvatarImage src={user?.avatar} alt={user?.name} />
-                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold text-lg">
+                        <AvatarFallback className="bg-primary text-primary-foreground font-bold text-lg">
                           {user?.name?.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-sm border-blue-200 shadow-xl" align="end" forceMount>
+                  <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-sm border-border shadow-xl" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-2 p-2">
                         {isImpersonating && (
@@ -113,11 +113,11 @@ const OrganizationLayout = () => {
                             </p>
                           </div>
                         )}
-                        <p className="text-base font-bold leading-none text-slate-900">{user?.name || 'User'}</p>
-                        <p className="text-sm leading-none text-slate-600 font-medium">{user?.email || 'No email'}</p>
-                        {user?.department && <p className="text-sm leading-none text-slate-500 font-medium">{user.department}</p>}
-                        {user?.position && <p className="text-xs leading-none text-slate-500">{user.position}</p>}
-                        <Badge className={`w-fit capitalize mt-1 font-bold shadow-sm ${user?.role === 'manager' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'}`}>
+                        <p className="text-base font-bold leading-none text-foreground">{user?.name || 'User'}</p>
+                        <p className="text-sm leading-none text-muted-foreground font-medium">{user?.email || 'No email'}</p>
+                        {user?.department && <p className="text-sm leading-none text-muted-foreground font-medium">{user.department}</p>}
+                        {user?.position && <p className="text-xs leading-none text-muted-foreground">{user.position}</p>}
+                        <Badge className={`w-fit capitalize mt-1 font-bold shadow-sm ${user?.role === 'manager' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' : 'bg-primary text-primary-foreground'}`}>
                           {user?.role === 'manager' ? <Crown className="h-3 w-3 mr-1" /> : <User className="h-3 w-3 mr-1" />}
                           {user?.role || 'staff'}
                         </Badge>
@@ -143,7 +143,7 @@ const OrganizationLayout = () => {
           </header>
 
           {/* Main Content */}
-          <main className="flex-1 pb-16 md:pb-0 bg-gradient-to-br from-blue-50/20 via-white to-slate-50/30">
+          <main className="flex-1 pb-16 md:pb-0 bg-background">
             <div className="container py-8 px-[15px]">
               <Outlet />
             </div>

@@ -55,15 +55,15 @@ export default function AppOrgSidebar() {
   };
 
   return (
-    <Sidebar className="w-64 border-r border-blue-200/60 bg-gradient-to-b from-blue-50/80 to-white/95 backdrop-blur-sm" collapsible="icon">
+    <Sidebar className="w-64 border-r border-border bg-white backdrop-blur-sm" collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
             <div className="flex items-center gap-3 px-2 py-1">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 shadow-md">
-                <Building className="h-4 w-4 text-blue-600" />
+              <div className="p-2 rounded-xl bg-secondary shadow-md">
+                <Building className="h-4 w-4 text-primary" />
               </div>
-              <span className="font-bold text-blue-800">Organization</span>
+              <span className="font-bold text-foreground">Organization</span>
             </div>
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -83,7 +83,7 @@ export default function AppOrgSidebar() {
                       asChild 
                       isActive={isActive(item.url)}
                       aria-disabled={!canAccess}
-                      className="hover:bg-blue-50 data-[active=true]:bg-blue-100 data-[active=true]:text-blue-700 data-[active=true]:border-r-3 data-[active=true]:border-blue-500 data-[active=true]:font-bold transition-all duration-200"
+                      className="hover:bg-secondary data-[active=true]:bg-secondary data-[active=true]:text-primary data-[active=true]:border-r-3 data-[active=true]:border-primary data-[active=true]:font-bold transition-all duration-200"
                     >
                       <NavLink to={item.url} end onClick={handleNavClick}>
                         <item.icon className="mr-3 h-5 w-5" />
