@@ -88,52 +88,64 @@ const CollectionsReport = () => {
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader>
-          <CardTitle>Collection Report</CardTitle>
-          <CardDescription>Mobile money and bank transfer collections in the period</CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base sm:text-lg">Collection Report</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Mobile money and bank transfer collections in the period</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <CardContent className="p-3 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <div className="p-3 border rounded-md">
               <div className="text-xs text-muted-foreground">Total Amount</div>
-              <div className="text-xl font-semibold">UGX {totalAmount.toLocaleString()}</div>
+              <div className="text-lg sm:text-xl font-semibold break-words">UGX {totalAmount.toLocaleString()}</div>
             </div>
             <div className="p-3 border rounded-md">
               <div className="text-xs text-muted-foreground">Successful</div>
-              <div className="text-xl font-semibold text-green-700">{countSuccessful}</div>
+              <div className="text-lg sm:text-xl font-semibold text-green-700">{countSuccessful}</div>
             </div>
-            <div className="p-3 border rounded-md">
+            <div className="p-3 border rounded-md sm:col-span-2 lg:col-span-1">
               <div className="text-xs text-muted-foreground">Transactions</div>
-              <div className="text-xl font-semibold">{filtered.length}</div>
+              <div className="text-lg sm:text-xl font-semibold">{filtered.length}</div>
             </div>
           </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Filters</span>
-            <Button variant="outline" size="sm" onClick={handleExport}>
-              <Download className="h-4 w-4 mr-2" /> Export CSV
+        <CardHeader className="pb-3">
+          <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <span className="text-base sm:text-lg">Filters</span>
+            <Button variant="outline" size="sm" onClick={handleExport} className="w-full sm:w-auto text-xs sm:text-sm">
+              <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Export CSV</span>
+              <span className="sm:hidden">Export</span>
             </Button>
           </CardTitle>
-          <CardDescription>Filter by date, status, method, or text</CardDescription>
+          <CardDescription className="text-xs sm:text-sm mt-2">Filter by date, status, method, or text</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+        <CardContent className="p-3 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
             <div className="space-y-1">
-              <label className="text-xs">From</label>
-              <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+              <label className="text-xs font-medium">From Date</label>
+              <Input 
+                type="date" 
+                value={fromDate} 
+                onChange={(e) => setFromDate(e.target.value)} 
+                className="text-xs sm:text-sm h-9 sm:h-10"
+              />
             </div>
             <div className="space-y-1">
-              <label className="text-xs">To</label>
-              <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+              <label className="text-xs font-medium">To Date</label>
+              <Input 
+                type="date" 
+                value={toDate} 
+                onChange={(e) => setToDate(e.target.value)} 
+                className="text-xs sm:text-sm h-9 sm:h-10"
+              />
             </div>
             <div className="space-y-1">
-              <label className="text-xs">Status</label>
+              <label className="text-xs font-medium">Status</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="text-xs sm:text-sm h-9 sm:h-10">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent className="bg-white z-50">
@@ -145,9 +157,9 @@ const CollectionsReport = () => {
               </Select>
             </div>
             <div className="space-y-1">
-              <label className="text-xs">Method</label>
+              <label className="text-xs font-medium">Method</label>
               <Select value={methodFilter} onValueChange={setMethodFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="text-xs sm:text-sm h-9 sm:h-10">
                   <SelectValue placeholder="Method" />
                 </SelectTrigger>
                 <SelectContent className="bg-white z-50">
@@ -157,42 +169,55 @@ const CollectionsReport = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="lg:col-span-2">
-              <label className="sr-only">Search</label>
-              <Input placeholder="Search ID, reference, or phone" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <div className="sm:col-span-2 lg:col-span-2 xl:col-span-2">
+              <label className="text-xs font-medium">Search</label>
+              <Input 
+                placeholder="Search ID, reference, or phone" 
+                value={search} 
+                onChange={(e) => setSearch(e.target.value)} 
+                className="text-xs sm:text-sm h-9 sm:h-10"
+              />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="rounded-md border overflow-x-auto">
+      <div className="rounded-md border overflow-x-auto -mx-4 sm:mx-0">
         <Table className="min-w-[700px]">
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Reference</TableHead>
-              <TableHead>Created</TableHead>
+              <TableHead className="text-xs sm:text-sm">ID</TableHead>
+              <TableHead className="text-xs sm:text-sm">Phone</TableHead>
+              <TableHead className="text-xs sm:text-sm">Method</TableHead>
+              <TableHead className="text-xs sm:text-sm">Status</TableHead>
+              <TableHead className="text-xs sm:text-sm">Amount</TableHead>
+              <TableHead className="text-xs sm:text-sm">Reference</TableHead>
+              <TableHead className="text-xs sm:text-sm">Created</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.map((c) => (
               <TableRow key={c.id}>
-                <TableCell className="font-medium">{c.id}</TableCell>
-                <TableCell>{c.phoneNumber}</TableCell>
-                <TableCell className="capitalize">{c.method.replace("_", " ")}</TableCell>
-                <TableCell><Badge className={statusColor(c.status)}>{c.status}</Badge></TableCell>
-                <TableCell>UGX {c.amount.toLocaleString()}</TableCell>
-                <TableCell>{c.reference}</TableCell>
-                <TableCell>{new Date(c.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell className="font-medium text-xs sm:text-sm p-2 sm:p-4">
+                  <span className="break-all">{c.id}</span>
+                </TableCell>
+                <TableCell className="text-xs sm:text-sm p-2 sm:p-4">{c.phoneNumber}</TableCell>
+                <TableCell className="capitalize text-xs sm:text-sm p-2 sm:p-4">{c.method.replace("_", " ")}</TableCell>
+                <TableCell className="p-2 sm:p-4">
+                  <Badge className={`${statusColor(c.status)} text-xs`}>{c.status}</Badge>
+                </TableCell>
+                <TableCell className="text-xs sm:text-sm p-2 sm:p-4 whitespace-nowrap">UGX {c.amount.toLocaleString()}</TableCell>
+                <TableCell className="text-xs sm:text-sm p-2 sm:p-4">
+                  <span className="break-all">{c.reference}</span>
+                </TableCell>
+                <TableCell className="text-xs sm:text-sm p-2 sm:p-4 whitespace-nowrap">{new Date(c.createdAt).toLocaleDateString()}</TableCell>
               </TableRow>
             ))}
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground">No records for selected filters.</TableCell>
+                <TableCell colSpan={7} className="text-center text-muted-foreground text-xs sm:text-sm p-4 sm:p-6">
+                  No records for selected filters.
+                </TableCell>
               </TableRow>
             )}
           </TableBody>
