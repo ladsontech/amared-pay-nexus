@@ -490,83 +490,85 @@ const BulkPayments = () => {
                   CSV format: Name, Account Number, Amount, Description
                 </CardDescription>
               </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 sm:p-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Payment Description</Label>
+                  <Label className="text-xs sm:text-sm">Payment Description</Label>
                   <Input
                     placeholder="e.g., Monthly salary payments"
                     value={bulkDescription}
                     onChange={(e) => setBulkDescription(e.target.value)}
+                    className="text-xs sm:text-sm h-9 sm:h-10"
                   />
                 </div>
                  
-                <div className="border rounded-lg">
-                  <div className="overflow-x-auto -mx-4 sm:mx-0">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="min-w-[120px] sm:min-w-[150px] text-xs sm:text-sm">Recipient Name</TableHead>
-                          <TableHead className="min-w-[130px] sm:min-w-[160px] text-xs sm:text-sm">Bank Name</TableHead>
-                          <TableHead className="min-w-[140px] sm:min-w-[180px] text-xs sm:text-sm">Bank Account</TableHead>
-                          <TableHead className="min-w-[100px] sm:min-w-[120px] text-xs sm:text-sm">Amount (UGX)</TableHead>
-                          <TableHead className="min-w-[120px] sm:min-w-[150px] text-xs sm:text-sm">Description</TableHead>
-                          <TableHead className="min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm">Status</TableHead>
-                          <TableHead className="min-w-[100px] sm:min-w-[120px] text-xs sm:text-sm">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                      {bankPaymentRows.map((row, index) => (
-                        <TableRow key={row.id}>
-                          <TableCell className="p-2 sm:p-4">
-                            <Input
-                              placeholder="Enter name"
-                              value={row.recipientName}
-                              onChange={(e) => updatePaymentRow("bank", row.id, "recipientName", e.target.value)}
-                              className="text-xs sm:text-sm h-8 sm:h-10"
-                            />
-                          </TableCell>
-                          <TableCell className="p-2 sm:p-4">
-                            <Select
-                              value={row.bankName || ''}
-                              onValueChange={(value) => updatePaymentRow("bank", row.id, "bankName", value)}
-                            >
-                              <SelectTrigger className="text-xs sm:text-sm h-8 sm:h-10">
-                                <SelectValue placeholder="Select bank" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {BANK_NAMES.map(name => (
-                                  <SelectItem key={name} value={name}>{name}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell className="p-2 sm:p-4">
-                            <Input
-                              placeholder="Account number"
-                              value={row.recipientAccount || ''}
-                              onChange={(e) => updatePaymentRow("bank", row.id, "recipientAccount", e.target.value)}
-                              className="text-xs sm:text-sm h-8 sm:h-10"
-                            />
-                          </TableCell>
-                          <TableCell className="p-2 sm:p-4">
-                            <Input
-                              type="number"
-                              placeholder="0"
-                              value={row.amount || ''}
-                              onChange={(e) => updatePaymentRow("bank", row.id, "amount", parseFloat(e.target.value) || 0)}
-                              className="text-xs sm:text-sm h-8 sm:h-10"
-                            />
-                          </TableCell>
-                          <TableCell className="p-2 sm:p-4">
-                            <Input
-                              placeholder="Payment description"
-                              value={row.description}
-                              onChange={(e) => updatePaymentRow("bank", row.id, "description", e.target.value)}
-                              className="text-xs sm:text-sm h-8 sm:h-10"
-                            />
-                          </TableCell>
-                          <TableCell className="p-2 sm:p-4">
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="overflow-x-auto -mx-3 sm:mx-0">
+                    <div className="min-w-full inline-block">
+                      <Table className="min-w-[800px]">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="min-w-[140px] sm:min-w-[150px] text-xs sm:text-sm px-2 sm:px-4">Recipient Name</TableHead>
+                            <TableHead className="min-w-[130px] sm:min-w-[160px] text-xs sm:text-sm px-2 sm:px-4">Bank Name</TableHead>
+                            <TableHead className="min-w-[140px] sm:min-w-[180px] text-xs sm:text-sm px-2 sm:px-4">Bank Account</TableHead>
+                            <TableHead className="min-w-[100px] sm:min-w-[120px] text-xs sm:text-sm px-2 sm:px-4">Amount (UGX)</TableHead>
+                            <TableHead className="min-w-[120px] sm:min-w-[150px] text-xs sm:text-sm px-2 sm:px-4 hidden sm:table-cell">Description</TableHead>
+                            <TableHead className="min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm px-2 sm:px-4">Status</TableHead>
+                            <TableHead className="min-w-[80px] sm:min-w-[120px] text-xs sm:text-sm px-2 sm:px-4">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                        {bankPaymentRows.map((row, index) => (
+                          <TableRow key={row.id} className="hover:bg-muted/50">
+                            <TableCell className="p-2 sm:p-4">
+                              <Input
+                                placeholder="Enter name"
+                                value={row.recipientName}
+                                onChange={(e) => updatePaymentRow("bank", row.id, "recipientName", e.target.value)}
+                                className="text-xs sm:text-sm h-8 sm:h-10 w-full"
+                              />
+                            </TableCell>
+                            <TableCell className="p-2 sm:p-4">
+                              <Select
+                                value={row.bankName || ''}
+                                onValueChange={(value) => updatePaymentRow("bank", row.id, "bankName", value)}
+                              >
+                                <SelectTrigger className="text-xs sm:text-sm h-8 sm:h-10 w-full">
+                                  <SelectValue placeholder="Select bank" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {BANK_NAMES.map(name => (
+                                    <SelectItem key={name} value={name} className="text-xs sm:text-sm">{name}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                            <TableCell className="p-2 sm:p-4">
+                              <Input
+                                placeholder="Account number"
+                                value={row.recipientAccount || ''}
+                                onChange={(e) => updatePaymentRow("bank", row.id, "recipientAccount", e.target.value)}
+                                className="text-xs sm:text-sm h-8 sm:h-10 w-full"
+                              />
+                            </TableCell>
+                            <TableCell className="p-2 sm:p-4">
+                              <Input
+                                type="number"
+                                placeholder="0"
+                                value={row.amount || ''}
+                                onChange={(e) => updatePaymentRow("bank", row.id, "amount", parseFloat(e.target.value) || 0)}
+                                className="text-xs sm:text-sm h-8 sm:h-10 w-full"
+                              />
+                            </TableCell>
+                            <TableCell className="p-2 sm:p-4 hidden sm:table-cell">
+                              <Input
+                                placeholder="Payment description"
+                                value={row.description}
+                                onChange={(e) => updatePaymentRow("bank", row.id, "description", e.target.value)}
+                                className="text-xs sm:text-sm h-8 sm:h-10 w-full"
+                              />
+                            </TableCell>
+                            <TableCell className="p-2 sm:p-4">
                             {row.verified ? (
                               <Badge className="bg-green-100 text-green-800 text-xs">
                                 <Check className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
@@ -581,32 +583,33 @@ const BulkPayments = () => {
                               <Badge variant="outline" className="text-xs">Empty</Badge>
                             )}
                           </TableCell>
-                          <TableCell className="p-2 sm:p-4">
-                            <div className="flex gap-1">
-                              {row.recipientName && row.recipientAccount && !row.verified && (
+                            <TableCell className="p-2 sm:p-4">
+                              <div className="flex gap-1 justify-center">
+                                {row.recipientName && row.recipientAccount && !row.verified && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => verifyPaymentRow("bank", row.id)}
+                                    className="text-green-600 h-7 w-7 sm:h-8 sm:w-8 p-0 flex-shrink-0"
+                                  >
+                                    <Check className="h-3 w-3" />
+                                  </Button>
+                                )}
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => verifyPaymentRow("bank", row.id)}
-                                  className="text-green-600 h-7 w-7 sm:h-8 sm:w-8 p-0"
+                                  onClick={() => removePaymentRow("bank", row.id)}
+                                  className="text-red-600 h-7 w-7 sm:h-8 sm:w-8 p-0 flex-shrink-0"
                                 >
-                                  <Check className="h-3 w-3" />
+                                  <Trash2 className="h-3 w-3" />
                                 </Button>
-                              )}
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => removePaymentRow("bank", row.id)}
-                                className="text-red-600 h-7 w-7 sm:h-8 sm:w-8 p-0"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      </TableBody>
-                    </Table>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </div>
                 </div>
 
@@ -669,77 +672,79 @@ const BulkPayments = () => {
                   CSV format: Name, Phone Number, Amount, Description
                 </CardDescription>
               </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 sm:p-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Payment Description</Label>
+                  <Label className="text-xs sm:text-sm">Payment Description</Label>
                   <Input
                     placeholder="e.g., Commission payments"
                     value={bulkDescription}
                     onChange={(e) => setBulkDescription(e.target.value)}
+                    className="text-xs sm:text-sm h-9 sm:h-10"
                   />
                 </div>
                  
-                <div className="border rounded-lg">
-                  <div className="overflow-x-auto -mx-4 sm:mx-0">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="min-w-[120px] sm:min-w-[150px] text-xs sm:text-sm">Recipient Name</TableHead>
-                          <TableHead className="min-w-[110px] sm:min-w-[130px] text-xs sm:text-sm">Phone Number</TableHead>
-                          <TableHead className="min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm">Provider</TableHead>
-                          <TableHead className="min-w-[100px] sm:min-w-[120px] text-xs sm:text-sm">Amount (UGX)</TableHead>
-                          <TableHead className="min-w-[120px] sm:min-w-[150px] text-xs sm:text-sm">Description</TableHead>
-                          <TableHead className="min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm">Status</TableHead>
-                          <TableHead className="min-w-[100px] sm:min-w-[120px] text-xs sm:text-sm">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                      {mobilePaymentRows.map((row, index) => (
-                        <TableRow key={row.id}>
-                          <TableCell className="p-2 sm:p-4">
-                            <Input
-                              placeholder="Enter name"
-                              value={row.recipientName}
-                              onChange={(e) => updatePaymentRow("mobile", row.id, "recipientName", e.target.value)}
-                              className="text-xs sm:text-sm h-8 sm:h-10"
-                            />
-                          </TableCell>
-                          <TableCell className="p-2 sm:p-4">
-                            <Input
-                              placeholder="+256701234567"
-                              value={row.phoneNumber || '+256'}
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                updatePaymentRow("mobile", row.id, "phoneNumber", value);
-                                updatePaymentRow("mobile", row.id, "mobileProvider", detectMobileProvider(value));
-                              }}
-                              className="text-xs sm:text-sm h-8 sm:h-10"
-                            />
-                          </TableCell>
-                          <TableCell className="p-2 sm:p-4">
-                            <Badge className={`text-xs ${row.mobileProvider === "MTN" ? "bg-yellow-100 text-yellow-800" : row.mobileProvider === "Airtel" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"}`}>
-                              {row.mobileProvider || "Unknown"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="p-2 sm:p-4">
-                            <Input
-                              type="number"
-                              placeholder="0"
-                              value={row.amount || ''}
-                              onChange={(e) => updatePaymentRow("mobile", row.id, "amount", parseFloat(e.target.value) || 0)}
-                              className="text-xs sm:text-sm h-8 sm:h-10"
-                            />
-                          </TableCell>
-                          <TableCell className="p-2 sm:p-4">
-                            <Input
-                              placeholder="Payment description"
-                              value={row.description}
-                              onChange={(e) => updatePaymentRow("mobile", row.id, "description", e.target.value)}
-                              className="text-xs sm:text-sm h-8 sm:h-10"
-                            />
-                          </TableCell>
-                          <TableCell className="p-2 sm:p-4">
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="overflow-x-auto -mx-3 sm:mx-0">
+                    <div className="min-w-full inline-block">
+                      <Table className="min-w-[750px]">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="min-w-[140px] sm:min-w-[150px] text-xs sm:text-sm px-2 sm:px-4">Recipient Name</TableHead>
+                            <TableHead className="min-w-[130px] sm:min-w-[130px] text-xs sm:text-sm px-2 sm:px-4">Phone Number</TableHead>
+                            <TableHead className="min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm px-2 sm:px-4">Provider</TableHead>
+                            <TableHead className="min-w-[100px] sm:min-w-[120px] text-xs sm:text-sm px-2 sm:px-4">Amount (UGX)</TableHead>
+                            <TableHead className="min-w-[120px] sm:min-w-[150px] text-xs sm:text-sm px-2 sm:px-4 hidden sm:table-cell">Description</TableHead>
+                            <TableHead className="min-w-[80px] sm:min-w-[100px] text-xs sm:text-sm px-2 sm:px-4">Status</TableHead>
+                            <TableHead className="min-w-[80px] sm:min-w-[120px] text-xs sm:text-sm px-2 sm:px-4">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                        {mobilePaymentRows.map((row, index) => (
+                          <TableRow key={row.id} className="hover:bg-muted/50">
+                            <TableCell className="p-2 sm:p-4">
+                              <Input
+                                placeholder="Enter name"
+                                value={row.recipientName}
+                                onChange={(e) => updatePaymentRow("mobile", row.id, "recipientName", e.target.value)}
+                                className="text-xs sm:text-sm h-8 sm:h-10 w-full"
+                              />
+                            </TableCell>
+                            <TableCell className="p-2 sm:p-4">
+                              <Input
+                                placeholder="+256701234567"
+                                value={row.phoneNumber || '+256'}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  updatePaymentRow("mobile", row.id, "phoneNumber", value);
+                                  updatePaymentRow("mobile", row.id, "mobileProvider", detectMobileProvider(value));
+                                }}
+                                className="text-xs sm:text-sm h-8 sm:h-10 w-full"
+                              />
+                            </TableCell>
+                            <TableCell className="p-2 sm:p-4">
+                              <Badge className={`text-xs whitespace-nowrap ${row.mobileProvider === "MTN" ? "bg-yellow-100 text-yellow-800" : row.mobileProvider === "Airtel" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"}`}>
+                                {row.mobileProvider || "Unknown"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="p-2 sm:p-4">
+                              <Input
+                                type="number"
+                                placeholder="0"
+                                value={row.amount || ''}
+                                onChange={(e) => updatePaymentRow("mobile", row.id, "amount", parseFloat(e.target.value) || 0)}
+                                className="text-xs sm:text-sm h-8 sm:h-10 w-full"
+                              />
+                            </TableCell>
+                            <TableCell className="p-2 sm:p-4 hidden sm:table-cell">
+                              <Input
+                                placeholder="Payment description"
+                                value={row.description}
+                                onChange={(e) => updatePaymentRow("mobile", row.id, "description", e.target.value)}
+                                className="text-xs sm:text-sm h-8 sm:h-10 w-full"
+                              />
+                            </TableCell>
+                            <TableCell className="p-2 sm:p-4">
                             {row.verified ? (
                               <Badge className="bg-green-100 text-green-800 text-xs">
                                 <Check className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
@@ -754,32 +759,33 @@ const BulkPayments = () => {
                               <Badge variant="outline" className="text-xs">Empty</Badge>
                             )}
                           </TableCell>
-                          <TableCell className="p-2 sm:p-4">
-                            <div className="flex gap-1">
-                              {row.recipientName && row.phoneNumber && !row.verified && (
+                            <TableCell className="p-2 sm:p-4">
+                              <div className="flex gap-1 justify-center">
+                                {row.recipientName && row.phoneNumber && !row.verified && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => verifyPaymentRow("mobile", row.id)}
+                                    className="text-green-600 h-7 w-7 sm:h-8 sm:w-8 p-0 flex-shrink-0"
+                                  >
+                                    <Check className="h-3 w-3" />
+                                  </Button>
+                                )}
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => verifyPaymentRow("mobile", row.id)}
-                                  className="text-green-600 h-7 w-7 sm:h-8 sm:w-8 p-0"
+                                  onClick={() => removePaymentRow("mobile", row.id)}
+                                  className="text-red-600 h-7 w-7 sm:h-8 sm:w-8 p-0 flex-shrink-0"
                                 >
-                                  <Check className="h-3 w-3" />
+                                  <Trash2 className="h-3 w-3" />
                                 </Button>
-                              )}
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => removePaymentRow("mobile", row.id)}
-                                className="text-red-600 h-7 w-7 sm:h-8 sm:w-8 p-0"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      </TableBody>
-                    </Table>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </div>
                 </div>
 

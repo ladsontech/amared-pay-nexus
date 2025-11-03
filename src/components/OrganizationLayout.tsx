@@ -53,7 +53,7 @@ const OrganizationLayout = () => {
         {/* Content */}
         <div className="flex-1 flex flex-col">
           {/* Header - Fixed during navigation */}
-          <header className="fixed top-0 left-0 md:left-64 right-0 z-50 border-b border-blue-200/50 bg-blue-50/95 backdrop-blur-xl supports-[backdrop-filter]:bg-blue-50/95 shadow-sm transition-[left] duration-200 will-change-[left]">
+          <header className="fixed top-0 left-0 md:left-0 right-0 z-50 border-b border-blue-200/50 bg-blue-50/95 backdrop-blur-xl supports-[backdrop-filter]:bg-blue-50/95 shadow-sm transition-[left] duration-200 will-change-[left]">
             <div className="container flex h-12 md:h-16 items-center justify-between px-3 md:px-6">
               <div className="flex items-center gap-2 md:gap-4">
                 <SidebarTrigger className="md:ml-0 h-8 w-8 md:h-10 md:w-10" />

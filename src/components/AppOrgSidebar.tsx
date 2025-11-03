@@ -82,7 +82,7 @@ export default function AppOrgSidebar() {
   };
 
   return (
-    <Sidebar className="w-64 border-r border-border bg-white backdrop-blur-sm" collapsible="icon">
+    <Sidebar className="w-64 border-r border-border bg-white backdrop-blur-sm" collapsible="icon" side="right">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
