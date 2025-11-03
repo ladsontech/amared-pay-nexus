@@ -123,18 +123,31 @@ const SystemOrganizationView = () => {
             className="w-full sm:w-auto text-xs sm:text-sm"
             onClick={async () => {
               try {
+                // Validate organization data
+                if (!organization?.id || !organization?.name) {
+                  throw new Error('Invalid organization data');
+                }
+
+                // Perform impersonation
                 impersonateOrganization(organization.id, organization.name);
+                
+                // Show success message
                 toast({
                   title: "Impersonating Organization",
                   description: `Now viewing as ${organization.name}. You can make changes just like the organization owner.`,
                 });
-                // Use window.location for a full reload to ensure state is properly set
-                window.location.href = "/org/dashboard";
+
+                // Small delay to ensure state is set before redirect
+                setTimeout(() => {
+                  // Use window.location for a full reload to ensure state is properly set
+                  window.location.href = "/org/dashboard";
+                }, 100);
               } catch (error) {
                 console.error("Error during impersonation:", error);
+                const errorMessage = error instanceof Error ? error.message : "Failed to impersonate organization";
                 toast({
                   title: "Error",
-                  description: "Failed to impersonate organization. Please try again.",
+                  description: errorMessage + ". Please try again.",
                   variant: "destructive",
                 });
               }

@@ -45,8 +45,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
-        // Ensure user has permissions array
-        if (user && user.permissions && Array.isArray(user.permissions)) {
+        
+        // Ensure user has permissions array - if missing, set default based on role
+        if (!user.permissions || !Array.isArray(user.permissions)) {
+          console.warn('User permissions missing or invalid, setting default permissions');
+          user.permissions = user.role && rolePermissions[user.role as UserRole] 
+            ? rolePermissions[user.role as UserRole] 
+            : rolePermissions.staff;
+        }
+        
+        // Ensure organizationId is set when impersonating
+        if (isImpersonating && !user.organizationId) {
+          console.error('Impersonation state found but organizationId missing');
+          // Clear invalid impersonation state
+          localStorage.removeItem('impersonating');
+          localStorage.removeItem('original_admin');
+        } else {
           setAuthState({
             user,
             isAuthenticated: true,
@@ -54,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
           
           // If impersonating, restore the original admin state
-          if (isImpersonating) {
+          if (isImpersonating && user.organizationId) {
             setIsImpersonating(true);
             const storedAdmin = localStorage.getItem('original_admin');
             if (storedAdmin) {
@@ -65,23 +79,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 console.error('Failed to parse original admin:', e);
               }
             }
+          } else if (isImpersonating) {
+            // Clear invalid impersonation state
+            setIsImpersonating(false);
+            localStorage.removeItem('impersonating');
+            localStorage.removeItem('original_admin');
           }
-        } else {
-          // Invalid user data, clear localStorage
-          localStorage.removeItem('user');
-          localStorage.removeItem('impersonating');
-          localStorage.removeItem('original_admin');
-          setAuthState(prev => ({ ...prev, loading: false }));
         }
       } catch (error) {
+        console.error('Error loading user from localStorage:', error);
         // Invalid JSON, clear localStorage
         localStorage.removeItem('user');
         localStorage.removeItem('impersonating');
         localStorage.removeItem('original_admin');
         setAuthState(prev => ({ ...prev, loading: false }));
+        setIsImpersonating(false);
       }
     } else {
       setAuthState(prev => ({ ...prev, loading: false }));
+      setIsImpersonating(false);
     }
   }, []);
 
@@ -237,47 +253,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setOriginalAdmin(null);
   };
 
-  const impersonateOrganization = (organizationId: string, organizationName: string) => {
+  const impersonateOrganization = (organizationId: string, organizationName: string): void => {
     const currentUser = authState.user;
-    if (!currentUser) return;
+    if (!currentUser) {
+      throw new Error('No user is currently logged in');
+    }
     
-    // Check if user is super admin
-    if (currentUser.role !== 'admin' && !currentUser.isSuperuser) {
-      console.error('Only super admins can impersonate organizations');
-      return;
+    // Check if user is super admin or has admin role
+    const isAdmin = currentUser.role === 'admin' || currentUser.isSuperuser === true;
+    if (!isAdmin) {
+      throw new Error('Only super admins can impersonate organizations');
     }
 
-    // Store original admin info
-    if (!originalAdmin) {
-      setOriginalAdmin(currentUser);
+    // Validate organization ID
+    if (!organizationId || organizationId.trim() === '') {
+      throw new Error('Invalid organization ID');
     }
 
-    // Create impersonated user with owner permissions
-    const impersonatedUser: User = {
-      ...currentUser,
-      organizationId,
-      organization: {
-        id: organizationId,
-        name: organizationName,
-        description: organizationName,
-        industry: 'Finance'
-      },
-      role: 'owner',
-      position: 'Organization Owner',
-      permissions: rolePermissions.owner,
-      isSuperuser: false, // Temporarily hide admin status
-    };
+    // Validate organization name
+    if (!organizationName || organizationName.trim() === '') {
+      throw new Error('Invalid organization name');
+    }
 
-    localStorage.setItem('user', JSON.stringify(impersonatedUser));
-    localStorage.setItem('impersonating', 'true');
-    localStorage.setItem('original_admin', JSON.stringify(currentUser));
-    
-    setIsImpersonating(true);
-    setAuthState({
-      user: impersonatedUser,
-      isAuthenticated: true,
-      loading: false,
-    });
+    try {
+      // Store original admin info
+      if (!originalAdmin) {
+        setOriginalAdmin(currentUser);
+      }
+
+      // Create impersonated user with owner permissions
+      const impersonatedUser: User = {
+        ...currentUser,
+        organizationId: organizationId.trim(),
+        organization: {
+          id: organizationId.trim(),
+          name: organizationName.trim(),
+          description: organizationName.trim(),
+          industry: 'Finance'
+        },
+        role: 'owner',
+        position: 'Organization Owner',
+        permissions: rolePermissions.owner,
+        isSuperuser: false, // Temporarily hide admin status
+      };
+
+      // Store in localStorage first
+      localStorage.setItem('user', JSON.stringify(impersonatedUser));
+      localStorage.setItem('impersonating', 'true');
+      localStorage.setItem('original_admin', JSON.stringify(currentUser));
+      
+      // Update state
+      setIsImpersonating(true);
+      setAuthState({
+        user: impersonatedUser,
+        isAuthenticated: true,
+        loading: false,
+      });
+    } catch (error) {
+      console.error('Error setting impersonation state:', error);
+      throw new Error(`Failed to set impersonation state: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   const logout = async () => {
