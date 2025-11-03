@@ -133,14 +133,20 @@ const OrganizationLayout = () => {
     );
   }
 
-  // Show loading state if organization is still loading (but allow impersonation to proceed)
-  // During impersonation, we should proceed even if organization is loading to avoid blocking
-  if (orgLoading && !isImpersonating && !organization) {
+  // Show loading state if organization is still loading (but allow impersonation and superusers to proceed)
+  // During impersonation or for superusers, we should proceed even if organization is loading to avoid blocking
+  if (orgLoading && !isImpersonating && !organization && !user?.isSuperuser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
+  }
+
+  // For superusers accessing org pages without impersonation, give them a default organization context
+  if (user?.isSuperuser && !isImpersonating && !user.organizationId) {
+    // Superusers can view but won't have organization-specific data
+    // This is fine - they can still navigate and use the interface
   }
 
   // Get organization name from user object if organization data is still loading

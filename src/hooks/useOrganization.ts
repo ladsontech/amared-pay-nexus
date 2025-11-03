@@ -53,7 +53,23 @@ export const useOrganization = () => {
 
   // Fetch current organization details
   const fetchOrganization = async () => {
-    if (!user?.organizationId) return;
+    if (!user?.organizationId) {
+      // For superusers without organizationId, use a default organization from user data if available
+      if (user?.isSuperuser && user?.organization) {
+        setOrganization({
+          id: user.organization.id || 'default-org',
+          name: user.organization.name || 'Organization',
+          logo: null,
+          address: user.organization.address || '',
+          company_reg_id: '',
+          tin: '',
+          static_collection_link: '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        } as Organization);
+      }
+      return;
+    }
     
     setLoading(true);
     setError(null);
@@ -71,6 +87,7 @@ export const useOrganization = () => {
         setOrganization({
           id: user.organizationId,
           name: user.organization.name || 'Organization',
+          logo: null,
           address: user.organization.address || '',
           company_reg_id: '',
           tin: '',

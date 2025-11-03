@@ -131,7 +131,7 @@ const SystemOrganizationView = () => {
                 console.log('Starting impersonation for:', organization.id, organization.name);
 
                 // Perform impersonation - this sets localStorage and state
-                impersonateOrganization(organization.id, organization.name);
+                await impersonateOrganization(organization.id, organization.name);
                 
                 // Verify impersonation was set
                 const impersonating = localStorage.getItem('impersonating');

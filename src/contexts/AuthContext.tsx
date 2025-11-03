@@ -11,7 +11,7 @@ interface AuthContextType extends AuthState {
   hasPermission: (permission: Permission) => boolean;
   hasAnyPermission: (permissions: Permission[]) => boolean;
   isRole: (role: string) => boolean;
-  impersonateOrganization: (organizationId: string, organizationName: string) => void;
+  impersonateOrganization: (organizationId: string, organizationName: string) => Promise<void>;
   stopImpersonating: () => void;
   isImpersonating: boolean;
 }
@@ -253,7 +253,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setOriginalAdmin(null);
   };
 
-  const impersonateOrganization = (organizationId: string, organizationName: string): void => {
+  const impersonateOrganization = async (organizationId: string, organizationName: string): Promise<void> => {
     const currentUser = authState.user;
     if (!currentUser) {
       throw new Error('No user is currently logged in');
@@ -281,12 +281,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setOriginalAdmin(currentUser);
       }
 
+      // Try to fetch the actual organization owner's staff record
+      let ownerStaff: any = null;
+      try {
+        const { organizationService } = await import('@/services/organizationService');
+        const staffResponse = await organizationService.getStaffList({ 
+          organization: organizationId.trim(),
+          role: 'owner'
+        });
+        
+        if (staffResponse.results && staffResponse.results.length > 0) {
+          ownerStaff = staffResponse.results[0];
+          console.log('Found organization owner:', ownerStaff);
+        }
+      } catch (e) {
+        console.warn('Could not fetch organization owner, using admin user info:', e);
+      }
+
       // Create impersonated user with owner permissions
-      // Ensure all required fields from User interface are present
+      // Use actual owner's info if available, otherwise use admin's info
+      const ownerUser = ownerStaff?.user || {};
       const impersonatedUser: User = {
-        id: currentUser.id,
-        name: currentUser.name || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || currentUser.email || 'User',
-        email: currentUser.email,
+        id: ownerUser.id || currentUser.id,
+        name: ownerUser.first_name && ownerUser.last_name 
+          ? `${ownerUser.first_name} ${ownerUser.last_name}`.trim()
+          : ownerUser.username || currentUser.name || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || currentUser.email || 'User',
+        email: ownerUser.email || currentUser.email,
         role: 'owner',
         organizationId: organizationId.trim(),
         organization: {
@@ -297,14 +317,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         permissions: rolePermissions.owner,
         position: 'Organization Owner',
-        firstName: currentUser.firstName,
-        lastName: currentUser.lastName,
-        phoneNumber: currentUser.phoneNumber,
-        avatar: currentUser.avatar,
-        isEmailVerified: currentUser.isEmailVerified,
-        isPhoneVerified: currentUser.isPhoneVerified,
+        firstName: ownerUser.first_name || currentUser.firstName,
+        lastName: ownerUser.last_name || currentUser.lastName,
+        phoneNumber: ownerUser.phone_number || currentUser.phoneNumber,
+        avatar: ownerUser.avatar || currentUser.avatar,
+        isEmailVerified: ownerUser.is_email_verified ?? currentUser.isEmailVerified,
+        isPhoneVerified: ownerUser.is_phone_verified ?? currentUser.isPhoneVerified,
         isSuperuser: false, // Temporarily hide admin status
-        isStaff: currentUser.isStaff,
+        isStaff: ownerUser.is_staff ?? currentUser.isStaff,
         department: currentUser.department,
       };
 
