@@ -9,18 +9,18 @@ export const API_CONFIG = {
       verify: 'users/auth/token/verify/'
     },
     user: {
-      list: 'user/',
-      detail: (id: string) => `user/${id}/`,
-      userList: 'users/user/',
-      userDetail: (id: string) => `users/user/${id}/`
+      list: 'user/', // GET /user/ - list all users
+      detail: (id: string) => `user/${id}/`, // GET /user/{id}/ - get user details
+      userList: 'users/user/', // GET /users/user/ - list users (with /users/ prefix)
+      userDetail: (id: string) => `users/user/${id}/` // GET /users/user/{id}/ - get user details
     },
     subAdmin: {
-      create: 'sub_admin/',
-      list: 'sub_admin_list/',
-      search: 'search_sub_admins/',
-      detail: (id: string) => `sub_admin_list/${id}/`,
-      update: (id: string) => `update_sub_admin/${id}/`,
-      delete: (id: string) => `sub_admin/${id}/`
+      create: 'users/sub_admin/', // POST /users/sub_admin/
+      list: 'users/sub_admin_list/', // GET /users/sub_admin_list/
+      search: 'users/search_sub_admins/', // GET /users/search_sub_admins/
+      detail: (id: string) => `users/sub_admin_list/${id}/`, // GET /users/sub_admin_list/{id}/
+      update: (id: string) => `users/update_sub_admin/${id}/`, // PUT /users/update_sub_admin/{id}/
+      delete: (id: string) => `users/sub_admin/${id}/` // DELETE /users/sub_admin/{id}/
     },
     organizations: {
       createWithOwner: '/organizations/create_org/',
@@ -102,16 +102,16 @@ export const API_CONFIG = {
     },
     otp: {
       email: {
-        send: 'users/otp/forgot_password/email/',
-        resend: 'users/otp/resend/email/',
-        verify: 'users/otp/verify/email_address/',
-        resetPassword: 'users/otp/reset_password/email_code/'
+        send: 'users/otp/forgot_password/email/', // POST /users/otp/forgot_password/email/
+        resend: 'users/otp/resend/email/', // POST /users/otp/resend/email/
+        verify: 'users/otp/verify/email_address/', // POST /users/otp/verify/email_address/
+        resetPassword: 'users/otp/reset_password/email_code/' // POST /users/otp/reset_password/email_code/
       },
       sms: {
-        send: 'users/otp/forgot_password/sms/',
-        resend: 'users/otp/resend/sms/',
-        verify: 'users/otp/verify/phone_number/',
-        resetPassword: 'users/otp/reset_password/sms_code/'
+        send: 'users/otp/forgot_password/sms/', // POST /users/otp/forgot_password/sms/
+        resend: 'users/otp/resend/sms/', // POST /users/otp/resend/sms/
+        verify: 'users/otp/verify/phone_number/', // POST /users/otp/verify/phone_number/
+        resetPassword: 'users/otp/reset_password/sms_code/' // POST /users/otp/reset_password/sms_code/
       }
     },
     // Legacy OTP endpoints for backward compatibility

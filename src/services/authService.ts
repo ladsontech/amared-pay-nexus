@@ -49,62 +49,39 @@ class AuthService {
       const loginPath = API_CONFIG.endpoints.auth.login; // e.g. 'users/auth/login/'
       const LOGIN_URL = `${API_BASE_URL}/${loginPath}`;
 
-      // Attempt 1: Full payload (username, email, password) + Basic header
+      // Build payload per API docs: username, email, password (all can be non-empty)
+      const payload: any = {
+          password: credentials.password,
+      };
+      
+      // Add username if provided
+      if (credentials.username && credentials.username.trim()) {
+        payload.username = credentials.username.trim();
+      }
+      
+      // Add email if provided
+      if (credentials.email && credentials.email.trim()) {
+        payload.email = credentials.email.trim();
+      }
+
+      // Attempt login with Basic auth header
       let response = await fetch(LOGIN_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
           ...(basicToken ? { "Authorization": `Basic ${basicToken}` } : {}),
         },
-        body: JSON.stringify({
-          username: credentials.username || credentials.email,
-          email: credentials.email,
-          password: credentials.password,
-        }),
+        body: JSON.stringify(payload),
       });
 
-      // If the first attempt fails, try alternative payloads
-      if (!response.ok) {
-        // Attempt 2: Only username + password
-        const responseUsernameOnly = await fetch(LOGIN_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(basicToken ? { "Authorization": `Basic ${basicToken}` } : {}),
-          },
-          body: JSON.stringify({
-            username: credentials.username || credentials.email,
-            password: credentials.password,
-          }),
-        });
-        if (responseUsernameOnly.ok) {
-          response = responseUsernameOnly;
-        } else {
-          // Attempt 3: Basic only with minimal body (in case server strictly uses Basic)
-          const responseBasicOnly = await fetch(LOGIN_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              ...(basicToken ? { "Authorization": `Basic ${basicToken}` } : {}),
-            },
-            body: JSON.stringify({ password: credentials.password }),
-          });
-          if (responseBasicOnly.ok) {
-            response = responseBasicOnly;
-          } else {
-            const errBody = await responseBasicOnly.text().catch(() => "");
-            const errBodyFallback = await responseUsernameOnly.text().catch(() => "");
-            const firstErr = await response.text().catch(() => "");
-            const combined = errBody || errBodyFallback || firstErr;
-            throw new Error(`Login failed (${responseBasicOnly.status}). ${combined}`);
-          }
-        }
-      }
-
+      // Parse response
       const data: any = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        const errText = typeof data === 'object' ? (data.message || JSON.stringify(data)) : String(data);
+        const errText = typeof data === 'object' 
+          ? (data.message || data.detail || data.error || JSON.stringify(data)) 
+          : String(data);
         throw new Error(errText || `HTTP error! status: ${response.status}`);
       }
 
@@ -146,49 +123,74 @@ class AuthService {
   }
 
   async logout(): Promise<void> {
-    // Attempt backend logout if available (non-blocking)
+    // Attempt backend logout - try POST first, then GET (per API docs both are supported)
     try {
-      await fetch(`${API_BASE_URL}/${API_CONFIG.endpoints.auth.logout}`, {
+      const logoutUrl = `${API_BASE_URL}/${API_CONFIG.endpoints.auth.logout}`;
+      
+      // Try POST first
+      let response = await fetch(logoutUrl, {
         method: "POST",
         headers: this.getAuthHeaders(),
       });
+      
+      // If POST fails, try GET
+      if (!response.ok && response.status !== 200 && response.status !== 201) {
+        response = await fetch(logoutUrl, {
+          method: "GET",
+          headers: this.getAuthHeaders(),
+        });
+      }
     } catch (e) {
-      // Ignore network/logout endpoint errors
+      // Ignore network/logout endpoint errors - still clear local storage
+      console.warn('Logout API call failed, clearing local storage anyway:', e);
     }
 
-    // Clear local storage
+    // Always clear local storage
     localStorage.removeItem("auth_token");
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
+    localStorage.removeItem("impersonating");
+    localStorage.removeItem("original_admin");
   }
 
   async changePassword(passwordData: ChangePasswordRequest): Promise<{ success: boolean; message: string }> {
     try {
+      // Validate password lengths per API docs
+      if (passwordData.current_password.length < 8 || passwordData.current_password.length > 40) {
+        throw new Error("Current password must be between 8 and 40 characters");
+      }
+      if (passwordData.new_password.length < 8 || passwordData.new_password.length > 40) {
+        throw new Error("New password must be between 8 and 40 characters");
+      }
+
       const response = await fetch(`${API_BASE_URL}/${API_CONFIG.endpoints.auth.changePassword}`, {
         method: "POST",
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(passwordData),
+        body: JSON.stringify({
+          current_password: passwordData.current_password,
+          new_password: passwordData.new_password,
+        }),
       });
 
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        const errorMessage = data.message || data.error || data.detail || `HTTP error! status: ${response.status}`;
+        throw new Error(errorMessage);
       }
       
-      return { success: true, message: data.message || "Password changed successfully" };
-    } catch (error) {
+      return { success: data.success !== false, message: data.message || "Password changed successfully" };
+    } catch (error: any) {
       console.error("Change password API error:", error);
-      // Fallback to demo mode
-      return { success: true, message: "Password changed successfully (demo mode)" };
+      throw new Error(error?.message || "Failed to change password");
     }
   }
 
   async refreshToken(): Promise<{ access: string; refresh: string }> {
     try {
       const refreshToken = localStorage.getItem("refresh_token");
-      if (!refreshToken) {
+      if (!refreshToken || refreshToken.trim() === '') {
         throw new Error("No refresh token available");
       }
 
@@ -196,52 +198,62 @@ class AuthService {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
-        body: JSON.stringify({ refresh: refreshToken }),
+        body: JSON.stringify({ refresh: refreshToken.trim() }),
       });
 
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        const errorMessage = data.message || data.error || data.detail || `HTTP error! status: ${response.status}`;
+        throw new Error(errorMessage);
+      }
+      
+      // Validate response has required fields
+      if (!data.access) {
+        throw new Error("Invalid refresh response: missing access token");
       }
       
       // Update stored tokens
       if (data.access) {
         localStorage.setItem("access_token", data.access);
+        localStorage.setItem("auth_token", data.access); // Back-compat
       }
       if (data.refresh) {
         localStorage.setItem("refresh_token", data.refresh);
       }
 
-      return data;
-    } catch (error) {
+      return { access: data.access, refresh: data.refresh || refreshToken };
+    } catch (error: any) {
       console.error("Token refresh API error:", error);
-      // Fallback to demo mode
-      return {
-        access: "demo_access_token_refreshed",
-        refresh: "demo_refresh_token_refreshed"
-      };
+      throw new Error(error?.message || "Failed to refresh token");
     }
   }
 
   async verifyToken(token: string): Promise<boolean> {
     try {
+      if (!token || token.trim() === '') {
+        return false;
+      }
+
       const response = await fetch(`${API_BASE_URL}/${API_CONFIG.endpoints.auth.verify}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token: token.trim() }),
       });
 
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        return false;
       }
       
-      return true; // Token is valid
+      // API returns { token: "..." } if valid
+      return data.token === token.trim() || data.token !== undefined;
     } catch (error) {
       console.error("Token verify API error:", error);
       return false;

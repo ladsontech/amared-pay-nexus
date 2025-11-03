@@ -31,13 +31,22 @@ export interface UserResponse {
   id: string;
   username: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  phone_number?: string;
+  first_name: string | null;
+  last_name: string | null;
+  phone_number: string | null;
   is_active: boolean;
+  is_staff?: boolean;
+  is_superuser?: boolean;
+  is_email_verified?: boolean;
+  is_phone_verified?: boolean;
   date_joined: string;
-  last_login?: string;
-  role?: string;
+  last_login: string | null;
+  permissions?: string;
+  avatar?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  groups?: number[];
+  role?: string; // Custom field for our app
   organization?: {
     id: string;
     name: string;
@@ -80,21 +89,50 @@ class UserService {
 
   async listUsers(query?: UserQuery): Promise<UserResponse[]> {
     try {
-      const response = await apiClient.get<{ results?: UserResponse[]; data?: UserResponse[] } | UserResponse[]>(
+      // Use /user/ endpoint (without /users/ prefix) per API docs
+      const response = await apiClient.get<{ 
+        count: number; 
+        next: string | null; 
+        previous: string | null; 
+        results: UserResponse[] 
+      }>(
+        API_CONFIG.endpoints.user.list, 
+        query
+      );
+      
+      // Handle paginated response
+      if (response && typeof response === 'object' && 'results' in response) {
+        return response.results || [];
+      }
+      
+      // Fallback for non-paginated response
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error('API call failed:', error);
+      throw error;
+    }
+  }
+
+  async listUsersWithUsersPrefix(query?: UserQuery): Promise<UserResponse[]> {
+    try {
+      // Use /users/user/ endpoint
+      const response = await apiClient.get<{ 
+        count: number; 
+        next: string | null; 
+        previous: string | null; 
+        results: UserResponse[] 
+      }>(
         API_CONFIG.endpoints.user.userList, 
         query
       );
       
-      // Handle different response formats
-      if (Array.isArray(response)) {
-        return response;
-      } else if (response.results) {
-        return response.results;
-      } else if (response.data) {
-        return response.data;
+      // Handle paginated response
+      if (response && typeof response === 'object' && 'results' in response) {
+        return response.results || [];
       }
       
-      return [];
+      // Fallback for non-paginated response
+      return Array.isArray(response) ? response : [];
     } catch (error) {
       console.error('API call failed:', error);
       throw error;
@@ -103,10 +141,17 @@ class UserService {
 
   async getUser(id: string): Promise<UserResponse> {
     try {
-      return await apiClient.get<UserResponse>(API_CONFIG.endpoints.user.userDetail(id));
+      // Try /user/{id}/ first
+      return await apiClient.get<UserResponse>(API_CONFIG.endpoints.user.detail(id));
     } catch (error) {
-      console.error('API call failed:', error);
-      throw error;
+      console.error('API call failed with /user/{id}/, trying /users/user/{id}/:', error);
+      // Fallback to /users/user/{id}/
+      try {
+        return await apiClient.get<UserResponse>(API_CONFIG.endpoints.user.userDetail(id));
+      } catch (fallbackError) {
+        console.error('API call failed:', fallbackError);
+        throw fallbackError;
+      }
     }
   }
 

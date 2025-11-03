@@ -40,8 +40,8 @@ const SystemUsers = () => {
     (user) =>
       user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.last_name.toLowerCase().includes(searchTerm.toLowerCase())
+      (user.first_name && user.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.last_name && user.last_name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -134,7 +134,7 @@ const SystemUsers = () => {
         <div className="space-y-2">
           {filteredUsers.map((user) => {
             const isExpanded = expandedUserId === user.id;
-            const fullName = `${user.first_name} ${user.last_name}`.trim();
+            const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username;
             
             return (
               <Card 
