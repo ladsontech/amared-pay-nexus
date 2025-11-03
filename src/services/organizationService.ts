@@ -168,17 +168,31 @@ export interface BillPayment {
 }
 
 export interface CreateBillPaymentRequest {
-  organization: string;
-  currency: number;
-  wallet_transaction?: string;
-  petty_cash_transaction?: string;
+  organization?: string | { id: string; name?: string; address?: string; company_reg_id?: string; tin?: string; static_collection_link?: string };
+  currency?: number | { id: number; name?: string; symbol?: string };
+  wallet_transaction?: string | { currency?: any; wallet?: any; type?: string; amount?: number; title?: string; updated_by?: string };
+  petty_cash_transaction?: string | { petty_cash_wallet?: any; currency?: any; updated_by?: any; type?: string; status?: string; amount?: number; title?: string };
   biller_name: string;
   account_number: string;
   amount: number;
   status?: "pending" | "successful" | "failed";
-  type?: "electricity" | "water" | "internet" | "airtime";
+  type?: "electricity" | "water" | "internet" | "airtime" | null;
   wallet_type?: "main_wallet" | "petty_cash_wallet";
-  reference?: string;
+  reference?: string | null;
+}
+
+export interface UpdateBillPaymentRequest {
+  organization?: string | { id: string; name?: string; address?: string; company_reg_id?: string; tin?: string; static_collection_link?: string };
+  currency?: number | { id: number; name?: string; symbol?: string };
+  wallet_transaction?: string | { currency?: any; wallet?: any; type?: string; amount?: number; title?: string; updated_by?: string };
+  petty_cash_transaction?: string | { petty_cash_wallet?: any; currency?: any; updated_by?: any; type?: string; status?: string; amount?: number; title?: string };
+  biller_name: string;
+  account_number: string;
+  amount: number;
+  status?: "pending" | "successful" | "failed";
+  type?: "electricity" | "water" | "internet" | "airtime" | null;
+  wallet_type?: "main_wallet" | "petty_cash_wallet";
+  reference?: string | null;
 }
 
 // Petty Cash Types
@@ -959,15 +973,81 @@ class OrganizationService {
 
   async createBillPayment(billData: CreateBillPaymentRequest): Promise<BillPayment> {
     try {
+      // Prepare payload - send IDs where provided, or minimal objects
+      const payload: any = {
+        biller_name: billData.biller_name,
+        account_number: billData.account_number,
+        amount: billData.amount,
+      };
+
+      // Add optional fields
+      if (billData.status) payload.status = billData.status;
+      if (billData.type) payload.type = billData.type;
+      if (billData.wallet_type) payload.wallet_type = billData.wallet_type;
+      if (billData.reference) payload.reference = billData.reference;
+
+      // Handle organization - send ID if string, or object if provided
+      if (billData.organization) {
+        if (typeof billData.organization === 'string') {
+          payload.organization = billData.organization;
+        } else {
+          payload.organization = billData.organization;
+        }
+      }
+
+      // Handle currency - send ID if number, or object if provided
+      if (billData.currency !== undefined) {
+        if (typeof billData.currency === 'number') {
+          payload.currency = billData.currency;
+        } else {
+          payload.currency = billData.currency;
+        }
+      }
+
+      // Handle wallet_transaction if provided
+      if (billData.wallet_transaction) {
+        if (typeof billData.wallet_transaction === 'string') {
+          payload.wallet_transaction = billData.wallet_transaction;
+        } else {
+          payload.wallet_transaction = billData.wallet_transaction;
+        }
+      }
+
+      // Handle petty_cash_transaction if provided
+      if (billData.petty_cash_transaction) {
+        if (typeof billData.petty_cash_transaction === 'string') {
+          payload.petty_cash_transaction = billData.petty_cash_transaction;
+        } else {
+          payload.petty_cash_transaction = billData.petty_cash_transaction;
+        }
+      }
+
       const response = await fetch(`${API_BASE_URL}/organizations/bill_payment/`, {
         method: "POST",
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(billData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        let errorMessage = "";
+        try {
+          const errorData = JSON.parse(errorText);
+          if (typeof errorData === 'object') {
+            const errors = Object.entries(errorData)
+              .map(([key, value]) => {
+                const fieldName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `${fieldName}: ${Array.isArray(value) ? value.join(', ') : value}`;
+              })
+              .join('; ');
+            errorMessage = errors || errorText;
+          } else {
+            errorMessage = errorData.message || errorText;
+          }
+        } catch {
+          errorMessage = errorText || `HTTP error! status: ${response.status}`;
+        }
+        throw new Error(errorMessage);
       }
 
       return await response.json();
@@ -996,17 +1076,83 @@ class OrganizationService {
     }
   }
 
-  async updateBillPayment(billId: string, billData: CreateBillPaymentRequest): Promise<BillPayment> {
+  async updateBillPayment(billId: string, billData: UpdateBillPaymentRequest): Promise<BillPayment> {
     try {
+      // Prepare payload similar to create
+      const payload: any = {
+        biller_name: billData.biller_name,
+        account_number: billData.account_number,
+        amount: billData.amount,
+      };
+
+      // Add optional fields
+      if (billData.status) payload.status = billData.status;
+      if (billData.type !== undefined) payload.type = billData.type;
+      if (billData.wallet_type) payload.wallet_type = billData.wallet_type;
+      if (billData.reference !== undefined) payload.reference = billData.reference;
+
+      // Handle organization
+      if (billData.organization) {
+        if (typeof billData.organization === 'string') {
+          payload.organization = billData.organization;
+        } else {
+          payload.organization = billData.organization;
+        }
+      }
+
+      // Handle currency
+      if (billData.currency !== undefined) {
+        if (typeof billData.currency === 'number') {
+          payload.currency = billData.currency;
+        } else {
+          payload.currency = billData.currency;
+        }
+      }
+
+      // Handle wallet_transaction
+      if (billData.wallet_transaction) {
+        if (typeof billData.wallet_transaction === 'string') {
+          payload.wallet_transaction = billData.wallet_transaction;
+        } else {
+          payload.wallet_transaction = billData.wallet_transaction;
+        }
+      }
+
+      // Handle petty_cash_transaction
+      if (billData.petty_cash_transaction) {
+        if (typeof billData.petty_cash_transaction === 'string') {
+          payload.petty_cash_transaction = billData.petty_cash_transaction;
+        } else {
+          payload.petty_cash_transaction = billData.petty_cash_transaction;
+        }
+      }
+
       const response = await fetch(`${API_BASE_URL}/organizations/bill_payment/${billId}/`, {
         method: "PUT",
         headers: this.getAuthHeaders(),
-        body: JSON.stringify(billData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        let errorMessage = "";
+        try {
+          const errorData = JSON.parse(errorText);
+          if (typeof errorData === 'object') {
+            const errors = Object.entries(errorData)
+              .map(([key, value]) => {
+                const fieldName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `${fieldName}: ${Array.isArray(value) ? value.join(', ') : value}`;
+              })
+              .join('; ');
+            errorMessage = errors || errorText;
+          } else {
+            errorMessage = errorData.message || errorText;
+          }
+        } catch {
+          errorMessage = errorText || `HTTP error! status: ${response.status}`;
+        }
+        throw new Error(errorMessage);
       }
 
       return await response.json();

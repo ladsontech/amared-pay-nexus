@@ -1,287 +1,426 @@
-import React, { useState } from 'react';
-import { CreditCard, Wallet, DollarSign, Receipt, AlertCircle, CheckCircle } from 'lucide-react';
-
-interface Bill {
-  id: string;
-  vendor: string;
-  description: string;
-  amount: number;
-  dueDate: string;
-  category: string;
-  status: 'pending' | 'paid' | 'overdue';
-}
-
-interface FundingSource {
-  id: 'main_wallet' | 'petty_cash';
-  name: string;
-  balance: number;
-  icon: React.ReactNode;
-}
+import React, { useState, useEffect } from 'react';
+import { CreditCard, Wallet, DollarSign, Receipt, AlertCircle, CheckCircle, Plus, RefreshCw, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { organizationService, BillPayment, CreateBillPaymentRequest, Wallet as WalletType } from '@/services/organizationService';
+import { useOrganization } from '@/hooks/useOrganization';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 const PayBills: React.FC = () => {
-  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
-  const [selectedFundingSource, setSelectedFundingSource] = useState<'main_wallet' | 'petty_cash'>('petty_cash');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState<string | null>(null);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const { organization, wallets } = useOrganization();
+  const [billPayments, setBillPayments] = useState<BillPayment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Demo data for bills
-  const [bills] = useState<Bill[]>([
-    {
-      id: '1',
-      vendor: 'Office Supplies Ltd',
-      description: 'Stationery and office materials',
-      amount: 150000,
-      dueDate: '2025-01-25',
-      category: 'Office Supplies',
-      status: 'pending'
-    },
-    {
-      id: '2',
-      vendor: 'Internet Service Provider',
-      description: 'Monthly internet subscription',
-      amount: 250000,
-      dueDate: '2025-01-20',
-      category: 'Utilities',
-      status: 'overdue'
-    },
-    {
-      id: '3',
-      vendor: 'Cleaning Services Co.',
-      description: 'Office cleaning services',
-      amount: 80000,
-      dueDate: '2025-01-30',
-      category: 'Services',
-      status: 'pending'
-    },
-    {
-      id: '4',
-      vendor: 'Security Company',
-      description: 'Monthly security services',
-      amount: 300000,
-      dueDate: '2025-01-28',
-      category: 'Security',
-      status: 'pending'
+  // Form state
+  const [formData, setFormData] = useState<Omit<CreateBillPaymentRequest, 'organization' | 'currency'>>({
+    biller_name: '',
+    account_number: '',
+    amount: 0,
+    type: undefined,
+    wallet_type: 'main_wallet',
+    reference: '',
+    status: 'pending',
+  });
+
+  // Fetch bill payments
+  useEffect(() => {
+    fetchBillPayments();
+  }, [user?.organizationId, refreshKey]);
+
+  const fetchBillPayments = async () => {
+    if (!user?.organizationId) return;
+
+    try {
+      setIsLoading(true);
+      const response = await organizationService.getBillPayments({
+        organization: user.organizationId,
+        limit: 100,
+      });
+      setBillPayments(response.results);
+    } catch (error: any) {
+      console.error('Error fetching bill payments:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to load bill payments',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
     }
-  ]);
-
-  // Demo funding sources with balances
-  const fundingSources: FundingSource[] = [
-    {
-      id: 'main_wallet',
-      name: 'Main Wallet',
-      balance: 2500000,
-      icon: <Wallet className="w-5 h-5" />
-    },
-    {
-      id: 'petty_cash',
-      name: 'Petty Cash',
-      balance: 500000,
-      icon: <DollarSign className="w-5 h-5" />
-    }
-  ];
-
-  const selectedSource = fundingSources.find(source => source.id === selectedFundingSource);
-  const hasInsufficientFunds = selectedBill && selectedSource && selectedBill.amount > selectedSource.balance;
-
-  const handlePayBill = async () => {
-    if (!selectedBill || !selectedSource || hasInsufficientFunds) return;
-
-    setIsProcessing(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setPaymentSuccess(`Bill paid successfully from ${selectedSource.name}`);
-      setSelectedBill(null);
-      setIsProcessing(false);
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setPaymentSuccess(null), 3000);
-    }, 2000);
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-UG', {
-      style: 'currency',
-      currency: 'UGX',
-      minimumFractionDigits: 0
-    }).format(amount);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!user?.organizationId) {
+      toast({
+        title: 'Error',
+        description: 'Organization ID not found',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Find the selected wallet
+    const selectedWallet = wallets.find(w => 
+      formData.wallet_type === 'main_wallet' 
+        ? !w.petty_cash_wallet 
+        : w.petty_cash_wallet !== null
+    );
+
+    if (!selectedWallet) {
+      toast({
+        title: 'Error',
+        description: `No ${formData.wallet_type === 'main_wallet' ? 'main' : 'petty cash'} wallet found`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Check balance
+    const balance = selectedWallet.balance || 0;
+    if (formData.amount > balance) {
+      toast({
+        title: 'Insufficient Funds',
+        description: `Available balance: ${selectedWallet.currency.symbol} ${balance.toLocaleString()}`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const payload: CreateBillPaymentRequest = {
+        organization: user.organizationId,
+        currency: selectedWallet.currency.id,
+        biller_name: formData.biller_name.trim(),
+        account_number: formData.account_number.trim(),
+        amount: formData.amount,
+        type: formData.type || null,
+        wallet_type: formData.wallet_type,
+        reference: formData.reference?.trim() || null,
+        status: formData.status || 'pending',
+      };
+
+      await organizationService.createBillPayment(payload);
+
+      toast({
+        title: 'Success',
+        description: 'Bill payment created successfully',
+      });
+
+      // Reset form
+      setFormData({
+        biller_name: '',
+        account_number: '',
+        amount: 0,
+        type: undefined,
+        wallet_type: 'main_wallet',
+        reference: '',
+        status: 'pending',
+      });
+
+      setIsCreateDialogOpen(false);
+      setRefreshKey(prev => prev + 1);
+    } catch (error: any) {
+      console.error('Error creating bill payment:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to create bill payment',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const getStatusColor = (status: string) => {
+  const formatCurrency = (amount: number, symbol?: string) => {
+    return `${symbol || 'UGX'} ${amount.toLocaleString()}`;
+  };
+
+  const getStatusColor = (status?: string) => {
     switch (status) {
-      case 'paid': return 'text-green-600 bg-green-100';
-      case 'overdue': return 'text-red-600 bg-red-100';
-      default: return 'text-yellow-600 bg-yellow-100';
+      case 'successful': return 'bg-green-100 text-green-800';
+      case 'failed': return 'bg-red-100 text-red-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  const getTypeLabel = (type?: string) => {
+    switch (type) {
+      case 'electricity': return 'Electricity';
+      case 'water': return 'Water';
+      case 'internet': return 'Internet';
+      case 'airtime': return 'Airtime';
+      default: return 'Other';
+    }
+  };
+
+  // Get wallet balances
+  const mainWallet = wallets.find(w => !w.petty_cash_wallet);
+  const pettyCashWallet = wallets.find(w => w.petty_cash_wallet !== null);
+
+  const mainBalance = mainWallet?.balance || 0;
+  const pettyCashBalance = pettyCashWallet?.balance || 0;
+  const mainCurrency = mainWallet?.currency.symbol || 'UGX';
+  const pettyCurrency = pettyCashWallet?.currency.symbol || 'UGX';
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Pay Bills</h1>
-        <p className="text-gray-600">Manage and pay your organization's bills from available funding sources</p>
+      <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Pay Bills</h1>
+          <p className="text-gray-600">Manage and pay your organization's bills from available funding sources</p>
+        </div>
+        <Button onClick={() => setIsCreateDialogOpen(true)}>
+          <Plus className="w-4 h-4 mr-2" />
+          Create Bill Payment
+        </Button>
       </div>
 
-      {paymentSuccess && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
-          <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-          <span className="text-green-800">{paymentSuccess}</span>
-        </div>
-      )}
+      {/* Wallet Balances */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Main Wallet</CardTitle>
+            <Wallet className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(mainBalance, mainCurrency)}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {mainWallet?.currency.name || 'N/A'}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Petty Cash</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(pettyCashBalance, pettyCurrency)}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {pettyCashWallet?.currency.name || 'N/A'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Bills List */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">Pending Bills</h2>
+      {/* Bill Payments List */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Bill Payments</CardTitle>
+              <CardDescription>View and manage your bill payment history</CardDescription>
             </div>
-            <div className="divide-y divide-gray-200">
-              {bills.map((bill) => (
+            <Button variant="outline" size="sm" onClick={fetchBillPayments}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : billPayments.length === 0 ? (
+            <div className="text-center py-12">
+              <Receipt className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <p className="text-gray-500">No bill payments found</p>
+              <p className="text-sm text-gray-400 mt-2">Create your first bill payment to get started</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {billPayments.map((payment) => (
                 <div
-                  key={bill.id}
-                  className={`p-6 cursor-pointer transition-colors ${
-                    selectedBill?.id === bill.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:bg-gray-50'
-                  }`}
-                  onClick={() => setSelectedBill(bill)}
+                  key={payment.id}
+                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center mb-2">
-                        <h3 className="text-lg font-medium text-gray-900">{bill.vendor}</h3>
-                        <span className={`ml-3 px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(bill.status)}`}>
-                          {bill.status.charAt(0).toUpperCase() + bill.status.slice(1)}
-                        </span>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-medium text-gray-900">{payment.biller_name}</h3>
+                        <Badge className={getStatusColor(payment.status)}>
+                          {payment.status || 'pending'}
+                        </Badge>
+                        {payment.type && (
+                          <Badge variant="outline">
+                            {getTypeLabel(payment.type)}
+                          </Badge>
+                        )}
                       </div>
-                      <p className="text-gray-600 mb-2">{bill.description}</p>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <span className="mr-4">Category: {bill.category}</span>
-                        <span>Due: {new Date(bill.dueDate).toLocaleDateString()}</span>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 mb-2">
+                        <div>
+                          <span className="font-medium">Account:</span> {payment.account_number}
+                        </div>
+                        <div>
+                          <span className="font-medium">Wallet:</span> {
+                            payment.wallet_type === 'petty_cash_wallet' ? 'Petty Cash' : 'Main Wallet'
+                          }
+                        </div>
+                        {payment.reference && (
+                          <div>
+                            <span className="font-medium">Reference:</span> {payment.reference}
+                          </div>
+                        )}
+                        <div>
+                          <span className="font-medium">Date:</span> {
+                            new Date(payment.created_at).toLocaleDateString()
+                          }
+                        </div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold text-gray-900">
-                        {formatCurrency(bill.amount)}
+                        {formatCurrency(payment.amount, payment.currency.symbol)}
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
+          )}
+        </CardContent>
+      </Card>
 
-        {/* Payment Panel */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-6">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">Payment Details</h2>
+      {/* Create Bill Payment Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create Bill Payment</DialogTitle>
+            <DialogDescription>
+              Create a new bill payment from your available wallets
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="biller_name">Biller Name *</Label>
+              <Input
+                id="biller_name"
+                value={formData.biller_name}
+                onChange={(e) => setFormData({ ...formData, biller_name: e.target.value })}
+                placeholder="e.g., UMEME"
+                required
+                maxLength={150}
+              />
             </div>
-            
-            {selectedBill ? (
-              <div className="p-6 space-y-6">
-                {/* Selected Bill Summary */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="font-medium text-gray-900 mb-2">{selectedBill.vendor}</h3>
-                  <p className="text-sm text-gray-600 mb-3">{selectedBill.description}</p>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {formatCurrency(selectedBill.amount)}
-                  </div>
-                </div>
 
-                {/* Funding Source Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Select Funding Source *
-                  </label>
-                  <div className="space-y-3">
-                    {fundingSources.map((source) => (
-                      <label
-                        key={source.id}
-                        className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
-                          selectedFundingSource === source.id
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:bg-gray-50'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="fundingSource"
-                          value={source.id}
-                          checked={selectedFundingSource === source.id}
-                          onChange={(e) => setSelectedFundingSource(e.target.value as 'main_wallet' | 'petty_cash')}
-                          className="sr-only"
-                        />
-                        <div className="flex items-center flex-1">
-                          <div className="mr-3 text-gray-600">
-                            {source.icon}
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900">{source.name}</div>
-                            <div className="text-sm text-gray-600">
-                              Available: {formatCurrency(source.balance)}
-                            </div>
-                          </div>
-                          <div className={`w-4 h-4 rounded-full border-2 ${
-                            selectedFundingSource === source.id
-                              ? 'border-blue-500 bg-blue-500'
-                              : 'border-gray-300'
-                          }`}>
-                            {selectedFundingSource === source.id && (
-                              <div className="w-2 h-2 bg-white rounded-full mx-auto mt-0.5"></div>
-                            )}
-                          </div>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="account_number">Account Number *</Label>
+              <Input
+                id="account_number"
+                value={formData.account_number}
+                onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
+                placeholder="Account number"
+                required
+                maxLength={150}
+              />
+            </div>
 
-                {/* Balance Check Warning */}
-                {hasInsufficientFunds && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
-                    <AlertCircle className="w-5 h-5 text-red-600 mr-3 mt-0.5" />
-                    <div>
-                      <p className="text-red-800 font-medium">Insufficient Funds</p>
-                      <p className="text-red-700 text-sm mt-1">
-                        The selected funding source has insufficient balance to pay this bill.
-                      </p>
-                    </div>
-                  </div>
+            <div className="space-y-2">
+              <Label htmlFor="amount">Amount *</Label>
+              <Input
+                id="amount"
+                type="number"
+                value={formData.amount || ''}
+                onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
+                placeholder="0"
+                required
+                min={1}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="type">Bill Type</Label>
+              <Select
+                value={formData.type || ''}
+                onValueChange={(value) => setFormData({ ...formData, type: value as any || undefined })}
+              >
+                <SelectTrigger id="type">
+                  <SelectValue placeholder="Select type (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="electricity">Electricity</SelectItem>
+                  <SelectItem value="water">Water</SelectItem>
+                  <SelectItem value="internet">Internet</SelectItem>
+                  <SelectItem value="airtime">Airtime</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="wallet_type">Wallet Type *</Label>
+              <Select
+                value={formData.wallet_type}
+                onValueChange={(value) => setFormData({ ...formData, wallet_type: value as any })}
+              >
+                <SelectTrigger id="wallet_type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="main_wallet">
+                    Main Wallet ({formatCurrency(mainBalance, mainCurrency)})
+                  </SelectItem>
+                  <SelectItem value="petty_cash_wallet">
+                    Petty Cash ({formatCurrency(pettyCashBalance, pettyCurrency)})
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reference">Reference (Optional)</Label>
+              <Input
+                id="reference"
+                value={formData.reference || ''}
+                onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+                placeholder="Payment reference"
+                maxLength={150}
+              />
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateDialogOpen(false)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Create Payment
+                  </>
                 )}
-
-                {/* Payment Button */}
-                <button
-                  onClick={handlePayBill}
-                  disabled={isProcessing || hasInsufficientFunds}
-                  className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors ${
-                    isProcessing || hasInsufficientFunds
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Processing Payment...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Pay Bill
-                    </>
-                  )}
-                </button>
-              </div>
-            ) : (
-              <div className="p-6 text-center text-gray-500">
-                <Receipt className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>Select a bill to proceed with payment</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
