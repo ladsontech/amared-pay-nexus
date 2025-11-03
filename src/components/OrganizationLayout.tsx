@@ -207,7 +207,7 @@ const OrganizationLayout = () => {
                 {isImpersonating && (
                   <Badge className="bg-orange-100 text-orange-800 border-orange-300">
                     <Shield className="h-3 w-3 mr-1" />
-                    Impersonating
+                    Admin Viewing as Owner
                   </Badge>
                 )}
                 <DropdownMenu>
@@ -228,7 +228,10 @@ const OrganizationLayout = () => {
                           <div className="mb-2 p-2 bg-orange-50 border border-orange-200 rounded-lg">
                             <p className="text-xs font-semibold text-orange-800 flex items-center gap-1">
                               <Shield className="h-3 w-3" />
-                              Viewing as Organization Owner
+                              Super Admin - Full Access Mode
+                            </p>
+                            <p className="text-xs text-orange-600 mt-1">
+                              You have complete access to all organization features
                             </p>
                           </div>
                         )}

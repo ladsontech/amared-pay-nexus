@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, AuthState, Permission, rolePermissions } from '@/types/auth';
+import { User, AuthState, Permission, rolePermissions, UserRole } from '@/types/auth';
 import { authService } from '@/services/authService';
 import { userService } from '@/services/userService';
 interface AuthContextType extends AuthState {
@@ -14,6 +14,7 @@ interface AuthContextType extends AuthState {
   impersonateOrganization: (organizationId: string, organizationName: string) => Promise<void>;
   stopImpersonating: () => void;
   isImpersonating: boolean;
+  loginAsUser: (userId: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -301,6 +302,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Create impersonated user with owner permissions
       // Use actual owner's info if available, otherwise use admin's info
       const ownerUser = ownerStaff?.user || {};
+      
+      // CRITICAL: Superusers retain their admin permissions even when impersonating
+      // This allows them to bypass all access restrictions
       const impersonatedUser: User = {
         id: ownerUser.id || currentUser.id,
         name: ownerUser.first_name && ownerUser.last_name 
@@ -315,7 +319,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: organizationName.trim(),
           industry: 'Finance'
         },
-        permissions: rolePermissions.owner,
+        // Give all permissions including admin permissions
+        permissions: [...new Set([...rolePermissions.owner, ...rolePermissions.admin, 'system_admin'])] as Permission[],
         position: 'Organization Owner',
         firstName: ownerUser.first_name || currentUser.firstName,
         lastName: ownerUser.last_name || currentUser.lastName,
@@ -323,8 +328,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         avatar: ownerUser.avatar || currentUser.avatar,
         isEmailVerified: ownerUser.is_email_verified ?? currentUser.isEmailVerified,
         isPhoneVerified: ownerUser.is_phone_verified ?? currentUser.isPhoneVerified,
-        isSuperuser: false, // Temporarily hide admin status
-        isStaff: ownerUser.is_staff ?? currentUser.isStaff,
+        isSuperuser: true, // Keep superuser status for internal access checks
+        isStaff: true, // Ensure staff status for API access
         department: currentUser.department,
       };
 
@@ -403,15 +408,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const hasPermission = (permission: Permission): boolean => {
+    // Superusers always have all permissions
+    if (authState.user?.isSuperuser === true) {
+      return true;
+    }
     return authState.user?.permissions?.includes(permission) || false;
   };
 
   const hasAnyPermission = (permissions: Permission[]): boolean => {
+    // Superusers always have all permissions
+    if (authState.user?.isSuperuser === true) {
+      return true;
+    }
     return permissions.some(permission => hasPermission(permission));
   };
 
   const isRole = (role: string): boolean => {
     return authState.user?.role === role;
+  };
+
+  const loginAsUser = (userId: string) => {
+    // Demo login function for testing
+    console.log('Demo login as user:', userId);
   };
 
   return (
@@ -429,6 +447,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         impersonateOrganization,
         stopImpersonating,
         isImpersonating,
+        loginAsUser,
       }}
     >
       {children}

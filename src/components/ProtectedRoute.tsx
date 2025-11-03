@@ -16,7 +16,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRole,
   fallbackRoute = '/login',
 }) => {
-  const { loading, isAuthenticated, hasAnyPermission, isRole } = useAuth();
+  const { loading, isAuthenticated, hasAnyPermission, isRole, user } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -30,6 +30,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Authentication check
   if (!isAuthenticated) {
     return <Navigate to={fallbackRoute} replace state={{ from: location }} />;
+  }
+
+  // Superusers bypass all permission and role checks
+  if (user?.isSuperuser === true) {
+    return <>{children}</>;
   }
 
   // Role check
