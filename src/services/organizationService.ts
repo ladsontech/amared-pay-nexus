@@ -440,18 +440,27 @@ class OrganizationService {
     }
 
     try {
+      // Prepare payload with only fields accepted by the API
+      const payload = {
+        username: staffData.username,
+        password: staffData.password,
+        first_name: staffData.first_name,
+        last_name: staffData.last_name,
+        email: staffData.email,
+        phone_number: staffData.phone_number,
+        organization: staffData.organization,
+        ...(staffData.role && { role: staffData.role }), // Only include role if provided
+      };
+
       console.log('Adding staff with data:', {
-        ...staffData,
+        ...payload,
         password: '[HIDDEN]' // Don't log password
       });
       
       const response = await fetch(`${API_BASE_URL}/organizations/add_staff/`, {
         method: "POST",
-        headers: {
-          ...this.getAuthHeaders(),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(staffData),
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(payload),
       });
 
       console.log('Staff addition response status:', response.status);
