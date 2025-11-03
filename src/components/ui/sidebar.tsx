@@ -191,7 +191,7 @@ const Sidebar = React.forwardRef<
     }
 
     if (isMobile) {
-      // Mobile drawer always opens from right, desktop sidebar uses side prop
+      // Mobile drawer respects the side prop
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
           <SheetContent
@@ -203,7 +203,7 @@ const Sidebar = React.forwardRef<
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
               } as React.CSSProperties
             }
-            side="right"
+            side={side}
           >
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>

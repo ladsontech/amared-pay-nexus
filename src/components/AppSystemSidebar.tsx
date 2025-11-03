@@ -35,7 +35,7 @@ export default function AppSystemSidebar() {
   };
 
   return (
-    <Sidebar className="w-64 border-l border-blue-200 bg-white" collapsible="icon" side="right">
+    <Sidebar className="w-64 border-r border-blue-200 bg-white" collapsible="icon" side="left">
       <SidebarContent className="flex flex-col h-full">
         {/* Avatar at the top */}
         <SidebarGroup className="border-b border-gray-200 pb-4">
