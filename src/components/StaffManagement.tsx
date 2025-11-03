@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -10,7 +9,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Plus, UserCircle, Mail, Phone, Edit, Trash2, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { organizationService, Staff, CreateStaffRequest } from "@/services/organizationService";
+import { organizationService, Staff } from "@/services/organizationService";
+import { StaffCreationForm } from "@/components/StaffCreationForm";
 
 export const StaffManagement = () => {
   const { user } = useAuth();
@@ -45,25 +45,6 @@ export const StaffManagement = () => {
     fetchStaff();
   }, [user?.organizationId]);
 
-  const handleCreate = async (data: CreateStaffRequest) => {
-    try {
-      await organizationService.addStaff(data);
-      await fetchStaff();
-      setCreateOpen(false);
-      toast({ 
-        title: "Success", 
-        description: "Staff member added successfully",
-        duration: 5000
-      });
-    } catch (error: any) {
-      toast({ 
-        title: "Error", 
-        description: error.message || "Failed to add staff member",
-        variant: "destructive",
-        duration: 5000
-      });
-    }
-  };
 
   const handleUpdateRole = async (staffId: string, role: "owner" | "manager" | "member") => {
     try {
@@ -212,20 +193,13 @@ export const StaffManagement = () => {
       </div>
 
       {/* Create Staff Dialog */}
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Staff Member</DialogTitle>
-            <DialogDescription>Add a new staff member to your organization</DialogDescription>
-          </DialogHeader>
-          <StaffForm 
-            organizationId={user?.organizationId || ''} 
-            onSubmit={handleCreate} 
-            onCancel={() => setCreateOpen(false)}
-            isSuperuser={user?.isSuperuser}
-          />
-        </DialogContent>
-      </Dialog>
+      <StaffCreationForm
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onSuccess={() => {
+          fetchStaff(); // Refresh staff list after successful creation
+        }}
+      />
 
       {/* Edit Role Dialog */}
       <Dialog open={!!editOpen} onOpenChange={(o) => !o && setEditOpen(null)}>
@@ -268,134 +242,6 @@ export const StaffManagement = () => {
         </AlertDialogContent>
       </AlertDialog>
     </>
-  );
-};
-
-// Staff Form Component
-interface StaffFormProps {
-  organizationId: string;
-  onSubmit: (data: CreateStaffRequest) => Promise<void>;
-  onCancel: () => void;
-  isSuperuser?: boolean;
-}
-
-const StaffForm = ({ organizationId, onSubmit, onCancel, isSuperuser }: StaffFormProps) => {
-  const [form, setForm] = useState<CreateStaffRequest>({
-    username: "",
-    password: "",
-    first_name: "",
-    last_name: "",
-    email: "",
-    phone_number: "",
-    organization: organizationId,
-    role: "member",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      await onSubmit(form);
-      // Reset form on success
-      setForm({
-        username: "",
-        password: "",
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone_number: "",
-        organization: organizationId,
-        role: "member",
-      });
-    } catch (error) {
-      // Error is handled by parent component
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label>First Name</Label>
-          <Input
-            value={form.first_name}
-            onChange={(e) => setForm({ ...form, first_name: e.target.value })}
-            required
-          />
-        </div>
-        <div>
-          <Label>Last Name</Label>
-          <Input
-            value={form.last_name}
-            onChange={(e) => setForm({ ...form, last_name: e.target.value })}
-            required
-          />
-        </div>
-      </div>
-      <div>
-        <Label>Email</Label>
-        <Input
-          type="email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          required
-        />
-      </div>
-      <div>
-        <Label>Phone Number</Label>
-        <Input
-          value={form.phone_number}
-          onChange={(e) => setForm({ ...form, phone_number: e.target.value })}
-          required
-          placeholder="+256700000000"
-        />
-      </div>
-      <div>
-        <Label>Username</Label>
-        <Input
-          value={form.username}
-          onChange={(e) => setForm({ ...form, username: e.target.value })}
-          required
-        />
-      </div>
-      <div>
-        <Label>Password</Label>
-        <Input
-          type="password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          required
-          minLength={8}
-        />
-      </div>
-      <div>
-        <Label>Role</Label>
-        <Select 
-          value={form.role} 
-          onValueChange={(value: "owner" | "manager" | "member") => setForm({ ...form, role: value })}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {isSuperuser && <SelectItem value="owner">Owner</SelectItem>}
-            <SelectItem value="manager">Manager</SelectItem>
-            <SelectItem value="member">Member</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Adding..." : "Add Staff Member"}
-        </Button>
-      </DialogFooter>
-    </form>
   );
 };
 

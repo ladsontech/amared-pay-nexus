@@ -3,14 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/hooks/useOrganization";
-import { organizationService, CreateStaffRequest, UpdateStaffRequest } from "@/services/organizationService";
+import { organizationService, UpdateStaffRequest } from "@/services/organizationService";
+import { StaffCreationForm } from "@/components/StaffCreationForm";
 import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, Building, Phone, Send, Target, Calendar, BarChart3, ChevronRight, Eye, ArrowUpRight, Plus, Edit, Trash2, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 const OrgDashboard = () => {
@@ -55,24 +52,6 @@ const OrgDashboard = () => {
   const [addStaffOpen, setAddStaffOpen] = useState(false);
   const [editStaffOpen, setEditStaffOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<{ id: string; user: { first_name: string; last_name: string; email: string; phone_number: string; username?: string }; role: string } | null>(null);
-  const [staffFormData, setStaffFormData] = useState<CreateStaffRequest>({
-    username: "",
-    password: "",
-    first_name: "",
-    last_name: "",
-    email: "",
-    phone_number: "",
-    organization: user?.organizationId || "",
-    role: "member",
-    permissions: {
-      petty_cash: false,
-      bulk_payments: false,
-      collections: false,
-      approvals: false,
-      users: false,
-      reports: false
-    }
-  });
 
   // Map wallet transactions to dashboard format
   const recentTransactions = walletTransactions.slice(0, 5).map(transaction => ({
@@ -203,75 +182,7 @@ const OrgDashboard = () => {
     setWithdrawOpen(false);
   };
 
-  // Staff Management Functions
-  const handleAddStaff = async () => {
-    if (!staffFormData.username || !staffFormData.password || !staffFormData.first_name || 
-        !staffFormData.last_name || !staffFormData.email || !staffFormData.phone_number) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Check if organization ID is available
-    if (!user?.organizationId) {
-      toast({
-        title: "Organization Error",
-        description: "Organization ID not found. Please refresh the page and try again.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Update organization ID in case it changed
-    const staffDataWithOrg = {
-      ...staffFormData,
-      organization: user.organizationId
-    };
-
-    console.log('Adding staff with organization ID:', user.organizationId);
-    console.log('Staff data being sent:', {
-      ...staffDataWithOrg,
-      password: '[HIDDEN]'
-    });
-
-    try {
-      await organizationService.addStaff(staffDataWithOrg);
-      toast({
-        title: "Staff Added Successfully",
-        description: `${staffFormData.first_name} ${staffFormData.last_name} has been added to the organization`
-      });
-      setStaffFormData({
-        username: "",
-        password: "",
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone_number: "",
-        organization: user?.organizationId || "",
-        role: "member",
-        permissions: {
-          petty_cash: false,
-          bulk_payments: false,
-          collections: false,
-          approvals: false,
-          users: false,
-          reports: false
-        }
-      });
-      setAddStaffOpen(false);
-      fetchStaff(); // Refresh staff list
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to add staff member";
-      toast({
-        title: "Error Adding Staff",
-        description: errorMessage,
-        variant: "destructive"
-      });
-    }
-  };
+  // Staff Management Functions - handleAddStaff removed, now using StaffCreationForm component
 
   const handleEditStaff = (staffMember: { id: string; user: { first_name: string; last_name: string; email: string; phone_number: string; username?: string }; role: string }) => {
     setSelectedStaff(staffMember);
@@ -906,193 +817,20 @@ const OrgDashboard = () => {
           {hasPermission('manage_team') && <div className="mt-4 md:mt-6">
               <div className="flex items-center justify-between mb-3 md:mb-4 px-2 md:px-0">
                 <h2 className="text-base md:text-lg font-bold text-black">Team Management</h2>
-                <Dialog open={addStaffOpen} onOpenChange={setAddStaffOpen}>
-                  <DialogTrigger asChild>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Add Staff
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Add New Staff Member</DialogTitle>
-                      <DialogDescription>Add a new team member to your organization</DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label>First Name</Label>
-                          <Input
-                            placeholder="John"
-                            value={staffFormData.first_name}
-                            onChange={(e) => setStaffFormData({...staffFormData, first_name: e.target.value})}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Last Name</Label>
-                          <Input
-                            placeholder="Doe"
-                            value={staffFormData.last_name}
-                            onChange={(e) => setStaffFormData({...staffFormData, last_name: e.target.value})}
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Username</Label>
-                        <Input
-                          placeholder="johndoe"
-                          value={staffFormData.username}
-                          onChange={(e) => setStaffFormData({...staffFormData, username: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Email</Label>
-                        <Input
-                          type="email"
-                          placeholder="john@example.com"
-                          value={staffFormData.email}
-                          onChange={(e) => setStaffFormData({...staffFormData, email: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Phone Number</Label>
-                        <Input
-                          placeholder="+256701234567"
-                          value={staffFormData.phone_number}
-                          onChange={(e) => setStaffFormData({...staffFormData, phone_number: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Password</Label>
-                        <Input
-                          type="password"
-                          placeholder="Enter password"
-                          value={staffFormData.password}
-                          onChange={(e) => setStaffFormData({...staffFormData, password: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Role</Label>
-                        <Select value={staffFormData.role} onValueChange={(value: "owner" | "manager" | "member") => setStaffFormData({...staffFormData, role: value})}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="member">Member</SelectItem>
-                            <SelectItem value="manager">Manager</SelectItem>
-                            <SelectItem value="owner">Owner</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      {/* Function-specific permissions */}
-                      <div className="space-y-3">
-                        <Label>Function Permissions</Label>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              id="petty_cash"
-                              checked={staffFormData.permissions?.petty_cash || false}
-                              onChange={(e) => setStaffFormData({
-                                ...staffFormData,
-                                permissions: {
-                                  ...staffFormData.permissions,
-                                  petty_cash: e.target.checked
-                                }
-                              })}
-                              className="rounded border-gray-300"
-                            />
-                            <Label htmlFor="petty_cash" className="text-sm">Petty Cash</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              id="bulk_payments"
-                              checked={staffFormData.permissions?.bulk_payments || false}
-                              onChange={(e) => setStaffFormData({
-                                ...staffFormData,
-                                permissions: {
-                                  ...staffFormData.permissions,
-                                  bulk_payments: e.target.checked
-                                }
-                              })}
-                              className="rounded border-gray-300"
-                            />
-                            <Label htmlFor="bulk_payments" className="text-sm">Bulk Payments</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              id="collections"
-                              checked={staffFormData.permissions?.collections || false}
-                              onChange={(e) => setStaffFormData({
-                                ...staffFormData,
-                                permissions: {
-                                  ...staffFormData.permissions,
-                                  collections: e.target.checked
-                                }
-                              })}
-                              className="rounded border-gray-300"
-                            />
-                            <Label htmlFor="collections" className="text-sm">Collections</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              id="approvals"
-                              checked={staffFormData.permissions?.approvals || false}
-                              onChange={(e) => setStaffFormData({
-                                ...staffFormData,
-                                permissions: {
-                                  ...staffFormData.permissions,
-                                  approvals: e.target.checked
-                                }
-                              })}
-                              className="rounded border-gray-300"
-                            />
-                            <Label htmlFor="approvals" className="text-sm">Approvals</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              id="users"
-                              checked={staffFormData.permissions?.users || false}
-                              onChange={(e) => setStaffFormData({
-                                ...staffFormData,
-                                permissions: {
-                                  ...staffFormData.permissions,
-                                  users: e.target.checked
-                                }
-                              })}
-                              className="rounded border-gray-300"
-                            />
-                            <Label htmlFor="users" className="text-sm">User Management</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              id="reports"
-                              checked={staffFormData.permissions?.reports || false}
-                              onChange={(e) => setStaffFormData({
-                                ...staffFormData,
-                                permissions: {
-                                  ...staffFormData.permissions,
-                                  reports: e.target.checked
-                                }
-                              })}
-                              className="rounded border-gray-300"
-                            />
-                            <Label htmlFor="reports" className="text-sm">Reports</Label>
-                          </div>
-                        </div>
-                      </div>
-                      <Button onClick={handleAddStaff} className="w-full bg-blue-600 hover:bg-blue-700">
-                        Add Staff Member
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => setAddStaffOpen(true)}
+                >
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Add Staff
+                </Button>
+                <StaffCreationForm
+                  open={addStaffOpen}
+                  onOpenChange={setAddStaffOpen}
+                  onSuccess={() => {
+                    fetchStaff(); // Refresh staff list after successful creation
+                  }}
+                />
               </div>
 
               {/* Staff List - Mobile Responsive */}

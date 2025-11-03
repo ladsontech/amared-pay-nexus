@@ -122,8 +122,14 @@ export function isInstallable(): boolean {
     return false;
   }
 
+  // Check if we have a deferred prompt ready
+  if ((window as any).deferredPrompt) {
+    return true;
+  }
+
   // Check if browser supports installation
-  return 'BeforeInstallPromptEvent' in window;
+  // Modern browsers support PWA installation
+  return 'serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window;
 }
 
 /**
