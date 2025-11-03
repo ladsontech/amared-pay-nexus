@@ -56,7 +56,8 @@ const OrganizationLayout = () => {
           <header className="fixed top-0 left-0 md:left-64 right-0 z-50 border-b border-blue-200/50 bg-blue-50/95 backdrop-blur-xl supports-[backdrop-filter]:bg-blue-50/95 shadow-sm transition-[left] duration-200">
             <div className="w-full flex h-12 md:h-16 items-center justify-between px-3 md:px-6 overflow-hidden">
               <div className="flex items-center gap-2 md:gap-4">
-                <SidebarTrigger className="md:ml-0 h-8 w-8 md:h-10 md:w-10" />
+                {/* Desktop Only: Sidebar Trigger */}
+                <SidebarTrigger className="hidden md:flex md:ml-0 h-8 w-8 md:h-10 md:w-10" />
                 {/* Organization Logo and Name */}
                 <div className="flex items-center gap-2 md:gap-3 min-w-0">
                   <div className="relative flex-shrink-0">
@@ -78,8 +79,13 @@ const OrganizationLayout = () => {
                 </div>
               </div>
 
-              {/* Desktop Only: Active Users, Impersonating Badge, and Account Menu */}
-              <div className="hidden md:flex items-center gap-2">
+              {/* Right Side: Mobile Drawer Icon on Right, Desktop Controls */}
+              <div className="flex items-center gap-2">
+                {/* Mobile Only: Sidebar Trigger on Right */}
+                <SidebarTrigger className="md:hidden h-8 w-8" />
+                
+                {/* Desktop Only: Active Users, Impersonating Badge, and Account Menu */}
+                <div className="hidden md:flex items-center gap-2">
                 {/* Active Users Indicator */}
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary border border-border">
                   <Users className="h-4 w-4 text-primary" />
@@ -142,6 +148,7 @@ const OrganizationLayout = () => {
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
+                </div>
               </div>
             </div>
           </header>
