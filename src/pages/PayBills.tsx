@@ -96,14 +96,16 @@ const PayBills: React.FC = () => {
     if (formData.wallet_type === 'main_wallet') {
       selectedWallet = wallets.find(w => !w.petty_cash_wallet);
     } else {
-      selectedWallet = hookPettyCashWallets[0];
+      selectedWallet = hookPettyCashWallets && hookPettyCashWallets.length > 0 ? hookPettyCashWallets[0] : null;
     }
 
     if (!selectedWallet) {
+      const walletType = formData.wallet_type === 'main_wallet' ? 'main' : 'petty cash';
       toast({
-        title: 'Error',
-        description: `No ${formData.wallet_type === 'main_wallet' ? 'main' : 'petty cash'} wallet found`,
+        title: 'Wallet Not Found',
+        description: `No ${walletType} wallet found. ${formData.wallet_type === 'petty_cash_wallet' ? 'Please contact your administrator to set up a petty cash wallet, or use the main wallet instead.' : 'Please contact your administrator.'}`,
         variant: 'destructive',
+        duration: 5000,
       });
       return;
     }
@@ -193,146 +195,231 @@ const PayBills: React.FC = () => {
 
   // Get wallet balances - use real API data
   const mainWallet = wallets.find(w => !w.petty_cash_wallet);
-  const pettyCashWallet = hookPettyCashWallets[0];
+  const pettyCashWallet = hookPettyCashWallets && hookPettyCashWallets.length > 0 ? hookPettyCashWallets[0] : null;
 
   // Get balances from API - ensure we're using the actual balance values
   const mainBalance = mainWallet?.balance ?? 0;
   const pettyCashBalance = pettyCashWallet?.balance ?? 0;
   const mainCurrency = mainWallet?.currency?.symbol || mainWallet?.currency?.name || 'UGX';
   const pettyCurrency = pettyCashWallet?.currency?.symbol || pettyCashWallet?.currency?.name || 'UGX';
+  const hasPettyCashWallet = !!pettyCashWallet;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Pay Bills</h1>
-          <p className="text-gray-600">Manage and pay your organization's bills from available funding sources</p>
-        </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Create Bill Payment
-        </Button>
-      </div>
-
-      {/* Wallet Balances */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Main Wallet</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {walletsLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-muted-foreground">Loading...</span>
-              </div>
-            ) : (
-              <>
-                <div className="text-2xl font-bold">{formatCurrency(mainBalance, mainCurrency)}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {mainWallet?.currency?.name || 'N/A'}
-                </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Petty Cash</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {walletsLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-muted-foreground">Loading...</span>
-              </div>
-            ) : (
-              <>
-                <div className="text-2xl font-bold">{formatCurrency(pettyCashBalance, pettyCurrency)}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {pettyCashWallet?.currency?.name || 'N/A'}
-                </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bill Payments List */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Bill Payments</CardTitle>
-              <CardDescription>View and manage your bill payment history</CardDescription>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-3 sm:p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+            <div className="flex-1">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">Pay Bills</h1>
+              <p className="text-xs sm:text-sm md:text-base text-gray-600">Manage and pay your organization's bills from available funding sources</p>
             </div>
-            <Button variant="outline" size="sm" onClick={async () => {
-              await fetchBillPayments();
-              await refreshWallets();
-            }}>
-              <RefreshCw className="w-4 h-4 mr-2" />
+            <Button 
+              onClick={() => setIsCreateDialogOpen(true)}
+              className="w-full sm:w-auto text-xs sm:text-sm"
+              size="sm"
+            >
+              <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Create Bill Payment</span>
+              <span className="sm:hidden">New Payment</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Wallet Balances - Enhanced Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
+          {/* Main Wallet Card */}
+          <Card className="border-2 border-blue-200 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-blue-50 to-white">
+            <CardHeader className="pb-3 sm:pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="p-2 sm:p-2.5 rounded-lg bg-blue-100">
+                    <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-sm sm:text-base font-semibold text-gray-900">Main Wallet</CardTitle>
+                    <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">{mainWallet?.currency?.name || 'Currency'}</p>
+                  </div>
+                </div>
+                {mainWallet && (
+                  <Badge className="bg-green-100 text-green-800 text-[10px] sm:text-xs px-1.5 sm:px-2">
+                    Active
+                  </Badge>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {walletsLoading ? (
+                <div className="flex items-center gap-2 py-4 sm:py-6">
+                  <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-blue-600" />
+                  <span className="text-xs sm:text-sm text-gray-600">Loading balance...</span>
+                </div>
+              ) : mainWallet ? (
+                <>
+                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1">
+                    {formatCurrency(mainBalance, mainCurrency)}
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-500">
+                    <CheckCircle className="h-3 w-3 text-green-600" />
+                    <span>Available balance</span>
+                  </div>
+                </>
+              ) : (
+                <div className="py-4 sm:py-6">
+                  <div className="text-sm sm:text-base text-gray-500 mb-2">No wallet found</div>
+                  <p className="text-[10px] sm:text-xs text-gray-400">Please contact your administrator</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Petty Cash Wallet Card */}
+          <Card className={`border-2 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br ${hasPettyCashWallet ? 'from-green-50 to-white border-green-200' : 'from-gray-50 to-white border-gray-200'}`}>
+            <CardHeader className="pb-3 sm:pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className={`p-2 sm:p-2.5 rounded-lg ${hasPettyCashWallet ? 'bg-green-100' : 'bg-gray-100'}`}>
+                    <DollarSign className={`h-4 w-4 sm:h-5 sm:w-5 ${hasPettyCashWallet ? 'text-green-600' : 'text-gray-400'}`} />
+                  </div>
+                  <div>
+                    <CardTitle className="text-sm sm:text-base font-semibold text-gray-900">Petty Cash</CardTitle>
+                    <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
+                      {hasPettyCashWallet ? (pettyCashWallet?.currency?.name || 'Currency') : 'Not configured'}
+                    </p>
+                  </div>
+                </div>
+                {hasPettyCashWallet ? (
+                  <Badge className="bg-green-100 text-green-800 text-[10px] sm:text-xs px-1.5 sm:px-2">
+                    Active
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 sm:px-2 border-gray-300 text-gray-500">
+                    Not Set
+                  </Badge>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {walletsLoading ? (
+                <div className="flex items-center gap-2 py-4 sm:py-6">
+                  <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-gray-600" />
+                  <span className="text-xs sm:text-sm text-gray-600">Loading balance...</span>
+                </div>
+              ) : hasPettyCashWallet ? (
+                <>
+                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1">
+                    {formatCurrency(pettyCashBalance, pettyCurrency)}
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-500">
+                    <CheckCircle className="h-3 w-3 text-green-600" />
+                    <span>Available balance</span>
+                  </div>
+                </>
+              ) : (
+                <div className="py-4 sm:py-6">
+                  <div className="text-sm sm:text-base text-gray-500 mb-2">Petty cash wallet not set up</div>
+                  <p className="text-[10px] sm:text-xs text-gray-400">Contact your administrator to set up petty cash</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Bill Payments List */}
+      <Card className="shadow-lg border-2 border-gray-200">
+        <CardHeader className="pb-3 sm:pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex-1">
+              <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1">Bill Payments</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">View and manage your bill payment history</CardDescription>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={async () => {
+                await fetchBillPayments();
+                await refreshWallets();
+              }}
+              className="w-full sm:w-auto text-xs sm:text-sm"
+            >
+              <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Refresh
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-4 md:p-6">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            <div className="flex items-center justify-center py-12 sm:py-16">
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-blue-600" />
+                <p className="text-xs sm:text-sm text-gray-500">Loading bill payments...</p>
+              </div>
             </div>
           ) : billPayments.length === 0 ? (
-            <div className="text-center py-12">
-              <Receipt className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500">No bill payments found</p>
-              <p className="text-sm text-gray-400 mt-2">Create your first bill payment to get started</p>
+            <div className="text-center py-12 sm:py-16">
+              <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <Receipt className="w-8 h-8 sm:w-10 sm:h-10 text-gray-300" />
+              </div>
+              <p className="text-sm sm:text-base font-medium text-gray-700 mb-1">No bill payments found</p>
+              <p className="text-xs sm:text-sm text-gray-400">Create your first bill payment to get started</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {billPayments.map((payment) => (
                 <div
                   key={payment.id}
-                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="border-2 border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 hover:border-blue-300 hover:shadow-md transition-all bg-white"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-medium text-gray-900">{payment.biller_name}</h3>
-                        <Badge className={getStatusColor(payment.status)}>
-                          {payment.status || 'pending'}
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                        <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 truncate">
+                          {payment.biller_name}
+                        </h3>
+                        <Badge className={`${getStatusColor(payment.status)} text-[10px] sm:text-xs px-2 py-0.5`}>
+                          {(payment.status || 'pending').toUpperCase()}
                         </Badge>
                         {payment.type && (
-                          <Badge variant="outline">
+                          <Badge variant="outline" className="text-[10px] sm:text-xs px-2 py-0.5">
                             {getTypeLabel(payment.type)}
                           </Badge>
                         )}
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 mb-2">
-                        <div>
-                          <span className="font-medium">Account:</span> {payment.account_number}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium text-gray-700">Account:</span>
+                          <span className="truncate">{payment.account_number}</span>
                         </div>
-                        <div>
-                          <span className="font-medium">Wallet:</span> {
-                            payment.wallet_type === 'petty_cash_wallet' ? 'Petty Cash' : 'Main Wallet'
-                          }
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium text-gray-700">Wallet:</span>
+                          <span>{payment.wallet_type === 'petty_cash_wallet' ? 'Petty Cash' : 'Main Wallet'}</span>
                         </div>
                         {payment.reference && (
-                          <div>
-                            <span className="font-medium">Reference:</span> {payment.reference}
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-medium text-gray-700">Reference:</span>
+                            <span className="truncate">{payment.reference}</span>
                           </div>
                         )}
-                        <div>
-                          <span className="font-medium">Date:</span> {
-                            new Date(payment.created_at).toLocaleDateString()
-                          }
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium text-gray-700">Date:</span>
+                          <span>{new Date(payment.created_at).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-gray-900">
+                    <div className="flex-shrink-0 sm:text-right">
+                      <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
                         {formatCurrency(payment.amount, payment.currency.symbol)}
                       </div>
+                      <p className="text-[10px] sm:text-xs text-gray-500 mt-1">
+                        {new Date(payment.created_at).toLocaleTimeString('en-US', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -344,14 +431,14 @@ const PayBills: React.FC = () => {
 
       {/* Create Bill Payment Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle>Create Bill Payment</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg sm:text-xl">Create Bill Payment</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
               Create a new bill payment from your available wallets
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             <div className="space-y-2">
               <Label htmlFor="biller_name">Biller Name *</Label>
               <Input
@@ -418,11 +505,27 @@ const PayBills: React.FC = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="main_wallet">
-                    Main Wallet ({formatCurrency(mainBalance, mainCurrency)})
+                  <SelectItem value="main_wallet" disabled={!mainWallet}>
+                    <div className="flex items-center justify-between w-full">
+                      <span>Main Wallet</span>
+                      {mainWallet && (
+                        <span className="ml-2 text-xs text-gray-500">
+                          ({formatCurrency(mainBalance, mainCurrency)})
+                        </span>
+                      )}
+                    </div>
                   </SelectItem>
-                  <SelectItem value="petty_cash_wallet">
-                    Petty Cash ({formatCurrency(pettyCashBalance, pettyCurrency)})
+                  <SelectItem value="petty_cash_wallet" disabled={!hasPettyCashWallet}>
+                    <div className="flex items-center justify-between w-full">
+                      <span>Petty Cash</span>
+                      {hasPettyCashWallet ? (
+                        <span className="ml-2 text-xs text-gray-500">
+                          ({formatCurrency(pettyCashBalance, pettyCurrency)})
+                        </span>
+                      ) : (
+                        <span className="ml-2 text-xs text-gray-400">(Not available)</span>
+                      )}
+                    </div>
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -465,6 +568,7 @@ const PayBills: React.FC = () => {
           </form>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 };
