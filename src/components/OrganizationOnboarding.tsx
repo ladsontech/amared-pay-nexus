@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/hooks/useOrganization";
 import { 
   Building, 
-  Upload, 
+  Save,
   CheckCircle2, 
   ArrowRight, 
   ArrowLeft,
@@ -43,13 +43,13 @@ export default function OrganizationOnboarding() {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     name: organization?.name || user?.organization?.name || "",
     address: organization?.address || "",
     company_reg_id: organization?.company_reg_id || "",
     tin: organization?.tin || "",
+    logo: organization?.logo || "",
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(
@@ -104,62 +104,45 @@ export default function OrganizationOnboarding() {
     }
   };
 
-  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !organization) return;
-
-    // Validate file size (2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Please upload an image smaller than 2MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Invalid file type",
-        description: "Please upload an image file (PNG, JPG, etc.)",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Create preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setLogoPreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+  const handleLogoSave = async () => {
+    if (!organization) return;
 
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('logo', file);
-
-      await organizationService.updateOrganization(organization.id, formData);
+      await updateOrganization({
+        logo: formData.logo || null,
+      });
       
       toast({
-        title: "Logo uploaded",
-        description: "Your organization logo has been uploaded successfully",
+        title: "Logo saved",
+        description: "Your organization logo has been saved successfully",
       });
+
+      // Update preview
+      if (formData.logo) {
+        setLogoPreview(formData.logo);
+      }
 
       // Optional: auto-advance to next step
       setTimeout(() => handleNext(), 1000);
     } catch (error) {
       toast({
-        title: "Upload failed",
-        description: error instanceof Error ? error.message : "Failed to upload logo",
+        title: "Save failed",
+        description: error instanceof Error ? error.message : "Failed to save logo",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+    }
+  };
+
+  const handleLogoUrlChange = (url: string) => {
+    setFormData({ ...formData, logo: url });
+    // Update preview immediately if URL is valid
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+      setLogoPreview(url);
+    } else if (!url) {
+      setLogoPreview(null);
     }
   };
 
@@ -255,7 +238,7 @@ export default function OrganizationOnboarding() {
           <div className="space-y-6 py-4">
             <div className="text-center mb-6">
               <p className="text-muted-foreground mb-4">
-                Upload your organization logo. This will be displayed in your app and on invoices.
+                Enter your organization logo URL. This will be displayed in your app and on invoices.
               </p>
             </div>
 
@@ -267,6 +250,11 @@ export default function OrganizationOnboarding() {
                       src={logoPreview} 
                       alt="Logo preview" 
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.src = '';
+                        setLogoPreview(null);
+                      }}
                     />
                   ) : (
                     <ImageIcon className="h-12 w-12 text-blue-300" />
@@ -274,23 +262,39 @@ export default function OrganizationOnboarding() {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="w-full space-y-2">
+                <Label htmlFor="logo-url" className="text-base font-semibold">
+                  Logo URL
+                </Label>
+                <Input
+                  id="logo-url"
+                  type="url"
+                  placeholder="https://example.com/logo.png"
+                  value={formData.logo}
+                  onChange={(e) => handleLogoUrlChange(e.target.value)}
+                  className="h-12 text-base"
+                />
+                <p className="text-xs text-muted-foreground text-center">
+                  Enter a direct link to your organization logo image
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
                 <Button
                   type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isLoading}
+                  onClick={handleLogoSave}
+                  disabled={isLoading || !formData.logo}
                   className="w-full sm:w-auto"
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Uploading...
+                      Saving...
                     </>
                   ) : (
                     <>
-                      <Upload className="h-4 w-4 mr-2" />
-                      {logoPreview ? "Change Logo" : "Upload Logo"}
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Logo
                     </>
                   )}
                 </Button>
@@ -305,18 +309,6 @@ export default function OrganizationOnboarding() {
                   </Button>
                 )}
               </div>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleLogoUpload}
-                className="hidden"
-              />
-
-              <p className="text-xs text-muted-foreground text-center max-w-md">
-                Recommended: Square image, at least 200x200px. Max file size: 2MB
-              </p>
             </div>
           </div>
         );

@@ -22,12 +22,11 @@ const OrganizationSettings = () => {
     name: organization?.name || "",
     address: organization?.address || "",
     company_reg_id: organization?.company_reg_id || "",
-    tin: organization?.tin || ""
+    tin: organization?.tin || "",
+    logo: organization?.logo || ""
   });
 
   const [isEditing, setIsEditing] = useState(false);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
@@ -39,8 +38,23 @@ const OrganizationSettings = () => {
       return;
     }
 
+    if (!organization) {
+      toast({
+        title: "Error",
+        description: "Organization not found",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      await updateOrganization(formData);
+      await updateOrganization({
+        name: formData.name,
+        address: formData.address || null,
+        company_reg_id: formData.company_reg_id || null,
+        tin: formData.tin || null,
+        logo: formData.logo || null,
+      });
       toast({
         title: "Settings Updated",
         description: "Organization settings have been updated successfully"
@@ -60,61 +74,10 @@ const OrganizationSettings = () => {
       name: organization?.name || "",
       address: organization?.address || "",
       company_reg_id: organization?.company_reg_id || "",
-      tin: organization?.tin || ""
+      tin: organization?.tin || "",
+      logo: organization?.logo || ""
     });
     setIsEditing(false);
-  };
-
-  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !organization) return;
-
-    // Validate file size (2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast({
-        title: "File Too Large",
-        description: "Please upload an image smaller than 2MB",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Invalid File Type",
-        description: "Please upload an image file",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      setUploadingLogo(true);
-      const formData = new FormData();
-      formData.append('logo', file);
-
-      await organizationService.updateOrganization(organization.id, formData);
-      
-      toast({
-        title: "Logo Updated",
-        description: "Organization logo has been updated successfully"
-      });
-
-      // Refresh the page to show new logo
-      window.location.reload();
-    } catch (error) {
-      toast({
-        title: "Upload Failed",
-        description: error instanceof Error ? error.message : "Failed to upload logo",
-        variant: "destructive"
-      });
-    } finally {
-      setUploadingLogo(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
   };
 
   if (loading && !organization) {
@@ -292,36 +255,15 @@ const OrganizationSettings = () => {
                       }}
                     />
                     <div className="flex flex-col gap-2 flex-1 min-w-0">
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoUpload}
-                        className="hidden"
+                      <Input
+                        type="url"
+                        value={formData.logo || ""}
+                        onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
+                        placeholder="https://example.com/logo.png"
+                        disabled={!isEditing}
+                        className="text-xs sm:text-sm"
                       />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploadingLogo}
-                        className="w-full sm:w-auto text-xs"
-                      >
-                        {uploadingLogo ? (
-                          <>
-                            <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2 animate-spin" />
-                            <span className="hidden sm:inline">Uploading...</span>
-                            <span className="sm:hidden">Uploading</span>
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                            <span className="hidden sm:inline">Upload Logo</span>
-                            <span className="sm:hidden">Upload</span>
-                          </>
-                        )}
-                      </Button>
-                      <p className="text-[10px] sm:text-xs text-slate-500">Max 2MB, image files only</p>
+                      <p className="text-[10px] sm:text-xs text-slate-500">Enter a direct link to your organization logo image</p>
                     </div>
                   </div>
                 </div>

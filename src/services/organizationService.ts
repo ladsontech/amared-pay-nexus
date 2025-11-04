@@ -122,18 +122,20 @@ export interface CreateOrganizationRequest {
   email: string;
   phone_number: string;
   org_name: string;
-  address?: string;
-  company_reg_id?: string;
-  tin?: string;
+  address?: string | null;
+  company_reg_id?: string | null;
+  tin?: string | null;
+  logo?: string | null;
   wallet_currency: number;
   wallet_pin: string;
 }
 
 export interface UpdateOrganizationRequest {
-  name: string;
+  name?: string;
   address?: string | null;
   company_reg_id?: string | null;
   tin?: string | null;
+  logo?: string | null;
   static_collection_link?: string | null;
 }
 

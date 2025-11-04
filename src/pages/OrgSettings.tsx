@@ -26,6 +26,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
 import { useNavigate } from "react-router-dom";
+import { organizationService } from "@/services/organizationService";
 
 const OrgSettings = () => {
   const { user, hasPermission } = useAuth();
@@ -506,106 +507,46 @@ const OrgSettings = () => {
                       }}
                     />
                   </div>
-                  <div className="flex-1 space-y-2 w-full sm:w-auto">
-                    <Button variant="outline" size="sm" asChild className="w-full sm:w-auto text-xs sm:text-sm">
-                      <label htmlFor="logo-upload" className="cursor-pointer">
-                        <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                        Upload Logo
-                      </label>
-                    </Button>
-                    <input
-                      id="logo-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
+                  <div className="flex-1 space-y-2 w-full">
+                    <Input
+                      type="url"
+                      value={user?.organization?.logo || ""}
                       onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-
-                        // Validate file size (2MB)
-                        if (file.size > 2 * 1024 * 1024) {
+                        const logoUrl = e.target.value;
+                        const orgId = user?.organization?.id || user?.organizationId;
+                        if (!orgId) {
                           toast({
-                            title: "File too large",
-                            description: "Logo must be less than 2MB",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-
-                        // Validate file type
-                        if (!file.type.startsWith('image/')) {
-                          toast({
-                            title: "Invalid file type",
-                            description: "Please upload an image file",
+                            title: "Error",
+                            description: "Organization ID not found",
                             variant: "destructive",
                           });
                           return;
                         }
 
                         try {
-                          const formData = new FormData();
-                          formData.append('logo', file);
-
-                          // Get organization ID
-                          const orgId = user?.organization?.id || user?.organizationId;
-                          if (!orgId) {
-                            throw new Error("Organization ID not found");
-                          }
-
-                          const accessToken = localStorage.getItem("access_token");
-                          const API_BASE_URL = "https://bulksrv.almaredagencyuganda.com";
-
-                          const response = await fetch(`${API_BASE_URL}/organizations/org/${orgId}/`, {
-                            method: "PATCH",
-                            headers: {
-                              ...(accessToken ? { "Authorization": `Bearer ${accessToken}` } : {}),
-                            },
-                            body: formData,
+                          await organizationService.updateOrganization(orgId, {
+                            logo: logoUrl || null,
                           });
-
-                          if (!response.ok) {
-                            // If PATCH doesn't work, try PUT with form data
-                            const putResponse = await fetch(`${API_BASE_URL}/organizations/org/${orgId}/`, {
-                              method: "PUT",
-                              headers: {
-                                ...(accessToken ? { "Authorization": `Bearer ${accessToken}` } : {}),
-                              },
-                              body: formData,
-                            });
-
-                            if (!putResponse.ok) {
-                              const errorData = await putResponse.json().catch(() => ({}));
-                              throw new Error(errorData.message || `Failed to upload logo: ${putResponse.status}`);
-                            }
-
-                            const updatedOrg = await putResponse.json();
-                            toast({
-                              title: "Logo uploaded",
-                              description: "Organization logo has been updated successfully",
-                            });
-                            // Refresh page to show new logo
-                            window.location.reload();
-                          } else {
-                            const updatedOrg = await response.json();
-                            toast({
-                              title: "Logo uploaded",
-                              description: "Organization logo has been updated successfully",
-                            });
-                            // Refresh page to show new logo
-                            window.location.reload();
-                          }
-                        } catch (error: any) {
-                          console.error("Logo upload error:", error);
                           toast({
-                            title: "Upload failed",
-                            description: error.message || "Failed to upload logo. Please try again.",
+                            title: "Logo updated",
+                            description: "Organization logo has been updated successfully",
+                          });
+                          // Refresh page to show new logo
+                          window.location.reload();
+                        } catch (error: any) {
+                          console.error("Logo update error:", error);
+                          toast({
+                            title: "Update failed",
+                            description: error.message || "Failed to update logo. Please try again.",
                             variant: "destructive",
                           });
                         }
                       }}
+                      placeholder="https://example.com/logo.png"
+                      className="text-xs sm:text-sm"
                     />
                     <p className="text-xs sm:text-sm text-muted-foreground">
-                      JPG, PNG or GIF. Max size 2MB. Recommended: 200x200px
+                      Enter a direct link to your organization logo image
                     </p>
                   </div>
                 </div>

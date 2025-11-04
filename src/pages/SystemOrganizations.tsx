@@ -485,6 +485,7 @@ const OrgForm = ({ onSubmit, onCancel }: OrgFormProps) => {
     address: "",
     company_reg_id: "",
     tin: "",
+    logo: "",
     wallet_currency: 1,
     wallet_pin: "",
   });
@@ -524,6 +525,16 @@ const OrgForm = ({ onSubmit, onCancel }: OrgFormProps) => {
           <div>
             <Label>TIN</Label>
             <Input value={form.tin} onChange={(e) => setForm({ ...form, tin: e.target.value })} />
+          </div>
+          <div className="col-span-2">
+            <Label>Logo URL (Optional)</Label>
+            <Input 
+              type="url" 
+              value={form.logo || ""} 
+              onChange={(e) => setForm({ ...form, logo: e.target.value || null })} 
+              placeholder="https://example.com/logo.png" 
+            />
+            <p className="text-xs text-muted-foreground mt-1">Enter a direct link to your organization logo image</p>
           </div>
         </div>
       </div>

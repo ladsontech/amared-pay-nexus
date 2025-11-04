@@ -351,10 +351,12 @@ export const useOrganization = () => {
 
   // Update organization
   const updateOrganization = async (orgData: {
-    name: string;
-    address?: string;
-    company_reg_id?: string;
-    tin?: string;
+    name?: string;
+    address?: string | null;
+    company_reg_id?: string | null;
+    tin?: string | null;
+    logo?: string | null;
+    static_collection_link?: string | null;
   }) => {
     if (!user?.organizationId) throw new Error('No organization selected');
     
