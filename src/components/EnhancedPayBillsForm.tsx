@@ -281,43 +281,45 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Pay Bills - Enhanced Categories</DialogTitle>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+        <DialogHeader className="pb-3 sm:pb-4">
+          <DialogTitle className="text-base sm:text-lg md:text-xl">Pay Bills - Enhanced Categories</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Payment Source Selection */}
           <Card>
-            <CardContent className="p-4">
-              <Label className="text-sm font-medium mb-3 block">Select Payment Source</Label>
-              <div className="grid grid-cols-2 gap-4">
+            <CardContent className="p-3 sm:p-4">
+              <Label className="text-xs sm:text-sm font-medium mb-2 sm:mb-3 block">Select Payment Source</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                 <Button
+                  type="button"
                   variant={paymentSource === 'wallet' ? 'default' : 'outline'}
                   onClick={() => setPaymentSource('wallet')}
-                  className="flex items-center justify-between p-4 h-auto"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 h-auto gap-2"
                 >
-                  <div className="flex items-center">
-                    <Wallet className="h-5 w-5 mr-2" />
-                    <span>Main Wallet</span>
+                  <div className="flex items-center gap-2">
+                    <Wallet className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="text-xs sm:text-sm font-medium">Main Wallet</span>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold">
+                    <div className="text-xs sm:text-sm font-bold">
                       {isLoadingBalances ? 'Loading...' : `UGX ${balances.wallet.toLocaleString()}`}
                     </div>
                   </div>
                 </Button>
                 <Button
+                  type="button"
                   variant={paymentSource === 'petty-cash' ? 'default' : 'outline'}
                   onClick={() => setPaymentSource('petty-cash')}
-                  className="flex items-center justify-between p-4 h-auto"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 h-auto gap-2"
                 >
-                  <div className="flex items-center">
-                    <CreditCard className="h-5 w-5 mr-2" />
-                    <span>Petty Cash</span>
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="text-xs sm:text-sm font-medium">Petty Cash</span>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold">
+                    <div className="text-xs sm:text-sm font-bold">
                       {isLoadingBalances ? 'Loading...' : `UGX ${balances['petty-cash'].toLocaleString()}`}
                     </div>
                   </div>
@@ -327,26 +329,27 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
           </Card>
 
           {/* Bill Category Selection */}
-          <div className="space-y-4">
-            <Label className="text-sm font-medium">Select Bill Category</Label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="space-y-2 sm:space-y-4">
+            <Label className="text-xs sm:text-sm font-medium">Select Bill Category</Label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
               {billCategories.map((category) => {
                 const IconComponent = category.icon;
                 return (
                   <Button
                     key={category.id}
+                    type="button"
                     variant={selectedCategory === category.id ? 'default' : 'outline'}
                     onClick={() => {
                       setSelectedCategory(category.id);
                       setSelectedProvider('');
                       setCustomerInfo(null);
                     }}
-                    className="flex flex-col items-center p-4 h-auto space-y-2"
+                    className="flex flex-col items-center p-2.5 sm:p-4 h-auto space-y-1.5 sm:space-y-2"
                   >
-                    <div className={`p-2 rounded-lg ${category.color}`}>
-                      <IconComponent className="h-6 w-6" />
+                    <div className={`p-1.5 sm:p-2 rounded-lg ${category.color}`}>
+                      <IconComponent className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                     </div>
-                    <span className="text-sm font-medium text-center">{category.name}</span>
+                    <span className="text-[10px] sm:text-xs md:text-sm font-medium text-center leading-tight">{category.name}</span>
                   </Button>
                 );
               })}
@@ -355,19 +358,19 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
 
           {/* Provider Selection */}
           {selectedCategoryData && (
-            <div className="space-y-4">
-              <Label className="text-sm font-medium">Select Service Provider</Label>
+            <div className="space-y-2 sm:space-y-4">
+              <Label className="text-xs sm:text-sm font-medium">Select Service Provider</Label>
               <Select value={selectedProvider} onValueChange={setSelectedProvider}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9 sm:h-10 text-xs sm:text-sm">
                   <SelectValue placeholder="Choose a provider" />
                 </SelectTrigger>
                 <SelectContent>
                   {selectedCategoryData.providers.map((provider) => (
                     <SelectItem key={provider.id} value={provider.id}>
-                      <div className="flex items-center justify-between w-full">
-                        <span>{provider.name}</span>
+                      <div className="flex items-center justify-between w-full gap-2">
+                        <span className="text-xs sm:text-sm">{provider.name}</span>
                         {provider.fees && (
-                          <Badge variant="outline" className="ml-2">
+                          <Badge variant="outline" className="ml-2 text-[10px] sm:text-xs">
                             Fee: UGX {provider.fees.toLocaleString()}
                           </Badge>
                         )}
@@ -381,10 +384,10 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
 
           {/* Account Details */}
           {selectedProviderData && (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Account Number/ID</Label>
-                <div className="flex gap-2">
+                <Label className="text-xs sm:text-sm font-medium">Account Number/ID</Label>
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     placeholder={selectedProviderData.accountFormat}
                     value={accountNumber}
@@ -392,8 +395,13 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
                       setAccountNumber(e.target.value);
                       setCustomerInfo(null);
                     }}
+                    className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
                   />
-                  <Button onClick={handleAccountLookup} disabled={!accountNumber}>
+                  <Button 
+                    onClick={handleAccountLookup} 
+                    disabled={!accountNumber}
+                    className="w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10"
+                  >
                     Lookup
                   </Button>
                 </div>
@@ -401,12 +409,12 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
 
               {customerInfo && (
                 <Card className="border-green-200 bg-green-50">
-                  <CardContent className="p-4">
+                  <CardContent className="p-2.5 sm:p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      <span className="font-medium text-green-800">Account Found</span>
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                      <span className="text-xs sm:text-sm font-medium text-green-800">Account Found</span>
                     </div>
-                    <div className="space-y-1 text-sm">
+                    <div className="space-y-1 text-[10px] sm:text-xs md:text-sm">
                       <div><strong>Name:</strong> {customerInfo.name}</div>
                       {customerInfo.balance && (
                         <div><strong>Outstanding Balance:</strong> UGX {customerInfo.balance.toLocaleString()}</div>
@@ -423,16 +431,17 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
               )}
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Amount (UGX)</Label>
+                <Label className="text-xs sm:text-sm font-medium">Amount (UGX)</Label>
                 <Input
                   type="number"
                   placeholder={`Min: ${selectedProviderData.minAmount?.toLocaleString() || 'N/A'}`}
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
+                  className="text-xs sm:text-sm h-9 sm:h-10"
                 />
                 {selectedProviderData.minAmount && parseInt(amount) < selectedProviderData.minAmount && amount && (
-                  <div className="text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4" />
+                  <div className="text-[10px] sm:text-xs text-red-600 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                     Minimum amount: UGX {selectedProviderData.minAmount.toLocaleString()}
                   </div>
                 )}
@@ -443,30 +452,30 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
           {/* Payment Summary */}
           {selectedProviderData && amount && parseInt(amount) > 0 && (
             <Card className="border-blue-200 bg-blue-50">
-              <CardContent className="p-4">
-                <h4 className="font-medium mb-3">Payment Summary</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
+              <CardContent className="p-2.5 sm:p-4">
+                <h4 className="text-xs sm:text-sm font-medium mb-2 sm:mb-3">Payment Summary</h4>
+                <div className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs md:text-sm">
+                  <div className="flex justify-between items-center">
                     <span>Bill Amount:</span>
-                    <span>UGX {parseInt(amount).toLocaleString()}</span>
+                    <span className="font-medium">UGX {parseInt(amount).toLocaleString()}</span>
                   </div>
                   {selectedProviderData.fees && (
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span>Service Fee:</span>
-                      <span>UGX {selectedProviderData.fees.toLocaleString()}</span>
+                      <span className="font-medium">UGX {selectedProviderData.fees.toLocaleString()}</span>
                     </div>
                   )}
-                  <div className="border-t pt-2 flex justify-between font-medium">
+                  <div className="border-t pt-1.5 sm:pt-2 flex justify-between items-center font-medium">
                     <span>Total Amount:</span>
                     <span>UGX {getTotalAmount().toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-muted-foreground">
+                  <div className="flex justify-between items-center text-muted-foreground">
                     <span>Payment Source Balance:</span>
                     <span>UGX {balances[paymentSource].toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <span>Balance After Payment:</span>
-                    <span className={balances[paymentSource] - getTotalAmount() < 0 ? 'text-red-600' : 'text-green-600'}>
+                    <span className={`font-medium ${balances[paymentSource] - getTotalAmount() < 0 ? 'text-red-600' : 'text-green-600'}`}>
                       UGX {(balances[paymentSource] - getTotalAmount()).toLocaleString()}
                     </span>
                   </div>
@@ -476,8 +485,12 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
-            <Button variant="outline" onClick={onClose}>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4">
+            <Button 
+              variant="outline" 
+              onClick={onClose}
+              className="w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10"
+            >
               Cancel
             </Button>
             <Button
@@ -491,9 +504,19 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
                 getTotalAmount() > balances[paymentSource] ||
                 (selectedProviderData?.minAmount && parseInt(amount) < selectedProviderData.minAmount)
               }
-              className="flex-1"
+              className="flex-1 w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10"
             >
-              {isProcessing ? 'Processing...' : `Pay Bill - UGX ${getTotalAmount().toLocaleString()}`}
+              {isProcessing ? (
+                <>
+                  <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  Pay Bill - UGX {getTotalAmount().toLocaleString()}
+                </>
+              )}
             </Button>
           </div>
         </div>
