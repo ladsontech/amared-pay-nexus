@@ -71,11 +71,14 @@ const Collections = () => {
   const { hasPermission } = useAuth();
   const { collections, loading, error, fetchCollections } = useOrganization();
   const [linksLoading, setLinksLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
+  const [phoneInfoLoading, setPhoneInfoLoading] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchCollections();
+    fetchCollections({ status: statusFilter === "all" ? undefined : statusFilter, limit: 50 });
     fetchPaymentLinks();
-  }, [user?.organizationId]);
+  }, [user?.organizationId, statusFilter]);
 
   // Collections data is now provided by useOrganization hook
 
@@ -277,10 +280,18 @@ const Collections = () => {
   };
 
   const filteredCollections = collections.filter(
-    (collection) =>
-      collection.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (collection.phone_number && collection.phone_number.includes(searchTerm)) ||
-      collection.reference.toLowerCase().includes(searchTerm.toLowerCase())
+    (collection) => {
+      const matchesSearch = 
+        collection.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (collection.phone_number && collection.phone_number.includes(searchTerm)) ||
+        collection.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (collection.reason && collection.reason.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (collection.message && collection.message.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesStatus = statusFilter === "all" || collection.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    }
   );
 
   const filteredPaymentLinks = paymentLinks.filter(
@@ -648,11 +659,20 @@ const Collections = () => {
               className="pl-9 md:pl-10 h-9 md:h-10 text-xs md:text-sm"
             />
           </div>
+          {activeTab === "collections" && (
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-[180px] h-9 md:h-10 text-xs md:text-sm">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="successful">Successful</SelectItem>
+                <SelectItem value="failed">Failed</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-9 md:h-10 text-xs md:text-sm px-3">
-              <Filter className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-2" />
-              Filter
-            </Button>
             <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-9 md:h-10 text-xs md:text-sm px-3">
               <Download className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-2" />
               Export
@@ -690,14 +710,19 @@ const Collections = () => {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-0.5 md:mb-1">
-                          <h3 className="font-semibold text-xs md:text-sm sm:text-base truncate">{collection.id}</h3>
+                          <h3 className="font-semibold text-xs md:text-sm sm:text-base truncate">{collection.reference}</h3>
                           <Badge className={`${getStatusColor(collection.status)} text-[9px] md:text-xs w-fit`}>
-                            {collection.status}
+                            {collection.status || 'pending'}
                           </Badge>
                         </div>
                         <p className="text-[10px] md:text-xs sm:text-sm text-muted-foreground break-all line-clamp-1">
-                          {collection.phone_number || 'N/A'} • {collection.reference}
+                          {collection.phone_number || 'N/A'} • {collection.reason || 'No reason'}
                         </p>
+                        {collection.message && (
+                          <p className="text-[9px] md:text-xs text-muted-foreground line-clamp-1">
+                            {collection.message}
+                          </p>
+                        )}
                         <p className="text-[9px] md:text-xs text-muted-foreground">
                           {new Date(collection.created_at).toLocaleString()}
                         </p>
@@ -707,15 +732,125 @@ const Collections = () => {
                       <div className="text-sm md:text-lg font-bold">
                         UGX {(collection.amount / 1000).toFixed(0)}K
                       </div>
+                      {collection.charge > 0 && (
+                        <div className="text-[9px] md:text-xs text-muted-foreground">
+                          Charge: UGX {(collection.charge / 1000).toFixed(0)}K
+                        </div>
+                      )}
                       <div className="text-[9px] md:text-xs sm:text-sm text-muted-foreground capitalize">
                         {collection.status || 'pending'}
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedCollection(collection)}
+                        className="mt-1 h-6 text-[9px] md:text-xs"
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
+                        Details
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
+          
+          {/* Collection Details Dialog */}
+          <Dialog open={!!selectedCollection} onOpenChange={(open) => !open && setSelectedCollection(null)}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Collection Details</DialogTitle>
+              </DialogHeader>
+              {selectedCollection && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Reference</Label>
+                      <p className="font-medium">{selectedCollection.reference}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Status</Label>
+                      <Badge className={getStatusColor(selectedCollection.status)}>
+                        {selectedCollection.status || 'pending'}
+                      </Badge>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Amount</Label>
+                      <p className="font-medium">UGX {selectedCollection.amount.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Charge</Label>
+                      <p className="font-medium">UGX {selectedCollection.charge.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Phone Number</Label>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{selectedCollection.phone_number || 'N/A'}</p>
+                        {selectedCollection.phone_number && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={async () => {
+                              if (!selectedCollection.phone_number) return;
+                              setPhoneInfoLoading(selectedCollection.phone_number);
+                              try {
+                                const info = await paymentService.getPhoneNumberInfo(selectedCollection.phone_number);
+                                toast({
+                                  title: "Phone Number Info",
+                                  description: `${info.first_name} ${info.last_name}`,
+                                });
+                              } catch (error: any) {
+                                toast({
+                                  title: "Error",
+                                  description: error.message || "Failed to fetch phone number info",
+                                  variant: "destructive",
+                                });
+                              } finally {
+                                setPhoneInfoLoading(null);
+                              }
+                            }}
+                            disabled={phoneInfoLoading === selectedCollection.phone_number}
+                            className="h-6 text-xs"
+                          >
+                            {phoneInfoLoading === selectedCollection.phone_number ? "Loading..." : "Lookup"}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Created At</Label>
+                      <p className="font-medium">{new Date(selectedCollection.created_at).toLocaleString()}</p>
+                    </div>
+                    {selectedCollection.reason && (
+                      <div className="col-span-2">
+                        <Label className="text-xs text-muted-foreground">Reason</Label>
+                        <p className="font-medium">{selectedCollection.reason}</p>
+                      </div>
+                    )}
+                    {selectedCollection.message && (
+                      <div className="col-span-2">
+                        <Label className="text-xs text-muted-foreground">Message</Label>
+                        <p className="font-medium">{selectedCollection.message}</p>
+                      </div>
+                    )}
+                    {selectedCollection.organization && (
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Organization ID</Label>
+                        <p className="font-medium">{selectedCollection.organization}</p>
+                      </div>
+                    )}
+                    {selectedCollection.profit && (
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Profit ID</Label>
+                        <p className="font-medium">{selectedCollection.profit}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         ) : (
           <div className="space-y-4">
             {filteredPaymentLinks.map((link) => (

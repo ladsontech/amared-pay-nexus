@@ -174,7 +174,7 @@ export const useOrganization = () => {
   };
 
   // Fetch collections for current organization
-  const fetchCollections = async () => {
+  const fetchCollections = async (params?: { status?: string; limit?: number }) => {
     if (!user?.organizationId) return;
 
     setLoading(true);
@@ -183,7 +183,8 @@ export const useOrganization = () => {
     try {
       const response = await paymentService.getCollections({
         organization: user.organizationId,
-        limit: 20
+        status: params?.status,
+        limit: params?.limit || 50
       });
       setCollections(response.results);
     } catch (err) {

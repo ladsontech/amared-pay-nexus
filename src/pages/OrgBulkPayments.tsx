@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Search, Filter, Download, Eye, CreditCard, Upload, Trash2, Check, AlertCircle, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -434,10 +435,102 @@ const BulkPayments = () => {
                           Download Sheet
                         </Button>
                       )}
-                      <Button variant="outline" size="sm" className="w-full mt-2 text-xs sm:text-sm">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View Details
-                      </Button>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="w-full mt-2 text-xs sm:text-sm">
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Details
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle>Bulk Payment Details</DialogTitle>
+                            <DialogDescription>
+                              {payment.reference || `Bulk Payment ${payment.id.substring(0, 8)}`}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-xs text-muted-foreground">ID</Label>
+                                <p className="font-medium text-sm">{payment.id}</p>
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Status</Label>
+                                <Badge className={getStatusColor(payment.status)}>
+                                  {payment.status || 'Unknown'}
+                                </Badge>
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Organization</Label>
+                                <p className="font-medium text-sm">{payment.organization.name}</p>
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Currency</Label>
+                                <p className="font-medium text-sm">{payment.currency.symbol} ({payment.currency.name})</p>
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Total Amount</Label>
+                                <p className="font-medium text-sm">{payment.currency.symbol} {payment.total_amount.toLocaleString()}</p>
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Charge</Label>
+                                <p className="font-medium text-sm">{payment.currency.symbol} {payment.charge.toLocaleString()}</p>
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Reference</Label>
+                                <p className="font-medium text-sm">{payment.reference}</p>
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Approved</Label>
+                                <Badge className={payment.is_approved ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                                  {payment.is_approved ? "Yes" : "No"}
+                                </Badge>
+                              </div>
+                              {payment.comments && (
+                                <div className="col-span-2">
+                                  <Label className="text-xs text-muted-foreground">Comments</Label>
+                                  <p className="font-medium text-sm">{payment.comments}</p>
+                                </div>
+                              )}
+                              {payment.approved_by && (
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">Approved By</Label>
+                                  <p className="font-medium text-sm">{payment.approved_by}</p>
+                                </div>
+                              )}
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Created At</Label>
+                                <p className="font-medium text-sm">{new Date(payment.created_at).toLocaleString()}</p>
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Updated At</Label>
+                                <p className="font-medium text-sm">{new Date(payment.updated_at).toLocaleString()}</p>
+                              </div>
+                              {payment.profit && (
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">Profit ID</Label>
+                                  <p className="font-medium text-sm">{payment.profit.id}</p>
+                                </div>
+                              )}
+                              {payment.sheet && (
+                                <div className="col-span-2">
+                                  <Label className="text-xs text-muted-foreground">Sheet URL</Label>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => window.open(payment.sheet || '', '_blank')}
+                                    className="mt-1"
+                                  >
+                                    <Download className="h-4 w-4 mr-2" />
+                                    Open Sheet
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </CardContent>
                 </Card>

@@ -424,11 +424,16 @@ class PaymentService {
     first_name: string;
     last_name: string;
   }> {
-    return apiClient.get<{
-      phone_number: string;
-      first_name: string;
-      last_name: string;
-    }>(`/payments/mobile_money/phone_number_info/${phoneNumber}`);
+    try {
+      return await apiClient.get<{
+        phone_number: string;
+        first_name: string;
+        last_name: string;
+      }>(`/payments/mobile_money/phone_number_info/${encodeURIComponent(phoneNumber)}`);
+    } catch (error: any) {
+      console.error('Error fetching phone number info:', error);
+      throw new Error(error.message || 'Failed to fetch phone number information');
+    }
   }
 
   async getProfits(params?: QueryParams): Promise<PaginatedResponse<Profit>> {
