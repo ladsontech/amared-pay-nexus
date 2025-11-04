@@ -27,6 +27,7 @@ const OrganizationSettings = () => {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isSavingLogo, setIsSavingLogo] = useState(false);
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
@@ -255,15 +256,105 @@ const OrganizationSettings = () => {
                       }}
                     />
                     <div className="flex flex-col gap-2 flex-1 min-w-0">
-                      <Input
-                        type="url"
-                        value={formData.logo || ""}
-                        onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
-                        placeholder="https://example.com/logo.png"
-                        disabled={!isEditing}
-                        className="text-xs sm:text-sm"
-                      />
-                      <p className="text-[10px] sm:text-xs text-slate-500">Enter a direct link to your organization logo image</p>
+                      <div className="flex gap-2">
+                        <Input
+                          type="url"
+                          value={formData.logo || ""}
+                          onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
+                          onBlur={async () => {
+                            if (!isEditing || !organization) return;
+                            
+                            // Only save if logo changed
+                            if (formData.logo === (organization.logo || "")) {
+                              return;
+                            }
+
+                            setIsSavingLogo(true);
+                            try {
+                              await updateOrganization({
+                                logo: formData.logo.trim() || null,
+                              });
+                              toast({
+                                title: "Logo updated",
+                                description: "Organization logo has been updated successfully",
+                              });
+                              // Refresh to show new logo
+                              setTimeout(() => window.location.reload(), 500);
+                            } catch (error: any) {
+                              console.error("Logo update error:", error);
+                              toast({
+                                title: "Update failed",
+                                description: error.message || "Failed to update logo. Please check the URL format and try again.",
+                                variant: "destructive",
+                              });
+                              // Reset to original value on error
+                              setFormData({ ...formData, logo: organization.logo || "" });
+                            } finally {
+                              setIsSavingLogo(false);
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && isEditing) {
+                              e.currentTarget.blur();
+                            }
+                          }}
+                          placeholder="https://example.com/logo.png"
+                          disabled={!isEditing || isSavingLogo}
+                          className="text-xs sm:text-sm"
+                        />
+                        {isEditing && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={async () => {
+                              if (!organization) return;
+                              
+                              setIsSavingLogo(true);
+                              try {
+                                await updateOrganization({
+                                  logo: formData.logo.trim() || null,
+                                });
+                                toast({
+                                  title: "Logo updated",
+                                  description: "Organization logo has been updated successfully",
+                                });
+                                // Refresh to show new logo
+                                setTimeout(() => window.location.reload(), 500);
+                              } catch (error: any) {
+                                console.error("Logo update error:", error);
+                                toast({
+                                  title: "Update failed",
+                                  description: error.message || "Failed to update logo. Please check the URL format and try again.",
+                                  variant: "destructive",
+                                });
+                                // Reset to original value on error
+                                setFormData({ ...formData, logo: organization.logo || "" });
+                              } finally {
+                                setIsSavingLogo(false);
+                              }
+                            }}
+                            disabled={isSavingLogo || formData.logo === (organization.logo || "")}
+                            className="text-xs sm:text-sm"
+                          >
+                            {isSavingLogo ? (
+                              <>
+                                <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 animate-spin" />
+                                <span className="hidden sm:inline">Saving...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                <span className="hidden sm:inline">Save</span>
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                      <p className="text-[10px] sm:text-xs text-slate-500">
+                        {isEditing 
+                          ? "Enter a direct link to your organization logo image. Press Enter or click Save to update."
+                          : "Enter a direct link to your organization logo image"}
+                      </p>
                     </div>
                   </div>
                 </div>

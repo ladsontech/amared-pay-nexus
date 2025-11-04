@@ -21,7 +21,8 @@ import {
   Edit,
   Layout,
   Upload,
-  Sparkles
+  Sparkles,
+  Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
@@ -33,13 +34,16 @@ const OrgSettings = () => {
   const { user, hasPermission } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { organization, loading: orgLoading } = useOrganization();
+  const { organization, loading: orgLoading, updateOrganization } = useOrganization();
   
   const [profileSettings, setProfileSettings] = useState({
     name: user?.name || '',
     email: user?.email || '',
     department: user?.department || ''
   });
+
+  const [logoUrl, setLogoUrl] = useState<string>("");
+  const [isSavingLogo, setIsSavingLogo] = useState(false);
 
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
@@ -58,16 +62,25 @@ const OrgSettings = () => {
   const [expenseCategories, setExpenseCategories] = useState<Array<{id: number, name: string, description: string, budget: number}>>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
 
-  // Fetch profile settings on mount
-  useEffect(() => {
-    if (user) {
-      setProfileSettings({
-        name: user.name || '',
-        email: user.email || '',
-        department: user.department || ''
-      });
-    }
-  }, [user]);
+   // Fetch profile settings on mount
+   useEffect(() => {
+     if (user) {
+       setProfileSettings({
+         name: user.name || '',
+         email: user.email || '',
+         department: user.department || ''
+       });
+     }
+   }, [user]);
+
+   // Update logo URL when organization changes
+   useEffect(() => {
+     if (organization?.logo) {
+       setLogoUrl(organization.logo);
+     } else {
+       setLogoUrl("");
+     }
+   }, [organization?.logo]);
 
   // Fetch expense categories
   useEffect(() => {
@@ -528,45 +541,120 @@ const OrgSettings = () => {
                     />
                   </div>
                   <div className="flex-1 space-y-2 w-full">
-                    <Input
-                      type="url"
-                      value={user?.organization?.logo || ""}
-                      onChange={async (e) => {
-                        const logoUrl = e.target.value;
-                        const orgId = user?.organization?.id || user?.organizationId;
-                        if (!orgId) {
-                          toast({
-                            title: "Error",
-                            description: "Organization ID not found",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
+                    <div className="flex gap-2">
+                      <Input
+                        type="url"
+                        value={logoUrl}
+                        onChange={(e) => setLogoUrl(e.target.value)}
+                        onBlur={async () => {
+                          if (!organization) return;
+                          
+                          const orgId = user?.organization?.id || user?.organizationId;
+                          if (!orgId) {
+                            toast({
+                              title: "Error",
+                              description: "Organization ID not found",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
 
-                        try {
-                          await organizationService.updateOrganization(orgId, {
-                            logo: logoUrl || null,
-                          });
-                          toast({
-                            title: "Logo updated",
-                            description: "Organization logo has been updated successfully",
-                          });
-                          // Refresh page to show new logo
-                          window.location.reload();
-                        } catch (error: any) {
-                          console.error("Logo update error:", error);
-                          toast({
-                            title: "Update failed",
-                            description: error.message || "Failed to update logo. Please try again.",
-                            variant: "destructive",
-                          });
-                        }
-                      }}
-                      placeholder="https://example.com/logo.png"
-                      className="text-xs sm:text-sm"
-                    />
+                          // Only save if URL changed
+                          if (logoUrl === (organization.logo || "")) {
+                            return;
+                          }
+
+                          setIsSavingLogo(true);
+                          try {
+                            await updateOrganization({
+                              logo: logoUrl.trim() || null,
+                            });
+                            toast({
+                              title: "Logo updated",
+                              description: "Organization logo has been updated successfully",
+                            });
+                            // Refresh to show new logo
+                            setTimeout(() => window.location.reload(), 500);
+                          } catch (error: any) {
+                            console.error("Logo update error:", error);
+                            toast({
+                              title: "Update failed",
+                              description: error.message || "Failed to update logo. Please check the URL format and try again.",
+                              variant: "destructive",
+                            });
+                            // Reset to original value on error
+                            setLogoUrl(organization.logo || "");
+                          } finally {
+                            setIsSavingLogo(false);
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.currentTarget.blur();
+                          }
+                        }}
+                        disabled={isSavingLogo}
+                        placeholder="https://example.com/logo.png"
+                        className="text-xs sm:text-sm"
+                      />
+                      <Button
+                        type="button"
+                        onClick={async () => {
+                          if (!organization) return;
+                          
+                          const orgId = user?.organization?.id || user?.organizationId;
+                          if (!orgId) {
+                            toast({
+                              title: "Error",
+                              description: "Organization ID not found",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+
+                          setIsSavingLogo(true);
+                          try {
+                            await updateOrganization({
+                              logo: logoUrl.trim() || null,
+                            });
+                            toast({
+                              title: "Logo updated",
+                              description: "Organization logo has been updated successfully",
+                            });
+                            // Refresh to show new logo
+                            setTimeout(() => window.location.reload(), 500);
+                          } catch (error: any) {
+                            console.error("Logo update error:", error);
+                            toast({
+                              title: "Update failed",
+                              description: error.message || "Failed to update logo. Please check the URL format and try again.",
+                              variant: "destructive",
+                            });
+                            // Reset to original value on error
+                            setLogoUrl(organization.logo || "");
+                          } finally {
+                            setIsSavingLogo(false);
+                          }
+                        }}
+                        disabled={isSavingLogo || logoUrl === (organization?.logo || "")}
+                        size="sm"
+                        className="text-xs sm:text-sm"
+                      >
+                        {isSavingLogo ? (
+                          <>
+                            <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 animate-spin" />
+                            <span className="hidden sm:inline">Saving...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                            <span className="hidden sm:inline">Save</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
                     <p className="text-xs sm:text-sm text-muted-foreground">
-                      Enter a direct link to your organization logo image
+                      Enter a direct link to your organization logo image. Press Enter or click Save to update.
                     </p>
                   </div>
                 </div>
