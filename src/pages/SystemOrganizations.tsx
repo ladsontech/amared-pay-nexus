@@ -65,13 +65,11 @@ const SystemOrganizations = () => {
       const result = await organizationService.createOrganization(data);
       console.log('Organization created successfully:', result);
       
-      // Store the organization data for OTP verification
-      setPendingOrganization(data);
-      setOtpCode("");
+      // Store the organization data in localStorage for OTP verification page
+      localStorage.setItem("pendingOrganization", JSON.stringify(data));
       
-      // Close the create dialog and open OTP verification
+      // Close the create dialog
       setCreateOpen(false);
-      setOtpVerificationOpen(true);
       
       // Show info toast
       toast({ 
@@ -79,6 +77,9 @@ const SystemOrganizations = () => {
         description: `Please check your email (${data.email}) for the verification code to complete organization setup.`,
         duration: 8000
       });
+      
+      // Redirect to OTP verification page
+      navigate(`/verify-otp?email=${encodeURIComponent(data.email)}&type=organization&orgName=${encodeURIComponent(data.org_name)}`);
     } catch (error: any) {
       console.error('Create organization error:', error);
       toast({ 

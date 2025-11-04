@@ -24,32 +24,76 @@ const Login = () => {
     setAttemptCount(prev => prev + 1);
 
     try {
-      await login(identity, password);
-      toast({
-        title: "Welcome Back! 🎉",
-        description: "Login successful. Redirecting to your dashboard...",
-        className: "border-green-200 bg-green-50 text-green-800",
-      });
+      // Get email from identity (could be email or username)
+      const isEmail = identity.includes('@');
+      const email = isEmail ? identity : '';
       
-      // Smooth transition to dashboard - redirect based on user type
-      setTimeout(() => {
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
+      // If identity is username, we'll need to get email from login response
+      await login(identity, password);
+      
+      // Get user email from stored user data
+      const userStr = localStorage.getItem('user');
+      let userEmail = email;
+      
+      if (userStr) {
+        try {
           const user = JSON.parse(userStr);
-          // Super admins go to system admin page, regular users go to organization dashboard
-          if (user.isSuperuser === true || user.role === 'admin') {
-            console.log('Redirecting super admin to system dashboard', { isSuperuser: user.isSuperuser, role: user.role });
-            navigate('/system/organizations');
+          userEmail = user.email || email;
+        } catch (e) {
+          console.error('Error parsing user data:', e);
+        }
+      }
+
+      // If we don't have email yet, try to get it from identity or show error
+      if (!userEmail) {
+        toast({
+          title: "Email Required",
+          description: "Email address is required for verification. Please use your email to login.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Send OTP email for verification (using resend email OTP which is appropriate for verification)
+      const { otpService } = await import('@/services/otpService');
+      try {
+        // First try to send verification OTP via resend email OTP
+        // This endpoint is typically used for email verification scenarios
+        await otpService.resendEmailOTP({ email: userEmail });
+        toast({
+          title: "Verification Code Sent",
+          description: `Please check your email (${userEmail}) for the verification code to complete your login.`,
+          duration: 8000,
+        });
+        
+        // Redirect to OTP verification page
+        navigate(`/verify-otp?email=${encodeURIComponent(userEmail)}&type=login`);
+      } catch (otpError: any) {
+        console.error("Error sending OTP:", otpError);
+        // If OTP sending fails, still allow login but warn user
+        toast({
+          title: "Verification Code Not Sent",
+          description: otpError.message || "Could not send verification code. You may proceed but email verification is recommended.",
+          variant: "destructive",
+          duration: 5000,
+        });
+        
+        // Still redirect to dashboard but note that verification wasn't completed
+        setTimeout(() => {
+          const userStr = localStorage.getItem('user');
+          if (userStr) {
+            const user = JSON.parse(userStr);
+            if (user.isSuperuser === true || user.role === 'admin') {
+              navigate('/system/organizations');
+            } else {
+              navigate('/org/dashboard');
+            }
           } else {
-            // Regular organization users go to organization dashboard
-            console.log('Redirecting regular user to org dashboard', { isSuperuser: user.isSuperuser, role: user.role });
             navigate('/org/dashboard');
           }
-        } else {
-          // Fallback to org dashboard if user data not available
-          navigate('/org/dashboard');
-        }
-      }, 1000);
+        }, 1000);
+      }
     } catch (error) {
       console.error("Login error:", error);
       const errorMsg = error instanceof Error ? error.message : "Authentication failed. Please check your credentials.";

@@ -15,6 +15,7 @@ const OrganizationLayout = lazy(() => import("./components/OrganizationLayout"))
 
 // Pages (lazy)
 const Login = lazy(() => import("./pages/Login"));
+const VerifyOTP = lazy(() => import("./pages/VerifyOTP"));
 // Removed: SystemAnalytics
 const SystemOrganizations = lazy(() => import("./pages/SystemOrganizations"));
 const SystemOrganizationView = lazy(() => import("./pages/SystemOrganizationView"));
@@ -61,6 +62,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* Role Dashboard Aliases */}
