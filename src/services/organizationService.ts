@@ -852,12 +852,13 @@ class OrganizationService {
 
       const response = await fetch(`${API_BASE_URL}/organizations/wallet/?${queryParams}`, {
         method: "GET",
-        headers: this.getAuthHeaders(),
+        headers: this.getBasicAuthHeaders(),
+        mode: 'cors'
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
       }
 
       return await response.json();
@@ -871,12 +872,13 @@ class OrganizationService {
     try {
       const response = await fetch(`${API_BASE_URL}/organizations/wallet/${walletId}/`, {
         method: "GET",
-        headers: this.getAuthHeaders(),
+        headers: this.getBasicAuthHeaders(),
+        mode: 'cors'
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
       }
 
       return await response.json();
@@ -890,13 +892,14 @@ class OrganizationService {
     try {
       const response = await fetch(`${API_BASE_URL}/organizations/update_wallet/${walletId}/`, {
         method: "PUT",
-        headers: this.getAuthHeaders(),
+        headers: this.getBasicAuthHeaders(),
         body: JSON.stringify(walletData),
+        mode: 'cors'
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
       }
 
       return await response.json();
@@ -924,12 +927,13 @@ class OrganizationService {
 
       const response = await fetch(`${API_BASE_URL}/organizations/wallet_transaction/?${queryParams}`, {
         method: "GET",
-        headers: this.getAuthHeaders(),
+        headers: this.getBasicAuthHeaders(),
+        mode: 'cors'
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
       }
 
       return await response.json();
@@ -943,12 +947,13 @@ class OrganizationService {
     try {
       const response = await fetch(`${API_BASE_URL}/organizations/wallet_transaction/${transactionId}/`, {
         method: "GET",
-        headers: this.getAuthHeaders(),
+        headers: this.getBasicAuthHeaders(),
+        mode: 'cors'
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
       }
 
       return await response.json();

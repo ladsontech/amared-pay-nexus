@@ -15,13 +15,13 @@ import { Badge } from '@/components/ui/badge';
 const PayBills: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { organization, wallets } = useOrganization();
+  const { organization, wallets, fetchWallets, fetchPettyCashWallets, pettyCashWallets: hookPettyCashWallets } = useOrganization();
   const [billPayments, setBillPayments] = useState<BillPayment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [pettyCashWallets, setPettyCashWallets] = useState<any[]>([]);
+  const [walletsLoading, setWalletsLoading] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState<Omit<CreateBillPaymentRequest, 'organization' | 'currency'>>({
@@ -34,23 +34,26 @@ const PayBills: React.FC = () => {
     status: 'pending',
   });
 
-  // Fetch bill payments and petty cash wallets
+  // Fetch bill payments and refresh wallets
   useEffect(() => {
     fetchBillPayments();
-    fetchPettyCashWallets();
+    refreshWallets();
   }, [user?.organizationId, refreshKey]);
 
-  const fetchPettyCashWallets = async () => {
+  const refreshWallets = async () => {
     if (!user?.organizationId) return;
 
     try {
-      const response = await organizationService.getPettyCashWallets({
-        organization: user.organizationId,
-        limit: 10
-      });
-      setPettyCashWallets(response.results);
+      setWalletsLoading(true);
+      // Refresh both wallets and petty cash wallets
+      await Promise.all([
+        fetchWallets(),
+        fetchPettyCashWallets()
+      ]);
     } catch (error) {
-      console.error('Error fetching petty cash wallets:', error);
+      console.error('Error refreshing wallets:', error);
+    } finally {
+      setWalletsLoading(false);
     }
   };
 
@@ -93,7 +96,7 @@ const PayBills: React.FC = () => {
     if (formData.wallet_type === 'main_wallet') {
       selectedWallet = wallets.find(w => !w.petty_cash_wallet);
     } else {
-      selectedWallet = pettyCashWallets[0];
+      selectedWallet = hookPettyCashWallets[0];
     }
 
     if (!selectedWallet) {
@@ -151,6 +154,8 @@ const PayBills: React.FC = () => {
 
       setIsCreateDialogOpen(false);
       setRefreshKey(prev => prev + 1);
+      // Refresh wallets to get updated balances
+      await refreshWallets();
     } catch (error: any) {
       console.error('Error creating bill payment:', error);
       toast({
@@ -186,14 +191,15 @@ const PayBills: React.FC = () => {
     }
   };
 
-  // Get wallet balances
+  // Get wallet balances - use real API data
   const mainWallet = wallets.find(w => !w.petty_cash_wallet);
-  const pettyCashWallet = pettyCashWallets[0] || wallets.find(w => w.petty_cash_wallet !== null);
+  const pettyCashWallet = hookPettyCashWallets[0];
 
-  const mainBalance = mainWallet?.balance || 0;
-  const pettyCashBalance = pettyCashWallet?.balance || 0;
-  const mainCurrency = mainWallet?.currency?.symbol || 'UGX';
-  const pettyCurrency = pettyCashWallet?.currency?.symbol || 'UGX';
+  // Get balances from API - ensure we're using the actual balance values
+  const mainBalance = mainWallet?.balance ?? 0;
+  const pettyCashBalance = pettyCashWallet?.balance ?? 0;
+  const mainCurrency = mainWallet?.currency?.symbol || mainWallet?.currency?.name || 'UGX';
+  const pettyCurrency = pettyCashWallet?.currency?.symbol || pettyCashWallet?.currency?.name || 'UGX';
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -216,10 +222,19 @@ const PayBills: React.FC = () => {
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(mainBalance, mainCurrency)}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {mainWallet?.currency.name || 'N/A'}
-            </p>
+            {walletsLoading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold">{formatCurrency(mainBalance, mainCurrency)}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {mainWallet?.currency?.name || 'N/A'}
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
         <Card>
@@ -228,10 +243,19 @@ const PayBills: React.FC = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(pettyCashBalance, pettyCurrency)}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {pettyCashWallet?.currency.name || 'N/A'}
-            </p>
+            {walletsLoading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold">{formatCurrency(pettyCashBalance, pettyCurrency)}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {pettyCashWallet?.currency?.name || 'N/A'}
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -244,7 +268,10 @@ const PayBills: React.FC = () => {
               <CardTitle>Bill Payments</CardTitle>
               <CardDescription>View and manage your bill payment history</CardDescription>
             </div>
-            <Button variant="outline" size="sm" onClick={fetchBillPayments}>
+            <Button variant="outline" size="sm" onClick={async () => {
+              await fetchBillPayments();
+              await refreshWallets();
+            }}>
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
             </Button>

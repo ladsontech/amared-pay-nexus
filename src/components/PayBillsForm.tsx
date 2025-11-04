@@ -34,11 +34,18 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
       if (!user?.organizationId) return;
       
       try {
+        // Fetch main wallets
+        const walletsResponse = await organizationService.getWallets({
+          organization: user.organizationId,
+          limit: 10
+        });
+        
         // Fetch petty cash wallets
         const pettyCashResponse = await organizationService.getPettyCashWallets({
           organization: user.organizationId,
-          limit: 1
+          limit: 10
         });
+        
         setPettyCashWallets(pettyCashResponse.results);
       } catch (error) {
         console.error("Error fetching wallets:", error);
@@ -50,17 +57,38 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
     }
   }, [user?.organizationId, isOpen]);
 
+  // Get main wallet (non-petty cash wallet) - fetch directly from API
+  const [mainWallets, setMainWallets] = useState<any[]>([]);
+  
+  useEffect(() => {
+    const fetchMainWallets = async () => {
+      if (!user?.organizationId || !isOpen) return;
+      
+      try {
+        const response = await organizationService.getWallets({
+          organization: user.organizationId,
+          limit: 10
+        });
+        setMainWallets(response.results);
+      } catch (error) {
+        console.error("Error fetching main wallets:", error);
+      }
+    };
+
+    fetchMainWallets();
+  }, [user?.organizationId, isOpen]);
+
   // Get main wallet (non-petty cash wallet)
-  const mainWallet = wallets.find(w => !w.petty_cash_wallet);
+  const mainWallet = mainWallets.find(w => !w.petty_cash_wallet);
   const pettyCashWallet = pettyCashWallets[0];
 
-  // Get balances
-  const walletBalance = mainWallet?.balance || 0;
-  const pettyCashBalance = pettyCashWallet?.balance || 0;
+  // Get balances from API - ensure we're using real values
+  const walletBalance = mainWallet?.balance ?? 0;
+  const pettyCashBalance = pettyCashWallet?.balance ?? 0;
   const selectedBalance = paymentSource === "main_wallet" ? walletBalance : pettyCashBalance;
   const selectedCurrency = paymentSource === "main_wallet" 
-    ? (mainWallet?.currency?.symbol || "UGX")
-    : (pettyCashWallet?.currency?.symbol || "UGX");
+    ? (mainWallet?.currency?.symbol || mainWallet?.currency?.name || "UGX")
+    : (pettyCashWallet?.currency?.symbol || pettyCashWallet?.currency?.name || "UGX");
 
   const billTypes = [
     { 
@@ -134,7 +162,17 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
     if (!selectedWallet) {
       toast({
         title: "Error",
-        description: `No ${paymentSource === "main_wallet" ? "main" : "petty cash"} wallet found`,
+        description: `No ${paymentSource === "main_wallet" ? "main" : "petty cash"} wallet found. Please ensure your organization has a wallet set up.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate currency exists
+    if (!selectedWallet.currency || !selectedWallet.currency.id) {
+      toast({
+        title: "Error",
+        description: "Wallet currency information is missing",
         variant: "destructive",
       });
       return;
