@@ -59,8 +59,20 @@ const OrgSettings = () => {
     darkMode: false
   });
 
-  const [expenseCategories, setExpenseCategories] = useState<Array<{id: number, name: string, description: string, budget: number}>>([]);
+  const [expenseCategories, setExpenseCategories] = useState<Array<{id: string, name: string, description: string, budget: number, spent: number, count: number}>>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
+
+  // Category definitions based on API enum values
+  const categoryDefinitions: Record<string, { name: string; description: string }> = {
+    office_supplies: { name: 'Office Supplies', description: 'Stationery, equipment, and office materials' },
+    travel: { name: 'Travel', description: 'Business travel expenses and transportation' },
+    meals: { name: 'Meals', description: 'Food and dining expenses' },
+    entertainment: { name: 'Entertainment', description: 'Client meetings, events, and entertainment' },
+    utilities: { name: 'Utilities', description: 'Internet, phone, electricity, and other utilities' },
+    maintenance: { name: 'Maintenance', description: 'Office repairs and maintenance costs' },
+    emergency: { name: 'Emergency', description: 'Unexpected or emergency expenses' },
+    other: { name: 'Other', description: 'Other miscellaneous expenses' }
+  };
 
    // Fetch profile settings on mount
    useEffect(() => {
@@ -82,29 +94,96 @@ const OrgSettings = () => {
      }
    }, [organization?.logo]);
 
-  // Fetch expense categories
+  // Fetch expense categories from actual expenses
   useEffect(() => {
     const fetchCategories = async () => {
+      if (!user?.organizationId || !organization?.id) {
+        setLoadingCategories(false);
+        return;
+      }
+
       try {
         setLoadingCategories(true);
-        // Since there's no dedicated category endpoint, we'll use a default set
-        // In a real implementation, this would fetch from the backend
-        setExpenseCategories([
-          { id: 1, name: 'Office Supplies', description: 'Stationery, equipment, etc.', budget: 500000 },
-          { id: 2, name: 'Travel', description: 'Business travel expenses', budget: 1000000 },
-          { id: 3, name: 'Entertainment', description: 'Client meetings, events', budget: 300000 },
-          { id: 4, name: 'Maintenance', description: 'Office repairs and maintenance', budget: 200000 },
-          { id: 5, name: 'Utilities', description: 'Internet, phone, electricity', budget: 150000 }
-        ]);
+        
+        // First, get the organization's petty cash wallet to filter expenses
+        const wallets = await organizationService.getPettyCashWallets({
+          organization: organization.id,
+          limit: 10
+        });
+
+        // Fetch petty cash expenses for all wallets in the organization
+        const allExpenses: any[] = [];
+        for (const wallet of wallets.results) {
+          try {
+            const expenses = await organizationService.getPettyCashExpenses({
+              petty_cash_wallet: wallet.id,
+              limit: 1000, // Get a large number to calculate stats
+              offset: 0
+            });
+            allExpenses.push(...expenses.results);
+          } catch (err) {
+            console.warn(`Failed to fetch expenses for wallet ${wallet.id}:`, err);
+          }
+        }
+
+        // Group expenses by category and calculate totals
+        const categoryStats: Record<string, { spent: number; count: number }> = {};
+        
+        allExpenses.forEach((expense) => {
+          const category = expense.category || 'other';
+          if (!categoryStats[category]) {
+            categoryStats[category] = { spent: 0, count: 0 };
+          }
+          categoryStats[category].spent += expense.amount || 0;
+          categoryStats[category].count += 1;
+        });
+
+        // Build categories array from all available categories
+        const allCategories = Object.keys(categoryDefinitions).map((categoryKey, index) => {
+          const stats = categoryStats[categoryKey] || { spent: 0, count: 0 };
+          const def = categoryDefinitions[categoryKey];
+          
+          return {
+            id: categoryKey,
+            name: def.name,
+            description: def.description,
+            budget: 0, // Budgets would need a separate endpoint
+            spent: stats.spent,
+            count: stats.count
+          };
+        });
+
+        // Sort by spent amount (descending), then by name
+        allCategories.sort((a, b) => {
+          if (b.spent !== a.spent) return b.spent - a.spent;
+          return a.name.localeCompare(b.name);
+        });
+
+        setExpenseCategories(allCategories);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
+        toast({
+          title: "Error loading categories",
+          description: "Could not load expense categories. Showing default categories.",
+          variant: "destructive",
+        });
+        // Fallback to default categories based on enum values
+        const defaultCategories = Object.keys(categoryDefinitions).map((key, index) => ({
+          id: key,
+          name: categoryDefinitions[key].name,
+          description: categoryDefinitions[key].description,
+          budget: 0,
+          spent: 0,
+          count: 0
+        }));
+        setExpenseCategories(defaultCategories);
       } finally {
         setLoadingCategories(false);
       }
     };
 
     fetchCategories();
-  }, []);
+  }, [user?.organizationId, organization?.id, toast]);
 
   const handleSaveProfile = () => {
     // Profile updates would be handled via API in production
@@ -129,20 +208,16 @@ const OrgSettings = () => {
   };
 
   const handleAddCategory = () => {
-    const newCategory = {
-      id: Date.now(),
-      name: 'New Category',
-      description: 'Category description',
-      budget: 0
-    };
-    setExpenseCategories([...expenseCategories, newCategory]);
+    toast({
+      title: "Info",
+      description: "Categories are predefined based on expense types. You cannot add custom categories.",
+    });
   };
 
-  const handleDeleteCategory = (id: number) => {
-    setExpenseCategories(expenseCategories.filter(cat => cat.id !== id));
+  const handleDeleteCategory = (id: string) => {
     toast({
-      title: "Category deleted",
-      description: "The expense category has been removed.",
+      title: "Info",
+      description: "Categories are predefined and cannot be deleted. They are based on expense types used in petty cash.",
     });
   };
 
@@ -454,38 +529,68 @@ const OrgSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {expenseCategories.map((category) => (
-                  <div key={category.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 border border-slate-200 rounded-lg bg-white">
-                    <div className="flex-1 space-y-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                        <h3 className="font-medium text-sm sm:text-base truncate">{category.name}</h3>
-                        <Badge variant="outline" className="text-xs sm:text-sm w-fit">
-                          UGX {category.budget.toLocaleString()}
-                        </Badge>
+              {loadingCategories ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+                  <span className="ml-2 text-sm text-muted-foreground">Loading categories...</span>
+                </div>
+              ) : expenseCategories.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-muted-foreground">No expense categories found.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {expenseCategories.map((category) => (
+                    <div key={category.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 border border-slate-200 rounded-lg bg-white">
+                      <div className="flex-1 space-y-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                          <h3 className="font-medium text-sm sm:text-base truncate">{category.name}</h3>
+                          <div className="flex gap-2 flex-wrap">
+                            {category.spent > 0 && (
+                              <Badge variant="outline" className="text-xs sm:text-sm w-fit">
+                                Spent: UGX {category.spent.toLocaleString()}
+                              </Badge>
+                            )}
+                            {category.count > 0 && (
+                              <Badge variant="secondary" className="text-xs sm:text-sm w-fit">
+                                {category.count} {category.count === 1 ? 'expense' : 'expenses'}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-xs sm:text-sm text-muted-foreground">{category.description}</p>
                       </div>
-                      <p className="text-xs sm:text-sm text-muted-foreground">{category.description}</p>
+                      {hasPermission('manage_team') && (
+                        <div className="flex items-center gap-2 sm:space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3"
+                            onClick={() => {
+                              toast({
+                                title: "Info",
+                                description: "Category budgets are not yet supported by the API. Categories are automatically derived from expense types.",
+                              });
+                            }}
+                          >
+                            <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline ml-2">Edit</span>
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleDeleteCategory(category.id)}
+                            className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline ml-2">Delete</span>
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                    {hasPermission('manage_team') && (
-                      <div className="flex items-center gap-2 sm:space-x-2">
-                        <Button variant="ghost" size="sm" className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3">
-                          <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                          <span className="hidden sm:inline ml-2">Edit</span>
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => handleDeleteCategory(category.id)}
-                          className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                          <span className="hidden sm:inline ml-2">Delete</span>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
