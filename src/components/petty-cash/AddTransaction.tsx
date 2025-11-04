@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Receipt, Wallet, Plus } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { organizationService } from "@/services/organizationService";
 
 interface AddTransactionProps {
   currentBalance: number;
@@ -36,10 +38,53 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
   const [showNewCategoryDialog, setShowNewCategoryDialog] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState({
-    expense: ["Office Supplies", "Travel", "Meals", "Utilities", "Maintenance", "Emergency", "Other"],
+    expense: ["office_supplies", "travel", "meals", "entertainment", "utilities", "maintenance", "emergency", "other"],
     addition: ["Fund Addition", "Reimbursement", "Transfer", "Other"]
   });
+  const [pettyCashWallet, setPettyCashWallet] = useState<{ id: string; currency: { id: number; symbol?: string; name?: string } } | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Map category labels for display
+  const categoryLabels: Record<string, string> = {
+    office_supplies: "Office Supplies",
+    travel: "Travel",
+    meals: "Meals",
+    entertainment: "Entertainment",
+    utilities: "Utilities",
+    maintenance: "Maintenance",
+    emergency: "Emergency",
+    other: "Other"
+  };
+
+  useEffect(() => {
+    const fetchWallet = async () => {
+      if (!user?.organizationId) return;
+      
+      try {
+        const walletsResponse = await organizationService.getPettyCashWallets({
+          organization: user.organizationId,
+          limit: 1
+        });
+        
+        if (walletsResponse.results.length > 0) {
+          const wallet = walletsResponse.results[0];
+          setPettyCashWallet({
+            id: wallet.id,
+            currency: {
+              id: wallet.currency.id,
+              symbol: wallet.currency.symbol,
+              name: wallet.currency.name
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching petty cash wallet:", error);
+      }
+    };
+
+    fetchWallet();
+  }, [user?.organizationId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,19 +122,38 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
       return;
     }
 
+    if (!pettyCashWallet) {
+      toast({
+        title: "Error",
+        description: "Petty cash wallet not found. Please contact your administrator.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Submitted for Approval",
-        description: `${transactionType === "expense" ? "Expense" : "Funding"} request of UGX ${amount.toLocaleString()} has been submitted and is pending approval.`,
-      });
-
-      // Reset appropriate form
       if (transactionType === "expense") {
+        // Create expense
+        await organizationService.createPettyCashExpense({
+          petty_cash_wallet: pettyCashWallet.id,
+          currency: pettyCashWallet.currency.id,
+          amount: Math.round(amount), // Amount in integer format
+          category: expenseFormData.category as any,
+          description: expenseFormData.description,
+          receipt_number: expenseFormData.receipt || undefined,
+          requestor_name: expenseFormData.requestorName,
+          requestor_phone_number: expenseFormData.mobileNumber,
+          is_approved: false
+        });
+
+        toast({
+          title: "Expense Submitted",
+          description: `Expense request of ${pettyCashWallet.currency.symbol || 'UGX'} ${amount.toLocaleString()} has been submitted and is pending approval.`,
+        });
+
+        // Reset form
         setExpenseFormData({ 
           amount: "", 
           description: "", 
@@ -99,6 +163,24 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
           mobileNumber: "" 
         });
       } else {
+        // Create fund request
+        await organizationService.createPettyCashFundRequest({
+          petty_cash_wallet: pettyCashWallet.id,
+          currency: pettyCashWallet.currency.id,
+          amount: Math.round(amount), // Amount in integer format
+          urgency_level: fundingFormData.urgency as any,
+          reason: fundingFormData.reason,
+          requestor_name: fundingFormData.requestorName,
+          requestor_phone_number: fundingFormData.contact,
+          is_approved: false
+        });
+
+        toast({
+          title: "Funding Request Submitted",
+          description: `Funding request of ${pettyCashWallet.currency.symbol || 'UGX'} ${amount.toLocaleString()} has been submitted and is pending approval.`,
+        });
+
+        // Reset form
         setFundingFormData({
           amount: "",
           reason: "",
@@ -107,10 +189,11 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
           urgency: "normal"
         });
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error submitting request:", error);
       toast({
         title: "Submission Failed",
-        description: "Unable to submit request. Please try again.",
+        description: error.message || "Unable to submit request. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -219,7 +302,7 @@ const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionPro
                         <SelectContent>
                           {categories.expense.map((category) => (
                             <SelectItem key={category} value={category}>
-                              {category}
+                              {categoryLabels[category] || category}
                             </SelectItem>
                           ))}
                         </SelectContent>

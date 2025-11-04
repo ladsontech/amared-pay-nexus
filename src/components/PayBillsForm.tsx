@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Receipt, Wallet, DollarSign, Zap, Wifi, Droplets, Home } from "lucide-react";
+import { Receipt, Wallet, DollarSign, Zap, Wifi, Droplets } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useOrganization } from "@/hooks/useOrganization";
+import { organizationService } from "@/services/organizationService";
 
 interface PayBillsFormProps {
   isOpen: boolean;
@@ -16,15 +19,48 @@ interface PayBillsFormProps {
 
 const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { wallets } = useOrganization();
   const [selectedBill, setSelectedBill] = useState("");
   const [amount, setAmount] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
-  const [paymentSource, setPaymentSource] = useState<"wallet" | "petty_cash">("wallet");
+  const [paymentSource, setPaymentSource] = useState<"main_wallet" | "petty_cash_wallet">("main_wallet");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [pettyCashWallets, setPettyCashWallets] = useState<any[]>([]);
 
-  // Mock balances - in real app, these would come from context/API
-  const walletBalance = 12300000;
-  const pettyCashBalance = 850000;
+  // Fetch real wallet balances
+  useEffect(() => {
+    const fetchWallets = async () => {
+      if (!user?.organizationId) return;
+      
+      try {
+        // Fetch petty cash wallets
+        const pettyCashResponse = await organizationService.getPettyCashWallets({
+          organization: user.organizationId,
+          limit: 1
+        });
+        setPettyCashWallets(pettyCashResponse.results);
+      } catch (error) {
+        console.error("Error fetching wallets:", error);
+      }
+    };
+
+    if (isOpen) {
+      fetchWallets();
+    }
+  }, [user?.organizationId, isOpen]);
+
+  // Get main wallet (non-petty cash wallet)
+  const mainWallet = wallets.find(w => !w.petty_cash_wallet);
+  const pettyCashWallet = pettyCashWallets[0];
+
+  // Get balances
+  const walletBalance = mainWallet?.balance || 0;
+  const pettyCashBalance = pettyCashWallet?.balance || 0;
+  const selectedBalance = paymentSource === "main_wallet" ? walletBalance : pettyCashBalance;
+  const selectedCurrency = paymentSource === "main_wallet" 
+    ? (mainWallet?.currency?.symbol || "UGX")
+    : (pettyCashWallet?.currency?.symbol || "UGX");
 
   const billTypes = [
     { 
@@ -52,17 +88,16 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
       placeholder: "Enter customer number"
     },
     { 
-      id: "rent", 
-      name: "Rent", 
-      icon: Home, 
-      provider: "Property Management",
-      accountLabel: "Property ID",
-      placeholder: "Enter property ID"
+      id: "airtime", 
+      name: "Airtime", 
+      icon: Receipt, 
+      provider: "Mobile Network",
+      accountLabel: "Phone Number",
+      placeholder: "Enter phone number"
     }
   ];
 
   const selectedBillType = billTypes.find(bill => bill.id === selectedBill);
-  const selectedBalance = paymentSource === "wallet" ? walletBalance : pettyCashBalance;
   const canAfford = amount ? parseFloat(amount) <= selectedBalance : true;
   const remainingBalance = amount ? selectedBalance - parseFloat(amount) : selectedBalance;
 
@@ -76,10 +111,30 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
       return;
     }
 
+    if (!user?.organizationId) {
+      toast({
+        title: "Error",
+        description: "Organization ID not found",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!canAfford) {
       toast({
         title: "Insufficient Balance",
-        description: `Insufficient ${paymentSource === "wallet" ? "wallet" : "petty cash"} balance for this payment`,
+        description: `Insufficient ${paymentSource === "main_wallet" ? "wallet" : "petty cash"} balance for this payment`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Ensure we have the selected wallet
+    const selectedWallet = paymentSource === "main_wallet" ? mainWallet : pettyCashWallet;
+    if (!selectedWallet) {
+      toast({
+        title: "Error",
+        description: `No ${paymentSource === "main_wallet" ? "main" : "petty cash"} wallet found`,
         variant: "destructive",
       });
       return;
@@ -88,25 +143,35 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
     setIsProcessing(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create bill payment
+      await organizationService.createBillPayment({
+        organization: user.organizationId,
+        currency: selectedWallet.currency.id,
+        biller_name: selectedBillType?.provider || selectedBillType?.name || "Unknown",
+        account_number: accountNumber.trim(),
+        amount: Math.round(parseFloat(amount)),
+        type: selectedBill as "electricity" | "water" | "internet" | "airtime" | null,
+        wallet_type: paymentSource,
+        status: "pending",
+        reference: null
+      });
       
       toast({
-        title: "Bill Payment Successful",
-        description: `${selectedBillType?.name} bill of UGX ${parseFloat(amount).toLocaleString()} has been paid successfully`,
-        className: "border-green-200 bg-green-50 text-green-800",
+        title: "Bill Payment Submitted",
+        description: `${selectedBillType?.name} bill of ${selectedCurrency} ${parseFloat(amount).toLocaleString()} has been submitted successfully`,
       });
 
       // Reset form
       setSelectedBill("");
       setAmount("");
       setAccountNumber("");
-      setPaymentSource("wallet");
+      setPaymentSource("main_wallet");
       onClose();
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error creating bill payment:", error);
       toast({
         title: "Payment Failed",
-        description: "Unable to process bill payment. Please try again.",
+        description: error.message || "Unable to process bill payment. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -131,21 +196,21 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
           {/* Payment Source Selection */}
           <div>
             <Label className="text-sm font-medium">Payment Source *</Label>
-            <Select value={paymentSource} onValueChange={(value: "wallet" | "petty_cash") => setPaymentSource(value)}>
+            <Select value={paymentSource} onValueChange={(value: "main_wallet" | "petty_cash_wallet") => setPaymentSource(value)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select payment source" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="wallet">
+                <SelectItem value="main_wallet" disabled={!mainWallet}>
                   <div className="flex items-center gap-2">
                     <Wallet className="h-4 w-4 text-blue-600" />
-                    <span>Main Wallet - UGX {(walletBalance / 1000000).toFixed(1)}M</span>
+                    <span>Main Wallet - {mainWallet?.currency?.symbol || "UGX"} {walletBalance.toLocaleString()}</span>
                   </div>
                 </SelectItem>
-                <SelectItem value="petty_cash">
+                <SelectItem value="petty_cash_wallet" disabled={!pettyCashWallet}>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-green-600" />
-                    <span>Petty Cash - UGX {(pettyCashBalance / 1000).toFixed(0)}K</span>
+                    <span>Petty Cash - {pettyCashWallet?.currency?.symbol || "UGX"} {pettyCashBalance.toLocaleString()}</span>
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -179,13 +244,13 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
                 Available Balance:
               </span>
               <span className="font-bold text-blue-600">
-                UGX {selectedBalance.toLocaleString()}
+                {selectedCurrency} {selectedBalance.toLocaleString()}
               </span>
             </div>
             {amount && canAfford && (
               <div className="flex items-center justify-between text-sm mt-1 pt-1 border-t border-blue-200">
                 <span className="text-gray-700">Balance after payment:</span>
-                <span className="font-bold text-black">UGX {remainingBalance.toLocaleString()}</span>
+                <span className="font-bold text-black">{selectedCurrency} {remainingBalance.toLocaleString()}</span>
               </div>
             )}
           </div>
@@ -205,21 +270,22 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
 
           {/* Amount */}
           <div className="space-y-2">
-            <Label>Amount (UGX)</Label>
+            <Label>Amount ({selectedCurrency})</Label>
             <Input
               type="number"
               placeholder="Enter bill amount"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className="bg-white"
+              min={1}
             />
             {amount && !canAfford && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-2">
                 <p className="text-xs text-red-700 font-medium">
-                  ⚠️ Insufficient {paymentSource === "wallet" ? "wallet" : "petty cash"} balance
+                  ⚠️ Insufficient {paymentSource === "main_wallet" ? "wallet" : "petty cash"} balance
                 </p>
                 <p className="text-xs text-red-600">
-                  Available: UGX {selectedBalance.toLocaleString()} | Required: UGX {parseFloat(amount).toLocaleString()}
+                  Available: {selectedCurrency} {selectedBalance.toLocaleString()} | Required: {selectedCurrency} {parseFloat(amount).toLocaleString()}
                 </p>
               </div>
             )}
@@ -240,17 +306,17 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Amount:</span>
-                  <span className="font-bold text-black">UGX {parseFloat(amount).toLocaleString()}</span>
+                  <span className="font-bold text-black">{selectedCurrency} {parseFloat(amount).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Payment Source:</span>
                   <span className="font-medium text-black">
-                    {paymentSource === "wallet" ? "Main Wallet" : "Petty Cash"}
+                    {paymentSource === "main_wallet" ? "Main Wallet" : "Petty Cash"}
                   </span>
                 </div>
                 <div className="flex justify-between pt-1 border-t border-green-300">
                   <span className="text-gray-600">Remaining Balance:</span>
-                  <span className="font-bold text-green-700">UGX {remainingBalance.toLocaleString()}</span>
+                  <span className="font-bold text-green-700">{selectedCurrency} {remainingBalance.toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -272,7 +338,7 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
                 Processing...
               </div>
             ) : (
-              `Pay UGX ${amount ? parseFloat(amount).toLocaleString() : '0'}`
+              `Pay ${selectedCurrency} ${amount ? parseFloat(amount).toLocaleString() : '0'}`
             )}
           </Button>
         </DialogFooter>

@@ -21,6 +21,7 @@ const PayBills: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [pettyCashWallets, setPettyCashWallets] = useState<any[]>([]);
 
   // Form state
   const [formData, setFormData] = useState<Omit<CreateBillPaymentRequest, 'organization' | 'currency'>>({
@@ -33,10 +34,25 @@ const PayBills: React.FC = () => {
     status: 'pending',
   });
 
-  // Fetch bill payments
+  // Fetch bill payments and petty cash wallets
   useEffect(() => {
     fetchBillPayments();
+    fetchPettyCashWallets();
   }, [user?.organizationId, refreshKey]);
+
+  const fetchPettyCashWallets = async () => {
+    if (!user?.organizationId) return;
+
+    try {
+      const response = await organizationService.getPettyCashWallets({
+        organization: user.organizationId,
+        limit: 10
+      });
+      setPettyCashWallets(response.results);
+    } catch (error) {
+      console.error('Error fetching petty cash wallets:', error);
+    }
+  };
 
   const fetchBillPayments = async () => {
     if (!user?.organizationId) return;
@@ -73,11 +89,12 @@ const PayBills: React.FC = () => {
     }
 
     // Find the selected wallet
-    const selectedWallet = wallets.find(w => 
-      formData.wallet_type === 'main_wallet' 
-        ? !w.petty_cash_wallet 
-        : w.petty_cash_wallet !== null
-    );
+    let selectedWallet: any;
+    if (formData.wallet_type === 'main_wallet') {
+      selectedWallet = wallets.find(w => !w.petty_cash_wallet);
+    } else {
+      selectedWallet = pettyCashWallets[0];
+    }
 
     if (!selectedWallet) {
       toast({
@@ -93,7 +110,7 @@ const PayBills: React.FC = () => {
     if (formData.amount > balance) {
       toast({
         title: 'Insufficient Funds',
-        description: `Available balance: ${selectedWallet.currency.symbol} ${balance.toLocaleString()}`,
+        description: `Available balance: ${selectedWallet.currency?.symbol || 'UGX'} ${balance.toLocaleString()}`,
         variant: 'destructive',
       });
       return;
@@ -171,12 +188,12 @@ const PayBills: React.FC = () => {
 
   // Get wallet balances
   const mainWallet = wallets.find(w => !w.petty_cash_wallet);
-  const pettyCashWallet = wallets.find(w => w.petty_cash_wallet !== null);
+  const pettyCashWallet = pettyCashWallets[0] || wallets.find(w => w.petty_cash_wallet !== null);
 
   const mainBalance = mainWallet?.balance || 0;
   const pettyCashBalance = pettyCashWallet?.balance || 0;
-  const mainCurrency = mainWallet?.currency.symbol || 'UGX';
-  const pettyCurrency = pettyCashWallet?.currency.symbol || 'UGX';
+  const mainCurrency = mainWallet?.currency?.symbol || 'UGX';
+  const pettyCurrency = pettyCashWallet?.currency?.symbol || 'UGX';
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
