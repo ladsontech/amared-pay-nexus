@@ -6,6 +6,8 @@ import { Wallet, Plus, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/hooks/useOrganization";
+import { organizationService } from "@/services/organizationService";
+import { paymentService } from "@/services/paymentService";
 import AddTransaction from "@/components/petty-cash/AddTransaction";
 import TransactionHistory from "@/components/petty-cash/TransactionHistory";
 import PettyCashOverview from "@/components/petty-cash/PettyCashOverview";
@@ -14,11 +16,20 @@ import PendingApprovals from "@/components/petty-cash/PendingApprovals";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
 import { useSearchParams, Link } from "react-router-dom";
 import EnhancedPayBillsForm from "@/components/EnhancedPayBillsForm";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 const PettyCash = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") as string || "overview";
   const [activeTab, setActiveTab] = useState(initialTab);
   const [isPayBillsOpen, setIsPayBillsOpen] = useState(false);
+  const [isCreateWalletOpen, setIsCreateWalletOpen] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState<string>("");
+  const [currencies, setCurrencies] = useState<any[]>([]);
+  const [isCreatingWallet, setIsCreatingWallet] = useState(false);
+  const [isLoadingCurrencies, setIsLoadingCurrencies] = useState(false);
   const {
     toast
   } = useToast();
@@ -31,8 +42,10 @@ const PettyCash = () => {
     pettyCashTransactions,
     pettyCashExpenses,
     loading,
-    error
+    error,
+    fetchPettyCashWallets
   } = useOrganization();
+  const { user } = useAuth();
 
   // Calculate current balance from petty cash wallets
   const currentBalance = pettyCashWallets.reduce((sum, wallet) => sum + (wallet.balance || 0), 0);
@@ -55,6 +68,71 @@ const PettyCash = () => {
       return `${currency} ${(amount / 1000).toFixed(0)}K`;
     }
     return `${currency} ${amount.toLocaleString()}`;
+  };
+
+  // Load currencies when dialog opens
+  const handleOpenCreateWallet = async () => {
+    setIsCreateWalletOpen(true);
+    setIsLoadingCurrencies(true);
+    try {
+      const currenciesResponse = await paymentService.getCurrencies();
+      setCurrencies(currenciesResponse.results || []);
+      // Set default currency if main wallet exists
+      if (mainWallet?.currency?.id) {
+        setSelectedCurrency(mainWallet.currency.id.toString());
+      }
+    } catch (error) {
+      console.error("Error loading currencies:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load currencies. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingCurrencies(false);
+    }
+  };
+
+  // Create petty cash wallet
+  const handleCreateWallet = async () => {
+    if (!selectedCurrency || !user?.organizationId) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a currency",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCreatingWallet(true);
+    try {
+      await organizationService.createPettyCashWallet({
+        organization: user.organizationId,
+        currency: parseInt(selectedCurrency),
+        updated_by: user.id,
+        balance: 0
+      });
+
+      toast({
+        title: "Success",
+        description: "Petty cash wallet created successfully",
+      });
+
+      // Refresh petty cash wallets
+      await fetchPettyCashWallets();
+      
+      setIsCreateWalletOpen(false);
+      setSelectedCurrency("");
+    } catch (error: any) {
+      console.error("Error creating petty cash wallet:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create petty cash wallet. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingWallet(false);
+    }
   };
 
   // Debug logging
@@ -287,13 +365,27 @@ const PettyCash = () => {
                       <>
                         <p className="text-base md:text-2xl font-bold text-gray-400 mt-0.5 md:mt-1">No Wallet</p>
                         <p className="text-[9px] md:text-xs text-gray-500 mt-0.5">Not configured</p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-2 text-xs"
+                          onClick={handleOpenCreateWallet}
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          Create Wallet
+                        </Button>
                       </>
                     )}
                   </CardContent>
                 </Card>
               </div>
               
-              <Button onClick={() => setIsPayBillsOpen(true)} className="w-full h-10 md:h-12 text-sm md:text-base" size="lg">
+              <Button 
+                onClick={() => setIsPayBillsOpen(true)} 
+                className="w-full h-10 md:h-12 text-sm md:text-base" 
+                size="lg"
+                disabled={!mainWallet && !pettyCashWallet}
+              >
                 <FileText className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
                 Start Bill Payment
               </Button>
@@ -322,6 +414,75 @@ const PettyCash = () => {
 
       {/* Pay Bills Modal */}
       <EnhancedPayBillsForm isOpen={isPayBillsOpen} onClose={() => setIsPayBillsOpen(false)} />
+
+      {/* Create Petty Cash Wallet Dialog */}
+      <Dialog open={isCreateWalletOpen} onOpenChange={setIsCreateWalletOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create Petty Cash Wallet</DialogTitle>
+            <DialogDescription>
+              Create a new petty cash wallet for your organization. This wallet will be used for petty cash transactions.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="currency">Currency *</Label>
+              {isLoadingCurrencies ? (
+                <div className="flex items-center gap-2 py-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm text-gray-600">Loading currencies...</span>
+                </div>
+              ) : (
+                <Select value={selectedCurrency} onValueChange={setSelectedCurrency}>
+                  <SelectTrigger id="currency">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currencies.map((currency) => (
+                      <SelectItem key={currency.id} value={currency.id.toString()}>
+                        {currency.symbol} - {currency.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              <p className="text-xs text-gray-500">
+                Select the currency for this petty cash wallet. This should typically match your main wallet currency.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsCreateWalletOpen(false);
+                setSelectedCurrency("");
+              }}
+              disabled={isCreatingWallet}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateWallet}
+              disabled={isCreatingWallet || !selectedCurrency || isLoadingCurrencies}
+            >
+              {isCreatingWallet ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Wallet
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>;
 };
 export default PettyCash;

@@ -1261,6 +1261,82 @@ class OrganizationService {
   }
 
   // Petty Cash Wallet Management
+  async createPettyCashWallet(walletData: {
+    organization: string | { id: string; name?: string; address?: string; company_reg_id?: string; tin?: string; static_collection_link?: string };
+    currency: number | { id: number; name?: string; symbol?: string };
+    updated_by?: string | { id: string; username?: string; first_name?: string; last_name?: string; email?: string; phone_number?: string; groups?: string[]; is_email_verified?: boolean; is_phone_verified?: boolean };
+    balance?: number | null;
+  }): Promise<PettyCashWallet> {
+    try {
+      // Format request body
+      const requestBody: any = {};
+
+      // Handle organization - send ID if string, or object if provided
+      if (typeof walletData.organization === 'string') {
+        requestBody.organization = walletData.organization;
+      } else {
+        requestBody.organization = walletData.organization.id || walletData.organization;
+      }
+
+      // Handle currency - send ID if number, or object if provided
+      if (typeof walletData.currency === 'number') {
+        requestBody.currency = walletData.currency;
+      } else {
+        requestBody.currency = walletData.currency.id || walletData.currency;
+      }
+
+      // Handle updated_by if provided
+      if (walletData.updated_by) {
+        if (typeof walletData.updated_by === 'string') {
+          requestBody.updated_by = walletData.updated_by;
+        } else {
+          requestBody.updated_by = walletData.updated_by.id || walletData.updated_by;
+        }
+      }
+
+      // Add balance if provided
+      if (walletData.balance !== undefined) {
+        requestBody.balance = walletData.balance;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/organizations/petty_cash_wallet/`, {
+        method: "POST",
+        headers: this.getBasicAuthHeaders(),
+        body: JSON.stringify(requestBody),
+        mode: 'cors'
+      });
+
+      await this.handleResponse(response);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = "";
+        try {
+          const errorData = JSON.parse(errorText);
+          if (typeof errorData === 'object' && !errorData.message) {
+            const errors = Object.entries(errorData)
+              .map(([key, value]) => {
+                const fieldName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `${fieldName}: ${Array.isArray(value) ? value.join(', ') : value}`;
+              })
+              .join('; ');
+            errorMessage = errors || errorText;
+          } else {
+            errorMessage = errorData.message || errorData.detail || errorText;
+          }
+        } catch {
+          errorMessage = errorText || `HTTP error! status: ${response.status}`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Create petty cash wallet error:", error);
+      throw error;
+    }
+  }
+
   async getPettyCashWallets(params?: {
     organization?: string;
     currency?: string;
