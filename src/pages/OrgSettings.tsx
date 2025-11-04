@@ -28,7 +28,6 @@ import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
 import { useNavigate } from "react-router-dom";
 import { organizationService } from "@/services/organizationService";
 import { useOrganization } from "@/hooks/useOrganization";
-import { userService } from "@/services/userService";
 
 const OrgSettings = () => {
   const { user, hasPermission } = useAuth();
