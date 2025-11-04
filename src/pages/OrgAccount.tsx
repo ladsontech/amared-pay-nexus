@@ -112,9 +112,9 @@ export default function OrgAccount() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-20 md:pb-0">
+    <div className="w-full space-y-4 sm:space-y-6 pb-20 md:pb-0 min-w-0">
       {/* Mobile Header */}
-      <div className="md:hidden bg-white border-b border-gray-100 -mx-6 px-6 py-4 mb-4">
+      <div className="md:hidden bg-white border-b border-gray-100 -mx-3 sm:-mx-4 md:mx-0 px-3 sm:px-4 md:px-0 py-4 mb-4 sticky top-0 z-10">
         <h1 className="text-xl font-bold text-black">Account Settings</h1>
         <p className="text-sm text-gray-600">Manage your account and organization</p>
       </div>
