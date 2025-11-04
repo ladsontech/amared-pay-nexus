@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,18 +27,19 @@ import { useToast } from "@/hooks/use-toast";
 import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
 import { useNavigate } from "react-router-dom";
 import { organizationService } from "@/services/organizationService";
+import { useOrganization } from "@/hooks/useOrganization";
+import { userService } from "@/services/userService";
 
 const OrgSettings = () => {
   const { user, hasPermission } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { organization, loading: orgLoading } = useOrganization();
   
   const [profileSettings, setProfileSettings] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    department: user?.department || '',
-    phone: '+256 700 123 456',
-    bio: 'Financial manager with 5+ years experience'
+    department: user?.department || ''
   });
 
   const [notificationSettings, setNotificationSettings] = useState({
@@ -55,15 +56,46 @@ const OrgSettings = () => {
     darkMode: false
   });
 
-  const [expenseCategories, setExpenseCategories] = useState([
-    { id: 1, name: 'Office Supplies', description: 'Stationery, equipment, etc.', budget: 500000 },
-    { id: 2, name: 'Travel', description: 'Business travel expenses', budget: 1000000 },
-    { id: 3, name: 'Entertainment', description: 'Client meetings, events', budget: 300000 },
-    { id: 4, name: 'Maintenance', description: 'Office repairs and maintenance', budget: 200000 },
-    { id: 5, name: 'Utilities', description: 'Internet, phone, electricity', budget: 150000 }
-  ]);
+  const [expenseCategories, setExpenseCategories] = useState<Array<{id: number, name: string, description: string, budget: number}>>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  // Fetch profile settings on mount
+  useEffect(() => {
+    if (user) {
+      setProfileSettings({
+        name: user.name || '',
+        email: user.email || '',
+        department: user.department || ''
+      });
+    }
+  }, [user]);
+
+  // Fetch expense categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        // Since there's no dedicated category endpoint, we'll use a default set
+        // In a real implementation, this would fetch from the backend
+        setExpenseCategories([
+          { id: 1, name: 'Office Supplies', description: 'Stationery, equipment, etc.', budget: 500000 },
+          { id: 2, name: 'Travel', description: 'Business travel expenses', budget: 1000000 },
+          { id: 3, name: 'Entertainment', description: 'Client meetings, events', budget: 300000 },
+          { id: 4, name: 'Maintenance', description: 'Office repairs and maintenance', budget: 200000 },
+          { id: 5, name: 'Utilities', description: 'Internet, phone, electricity', budget: 150000 }
+        ]);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleSaveProfile = () => {
+    // Profile updates would be handled via API in production
     toast({
       title: "Profile updated",
       description: "Your profile settings have been saved successfully.",
@@ -182,25 +214,14 @@ const OrgSettings = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-xs sm:text-sm">Phone Number</Label>
+                  <Label htmlFor="role" className="text-xs sm:text-sm">Role</Label>
                   <Input
-                    id="phone"
-                    value={profileSettings.phone}
-                    onChange={(e) => setProfileSettings({...profileSettings, phone: e.target.value})}
+                    id="role"
+                    value={user?.role || 'N/A'}
+                    disabled
                     className="text-sm"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="bio" className="text-xs sm:text-sm">Bio</Label>
-                <Textarea
-                  id="bio"
-                  value={profileSettings.bio}
-                  onChange={(e) => setProfileSettings({...profileSettings, bio: e.target.value})}
-                  rows={3}
-                  className="text-sm"
-                />
               </div>
 
               <div className="flex justify-end">
@@ -555,61 +576,65 @@ const OrgSettings = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label className="text-xs sm:text-sm">Organization Name</Label>
-                  <Input value={user?.organization?.name || 'Tech Solutions Ltd'} disabled className="text-sm" />
+                  <Input value={organization?.name || 'Loading...'} disabled className="text-sm" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-xs sm:text-sm">Organization ID</Label>
-                  <Input value={user?.organizationId || 'ORG-001'} disabled className="text-sm" />
+                  <Input value={user?.organizationId || 'Loading...'} disabled className="text-sm" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Default Currency</Label>
-                  <Select defaultValue="UGX" disabled={!hasPermission('manage_team')}>
-                    <SelectTrigger className="text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="UGX">UGX - Ugandan Shilling</SelectItem>
-                      <SelectItem value="USD">USD - US Dollar</SelectItem>
-                      <SelectItem value="EUR">EUR - Euro</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-xs sm:text-sm">Company Registration ID</Label>
+                  <Input value={organization?.company_reg_id || 'Not set'} disabled className="text-sm" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Time Zone</Label>
-                  <Select defaultValue="Africa/Kampala" disabled={!hasPermission('manage_team')}>
-                    <SelectTrigger className="text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Africa/Kampala">Africa/Kampala</SelectItem>
-                      <SelectItem value="UTC">UTC</SelectItem>
-                      <SelectItem value="America/New_York">America/New_York</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-xs sm:text-sm">Tax ID (TIN)</Label>
+                  <Input value={organization?.tin || 'Not set'} disabled className="text-sm" />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label className="text-xs sm:text-sm">Organization Address</Label>
                 <Textarea
-                  value="123 Business District, Kampala, Uganda"
-                  disabled={!hasPermission('manage_team')}
+                  value={organization?.address || 'Not set'}
+                  disabled
                   rows={3}
                   className="text-sm"
                 />
               </div>
-
-              {hasPermission('manage_team') && (
-                <div className="flex justify-end">
-                  <Button>
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Organization Settings
-                  </Button>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs sm:text-sm">Created On</Label>
+                  <Input 
+                    value={organization?.created_at ? new Date(organization.created_at).toLocaleDateString() : 'N/A'} 
+                    disabled 
+                    className="text-sm" 
+                  />
                 </div>
-              )}
+                <div className="space-y-2">
+                  <Label className="text-xs sm:text-sm">Last Updated</Label>
+                  <Input 
+                    value={organization?.updated_at ? new Date(organization.updated_at).toLocaleDateString() : 'N/A'} 
+                    disabled 
+                    className="text-sm" 
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center pt-4 border-t">
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  To update organization details, visit the Organization tab
+                </p>
+                {hasPermission('manage_team') && (
+                  <Button onClick={() => navigate('/org/settings')} variant="outline">
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Details
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

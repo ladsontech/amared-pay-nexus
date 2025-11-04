@@ -699,65 +699,66 @@ const Collections = () => {
             ))}
           </div>
         ) : activeTab === "collections" ? (
-          <div className="space-y-2 md:space-y-4 px-2 md:px-0">
-            {filteredCollections.map((collection) => (
-              <Card key={collection.id} className="hover:shadow-lg transition-shadow bg-white border border-gray-100 shadow-sm">
-                <CardContent className="p-2.5 md:p-4 lg:p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-4">
-                    <div className="flex items-start space-x-2 md:space-x-3 sm:space-x-4 min-w-0 flex-1">
-                      <div className="w-8 h-8 md:w-10 md:h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Smartphone className="h-3.5 w-3.5 md:h-5 md:w-5 sm:h-6 sm:w-6 text-blue-600" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-0.5 md:mb-1">
-                          <h3 className="font-semibold text-xs md:text-sm sm:text-base truncate">{collection.reference}</h3>
-                          <Badge className={`${getStatusColor(collection.status)} text-[9px] md:text-xs w-fit`}>
-                            {collection.status || 'pending'}
-                          </Badge>
+          <>
+            <div className="space-y-2 md:space-y-4 px-2 md:px-0">
+              {filteredCollections.map((collection) => (
+                <Card key={collection.id} className="hover:shadow-lg transition-shadow bg-white border border-gray-100 shadow-sm">
+                  <CardContent className="p-2.5 md:p-4 lg:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-4">
+                      <div className="flex items-start space-x-2 md:space-x-3 sm:space-x-4 min-w-0 flex-1">
+                        <div className="w-8 h-8 md:w-10 md:h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Smartphone className="h-3.5 w-3.5 md:h-5 md:w-5 sm:h-6 sm:w-6 text-blue-600" />
                         </div>
-                        <p className="text-[10px] md:text-xs sm:text-sm text-muted-foreground break-all line-clamp-1">
-                          {collection.phone_number || 'N/A'} • {collection.reason || 'No reason'}
-                        </p>
-                        {collection.message && (
-                          <p className="text-[9px] md:text-xs text-muted-foreground line-clamp-1">
-                            {collection.message}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-0.5 md:mb-1">
+                            <h3 className="font-semibold text-xs md:text-sm sm:text-base truncate">{collection.reference}</h3>
+                            <Badge className={`${getStatusColor(collection.status)} text-[9px] md:text-xs w-fit`}>
+                              {collection.status || 'pending'}
+                            </Badge>
+                          </div>
+                          <p className="text-[10px] md:text-xs sm:text-sm text-muted-foreground break-all line-clamp-1">
+                            {collection.phone_number || 'N/A'} • {collection.reason || 'No reason'}
                           </p>
-                        )}
-                        <p className="text-[9px] md:text-xs text-muted-foreground">
-                          {new Date(collection.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-left sm:text-right flex-shrink-0">
-                      <div className="text-sm md:text-lg font-bold">
-                        UGX {(collection.amount / 1000).toFixed(0)}K
-                      </div>
-                      {collection.charge > 0 && (
-                        <div className="text-[9px] md:text-xs text-muted-foreground">
-                          Charge: UGX {(collection.charge / 1000).toFixed(0)}K
+                          {collection.message && (
+                            <p className="text-[9px] md:text-xs text-muted-foreground line-clamp-1">
+                              {collection.message}
+                            </p>
+                          )}
+                          <p className="text-[9px] md:text-xs text-muted-foreground">
+                            {new Date(collection.created_at).toLocaleString()}
+                          </p>
                         </div>
-                      )}
-                      <div className="text-[9px] md:text-xs sm:text-sm text-muted-foreground capitalize">
-                        {collection.status || 'pending'}
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedCollection(collection)}
-                        className="mt-1 h-6 text-[9px] md:text-xs"
-                      >
-                        <Eye className="h-3 w-3 mr-1" />
-                        Details
-                      </Button>
+                      <div className="text-left sm:text-right flex-shrink-0">
+                        <div className="text-sm md:text-lg font-bold">
+                          UGX {(collection.amount / 1000).toFixed(0)}K
+                        </div>
+                        {collection.charge > 0 && (
+                          <div className="text-[9px] md:text-xs text-muted-foreground">
+                            Charge: UGX {(collection.charge / 1000).toFixed(0)}K
+                          </div>
+                        )}
+                        <div className="text-[9px] md:text-xs sm:text-sm text-muted-foreground capitalize">
+                          {collection.status || 'pending'}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedCollection(collection)}
+                          className="mt-1 h-6 text-[9px] md:text-xs"
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
+                          Details
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          
-          {/* Collection Details Dialog */}
-          <Dialog open={!!selectedCollection} onOpenChange={(open) => !open && setSelectedCollection(null)}>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            {/* Collection Details Dialog */}
+            <Dialog open={!!selectedCollection} onOpenChange={(open) => !open && setSelectedCollection(null)}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Collection Details</DialogTitle>
@@ -851,6 +852,7 @@ const Collections = () => {
               )}
             </DialogContent>
           </Dialog>
+          </>
         ) : (
           <div className="space-y-4">
             {filteredPaymentLinks.map((link) => (

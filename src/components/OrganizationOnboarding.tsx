@@ -18,7 +18,8 @@ import {
   Hash,
   MapPin,
   Loader2,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Upload
 } from "lucide-react";
 import { organizationService } from "@/services/organizationService";
 import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
