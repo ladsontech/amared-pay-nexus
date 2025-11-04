@@ -1,4 +1,5 @@
 import { API_CONFIG } from './api-config';
+import { handleTokenExpiration } from '@/utils/apiHelper';
 
 export interface ApiError extends Error {
   status?: number;
@@ -39,6 +40,9 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
+  // Check for token expiration first (401 status)
+  await handleTokenExpiration(response);
+  
   const contentType = response.headers.get('content-type') || '';
   const isJson = contentType.includes('application/json');
   if (!response.ok) {

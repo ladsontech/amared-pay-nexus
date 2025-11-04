@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthState, Permission, rolePermissions, UserRole } from '@/types/auth';
 import { authService } from '@/services/authService';
 import { userService } from '@/services/userService';
+import { setLogoutCallback } from '@/utils/apiHelper';
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -38,7 +39,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.getItem('impersonating') === 'true'
   );
 
+  const logout = async () => {
+    // If impersonating, return to admin dashboard
+    if (originalAdmin || localStorage.getItem('impersonating') === 'true') {
+      stopImpersonating();
+      return;
+    }
+    await authService.logout();
+    setAuthState({
+      user: null,
+      isAuthenticated: false,
+      loading: false,
+    });
+  };
+
   useEffect(() => {
+    // Register logout callback for automatic token expiration handling
+    setLogoutCallback(async () => {
+      await logout();
+    });
+
     // Load user from localStorage
     const storedUser = localStorage.getItem('user');
     const isImpersonating = localStorage.getItem('impersonating') === 'true';
@@ -373,20 +393,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Error setting impersonation state:', error);
       throw new Error(`Failed to set impersonation state: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  };
-
-  const logout = async () => {
-    // If impersonating, return to admin dashboard
-    if (originalAdmin || localStorage.getItem('impersonating') === 'true') {
-      stopImpersonating();
-      return;
-    }
-    await authService.logout();
-    setAuthState({
-      user: null,
-      isAuthenticated: false,
-      loading: false,
-    });
   };
 
   const changePassword = async (currentPassword: string, newPassword: string) => {

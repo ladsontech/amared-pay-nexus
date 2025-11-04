@@ -1,3 +1,5 @@
+import { handleTokenExpiration } from '@/utils/apiHelper';
+
 const API_BASE_URL = "https://bulksrv.almaredagencyuganda.com";
 
 // Types based on the API documentation
@@ -381,6 +383,19 @@ export interface VerifyOTPRequest {
 }
 
 class OrganizationService {
+  /**
+   * Helper method to handle fetch responses and check for token expiration
+   */
+  private async handleResponse(response: Response): Promise<Response> {
+    // Check for token expiration first
+    const tokenExpired = await handleTokenExpiration(response);
+    if (tokenExpired) {
+      // User will be logged out and redirected, throw a specific error
+      throw new Error('Session expired. Please log in again.');
+    }
+    return response;
+  }
+
   private getAuthHeaders() {
     const accessToken = localStorage.getItem("access_token");
     const headers: Record<string, string> = { 
@@ -503,9 +518,13 @@ class OrganizationService {
         method: "POST",
         headers: this.getAuthHeaders(),
         body: JSON.stringify(payload),
+        mode: 'cors'
       });
 
       console.log('Staff addition response status:', response.status);
+
+      // Check for token expiration
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -573,7 +592,10 @@ class OrganizationService {
         method: "PUT",
         headers: this.getAuthHeaders(),
         body: JSON.stringify(roleData),
+        mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -592,7 +614,10 @@ class OrganizationService {
       const response = await fetch(`${API_BASE_URL}/organizations/change_staff/${staffId}/`, {
         method: "DELETE",
         headers: this.getAuthHeaders(),
+        mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -622,7 +647,10 @@ class OrganizationService {
       const response = await fetch(`${API_BASE_URL}/organizations/staff/?${queryParams}`, {
         method: "GET",
         headers: this.getAuthHeaders(),
+        mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -641,7 +669,10 @@ class OrganizationService {
       const response = await fetch(`${API_BASE_URL}/organizations/staff/${staffId}/`, {
         method: "GET",
         headers: this.getAuthHeaders(),
+        mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -666,7 +697,10 @@ class OrganizationService {
         method: "POST",
         headers: this.getAuthHeaders(),
         body: JSON.stringify(orgData),
+        mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -733,7 +767,11 @@ class OrganizationService {
       const response = await fetch(url, {
         method: "GET",
         headers: this.getAuthHeaders(),
+        mode: 'cors'
       });
+
+      // Check for token expiration
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -746,8 +784,6 @@ class OrganizationService {
           // If response is HTML or not JSON
           if (errorText.includes('<!DOCTYPE html>')) {
             errorMessage = `Server error (${response.status}): The server returned an HTML page instead of JSON. This usually indicates a server-side error.`;
-          } else if (response.status === 401) {
-            errorMessage = "Unauthorized: Please log in again.";
           } else if (response.status === 403) {
             errorMessage = "Forbidden: You don't have permission to view organizations.";
           } else if (response.status === 500) {
@@ -790,7 +826,10 @@ class OrganizationService {
       const response = await fetch(`${API_BASE_URL}/organizations/org/${orgId}/`, {
         method: "GET",
         headers: this.getAuthHeaders(),
+        mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -824,7 +863,10 @@ class OrganizationService {
         method: "PUT",
         headers,
         body: isFormData ? orgData : JSON.stringify(orgData),
+        mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -856,6 +898,9 @@ class OrganizationService {
         mode: 'cors'
       });
 
+      // Check for token expiration
+      await this.handleResponse(response);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
@@ -875,6 +920,8 @@ class OrganizationService {
         headers: this.getBasicAuthHeaders(),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -896,6 +943,8 @@ class OrganizationService {
         body: JSON.stringify(walletData),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -931,6 +980,8 @@ class OrganizationService {
         mode: 'cors'
       });
 
+      await this.handleResponse(response);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
@@ -950,6 +1001,8 @@ class OrganizationService {
         headers: this.getBasicAuthHeaders(),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -992,6 +1045,8 @@ class OrganizationService {
         headers: this.getBasicAuthHeaders(),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -1063,6 +1118,8 @@ class OrganizationService {
         mode: 'cors'
       });
 
+      await this.handleResponse(response);
+
       if (!response.ok) {
         const errorText = await response.text();
         let errorMessage = "";
@@ -1099,6 +1156,8 @@ class OrganizationService {
         headers: this.getBasicAuthHeaders(),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -1170,6 +1229,8 @@ class OrganizationService {
         mode: 'cors'
       });
 
+      await this.handleResponse(response);
+
       if (!response.ok) {
         const errorText = await response.text();
         let errorMessage = "";
@@ -1221,6 +1282,8 @@ class OrganizationService {
         mode: 'cors'
       });
 
+      await this.handleResponse(response);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
@@ -1240,6 +1303,8 @@ class OrganizationService {
         headers: this.getBasicAuthHeaders(),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -1278,6 +1343,8 @@ class OrganizationService {
         headers: this.getBasicAuthHeaders(),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -1338,6 +1405,8 @@ class OrganizationService {
         mode: 'cors'
       });
 
+      await this.handleResponse(response);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
@@ -1357,6 +1426,8 @@ class OrganizationService {
         headers: this.getBasicAuthHeaders(),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -1395,6 +1466,8 @@ class OrganizationService {
         headers: this.getBasicAuthHeaders(),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -1479,6 +1552,8 @@ class OrganizationService {
         mode: 'cors'
       });
 
+      await this.handleResponse(response);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
@@ -1498,6 +1573,8 @@ class OrganizationService {
         headers: this.getBasicAuthHeaders(),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -1586,6 +1663,8 @@ class OrganizationService {
         mode: 'cors'
       });
 
+      await this.handleResponse(response);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
@@ -1623,6 +1702,8 @@ class OrganizationService {
         headers: this.getBasicAuthHeaders(),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -1705,6 +1786,8 @@ class OrganizationService {
         mode: 'cors'
       });
 
+      await this.handleResponse(response);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
@@ -1724,6 +1807,8 @@ class OrganizationService {
         headers: this.getBasicAuthHeaders(),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -1809,6 +1894,8 @@ class OrganizationService {
         body: JSON.stringify(requestBody),
         mode: 'cors'
       });
+
+      await this.handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
