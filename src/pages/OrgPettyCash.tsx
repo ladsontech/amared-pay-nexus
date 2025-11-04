@@ -26,6 +26,7 @@ const PettyCash = () => {
     hasPermission
   } = useAuth();
   const {
+    wallets,
     pettyCashWallets,
     pettyCashTransactions,
     pettyCashExpenses,
@@ -35,6 +36,26 @@ const PettyCash = () => {
 
   // Calculate current balance from petty cash wallets
   const currentBalance = pettyCashWallets.reduce((sum, wallet) => sum + (wallet.balance || 0), 0);
+
+  // Get main wallet and petty cash wallet for bill payments
+  const mainWallet = wallets.find(w => !w.petty_cash_wallet);
+  const pettyCashWallet = pettyCashWallets && pettyCashWallets.length > 0 ? pettyCashWallets[0] : null;
+
+  // Get balances from API
+  const mainBalance = mainWallet?.balance ?? 0;
+  const pettyCashBalance = pettyCashWallet?.balance ?? 0;
+  const mainCurrency = mainWallet?.currency?.symbol || mainWallet?.currency?.name || 'UGX';
+  const pettyCurrency = pettyCashWallet?.currency?.symbol || pettyCashWallet?.currency?.name || 'UGX';
+
+  // Format balance with abbreviation (e.g., 12.3M, 850K)
+  const formatBalance = (amount: number, currency: string = 'UGX') => {
+    if (amount >= 1000000) {
+      return `${currency} ${(amount / 1000000).toFixed(1)}M`;
+    } else if (amount >= 1000) {
+      return `${currency} ${(amount / 1000).toFixed(0)}K`;
+    }
+    return `${currency} ${amount.toLocaleString()}`;
+  };
 
   // Debug logging
   console.log('PettyCash Debug:', {
@@ -231,8 +252,21 @@ const PettyCash = () => {
                   <CardContent className="p-2.5 md:p-4 text-center">
                     <Wallet className="h-5 w-5 md:h-8 md:w-8 mx-auto mb-1 md:mb-2 text-blue-600" />
                     <p className="text-[10px] md:text-sm font-semibold text-black">Main Wallet</p>
-                    <p className="text-base md:text-2xl font-bold text-blue-600 mt-0.5 md:mt-1">UGX 12.3M</p>
-                    <p className="text-[9px] md:text-xs text-gray-600 mt-0.5">Available</p>
+                    {loading ? (
+                      <p className="text-base md:text-2xl font-bold text-blue-600 mt-0.5 md:mt-1">Loading...</p>
+                    ) : mainWallet ? (
+                      <>
+                        <p className="text-base md:text-2xl font-bold text-blue-600 mt-0.5 md:mt-1">
+                          {formatBalance(mainBalance, mainCurrency)}
+                        </p>
+                        <p className="text-[9px] md:text-xs text-gray-600 mt-0.5">Available</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-base md:text-2xl font-bold text-gray-400 mt-0.5 md:mt-1">No Wallet</p>
+                        <p className="text-[9px] md:text-xs text-gray-500 mt-0.5">Not configured</p>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
                 
@@ -240,8 +274,21 @@ const PettyCash = () => {
                   <CardContent className="p-2.5 md:p-4 text-center">
                     <Wallet className="h-5 w-5 md:h-8 md:w-8 mx-auto mb-1 md:mb-2 text-green-600" />
                     <p className="text-[10px] md:text-sm font-semibold text-black">Petty Cash</p>
-                    <p className="text-base md:text-2xl font-bold text-green-600 mt-0.5 md:mt-1">UGX 850K</p>
-                    <p className="text-[9px] md:text-xs text-gray-600 mt-0.5">Available</p>
+                    {loading ? (
+                      <p className="text-base md:text-2xl font-bold text-green-600 mt-0.5 md:mt-1">Loading...</p>
+                    ) : pettyCashWallet ? (
+                      <>
+                        <p className="text-base md:text-2xl font-bold text-green-600 mt-0.5 md:mt-1">
+                          {formatBalance(pettyCashBalance, pettyCurrency)}
+                        </p>
+                        <p className="text-[9px] md:text-xs text-gray-600 mt-0.5">Available</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-base md:text-2xl font-bold text-gray-400 mt-0.5 md:mt-1">No Wallet</p>
+                        <p className="text-[9px] md:text-xs text-gray-500 mt-0.5">Not configured</p>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               </div>
