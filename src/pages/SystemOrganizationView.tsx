@@ -161,20 +161,92 @@ const SystemOrganizationView = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6 p-3 sm:p-6">
-      {/* Header Section - Improved Mobile Layout */}
-      <div className="space-y-3 sm:space-y-0">
-        {/* Back Button - Mobile First */}
-        <div className="sm:hidden">
-          <Button variant="outline" size="sm" className="w-full" onClick={() => navigate("/system/organizations")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+      {/* Header Section - App-like Mobile Design */}
+      <div className="space-y-4">
+        {/* Mobile Header - Clean App Design */}
+        <div className="sm:hidden space-y-4">
+          {/* Top Navigation Bar */}
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-9 w-9 p-0 hover:bg-gray-100 rounded-lg"
+              onClick={() => navigate("/system/organizations")}
+            >
+              <ArrowLeft className="h-5 w-5 text-gray-700" />
+            </Button>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg font-bold text-gray-900 truncate">{organization.name}</h1>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-9 w-9 p-0 hover:bg-gray-100 rounded-lg"
+              onClick={() => setEditOpen(true)}
+            >
+              <Pencil className="h-4 w-4 text-gray-700" />
+            </Button>
+          </div>
+
+          {/* Status Badge */}
+          <div className="flex items-center gap-2">
+            <Badge className="bg-green-50 text-green-700 border border-green-200 px-2.5 py-0.5 text-xs font-medium">
+              Active
+            </Badge>
+            <p className="text-xs text-gray-500">View and manage organization details</p>
+          </div>
+
+          {/* Primary Action Button - App Style */}
+          <Button 
+            variant="default" 
+            size="lg" 
+            className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base shadow-lg rounded-xl"
+            onClick={async () => {
+              try {
+                if (!organization?.id || !organization?.name) {
+                  throw new Error('Invalid organization data');
+                }
+
+                console.log('Starting impersonation for:', organization.id, organization.name);
+                await impersonateOrganization(organization.id, organization.name);
+                
+                const impersonating = localStorage.getItem('impersonating');
+                const storedUser = localStorage.getItem('user');
+                
+                if (impersonating !== 'true' || !storedUser) {
+                  throw new Error('Failed to set impersonation state');
+                }
+
+                console.log('Impersonation state set, redirecting...');
+                
+                toast({
+                  title: "Impersonating Organization",
+                  description: `Now viewing as ${organization.name}. You can make changes just like the organization owner.`,
+                });
+
+                await new Promise(resolve => setTimeout(resolve, 300));
+                window.location.href = "/org/dashboard";
+              } catch (error) {
+                console.error("Error during impersonation:", error);
+                const errorMessage = error instanceof Error ? error.message : "Failed to impersonate organization";
+                toast({
+                  title: "Error",
+                  description: errorMessage + ". Please try again.",
+                  variant: "destructive",
+                  duration: 5000,
+                });
+              }
+            }}
+          >
+            <LogIn className="h-5 w-5 mr-2" />
+            Login as Organization
           </Button>
         </div>
-        
-        {/* Title and Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+
+        {/* Desktop Header */}
+        <div className="hidden sm:flex sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => navigate("/system/organizations")}>
+            <Button variant="outline" size="sm" onClick={() => navigate("/system/organizations")}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
@@ -190,17 +262,17 @@ const SystemOrganizationView = () => {
                 <Pencil className="h-4 w-4" />
               </Button>
             </div>
-            <div className="hidden sm:block">
+            <div>
               <p className="text-xs sm:text-sm text-muted-foreground">View and manage organization details</p>
             </div>
           </div>
           
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          {/* Desktop Action Buttons */}
+          <div className="flex items-center gap-2">
             <Button 
               variant="default" 
               size="sm" 
-              className="w-full sm:w-auto text-xs sm:text-sm"
+              className="text-xs sm:text-sm"
               onClick={async () => {
                 try {
                   if (!organization?.id || !organization?.name) {
@@ -238,18 +310,11 @@ const SystemOrganizationView = () => {
                 }
               }}
             >
-              <LogIn className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Login as Organization</span>
-              <span className="sm:hidden">Login as Org</span>
+              <LogIn className="h-4 w-4 mr-2" />
+              Login as Organization
             </Button>
-            <Badge className="bg-green-100 text-green-800 w-fit hidden sm:inline-flex">Active</Badge>
+            <Badge className="bg-green-100 text-green-800 w-fit">Active</Badge>
           </div>
-        </div>
-        
-        {/* Description and Active Badge - Mobile */}
-        <div className="sm:hidden space-y-2">
-          <p className="text-xs text-muted-foreground">View and manage organization details</p>
-          <Badge className="bg-green-100 text-green-800 w-fit">Active</Badge>
         </div>
       </div>
 

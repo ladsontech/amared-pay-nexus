@@ -31,69 +31,32 @@ const Login = () => {
       // If identity is username, we'll need to get email from login response
       await login(identity, password);
       
-      // Get user email from stored user data
-      const userStr = localStorage.getItem('user');
-      let userEmail = email;
+      // Email verification disabled - redirect directly to dashboard
+      toast({
+        title: "Login Successful",
+        description: "Welcome back! Redirecting to your dashboard...",
+        duration: 2000,
+      });
       
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          userEmail = user.email || email;
-        } catch (e) {
-          console.error('Error parsing user data:', e);
-        }
-      }
-
-      // If we don't have email yet, try to get it from identity or show error
-      if (!userEmail) {
-        toast({
-          title: "Email Required",
-          description: "Email address is required for verification. Please use your email to login.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // Send OTP email for verification (using resend email OTP which is appropriate for verification)
-      const { otpService } = await import('@/services/otpService');
-      try {
-        // First try to send verification OTP via resend email OTP
-        // This endpoint is typically used for email verification scenarios
-        await otpService.resendEmailOTP({ email: userEmail });
-        toast({
-          title: "Verification Code Sent",
-          description: `Please check your email (${userEmail}) for the verification code to complete your login.`,
-          duration: 8000,
-        });
-        
-        // Redirect to OTP verification page
-        navigate(`/verify-otp?email=${encodeURIComponent(userEmail)}&type=login`);
-      } catch (otpError: any) {
-        console.error("Error sending OTP:", otpError);
-        // If OTP sending fails, still allow login but warn user
-        toast({
-          title: "Verification Code Not Sent",
-          description: otpError.message || "Could not send verification code. You may proceed but email verification is recommended.",
-          variant: "destructive",
-          duration: 5000,
-        });
-        
-        // Still redirect to dashboard but note that verification wasn't completed
-        setTimeout(() => {
-          const userStr = localStorage.getItem('user');
-          if (userStr) {
+      // Redirect to appropriate dashboard based on user role
+      setTimeout(() => {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          try {
             const user = JSON.parse(userStr);
             if (user.isSuperuser === true || user.role === 'admin') {
               navigate('/system/organizations');
             } else {
               navigate('/org/dashboard');
             }
-          } else {
+          } catch (e) {
+            console.error('Error parsing user data:', e);
             navigate('/org/dashboard');
           }
-        }, 1000);
-      }
+        } else {
+          navigate('/org/dashboard');
+        }
+      }, 500);
     } catch (error) {
       console.error("Login error:", error);
       const errorMsg = error instanceof Error ? error.message : "Authentication failed. Please check your credentials.";
