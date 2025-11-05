@@ -5,6 +5,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Tv, Building2 } from 'lucide-react';
 
+// Helper function to get provider logo path
+const getProviderLogo = (providerId: string): string | null => {
+  const logoMap: Record<string, string> = {
+    'dstv': '/images/BILLS_LOGOS/DSTV.png',
+    'startimes': '/images/BILLS_LOGOS/STARTIMES.png',
+    'gotv': '/images/BILLS_LOGOS/ZUKU.png', // Using ZUKU as GOTV logo (if GOTV logo exists, replace this)
+    'azam_tv': '/images/BILLS_LOGOS/AZAM.png',
+    'ura': '/images/BILLS_LOGOS/URA.png',
+    'kcca': '/images/BILLS_LOGOS/KCCA.png',
+  };
+  return logoMap[providerId] || null;
+};
+
 const CardNumberEntry: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -71,14 +84,24 @@ const CardNumberEntry: React.FC = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex items-center gap-2 flex-1">
-            {(category === 'tv' || category === 'tax') && (
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                {category === 'tv' ? (
-                  <Tv className="h-5 w-5 text-blue-600" />
-                ) : (
-                  <Building2 className="h-5 w-5 text-blue-600" />
-                )}
+            {getProviderLogo(provider || '') ? (
+              <div className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center p-1.5">
+                <img 
+                  src={getProviderLogo(provider || '') || ''} 
+                  alt={providerConfig.name}
+                  className="h-full w-full object-contain"
+                />
               </div>
+            ) : (
+              (category === 'tv' || category === 'tax') && (
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                  {category === 'tv' ? (
+                    <Tv className="h-5 w-5 text-blue-600" />
+                  ) : (
+                    <Building2 className="h-5 w-5 text-blue-600" />
+                  )}
+                </div>
+              )
             )}
             <h1 className="text-lg font-semibold text-gray-900">{providerConfig.name}</h1>
           </div>

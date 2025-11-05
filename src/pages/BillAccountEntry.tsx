@@ -6,6 +6,16 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Droplets, Zap } from 'lucide-react';
 
+// Helper function to get provider logo path
+const getProviderLogo = (providerId: string): string | null => {
+  const logoMap: Record<string, string> = {
+    'nwsc': '/images/BILLS_LOGOS/NWSC.png',
+    'uedcl_postpaid': '/images/BILLS_LOGOS/UEDCL.png',
+    'uedcl_light': '/images/BILLS_LOGOS/UEDCL.png',
+  };
+  return logoMap[providerId] || null;
+};
+
 const BillAccountEntry: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -91,9 +101,19 @@ const BillAccountEntry: React.FC = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex items-center gap-2 flex-1">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <IconComponent className="h-5 w-5 text-blue-600" />
-            </div>
+            {getProviderLogo(provider || '') ? (
+              <div className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center p-1.5">
+                <img 
+                  src={getProviderLogo(provider || '') || ''} 
+                  alt={providerConfig.name}
+                  className="h-full w-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <IconComponent className="h-5 w-5 text-blue-600" />
+              </div>
+            )}
             <h1 className="text-lg font-semibold text-gray-900">{providerConfig.name}</h1>
           </div>
         </div>

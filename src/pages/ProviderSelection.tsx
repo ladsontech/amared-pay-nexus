@@ -4,6 +4,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Zap, Droplets, Tv, Building } from 'lucide-react';
 
+// Helper function to get provider logo path
+const getProviderLogo = (providerId: string): string | null => {
+  const logoMap: Record<string, string> = {
+    'nwsc': '/images/BILLS_LOGOS/NWSC.png',
+    'uedcl_postpaid': '/images/BILLS_LOGOS/UEDCL.png',
+    'uedcl_light': '/images/BILLS_LOGOS/UEDCL.png',
+    'dstv': '/images/BILLS_LOGOS/DSTV.png',
+    'startimes': '/images/BILLS_LOGOS/STARTIMES.png',
+    'gotv': '/images/BILLS_LOGOS/ZUKU.png', // Using ZUKU as GOTV logo (if GOTV logo exists, replace this)
+    'azam_tv': '/images/BILLS_LOGOS/AZAM.png',
+    'ura': '/images/BILLS_LOGOS/URA.png',
+    'kcca': '/images/BILLS_LOGOS/KCCA.png',
+  };
+  return logoMap[providerId] || null;
+};
+
 const ProviderSelection: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -130,9 +146,19 @@ const ProviderSelection: React.FC = () => {
               >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${selectedCategory.color} flex-shrink-0`}>
-                      <IconComponent className="h-5 w-5" />
-                    </div>
+                    {getProviderLogo(provider.id) ? (
+                      <div className="p-2 rounded-lg bg-white border border-gray-200 flex-shrink-0">
+                        <img 
+                          src={getProviderLogo(provider.id) || ''} 
+                          alt={provider.name}
+                          className="h-8 w-8 object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className={`p-2 rounded-lg ${selectedCategory.color} flex-shrink-0`}>
+                        <IconComponent className="h-5 w-5" />
+                      </div>
+                    )}
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900">{provider.name}</h3>
                       <p className="text-xs text-gray-500 mt-1">{provider.accountLabel}</p>

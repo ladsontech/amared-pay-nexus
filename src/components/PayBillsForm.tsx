@@ -13,6 +13,22 @@ import { useOrganization } from "@/hooks/useOrganization";
 import { organizationService } from "@/services/organizationService";
 import { useNavigate } from "react-router-dom";
 
+// Helper function to get provider logo path
+const getProviderLogo = (providerId: string): string | null => {
+  const logoMap: Record<string, string> = {
+    'nwsc': '/images/BILLS_LOGOS/NWSC.png',
+    'uedcl_postpaid': '/images/BILLS_LOGOS/UEDCL.png',
+    'uedcl_light': '/images/BILLS_LOGOS/UEDCL.png',
+    'dstv': '/images/BILLS_LOGOS/DSTV.png',
+    'startimes': '/images/BILLS_LOGOS/STARTIMES.png',
+    'gotv': '/images/BILLS_LOGOS/ZUKU.png', // Using ZUKU as GOTV logo (if GOTV logo exists, replace this)
+    'azam_tv': '/images/BILLS_LOGOS/AZAM.png',
+    'ura': '/images/BILLS_LOGOS/URA.png',
+    'kcca': '/images/BILLS_LOGOS/KCCA.png',
+  };
+  return logoMap[providerId] || null;
+};
+
 interface PayBillsFormProps {
   isOpen: boolean;
   onClose: () => void;
@@ -409,7 +425,17 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider, initi
                     >
                       <CardContent className="p-3 sm:p-4">
                         <div className="flex flex-col items-center gap-2">
-                          <IconComponent className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+                          {getProviderLogo(provider.id) ? (
+                            <div className="p-2 rounded-lg bg-white border border-gray-200">
+                              <img 
+                                src={getProviderLogo(provider.id) || ''} 
+                                alt={provider.name}
+                                className="h-8 w-8 sm:h-10 sm:w-10 object-contain"
+                              />
+                            </div>
+                          ) : (
+                            <IconComponent className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+                          )}
                           <span className="text-xs sm:text-sm font-medium text-center">{provider.name}</span>
                         </div>
                       </CardContent>
