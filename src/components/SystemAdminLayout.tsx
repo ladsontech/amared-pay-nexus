@@ -9,8 +9,10 @@ const SystemAdminLayout = () => {
 
   return (
     <SidebarProvider className="bg-white">
-      {/* Sidebar - positioned by Sidebar component (creates spacer automatically) */}
-      <AppSystemSidebar />
+      {/* Sidebar - Hidden on mobile to prevent drawer */}
+      <div className="hidden md:block">
+        <AppSystemSidebar />
+      </div>
 
       {/* Content - SidebarInset automatically handles spacing for sidebar */}
       <SidebarInset className="flex flex-col bg-white">
@@ -28,10 +30,6 @@ const SystemAdminLayout = () => {
                   <p className="text-[9px] md:text-xs text-blue-600 font-medium">Platform Control</p>
                 </div>
               </div>
-            </div>
-
-            <div className="flex items-center gap-1 md:gap-2">
-              <SidebarTrigger className="md:ml-0 h-8 w-8 md:h-10 md:w-10" />
             </div>
           </div>
         </header>

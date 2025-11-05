@@ -176,14 +176,15 @@ const OrganizationLayout = () => {
   const orgLogo = (isImpersonating ? user?.organization?.logo : organization?.logo) || user?.organization?.logo;
 
   return <SidebarProvider>
-      <AppOrgSidebar />
+      {/* Sidebar - Hidden on mobile to prevent drawer */}
+      <div className="hidden md:block">
+        <AppOrgSidebar />
+      </div>
       <SidebarInset className="flex flex-col bg-white">
         {/* Header - Sticky instead of fixed for better layout */}
         <header className="sticky top-0 z-40 border-b border-gray-200 bg-white backdrop-blur-xl supports-[backdrop-filter]:bg-white shadow-sm md:shadow-lg">
           <div className="w-full flex h-12 md:h-16 items-stretch justify-between px-3 md:px-6">
             <div className="flex items-center gap-2 md:gap-4">
-              {/* Desktop Only: Sidebar Trigger */}
-              <SidebarTrigger className="hidden md:flex md:ml-0 h-8 w-8 md:h-10 md:w-10" />
               {/* Organization Logo and Name */}
               <div className="flex items-center gap-2 md:gap-3 min-w-0">
                 <div className="relative flex-shrink-0">
@@ -207,11 +208,6 @@ const OrganizationLayout = () => {
 
             {/* Right Side: Mobile Drawer Icon on Right, Desktop Controls */}
             <div className="flex items-center gap-2">
-              {/* Mobile Only: Sidebar Trigger on Right - Hidden on dashboard */}
-              {isMobile && location.pathname !== '/org/dashboard' && (
-                <SidebarTrigger className="h-8 w-8" />
-              )}
-              
               {/* Mobile Only: Account Menu Button */}
               {isMobile && (
                 <>
