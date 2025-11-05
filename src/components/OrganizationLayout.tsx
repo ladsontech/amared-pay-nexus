@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Outlet, Navigate } from "react-router-dom";
+import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/hooks/useOrganization";
 import { Organization as OrgType } from "@/types/auth";
@@ -15,6 +15,7 @@ import OrganizationOnboarding from "./OrganizationOnboarding";
 import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
 
 const OrganizationLayout = () => {
+  const location = useLocation();
   const {
     user,
     logout,
@@ -283,8 +284,12 @@ const OrganizationLayout = () => {
         </div>
       </SidebarInset>
 
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav />
+      {/* Mobile Bottom Navigation - Hide on payment pages */}
+      {!location.pathname.includes('/bulk-payments/bank') && 
+       !location.pathname.includes('/bulk-payments/mobile') &&
+       !location.pathname.includes('/request-expense') &&
+       !location.pathname.includes('/request-cash-addition') &&
+       <MobileBottomNav />}
     </SidebarProvider>;
 };
 export default OrganizationLayout;

@@ -28,6 +28,8 @@ const OrgPettyCash = lazy(() => import("./pages/OrgPettyCash"));
 const RequestExpense = lazy(() => import("./pages/RequestExpense"));
 const RequestCashAddition = lazy(() => import("./pages/RequestCashAddition"));
 const OrgBulkPayments = lazy(() => import("./pages/OrgBulkPayments"));
+const BankPayments = lazy(() => import("./pages/BankPayments"));
+const MobilePayments = lazy(() => import("./pages/MobilePayments"));
 const OrgCollections = lazy(() => import("./pages/OrgCollections"));
 const OrgDeposits = lazy(() => import("./pages/OrgDeposits"));
 const OrgApprovals = lazy(() => import("./pages/OrgApprovals"));
@@ -118,6 +120,16 @@ const AppRoutes = () => {
           <Route path="bulk-payments" element={
             <ProtectedRoute requiredPermissions={["access_bulk_payments"]}>
               <OrgBulkPayments />
+            </ProtectedRoute>
+          } />
+          <Route path="bulk-payments/bank" element={
+            <ProtectedRoute requiredPermissions={["access_bulk_payments"]}>
+              <BankPayments />
+            </ProtectedRoute>
+          } />
+          <Route path="bulk-payments/mobile" element={
+            <ProtectedRoute requiredPermissions={["access_bulk_payments"]}>
+              <MobilePayments />
             </ProtectedRoute>
           } />
           <Route path="collections" element={

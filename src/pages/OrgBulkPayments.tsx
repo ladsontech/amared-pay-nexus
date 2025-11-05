@@ -398,34 +398,36 @@ const BulkPayments = () => {
 
           {/* Create Options - Bank Payments and Mobile Payments at the top */}
           <div className="grid grid-cols-2 gap-3 md:gap-4">
-            <Card 
-              className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
-              onClick={() => handleTabChange("bank")}
-            >
-              <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-                <CreditCard className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
-                <CardTitle className="text-sm md:text-base font-semibold text-white">
-                  Bank Payments
-                </CardTitle>
-                <CardDescription className="text-xs md:text-sm text-blue-100">
-                  Create bank transfers
-                </CardDescription>
-              </CardContent>
-            </Card>
-            <Card 
-              className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
-              onClick={() => handleTabChange("mobile")}
-            >
-              <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-                <Upload className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
-                <CardTitle className="text-sm md:text-base font-semibold text-white">
-                  Mobile Payments
-                </CardTitle>
-                <CardDescription className="text-xs md:text-sm text-blue-100">
-                  Create mobile money
-                </CardDescription>
-              </CardContent>
-            </Card>
+            <Link to="/org/bulk-payments/bank" className="block">
+              <Card 
+                className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+              >
+                <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+                  <CreditCard className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+                  <CardTitle className="text-sm md:text-base font-semibold text-white">
+                    Bank Payments
+                  </CardTitle>
+                  <CardDescription className="text-xs md:text-sm text-blue-100">
+                    Create bank transfers
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link to="/org/bulk-payments/mobile" className="block">
+              <Card 
+                className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+              >
+                <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+                  <Upload className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+                  <CardTitle className="text-sm md:text-base font-semibold text-white">
+                    Mobile Payments
+                  </CardTitle>
+                  <CardDescription className="text-xs md:text-sm text-blue-100">
+                    Create mobile money
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
 
           {/* Search and Filters */}
