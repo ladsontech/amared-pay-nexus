@@ -67,6 +67,10 @@ export const useOrganization = () => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         } as Organization);
+        setLoading(false);
+      } else {
+        // No organizationId and not a superuser - set loading to false to prevent infinite loading
+        setLoading(false);
       }
       return;
     }
@@ -410,6 +414,7 @@ export const useOrganization = () => {
       // If organization fetch fails, continue with user.organization data
       fetchOrganization().catch(err => {
         console.warn('Failed to fetch organization during impersonation:', err);
+        setLoading(false);
         // Continue without throwing - organization data from user object will be used
       });
       
@@ -423,9 +428,12 @@ export const useOrganization = () => {
       fetchPettyCashWallets().catch(console.error);
       fetchPettyCashTransactions().catch(console.error);
       fetchPettyCashExpenses().catch(console.error);
+    } else if (user) {
+      // User exists but no organizationId - set loading to false
+      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.organizationId]);
+  }, [user?.organizationId, user]);
 
   return {
     // State

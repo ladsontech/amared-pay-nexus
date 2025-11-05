@@ -25,6 +25,7 @@ const OrganizationLayout = () => {
   const { activeStaff, totalStaff, organization, loading: orgLoading } = useOrganization();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
 
   // Debug logging for impersonation
   useEffect(() => {
@@ -133,9 +134,22 @@ const OrganizationLayout = () => {
     );
   }
 
+  // Add timeout to prevent infinite loading - if loading takes too long, proceed anyway
+  useEffect(() => {
+    if (orgLoading && !isImpersonating && !organization && !user?.isSuperuser) {
+      const timer = setTimeout(() => {
+        setLoadingTimeout(true);
+      }, 5000); // 5 second timeout
+      return () => clearTimeout(timer);
+    } else {
+      setLoadingTimeout(false);
+    }
+  }, [orgLoading, isImpersonating, organization, user?.isSuperuser]);
+  
   // Show loading state if organization is still loading (but allow impersonation and superusers to proceed)
   // During impersonation or for superusers, we should proceed even if organization is loading to avoid blocking
-  if (orgLoading && !isImpersonating && !organization && !user?.isSuperuser) {
+  
+  if (orgLoading && !isImpersonating && !organization && !user?.isSuperuser && !loadingTimeout) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
