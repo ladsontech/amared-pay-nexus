@@ -80,11 +80,19 @@ const ProviderSelection: React.FC = () => {
   const IconComponent = selectedCategory.icon;
 
   const handleProviderSelect = (providerId: string) => {
-    // For TV and Tax providers, navigate to card number entry screen
-    if (category === 'tv' || category === 'tax') {
-      navigate(`/org/pay-bills/card-entry?category=${category}&provider=${providerId}`);
+    // Check if mobile
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile) {
+      // For mobile: TV and Tax go to card entry, Water and Electricity go to account entry
+      if (category === 'tv' || category === 'tax') {
+        navigate(`/org/pay-bills/card-entry?category=${category}&provider=${providerId}`);
+      } else {
+        // For Water and Electricity on mobile, go to account entry page
+        navigate(`/org/pay-bills/account-entry?category=${category}&provider=${providerId}`);
+      }
     } else {
-      // For Water and Electricity, navigate directly to pay bills page
+      // For desktop: navigate to pay bills page with params
       navigate(`/org/pay-bills?category=${category}&provider=${providerId}`);
     }
   };

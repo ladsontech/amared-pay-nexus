@@ -50,17 +50,23 @@ const PayBills: React.FC = () => {
     }
   ];
 
-  // Check if we have category and provider from mobile navigation
+  // Check if we have category and provider from desktop navigation
   useEffect(() => {
     const category = searchParams.get('category');
     const provider = searchParams.get('provider');
     const cardNumber = searchParams.get('cardNumber');
-    if (category && provider) {
+    const isMobile = window.innerWidth < 768;
+    
+    // Only auto-open dialog on desktop, not mobile
+    if (category && provider && !isMobile) {
       // Store the values and open the form dialog
       setInitialCategory(category);
       setInitialProvider(provider);
       setIsCreateDialogOpen(true);
       // Clear the URL params
+      setSearchParams({});
+    } else if (category && provider && isMobile) {
+      // On mobile, clear params and let user navigate through pages
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
@@ -166,7 +172,7 @@ const PayBills: React.FC = () => {
         </div>
 
         {/* Wallet Balances - Two Column Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
           {/* Main Wallet Card */}
           <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">

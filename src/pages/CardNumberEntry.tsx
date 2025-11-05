@@ -44,8 +44,16 @@ const CardNumberEntry: React.FC = () => {
     if (!cardNumber.trim() || !category || !provider) {
       return;
     }
-    // Navigate to pay bills page with category, provider, and card number
-    navigate(`/org/pay-bills?category=${category}&provider=${provider}&cardNumber=${encodeURIComponent(cardNumber)}`);
+    // Check if mobile
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile) {
+      // On mobile, navigate to amount entry page
+      navigate(`/org/pay-bills/amount-entry?category=${category}&provider=${provider}&cardNumber=${encodeURIComponent(cardNumber)}`);
+    } else {
+      // On desktop, navigate to pay bills page with params
+      navigate(`/org/pay-bills?category=${category}&provider=${provider}&cardNumber=${encodeURIComponent(cardNumber)}`);
+    }
   };
 
   return (
