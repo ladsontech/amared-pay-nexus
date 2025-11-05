@@ -403,6 +403,7 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider, initi
                           onClose();
                         } else {
                           setSelectedProvider(provider.id);
+                          setSelectedDistrict("");
                         }
                       }}
                     >
@@ -437,10 +438,31 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider, initi
             )}
           </div>
 
+          {/* District Selection for NWSC */}
+          {selectedProviderData && selectedProvider === "nwsc" && (
+            <div className="space-y-2">
+              <Label className="text-xs sm:text-sm font-medium">Select Area</Label>
+              <Select value={selectedDistrict} onValueChange={setSelectedDistrict}>
+                <SelectTrigger className="bg-white text-xs sm:text-sm h-9 sm:h-10">
+                  <SelectValue placeholder="Select Area" />
+                </SelectTrigger>
+                <SelectContent>
+                  {nwscDistricts.map((district) => (
+                    <SelectItem key={district} value={district}>
+                      {district}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {/* Account Number */}
           {selectedProviderData && (
             <div className="space-y-2">
-              <Label className="text-xs sm:text-sm font-medium">{selectedProviderData.accountLabel}</Label>
+              <Label className="text-xs sm:text-sm font-medium">
+                {selectedProvider === "nwsc" ? "Meter Number" : selectedProviderData.accountLabel}
+              </Label>
               <Input
                 placeholder={selectedProviderData.placeholder}
                 value={accountNumber}
@@ -670,10 +692,31 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider, initi
             )}
           </div>
 
+          {/* District Selection for NWSC */}
+          {selectedProviderData && selectedProvider === "nwsc" && (
+            <div className="space-y-2">
+              <Label className="text-xs sm:text-sm font-medium">Select Area</Label>
+              <Select value={selectedDistrict} onValueChange={setSelectedDistrict}>
+                <SelectTrigger className="bg-white text-xs sm:text-sm h-9 sm:h-10">
+                  <SelectValue placeholder="Select Area" />
+                </SelectTrigger>
+                <SelectContent>
+                  {nwscDistricts.map((district) => (
+                    <SelectItem key={district} value={district}>
+                      {district}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {/* Account Number */}
           {selectedProviderData && (
             <div className="space-y-2">
-              <Label className="text-xs sm:text-sm font-medium">{selectedProviderData.accountLabel}</Label>
+              <Label className="text-xs sm:text-sm font-medium">
+                {selectedProvider === "nwsc" ? "Meter Number" : selectedProviderData.accountLabel}
+              </Label>
               <Input
                 placeholder={selectedProviderData.placeholder}
                 value={accountNumber}
@@ -707,7 +750,7 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider, initi
           </div>
 
           {/* Payment Confirmation */}
-          {amount && canAfford && selectedBill && selectedProvider && accountNumber && (
+          {amount && canAfford && selectedBill && selectedProvider && accountNumber && (selectedProvider !== "nwsc" || selectedDistrict) && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-2.5 sm:p-3">
               <h4 className="text-xs sm:text-sm font-semibold text-black mb-2">Payment Summary</h4>
               <div className="space-y-1.5 text-[10px] sm:text-xs">
@@ -715,6 +758,12 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider, initi
                   <span className="text-gray-600">Bill Type:</span>
                   <span className="font-medium text-black text-right">{selectedBillType?.name} - {selectedProviderData?.name}</span>
                 </div>
+                {selectedProvider === "nwsc" && selectedDistrict && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Area:</span>
+                    <span className="font-medium text-black text-right">{selectedDistrict}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Account:</span>
                   <span className="font-medium text-black truncate ml-2">{accountNumber}</span>
