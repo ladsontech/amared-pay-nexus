@@ -11,10 +11,13 @@ import { organizationService, BillPayment, CreateBillPaymentRequest, Wallet as W
 import { useOrganization } from '@/hooks/useOrganization';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useSearchParams } from 'react-router-dom';
+import PayBillsForm from '@/components/PayBillsForm';
 
 const PayBills: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { organization, wallets, fetchWallets, fetchPettyCashWallets, pettyCashWallets: hookPettyCashWallets } = useOrganization();
   const [billPayments, setBillPayments] = useState<BillPayment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +36,24 @@ const PayBills: React.FC = () => {
     reference: '',
     status: 'pending',
   });
+
+  // Store category and provider from URL for passing to PayBillsForm
+  const [initialCategory, setInitialCategory] = useState<string | undefined>();
+  const [initialProvider, setInitialProvider] = useState<string | undefined>();
+
+  // Check if we have category and provider from mobile navigation
+  useEffect(() => {
+    const category = searchParams.get('category');
+    const provider = searchParams.get('provider');
+    if (category && provider) {
+      // Store the values and open the form dialog
+      setInitialCategory(category);
+      setInitialProvider(provider);
+      setIsCreateDialogOpen(true);
+      // Clear the URL params
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
 
   // Fetch bill payments and refresh wallets
   useEffect(() => {
@@ -568,6 +589,18 @@ const PayBills: React.FC = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Pay Bills Form Dialog (for mobile navigation) */}
+      <PayBillsForm 
+        isOpen={isCreateDialogOpen} 
+        onClose={() => {
+          setIsCreateDialogOpen(false);
+          setInitialCategory(undefined);
+          setInitialProvider(undefined);
+        }}
+        initialCategory={initialCategory}
+        initialProvider={initialProvider}
+      />
       </div>
     </div>
   );

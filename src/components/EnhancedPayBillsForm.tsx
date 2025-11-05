@@ -20,6 +20,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { organizationService } from '@/services/organizationService';
+import { useNavigate } from 'react-router-dom';
 
 interface EnhancedPayBillsFormProps {
   isOpen: boolean;
@@ -46,6 +47,7 @@ interface BillProvider {
 const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onClose }) => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedProvider, setSelectedProvider] = useState<string>('');
   const [accountNumber, setAccountNumber] = useState('');
@@ -55,6 +57,17 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
   const [customerInfo, setCustomerInfo] = useState<any>(null);
   const [balances, setBalances] = useState({ wallet: 0, 'petty-cash': 0 });
   const [isLoadingBalances, setIsLoadingBalances] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile view
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -330,9 +343,15 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
                     type="button"
                     variant={selectedCategory === category.id ? 'default' : 'outline'}
                     onClick={() => {
-                      setSelectedCategory(category.id);
-                      setSelectedProvider('');
-                      setCustomerInfo(null);
+                      if (isMobile) {
+                        // Navigate to provider selection page on mobile
+                        navigate(`/org/pay-bills/provider-selection?category=${category.id}`);
+                        onClose();
+                      } else {
+                        setSelectedCategory(category.id);
+                        setSelectedProvider('');
+                        setCustomerInfo(null);
+                      }
                     }}
                     className="flex flex-col items-center p-2.5 sm:p-4 h-auto space-y-1.5 sm:space-y-2"
                   >
@@ -346,29 +365,40 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
             </div>
           </div>
 
-          {/* Provider Selection */}
-          {selectedCategoryData && (
+          {/* Provider Selection as Cards */}
+          {selectedCategoryData && !isMobile && (
             <div className="space-y-2 sm:space-y-4">
               <Label className="text-xs sm:text-sm font-medium">Select Service Provider</Label>
-              <Select value={selectedProvider} onValueChange={setSelectedProvider}>
-                <SelectTrigger className="h-9 sm:h-10 text-xs sm:text-sm">
-                  <SelectValue placeholder="Choose a provider" />
-                </SelectTrigger>
-                <SelectContent>
-                  {selectedCategoryData.providers.map((provider) => (
-                    <SelectItem key={provider.id} value={provider.id}>
-                      <div className="flex items-center justify-between w-full gap-2">
-                        <span className="text-xs sm:text-sm">{provider.name}</span>
-                        {provider.fees && (
-                          <Badge variant="outline" className="ml-2 text-[10px] sm:text-xs">
-                            Fee: UGX {provider.fees.toLocaleString()}
-                          </Badge>
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                {selectedCategoryData.providers.map((provider) => {
+                  const IconComponent = selectedCategoryData.icon;
+                  return (
+                    <Card
+                      key={provider.id}
+                      className={`cursor-pointer transition-all hover:shadow-md ${
+                        selectedProvider === provider.id
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 hover:border-blue-300"
+                      }`}
+                      onClick={() => setSelectedProvider(provider.id)}
+                    >
+                      <CardContent className="p-3 sm:p-4">
+                        <div className="flex flex-col items-center gap-2">
+                          <div className={`p-2 rounded-lg ${selectedCategoryData.color}`}>
+                            <IconComponent className="h-5 w-5 sm:h-6 sm:w-6" />
+                          </div>
+                          <span className="text-xs sm:text-sm font-medium text-center">{provider.name}</span>
+                          {provider.fees && (
+                            <Badge variant="outline" className="text-[10px] sm:text-xs mt-1">
+                              Fee: UGX {provider.fees.toLocaleString()}
+                            </Badge>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
             </div>
           )}
 

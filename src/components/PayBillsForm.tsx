@@ -7,27 +7,52 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Wallet, DollarSign, Zap, Droplets, Tv, Building2, CreditCard } from "lucide-react";
+import { Wallet, DollarSign, Zap, Droplets, Tv, Building2, CreditCard, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/hooks/useOrganization";
 import { organizationService } from "@/services/organizationService";
+import { useNavigate } from "react-router-dom";
 
 interface PayBillsFormProps {
   isOpen: boolean;
   onClose: () => void;
+  initialCategory?: string;
+  initialProvider?: string;
 }
 
-const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
+const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: PayBillsFormProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { wallets } = useOrganization();
-  const [selectedBill, setSelectedBill] = useState("");
-  const [selectedProvider, setSelectedProvider] = useState("");
+  const navigate = useNavigate();
+  const [selectedBill, setSelectedBill] = useState(initialCategory || "");
+  const [selectedProvider, setSelectedProvider] = useState(initialProvider || "");
   const [amount, setAmount] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [paymentSource, setPaymentSource] = useState<"main_wallet" | "petty_cash_wallet">("main_wallet");
   const [isProcessing, setIsProcessing] = useState(false);
   const [pettyCashWallets, setPettyCashWallets] = useState<any[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile view
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Update selected values when initial props change
+  useEffect(() => {
+    if (initialCategory) {
+      setSelectedBill(initialCategory);
+    }
+    if (initialProvider) {
+      setSelectedProvider(initialProvider);
+    }
+  }, [initialCategory, initialProvider]);
 
   // Fetch real wallet balances
   useEffect(() => {
@@ -300,8 +325,14 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
                     type="button"
                     variant={selectedBill === bill.id ? "default" : "outline"}
                     onClick={() => {
-                      setSelectedBill(bill.id);
-                      setSelectedProvider("");
+                      if (isMobile) {
+                        // Navigate to provider selection page on mobile
+                        navigate(`/org/pay-bills/provider-selection?category=${bill.id}`);
+                        onClose();
+                      } else {
+                        setSelectedBill(bill.id);
+                        setSelectedProvider("");
+                      }
                     }}
                     className="flex flex-col items-center p-3 sm:p-4 h-auto gap-2"
                   >
@@ -315,22 +346,33 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
             </div>
           </div>
 
-          {/* Provider Selection */}
-          {selectedBillType && (
+          {/* Provider Selection as Cards */}
+          {selectedBillType && !isMobile && (
             <div className="space-y-2">
               <Label className="text-xs sm:text-sm font-medium">Select Provider</Label>
-              <Select value={selectedProvider} onValueChange={setSelectedProvider}>
-                <SelectTrigger className="h-9 sm:h-10 text-xs sm:text-sm">
-                  <SelectValue placeholder="Choose a provider" />
-                </SelectTrigger>
-                <SelectContent>
-                  {selectedBillType.providers.map((provider) => (
-                    <SelectItem key={provider.id} value={provider.id}>
-                      {provider.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                {selectedBillType.providers.map((provider) => {
+                  const IconComponent = selectedBillType.icon;
+                  return (
+                    <Card
+                      key={provider.id}
+                      className={`cursor-pointer transition-all hover:shadow-md ${
+                        selectedProvider === provider.id
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 hover:border-blue-300"
+                      }`}
+                      onClick={() => setSelectedProvider(provider.id)}
+                    >
+                      <CardContent className="p-3 sm:p-4">
+                        <div className="flex flex-col items-center gap-2">
+                          <IconComponent className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+                          <span className="text-xs sm:text-sm font-medium text-center">{provider.name}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
             </div>
           )}
 
