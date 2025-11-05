@@ -51,6 +51,7 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedProvider, setSelectedProvider] = useState<string>('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [amount, setAmount] = useState('');
   const [paymentSource, setPaymentSource] = useState<'wallet' | 'petty-cash'>('wallet');
@@ -106,6 +107,16 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
     fetchBalances();
   }, [user?.organizationId, isOpen]);
 
+  // NWSC Districts
+  const nwscDistricts = [
+    "Kampala",
+    "Entebbe",
+    "Jinja",
+    "Lugazi",
+    "Iganga",
+    "Others"
+  ];
+
   const billCategories: BillCategory[] = [
     {
       id: 'water',
@@ -113,7 +124,7 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
       icon: Droplets,
       color: 'text-blue-600 bg-blue-100',
       providers: [
-        { id: 'nwsc', name: 'NWSC', accountFormat: 'Customer Number XXXXXXX', minAmount: 10000, maxAmount: 1000000, fees: 800 }
+        { id: 'nwsc', name: 'NWSC', accountFormat: 'Meter Number E.g 1234567879', minAmount: 10000, maxAmount: 1000000, fees: 800, requiresDistrict: true }
       ]
     },
     {
@@ -176,10 +187,12 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
   };
 
   const handlePayBill = async () => {
-    if (!selectedCategory || !selectedProvider || !accountNumber || !amount) {
+    // Check if NWSC requires district
+    const needsDistrict = selectedProvider === 'nwsc' && !selectedDistrict;
+    if (!selectedCategory || !selectedProvider || !accountNumber || !amount || needsDistrict) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields.",
+        description: needsDistrict ? "Please select area and enter meter number" : "Please fill in all required fields.",
         variant: "destructive"
       });
       return;
@@ -262,6 +275,7 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
       // Reset form
       setSelectedCategory('');
       setSelectedProvider('');
+      setSelectedDistrict('');
       setAccountNumber('');
       setAmount('');
       setCustomerInfo(null);
@@ -369,6 +383,7 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
                       } else {
                         setSelectedCategory(category.id);
                         setSelectedProvider('');
+                        setSelectedDistrict('');
                         setCustomerInfo(null);
                       }
                     }}
@@ -399,7 +414,12 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
                           ? "border-blue-500 bg-blue-50"
                           : "border-gray-200 hover:border-blue-300"
                       }`}
-                      onClick={() => setSelectedProvider(provider.id)}
+                      onClick={() => {
+                        setSelectedProvider(provider.id);
+                        if (provider.id !== 'nwsc') {
+                          setSelectedDistrict('');
+                        }
+                      }}
                     >
                       <CardContent className="p-3 sm:p-4">
                         <div className="flex flex-col items-center gap-2">
@@ -424,11 +444,32 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
           {/* Account Details */}
           {selectedProviderData && (
             <div className="space-y-3 sm:space-y-4">
+              {/* District Selection for NWSC */}
+              {selectedProvider === 'nwsc' && (
+                <div className="space-y-2">
+                  <Label className="text-xs sm:text-sm font-medium">Select Area</Label>
+                  <Select value={selectedDistrict} onValueChange={setSelectedDistrict}>
+                    <SelectTrigger className="bg-white text-xs sm:text-sm h-9 sm:h-10">
+                      <SelectValue placeholder="Select Area" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {nwscDistricts.map((district) => (
+                        <SelectItem key={district} value={district}>
+                          {district}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label className="text-xs sm:text-sm font-medium">Account Number/ID</Label>
+                <Label className="text-xs sm:text-sm font-medium">
+                  {selectedProvider === 'nwsc' ? 'Meter Number' : 'Account Number/ID'}
+                </Label>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <Input
-                    placeholder={selectedProviderData.accountFormat}
+                    placeholder={selectedProvider === 'nwsc' ? 'E.g 1234567879' : selectedProviderData.accountFormat}
                     value={accountNumber}
                     onChange={(e) => {
                       setAccountNumber(e.target.value);
@@ -436,13 +477,15 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
                     }}
                     className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
                   />
-                  <Button 
-                    onClick={handleAccountLookup} 
-                    disabled={!accountNumber}
-                    className="w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10"
-                  >
-                    Lookup
-                  </Button>
+                  {selectedProvider !== 'nwsc' && (
+                    <Button 
+                      onClick={handleAccountLookup} 
+                      disabled={!accountNumber}
+                      className="w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10"
+                    >
+                      Lookup
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -528,15 +571,16 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
           <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 space-y-2">
               <Button
                 onClick={handlePayBill}
-                disabled={
-                  !selectedCategory || 
-                  !selectedProvider || 
-                  !accountNumber || 
-                  !amount || 
-                  isProcessing ||
-                  getTotalAmount() > balances[paymentSource] ||
-                  (selectedProviderData?.minAmount && parseInt(amount) < selectedProviderData.minAmount)
-                }
+              disabled={
+                !selectedCategory || 
+                !selectedProvider || 
+                !accountNumber || 
+                !amount || 
+                isProcessing ||
+                getTotalAmount() > balances[paymentSource] ||
+                (selectedProviderData?.minAmount && parseInt(amount) < selectedProviderData.minAmount) ||
+                (selectedProvider === 'nwsc' && !selectedDistrict)
+              }
                 className="w-full bg-blue-600 hover:bg-blue-700 text-sm h-12"
               >
                 {isProcessing ? (

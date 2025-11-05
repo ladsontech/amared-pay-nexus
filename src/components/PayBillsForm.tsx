@@ -27,6 +27,7 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
   const navigate = useNavigate();
   const [selectedBill, setSelectedBill] = useState(initialCategory || "");
   const [selectedProvider, setSelectedProvider] = useState(initialProvider || "");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
   const [amount, setAmount] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [paymentSource, setPaymentSource] = useState<"main_wallet" | "petty_cash_wallet">("main_wallet");
@@ -51,6 +52,10 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
     }
     if (initialProvider) {
       setSelectedProvider(initialProvider);
+      // Reset district when provider changes
+      if (initialProvider !== "nwsc") {
+        setSelectedDistrict("");
+      }
     }
   }, [initialCategory, initialProvider]);
 
@@ -116,13 +121,23 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
     ? (mainWallet?.currency?.symbol || mainWallet?.currency?.name || "UGX")
     : (pettyCashWallet?.currency?.symbol || pettyCashWallet?.currency?.name || "UGX");
 
+  // NWSC Districts
+  const nwscDistricts = [
+    "Kampala",
+    "Entebbe",
+    "Jinja",
+    "Lugazi",
+    "Iganga",
+    "Others"
+  ];
+
   const billTypes = [
     { 
       id: "water", 
       name: "Water", 
       icon: Droplets, 
       providers: [
-        { id: "nwsc", name: "NWSC", accountLabel: "Customer Number", placeholder: "Enter customer number" }
+        { id: "nwsc", name: "NWSC", accountLabel: "Meter Number", placeholder: "E.g 1234567879", requiresDistrict: true }
       ]
     },
     { 
@@ -162,10 +177,12 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
   const remainingBalance = amount ? selectedBalance - parseFloat(amount) : selectedBalance;
 
   const handlePayBill = async () => {
-    if (!selectedBill || !selectedProvider || !amount || !accountNumber) {
+    // Check if NWSC requires district
+    const needsDistrict = selectedProvider === "nwsc" && !selectedDistrict;
+    if (!selectedBill || !selectedProvider || !amount || !accountNumber || needsDistrict) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields",
+        description: needsDistrict ? "Please select area and enter meter number" : "Please fill in all required fields",
         variant: "destructive",
       });
       return;
@@ -242,6 +259,7 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
       // Reset form
       setSelectedBill("");
       setSelectedProvider("");
+      setSelectedDistrict("");
       setAmount("");
       setAccountNumber("");
       setPaymentSource("main_wallet");
@@ -344,6 +362,7 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
                       } else {
                         setSelectedBill(bill.id);
                         setSelectedProvider("");
+                        setSelectedDistrict("");
                       }
                     }}
                     className="flex flex-col items-center p-3 sm:p-4 h-auto gap-2"
@@ -478,7 +497,7 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
           <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 space-y-2">
             <Button 
               onClick={handlePayBill} 
-              disabled={!selectedBill || !selectedProvider || !amount || !accountNumber || !canAfford || isProcessing}
+              disabled={!selectedBill || !selectedProvider || !amount || !accountNumber || !canAfford || isProcessing || (selectedProvider === "nwsc" && !selectedDistrict)}
               className="w-full bg-blue-600 hover:bg-blue-700 text-sm h-12"
             >
               {isProcessing ? (
@@ -569,6 +588,7 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
                     onClick={() => {
                       setSelectedBill(bill.id);
                       setSelectedProvider("");
+                      setSelectedDistrict("");
                     }}
                     className="flex flex-col items-center p-3 sm:p-4 h-auto gap-2"
                   >
@@ -709,7 +729,7 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
           </Button>
           <Button 
             onClick={handlePayBill} 
-            disabled={!selectedBill || !selectedProvider || !amount || !accountNumber || !canAfford || isProcessing}
+            disabled={!selectedBill || !selectedProvider || !amount || !accountNumber || !canAfford || isProcessing || (selectedProvider === "nwsc" && !selectedDistrict)}
             className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm h-9 sm:h-10"
           >
             {isProcessing ? (
