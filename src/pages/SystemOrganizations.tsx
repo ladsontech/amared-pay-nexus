@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Search, Filter, Building, Wallet, Users, Edit, RefreshCw, Mail } from "lucide-react";
+import { Plus, Search, Filter, Building, Wallet, Users, Edit, RefreshCw, Mail, Upload, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { organizationService, Organization, CreateOrganizationRequest } from "@/services/organizationService";
 import { otpService } from "@/services/otpService";
@@ -490,6 +490,40 @@ const OrgForm = ({ onSubmit, onCancel }: OrgFormProps) => {
     wallet_pin: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        return;
+      }
+      setLogoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setLogoPreview(base64String);
+        setForm({ ...form, logo: base64String });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    setForm({ ...form, logo: "" });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -509,83 +543,191 @@ const OrgForm = ({ onSubmit, onCancel }: OrgFormProps) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <h3 className="font-semibold text-sm sm:text-base">Organization Details</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <Label>Organization Name</Label>
-            <Input value={form.org_name} onChange={(e) => setForm({ ...form, org_name: e.target.value })} required />
-          </div>
-          <div>
-            <Label>Address</Label>
-            <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
-          </div>
-          <div>
-            <Label>Company Registration ID</Label>
-            <Input value={form.company_reg_id} onChange={(e) => setForm({ ...form, company_reg_id: e.target.value })} />
-          </div>
-          <div>
-            <Label>TIN</Label>
-            <Input value={form.tin} onChange={(e) => setForm({ ...form, tin: e.target.value })} />
-          </div>
-          <div className="col-span-2">
-            <Label>Logo URL (Optional)</Label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="sm:col-span-1">
+            <Label className="text-sm">Organization Name</Label>
             <Input 
-              type="url" 
-              value={form.logo || ""} 
-              onChange={(e) => setForm({ ...form, logo: e.target.value || null })} 
-              placeholder="https://example.com/logo.png" 
+              value={form.org_name} 
+              onChange={(e) => setForm({ ...form, org_name: e.target.value })} 
+              required 
+              className="text-sm sm:text-base"
             />
-            <p className="text-xs text-muted-foreground mt-1">Enter a direct link to your organization logo image</p>
+          </div>
+          <div className="sm:col-span-1">
+            <Label className="text-sm">Address</Label>
+            <Input 
+              value={form.address} 
+              onChange={(e) => setForm({ ...form, address: e.target.value })} 
+              className="text-sm sm:text-base"
+            />
+          </div>
+          <div className="sm:col-span-1">
+            <Label className="text-sm">Company Registration ID</Label>
+            <Input 
+              value={form.company_reg_id} 
+              onChange={(e) => setForm({ ...form, company_reg_id: e.target.value })} 
+              className="text-sm sm:text-base"
+            />
+          </div>
+          <div className="sm:col-span-1">
+            <Label className="text-sm">TIN</Label>
+            <Input 
+              value={form.tin} 
+              onChange={(e) => setForm({ ...form, tin: e.target.value })} 
+              className="text-sm sm:text-base"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <Label className="text-sm">Organization Logo (Optional)</Label>
+            {logoPreview ? (
+              <div className="mt-2 relative inline-block">
+                <img 
+                  src={logoPreview} 
+                  alt="Logo preview" 
+                  className="h-24 w-24 sm:h-32 sm:w-32 object-cover rounded-lg border-2 border-gray-200"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleRemoveLogo}
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-2">
+                <Input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoChange}
+                  className="hidden"
+                  id="logo-upload"
+                />
+                <Label
+                  htmlFor="logo-upload"
+                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                >
+                  <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                  <p className="text-sm text-gray-600 text-center px-2">
+                    Click to upload logo
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
+                </Label>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       <div className="space-y-2">
         <h3 className="font-semibold text-sm sm:text-base">Owner Details</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <Label>First Name</Label>
-            <Input value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} required />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="sm:col-span-1">
+            <Label className="text-sm">First Name</Label>
+            <Input 
+              value={form.first_name} 
+              onChange={(e) => setForm({ ...form, first_name: e.target.value })} 
+              required 
+              className="text-sm sm:text-base"
+            />
           </div>
-          <div>
-            <Label>Last Name</Label>
-            <Input value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} required />
+          <div className="sm:col-span-1">
+            <Label className="text-sm">Last Name</Label>
+            <Input 
+              value={form.last_name} 
+              onChange={(e) => setForm({ ...form, last_name: e.target.value })} 
+              required 
+              className="text-sm sm:text-base"
+            />
           </div>
-          <div>
-            <Label>Email</Label>
-            <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+          <div className="sm:col-span-1">
+            <Label className="text-sm">Email</Label>
+            <Input 
+              type="email" 
+              value={form.email} 
+              onChange={(e) => setForm({ ...form, email: e.target.value })} 
+              required 
+              className="text-sm sm:text-base"
+            />
           </div>
-          <div>
-            <Label>Phone Number</Label>
-            <Input value={form.phone_number} onChange={(e) => setForm({ ...form, phone_number: e.target.value })} required />
+          <div className="sm:col-span-1">
+            <Label className="text-sm">Phone Number</Label>
+            <Input 
+              value={form.phone_number} 
+              onChange={(e) => setForm({ ...form, phone_number: e.target.value })} 
+              required 
+              className="text-sm sm:text-base"
+            />
           </div>
-          <div>
-            <Label>Username</Label>
-            <Input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} required />
+          <div className="sm:col-span-1">
+            <Label className="text-sm">Username</Label>
+            <Input 
+              value={form.username} 
+              onChange={(e) => setForm({ ...form, username: e.target.value })} 
+              required 
+              className="text-sm sm:text-base"
+            />
           </div>
-          <div>
-            <Label>Password</Label>
-            <Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={8} />
+          <div className="sm:col-span-1">
+            <Label className="text-sm">Password</Label>
+            <Input 
+              type="password" 
+              value={form.password} 
+              onChange={(e) => setForm({ ...form, password: e.target.value })} 
+              required 
+              minLength={8} 
+              className="text-sm sm:text-base"
+            />
           </div>
         </div>
       </div>
 
       <div className="space-y-2">
         <h3 className="font-semibold text-sm sm:text-base">Wallet Setup</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <Label>Currency ID</Label>
-            <Input type="number" value={form.wallet_currency} onChange={(e) => setForm({ ...form, wallet_currency: Number(e.target.value) })} required />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="sm:col-span-1">
+            <Label className="text-sm">Currency ID</Label>
+            <Input 
+              type="number" 
+              value={form.wallet_currency} 
+              onChange={(e) => setForm({ ...form, wallet_currency: Number(e.target.value) })} 
+              required 
+              className="text-sm sm:text-base"
+            />
           </div>
-          <div>
-            <Label>Wallet PIN</Label>
-            <Input type="password" value={form.wallet_pin} onChange={(e) => setForm({ ...form, wallet_pin: e.target.value })} required minLength={4} maxLength={4} />
+          <div className="sm:col-span-1">
+            <Label className="text-sm">Wallet PIN</Label>
+            <Input 
+              type="password" 
+              value={form.wallet_pin} 
+              onChange={(e) => setForm({ ...form, wallet_pin: e.target.value })} 
+              required 
+              minLength={4} 
+              maxLength={4} 
+              className="text-sm sm:text-base"
+            />
           </div>
         </div>
       </div>
 
-      <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>Cancel</Button>
-        <Button type="submit" disabled={isSubmitting}>
+      <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onCancel} 
+          disabled={isSubmitting}
+          className="w-full sm:w-auto"
+        >
+          Cancel
+        </Button>
+        <Button 
+          type="submit" 
+          disabled={isSubmitting}
+          className="w-full sm:w-auto"
+        >
           {isSubmitting ? "Creating..." : "Create Organization"}
         </Button>
       </DialogFooter>

@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Building, LogOut, Crown, User, CreditCard, Shield, Users } from "lucide-react";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import AppOrgSidebar from "./AppOrgSidebar";
 import MobileBottomNav from "./MobileBottomNav";
 import OrganizationOnboarding from "./OrganizationOnboarding";
 import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const OrganizationLayout = () => {
   const location = useLocation();
@@ -27,6 +29,8 @@ const OrganizationLayout = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadingTimeout, setLoadingTimeout] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   // Debug logging for impersonation
   useEffect(() => {
@@ -221,9 +225,13 @@ const OrganizationLayout = () => {
                   Admin Viewing as Owner
                 </Badge>
               )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-secondary border-2 border-transparent hover:border-border transition-all duration-200">
+              {isMobile ? (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="relative h-10 w-10 rounded-full hover:bg-secondary border-2 border-transparent hover:border-border transition-all duration-200"
+                    onClick={() => setAccountMenuOpen(true)}
+                  >
                     <Avatar className="h-10 w-10 shadow-lg">
                       <AvatarImage src={user?.avatar} alt={user?.name} />
                       <AvatarFallback className="bg-primary text-primary-foreground font-bold text-lg">
@@ -231,46 +239,119 @@ const OrganizationLayout = () => {
                       </AvatarFallback>
                     </Avatar>
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-sm border-border shadow-xl" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-2 p-2">
-                      {isImpersonating && (
-                        <div className="mb-2 p-2 bg-orange-50 border border-orange-200 rounded-lg">
-                          <p className="text-xs font-semibold text-orange-800 flex items-center gap-1">
-                            <Shield className="h-3 w-3" />
-                            Super Admin - Full Access Mode
-                          </p>
-                          <p className="text-xs text-orange-600 mt-1">
-                            You have complete access to all organization features
-                          </p>
+                  <Sheet open={accountMenuOpen} onOpenChange={setAccountMenuOpen}>
+                    <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl">
+                      <SheetHeader className="pb-4 border-b">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-16 w-16 shadow-lg">
+                            <AvatarImage src={user?.avatar} alt={user?.name} />
+                            <AvatarFallback className="bg-primary text-primary-foreground font-bold text-xl">
+                              {user?.name?.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <SheetTitle className="text-left text-lg font-bold">{user?.name || 'User'}</SheetTitle>
+                            <p className="text-sm text-muted-foreground">{user?.email || 'No email'}</p>
+                          </div>
                         </div>
-                      )}
-                      <p className="text-base font-bold leading-none text-foreground">{user?.name || 'User'}</p>
-                      <p className="text-sm leading-none text-muted-foreground font-medium">{user?.email || 'No email'}</p>
-                      {user?.department && <p className="text-sm leading-none text-muted-foreground font-medium">{user.department}</p>}
-                      {user?.position && <p className="text-xs leading-none text-muted-foreground">{user.position}</p>}
-                      <Badge className={`w-fit capitalize mt-1 font-bold shadow-sm ${user?.role === 'manager' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' : 'bg-primary text-primary-foreground'}`}>
-                        {user?.role === 'manager' ? <Crown className="h-3 w-3 mr-1" /> : <User className="h-3 w-3 mr-1" />}
-                        {user?.role || 'staff'}
-                      </Badge>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {isImpersonating && (
-                    <DropdownMenuItem onClick={handleLogout} className="text-orange-600 font-medium">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Return to Admin Dashboard</span>
-                    </DropdownMenuItem>
-                  )}
-                  {!isImpersonating && (
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 font-medium">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      </SheetHeader>
+                      <div className="mt-6 space-y-4">
+                        {isImpersonating && (
+                          <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                            <p className="text-sm font-semibold text-orange-800 flex items-center gap-2">
+                              <Shield className="h-4 w-4" />
+                              Super Admin - Full Access Mode
+                            </p>
+                            <p className="text-xs text-orange-600 mt-1">
+                              You have complete access to all organization features
+                            </p>
+                          </div>
+                        )}
+                        {user?.department && (
+                          <div>
+                            <p className="text-xs text-muted-foreground">Department</p>
+                            <p className="text-sm font-medium">{user.department}</p>
+                          </div>
+                        )}
+                        {user?.position && (
+                          <div>
+                            <p className="text-xs text-muted-foreground">Position</p>
+                            <p className="text-sm font-medium">{user.position}</p>
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-2">Role</p>
+                          <Badge className={`w-fit capitalize font-bold shadow-sm ${user?.role === 'manager' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' : 'bg-primary text-primary-foreground'}`}>
+                            {user?.role === 'manager' ? <Crown className="h-3 w-3 mr-1" /> : <User className="h-3 w-3 mr-1" />}
+                            {user?.role || 'staff'}
+                          </Badge>
+                        </div>
+                        <div className="pt-4 border-t">
+                          <Button
+                            onClick={handleLogout}
+                            variant={isImpersonating ? "outline" : "destructive"}
+                            className="w-full"
+                          >
+                            <LogOut className="mr-2 h-4 w-4" />
+                            {isImpersonating ? 'Return to Admin Dashboard' : 'Log out'}
+                          </Button>
+                        </div>
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                </>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-secondary border-2 border-transparent hover:border-border transition-all duration-200">
+                      <Avatar className="h-10 w-10 shadow-lg">
+                        <AvatarImage src={user?.avatar} alt={user?.name} />
+                        <AvatarFallback className="bg-primary text-primary-foreground font-bold text-lg">
+                          {user?.name?.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-sm border-border shadow-xl" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-2 p-2">
+                        {isImpersonating && (
+                          <div className="mb-2 p-2 bg-orange-50 border border-orange-200 rounded-lg">
+                            <p className="text-xs font-semibold text-orange-800 flex items-center gap-1">
+                              <Shield className="h-3 w-3" />
+                              Super Admin - Full Access Mode
+                            </p>
+                            <p className="text-xs text-orange-600 mt-1">
+                              You have complete access to all organization features
+                            </p>
+                          </div>
+                        )}
+                        <p className="text-base font-bold leading-none text-foreground">{user?.name || 'User'}</p>
+                        <p className="text-sm leading-none text-muted-foreground font-medium">{user?.email || 'No email'}</p>
+                        {user?.department && <p className="text-sm leading-none text-muted-foreground font-medium">{user.department}</p>}
+                        {user?.position && <p className="text-xs leading-none text-muted-foreground">{user.position}</p>}
+                        <Badge className={`w-fit capitalize mt-1 font-bold shadow-sm ${user?.role === 'manager' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' : 'bg-primary text-primary-foreground'}`}>
+                          {user?.role === 'manager' ? <Crown className="h-3 w-3 mr-1" /> : <User className="h-3 w-3 mr-1" />}
+                          {user?.role || 'staff'}
+                        </Badge>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {isImpersonating && (
+                      <DropdownMenuItem onClick={handleLogout} className="text-orange-600 font-medium">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Return to Admin Dashboard</span>
+                      </DropdownMenuItem>
+                    )}
+                    {!isImpersonating && (
+                      <DropdownMenuItem onClick={handleLogout} className="text-red-600 font-medium">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
               </div>
             </div>
           </div>
