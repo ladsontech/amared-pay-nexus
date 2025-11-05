@@ -368,50 +368,50 @@ const BulkPayments = () => {
         <TabsContent value="overview" className="space-y-4 md:space-y-6">
           {/* Stats Cards - 2 columns on mobile, 4 on desktop */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            <Card className="bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
+            <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 md:px-6 pt-3 md:pt-6">
-                <CardTitle className="text-xs md:text-sm font-medium text-blue-800 leading-tight">
+                <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">
                   Total Payments
                 </CardTitle>
-                <FileText className="h-4 w-4 md:h-5 md:w-5 text-blue-600 flex-shrink-0" />
+                <FileText className="h-4 w-4 md:h-5 md:w-5 text-gray-600 flex-shrink-0" />
               </CardHeader>
               <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
-                <div className="text-lg md:text-2xl font-bold text-blue-700 truncate">{totalPayments}</div>
+                <div className="text-lg md:text-2xl font-bold text-gray-900 truncate">{totalPayments}</div>
               </CardContent>
             </Card>
-            <Card className="bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
+            <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 md:px-6 pt-3 md:pt-6">
-                <CardTitle className="text-xs md:text-sm font-medium text-blue-800 leading-tight">
+                <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">
                   Pending Approvals
                 </CardTitle>
-                <Bell className="h-4 w-4 md:h-5 md:w-5 text-blue-600 flex-shrink-0" />
+                <Bell className="h-4 w-4 md:h-5 md:w-5 text-gray-600 flex-shrink-0" />
               </CardHeader>
               <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
-                <div className="text-lg md:text-2xl font-bold text-blue-700 truncate">{pendingApprovals}</div>
+                <div className="text-lg md:text-2xl font-bold text-gray-900 truncate">{pendingApprovals}</div>
               </CardContent>
             </Card>
-            <Card className="bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
+            <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 md:px-6 pt-3 md:pt-6">
-                <CardTitle className="text-xs md:text-sm font-medium text-blue-800 leading-tight">
+                <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">
                   Total Amount
                 </CardTitle>
-                <Wallet className="h-4 w-4 md:h-5 md:w-5 text-blue-600 flex-shrink-0" />
+                <Wallet className="h-4 w-4 md:h-5 md:w-5 text-gray-600 flex-shrink-0" />
               </CardHeader>
               <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
-                <div className="text-lg md:text-2xl font-bold text-blue-700 truncate">
+                <div className="text-lg md:text-2xl font-bold text-gray-900 truncate">
                   UGX {totalAmount.toLocaleString()}
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
+            <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 md:px-6 pt-3 md:pt-6">
-                <CardTitle className="text-xs md:text-sm font-medium text-blue-800 leading-tight">
+                <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">
                   Approved
                 </CardTitle>
-                <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-blue-600 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-gray-600 flex-shrink-0" />
               </CardHeader>
               <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
-                <div className="text-lg md:text-2xl font-bold text-blue-700 truncate">{approvedPayments}</div>
+                <div className="text-lg md:text-2xl font-bold text-gray-900 truncate">{approvedPayments}</div>
               </CardContent>
             </Card>
           </div>
@@ -421,7 +421,7 @@ const BulkPayments = () => {
             <Button
               variant="default"
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2"
+              className="bg-gray-900 hover:bg-gray-800 text-white h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
               onClick={() => handleTabChange("bank")}
             >
               <CreditCard className="h-5 w-5 md:h-6 md:w-6" />
@@ -433,7 +433,7 @@ const BulkPayments = () => {
             <Button
               variant="outline"
               size="lg"
-              className="border-blue-200 bg-white hover:bg-blue-50 text-blue-700 hover:text-blue-800 h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2"
+              className="border-gray-200 bg-white hover:bg-gray-50 text-gray-900 hover:text-gray-900 h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
               onClick={() => handleTabChange("mobile")}
             >
               <Upload className="h-5 w-5 md:h-6 md:w-6" />
@@ -448,18 +448,18 @@ const BulkPayments = () => {
           {hasPermission("approve_bulk_payments") && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
               <Card 
-                className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all hover:shadow-md active:scale-[0.98]"
+                className="bg-white border border-gray-200 hover:shadow-md cursor-pointer transition-all active:scale-[0.98] shadow-sm"
                 onClick={() => handleTabChange("approvals")}
               >
                 <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-                  <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
+                  <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-gray-600 mb-1" />
                   <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
                     Approvals
                   </CardTitle>
                   <CardDescription className="text-xs md:text-sm text-gray-600">
                     Review pending requests
                     {pendingApprovals > 0 && (
-                      <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                      <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
                         {pendingApprovals}
                       </span>
                     )}
@@ -496,17 +496,17 @@ const BulkPayments = () => {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {[1, 2, 3].map((i) => (
-                <Card key={i} className="animate-pulse bg-blue-50 border border-blue-200">
+                <Card key={i} className="animate-pulse bg-white border border-gray-200 shadow-sm">
                   <CardHeader>
-                    <div className="h-6 bg-blue-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-blue-200 rounded w-1/2"></div>
+                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      <div className="h-4 bg-blue-200 rounded"></div>
-                      <div className="h-4 bg-blue-200 rounded"></div>
-                      <div className="h-4 bg-blue-200 rounded"></div>
-                      <div className="h-10 bg-blue-200 rounded mt-4"></div>
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                      <div className="h-10 bg-gray-200 rounded mt-4"></div>
                     </div>
                   </CardContent>
                 </Card>
@@ -515,7 +515,7 @@ const BulkPayments = () => {
           ) : filteredPayments.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredPayments.map((payment) => (
-                <Card key={payment.id} className="bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
+                <Card key={payment.id} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base sm:text-lg">{payment.reference || `BP-${payment.id.substring(0, 8)}`}</CardTitle>
@@ -669,38 +669,31 @@ const BulkPayments = () => {
         </TabsContent>
 
         <TabsContent value="bank" className="space-y-4">
-          <Card className="border border-slate-100 bg-white">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <span className="text-base sm:text-lg">Bank Bulk Payments</span>
-                  <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => setBankPaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `bank-new-${Date.now()}-${i}`, recipientName: '', recipientAccount: '', bankName: '', amount: 0, description: '', verified: false }))])}>
-                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                      <span className="hidden sm:inline">Add 5 Rows</span>
-                      <span className="sm:hidden">+5</span>
+          <Card className="border border-gray-200 bg-white shadow-sm">
+            <CardContent className="p-3 sm:p-4 md:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => setBankPaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `bank-new-${Date.now()}-${i}`, recipientName: '', recipientAccount: '', bankName: '', amount: 0, description: '', verified: false }))])}>
+                    <Plus className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Add 5 Rows</span>
+                    <span className="sm:hidden">+5</span>
+                  </Button>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => handleCSVUpload(e, "bank")}
+                    className="hidden"
+                    id="bank-csv-upload"
+                  />
+                  <label htmlFor="bank-csv-upload" className="w-full sm:w-auto">
+                    <Button variant="outline" size="sm" className="text-xs sm:text-sm w-full sm:w-auto">
+                      <Upload className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                      <span className="hidden sm:inline">Upload CSV</span>
+                      <span className="sm:hidden">CSV</span>
                     </Button>
-                    <input
-                      type="file"
-                      accept=".csv"
-                      onChange={(e) => handleCSVUpload(e, "bank")}
-                      className="hidden"
-                      id="bank-csv-upload"
-                    />
-                    <label htmlFor="bank-csv-upload" className="w-full sm:w-auto">
-                      <Button variant="outline" size="sm" className="text-xs sm:text-sm w-full sm:w-auto">
-                        <Upload className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                        <span className="hidden sm:inline">Upload CSV</span>
-                        <span className="sm:hidden">CSV</span>
-                      </Button>
-                    </label>
-                  </div>
-                </CardTitle>
-                <CardDescription className="text-xs sm:text-sm mt-2">
-                  Create bulk payments to bank accounts. Upload CSV or enter manually.
-                  CSV format: Name, Account Number, Amount, Description
-                </CardDescription>
-              </CardHeader>
-            <CardContent className="p-3 sm:p-6">
+                  </label>
+                </div>
+              </div>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label className="text-xs sm:text-sm">Payment Description</Label>
@@ -851,38 +844,31 @@ const BulkPayments = () => {
         </TabsContent>
 
         <TabsContent value="mobile" className="space-y-4">
-          <Card className="border border-slate-100 bg-white">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <span className="text-base sm:text-lg">Mobile Money Bulk Payments</span>
-                  <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => setMobilePaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `mobile-new-${Date.now()}-${i}`, recipientName: '', phoneNumber: '+256', mobileProvider: 'Unknown' as const, amount: 0, description: '', verified: false }))])}>
-                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                      <span className="hidden sm:inline">Add 5 Rows</span>
-                      <span className="sm:hidden">+5</span>
+          <Card className="border border-gray-200 bg-white shadow-sm">
+            <CardContent className="p-3 sm:p-4 md:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={() => setMobilePaymentRows(prev => [...prev, ...Array.from({ length: 5 }, (_, i) => ({ id: `mobile-new-${Date.now()}-${i}`, recipientName: '', phoneNumber: '+256', mobileProvider: 'Unknown' as const, amount: 0, description: '', verified: false }))])}>
+                    <Plus className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Add 5 Rows</span>
+                    <span className="sm:hidden">+5</span>
+                  </Button>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => handleCSVUpload(e, "mobile")}
+                    className="hidden"
+                    id="mobile-csv-upload"
+                  />
+                  <label htmlFor="mobile-csv-upload" className="w-full sm:w-auto">
+                    <Button variant="outline" size="sm" className="text-xs sm:text-sm w-full sm:w-auto">
+                      <Upload className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                      <span className="hidden sm:inline">Upload CSV</span>
+                      <span className="sm:hidden">CSV</span>
                     </Button>
-                    <input
-                      type="file"
-                      accept=".csv"
-                      onChange={(e) => handleCSVUpload(e, "mobile")}
-                      className="hidden"
-                      id="mobile-csv-upload"
-                    />
-                    <label htmlFor="mobile-csv-upload" className="w-full sm:w-auto">
-                      <Button variant="outline" size="sm" className="text-xs sm:text-sm w-full sm:w-auto">
-                        <Upload className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                        <span className="hidden sm:inline">Upload CSV</span>
-                        <span className="sm:hidden">CSV</span>
-                      </Button>
-                    </label>
-                  </div>
-                </CardTitle>
-                <CardDescription className="text-xs sm:text-sm mt-2">
-                  Create bulk payments to mobile money accounts. Upload CSV or enter manually.
-                  CSV format: Name, Phone Number, Amount, Description
-                </CardDescription>
-              </CardHeader>
-            <CardContent className="p-3 sm:p-6">
+                  </label>
+                </div>
+              </div>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label className="text-xs sm:text-sm">Payment Description</Label>

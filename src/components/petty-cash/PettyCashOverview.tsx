@@ -46,22 +46,16 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
       title: "Current Balance",
       value: `UGX ${currentBalance.toLocaleString()}`,
       icon: Wallet,
-      color: "text-blue-700",
-      iconColor: "text-blue-600",
     },
     {
       title: "Monthly Spending",
       value: `UGX ${monthlySpending.toLocaleString()}`,
       icon: TrendingDown,
-      color: "text-blue-700",
-      iconColor: "text-blue-600",
     },
     {
       title: "Pending Approvals",
       value: pendingApprovals.toString(),
       icon: Bell,
-      color: "text-blue-700",
-      iconColor: "text-blue-600",
     }
   ];
 
@@ -89,13 +83,13 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
   return (
     <div className="space-y-6">
       {isLowBalance && (
-        <Card className="border-blue-200 bg-blue-50">
+        <Card className="border-yellow-200 bg-yellow-50 shadow-sm">
           <CardContent className="pt-6">
-            <div className="flex items-center space-x-2 text-blue-800">
+            <div className="flex items-center space-x-2 text-yellow-800">
               <AlertTriangle className="h-5 w-5" />
               <p className="font-medium">Low Balance Alert</p>
             </div>
-            <p className="text-sm text-blue-700 mt-1">
+            <p className="text-sm text-yellow-700 mt-1">
               Petty cash balance is below the threshold of UGX {lowBalanceThreshold.toLocaleString()}. 
               Consider adding funds soon.
             </p>
@@ -108,18 +102,18 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
         {stats.map((stat, index) => (
           <Card 
             key={index} 
-            className={`bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow ${
+            className={`bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow ${
               index === 2 ? 'col-span-2 md:col-span-1' : ''
             }`}
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 md:px-6 pt-3 md:pt-6">
-              <CardTitle className="text-xs md:text-sm font-medium text-blue-800 leading-tight">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">
                 {stat.title}
               </CardTitle>
-              <stat.icon className={`h-4 w-4 md:h-5 md:w-5 ${stat.iconColor} flex-shrink-0`} />
+              <stat.icon className="h-4 w-4 md:h-5 md:w-5 text-gray-600 flex-shrink-0" />
             </CardHeader>
             <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
-              <div className={`text-lg md:text-2xl font-bold ${stat.color} truncate`}>{stat.value}</div>
+              <div className="text-lg md:text-2xl font-bold text-gray-900 truncate">{stat.value}</div>
             </CardContent>
           </Card>
         ))}
@@ -130,7 +124,7 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
         <Button
           variant="default"
           size="lg"
-          className="bg-blue-600 hover:bg-blue-700 text-white h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2"
+          className="bg-gray-900 hover:bg-gray-800 text-white h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
           onClick={() => handleTabChange("add")}
         >
           <Receipt className="h-5 w-5 md:h-6 md:w-6" />
@@ -142,7 +136,7 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
         <Button
           variant="outline"
           size="lg"
-          className="border-blue-200 bg-white hover:bg-blue-50 text-blue-700 hover:text-blue-800 h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2"
+          className="border-gray-200 bg-white hover:bg-gray-50 text-gray-900 hover:text-gray-900 h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
           onClick={() => handleTabChange("add")}
         >
           <Wallet className="h-5 w-5 md:h-6 md:w-6" />
@@ -158,11 +152,11 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
         {navigationCards.map((nav, index) => (
           <Card 
             key={index} 
-            className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all hover:shadow-md active:scale-[0.98]"
+            className="bg-white border border-gray-200 hover:shadow-md cursor-pointer transition-all active:scale-[0.98] shadow-sm"
             onClick={() => handleTabChange(nav.tab)}
           >
             <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-              <nav.icon className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
+              <nav.icon className="h-6 w-6 md:h-8 md:w-8 text-gray-600 mb-1" />
               <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
                 {nav.title}
               </CardTitle>
@@ -175,18 +169,18 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
       </div>
 
       {/* Recent Transactions */}
-      <Card className="bg-blue-50 border border-blue-200">
+      <Card className="bg-white border border-gray-200 shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-base md:text-lg">Recent Transactions</CardTitle>
-              <CardDescription className="text-sm text-blue-700">Latest petty cash activities</CardDescription>
+              <CardDescription className="text-sm text-gray-600">Latest petty cash activities</CardDescription>
             </div>
             {pendingApprovals > 0 && (
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-white border-blue-200 hover:bg-blue-100 text-blue-700"
+                className="bg-white border-gray-200 hover:bg-gray-50 text-gray-900"
                 onClick={() => handleTabChange("approvals")}
               >
                 <Bell className="h-4 w-4 mr-2" />
@@ -218,9 +212,9 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
                       {isCredit ? 'Addition' : 'Expense'} • {dateText}
                     </p>
                   </div>
-                  <div className={`font-medium text-blue-700 text-sm md:text-base ml-2 flex-shrink-0`}>
-                    {amount > 0 ? '+' : ''}UGX {Math.abs(amount).toLocaleString()}
-                  </div>
+                    <div className="font-medium text-gray-900 text-sm md:text-base ml-2 flex-shrink-0">
+                      {amount > 0 ? '+' : ''}UGX {Math.abs(amount).toLocaleString()}
+                    </div>
                 </div>
               );
             })}
