@@ -232,52 +232,6 @@ const PettyCash = () => {
         return p;
       });
     }} className="w-full">
-        {/* Mobile Tabs - Compact */}
-        <div className="md:hidden">
-          <TabsList className="grid w-full grid-cols-4 h-10 bg-gray-50 rounded-lg p-0.5 gap-0.5">
-            <TabsTrigger value="overview" className="text-[11px] font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm h-9">
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="add" className="text-[11px] font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm h-9">
-              Add
-            </TabsTrigger>
-            <TabsTrigger value="history" className="text-[11px] font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm h-9">
-              History
-            </TabsTrigger>
-          </TabsList>
-          
-          {/* Mobile Secondary Tabs */}
-          {(activeTab === "approvals" || activeTab === "reconciliation") && <div className="flex gap-2 mt-2">
-              <Button variant={activeTab === "approvals" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("approvals")} className="flex-1 h-9 text-xs">
-                Approvals
-              </Button>
-              <Button variant={activeTab === "reconciliation" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("reconciliation")} className="flex-1 h-9 text-xs">
-                Reconciliation
-              </Button>
-            </div>}
-        </div>
-
-        {/* Desktop Tabs */}
-        <div className="hidden md:block">
-          <TabsList className="grid w-full grid-cols-5 h-auto">
-            <TabsTrigger value="overview" className="text-sm">Overview</TabsTrigger>
-            <TabsTrigger value="add" className="text-sm">Add Transaction</TabsTrigger>
-            <TabsTrigger value="history" className="text-sm">History</TabsTrigger>
-            <TabsTrigger value="approvals" className="text-sm">PC Approvals</TabsTrigger>
-            <TabsTrigger value="reconciliation" className="text-sm">Reconciliation</TabsTrigger>
-          </TabsList>
-        </div>
-
-        {/* Mobile Action Buttons - Compact */}
-        <div className="md:hidden flex gap-2 mt-2">
-          {hasPermission("approve_transactions") && <Button variant="outline" size="sm" onClick={() => setActiveTab("approvals")} className="flex-1 h-9 text-xs">
-              Approvals
-            </Button>}
-          <Button variant="outline" size="sm" onClick={() => setActiveTab("reconciliation")} className="flex-1 h-9 text-xs">
-            Reconciliation
-          </Button>
-        </div>
-
         <TabsContent value="overview" className="space-y-3 md:space-y-4 mt-4 md:mt-6">
           <div className="bg-white">
             <PettyCashOverview 

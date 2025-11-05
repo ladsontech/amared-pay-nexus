@@ -356,15 +356,6 @@ const BulkPayments = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 sm:gap-0 p-1">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm px-2 py-1.5">Overview</TabsTrigger>
-          <TabsTrigger value="bank" className="text-xs sm:text-sm px-2 py-1.5">Bank Payments</TabsTrigger>
-          <TabsTrigger value="mobile" className="text-xs sm:text-sm px-2 py-1.5">Mobile Payments</TabsTrigger>
-          {hasPermission("approve_bulk_payments") && (
-            <TabsTrigger value="approvals" className="text-xs sm:text-sm px-2 py-1.5">Approvals</TabsTrigger>
-          )}
-        </TabsList>
-
         <TabsContent value="overview" className="space-y-4 md:space-y-6">
           {/* Stats Cards - 2 columns on mobile, 4 on desktop */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -416,37 +407,37 @@ const BulkPayments = () => {
             </Card>
           </div>
 
-          {/* Action Buttons - Bank Payments and Mobile Payments */}
-          <div className="grid grid-cols-2 gap-3 md:gap-4">
-            <Button
-              variant="default"
-              size="lg"
-              className="bg-gray-900 hover:bg-gray-800 text-white h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
+          {/* Navigation Cards - All tabs accessible from overview */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            <Card 
+              className="bg-white border border-gray-200 hover:shadow-md cursor-pointer transition-all active:scale-[0.98] shadow-sm"
               onClick={() => handleTabChange("bank")}
             >
-              <CreditCard className="h-5 w-5 md:h-6 md:w-6" />
-              <div className="text-center">
-                <div className="text-sm md:text-base font-semibold">Bank Payments</div>
-                <div className="text-xs md:text-sm opacity-90">Create bank transfers</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-gray-200 bg-white hover:bg-gray-50 text-gray-900 hover:text-gray-900 h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
+              <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+                <CreditCard className="h-6 w-6 md:h-8 md:w-8 text-gray-600 mb-1" />
+                <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
+                  Bank Payments
+                </CardTitle>
+                <CardDescription className="text-xs md:text-sm text-gray-600">
+                  Create bank transfers
+                </CardDescription>
+              </CardContent>
+            </Card>
+            <Card 
+              className="bg-white border border-gray-200 hover:shadow-md cursor-pointer transition-all active:scale-[0.98] shadow-sm"
               onClick={() => handleTabChange("mobile")}
             >
-              <Upload className="h-5 w-5 md:h-6 md:w-6" />
-              <div className="text-center">
-                <div className="text-sm md:text-base font-semibold">Mobile Payments</div>
-                <div className="text-xs md:text-sm opacity-90">Create mobile money</div>
-              </div>
-            </Button>
-          </div>
-
-          {/* Navigation Cards */}
-          {hasPermission("approve_bulk_payments") && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+              <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+                <Upload className="h-6 w-6 md:h-8 md:w-8 text-gray-600 mb-1" />
+                <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
+                  Mobile Payments
+                </CardTitle>
+                <CardDescription className="text-xs md:text-sm text-gray-600">
+                  Create mobile money
+                </CardDescription>
+              </CardContent>
+            </Card>
+            {hasPermission("approve_bulk_payments") && (
               <Card 
                 className="bg-white border border-gray-200 hover:shadow-md cursor-pointer transition-all active:scale-[0.98] shadow-sm"
                 onClick={() => handleTabChange("approvals")}
@@ -466,8 +457,8 @@ const BulkPayments = () => {
                   </CardDescription>
                 </CardContent>
               </Card>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Search and Filters */}
           <div className="flex flex-col sm:flex-row gap-4">
@@ -1018,24 +1009,6 @@ const BulkPayments = () => {
           </TabsContent>
         )}
       </Tabs>
-      <nav className="mobile-nav fixed bottom-0 left-0 right-0 z-50 md:hidden">
-        <div className="grid grid-cols-4 gap-2 p-3 bg-white shadow-lg rounded-t-lg">
-          <Button variant="ghost" size="icon" onClick={() => setActiveTab("overview")}>
-            <FileText className={`h-6 w-6 ${activeTab === "overview" ? "text-primary" : "text-muted-foreground"}`} />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => setActiveTab("bank")}>
-            <CreditCard className={`h-6 w-6 ${activeTab === "bank" ? "text-primary" : "text-muted-foreground"}`} />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => setActiveTab("mobile")}>
-            <Upload className={`h-6 w-6 ${activeTab === "mobile" ? "text-primary" : "text-muted-foreground"}`} />
-          </Button>
-          {hasPermission("approve_bulk_payments") && (
-            <Button variant="ghost" size="icon" onClick={() => setActiveTab("approvals")}>
-              <Eye className={`h-6 w-6 ${activeTab === "approvals" ? "text-primary" : "text-muted-foreground"}`} />
-            </Button>
-          )}
-        </div>
-      </nav>
     </div>
   );
 };

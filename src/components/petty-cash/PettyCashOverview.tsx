@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet, TrendingDown, AlertTriangle, Bell, Receipt, History, CheckCircle, FileText } from "lucide-react";
+import { Wallet, TrendingDown, AlertTriangle, Bell, History, CheckCircle, FileText, Plus } from "lucide-react";
 import { PettyCashWallet, PettyCashTransaction, PettyCashExpense } from "@/services/organizationService";
 import { useSearchParams } from "react-router-dom";
 
@@ -61,6 +61,12 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
 
   const navigationCards = [
     {
+      title: "Add Transaction",
+      description: "Create new transaction",
+      icon: Plus,
+      tab: "add",
+    },
+    {
       title: "History",
       description: "View transaction history",
       icon: History,
@@ -119,36 +125,8 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
         ))}
       </div>
 
-      {/* Action Buttons - Request Expense and Fund Petty Cash */}
-      <div className="grid grid-cols-2 gap-3 md:gap-4">
-        <Button
-          variant="default"
-          size="lg"
-          className="bg-gray-900 hover:bg-gray-800 text-white h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
-          onClick={() => handleTabChange("add")}
-        >
-          <Receipt className="h-5 w-5 md:h-6 md:w-6" />
-          <div className="text-center">
-            <div className="text-sm md:text-base font-semibold">Request Expense</div>
-            <div className="text-xs md:text-sm opacity-90">Submit expense request</div>
-          </div>
-        </Button>
-        <Button
-          variant="outline"
-          size="lg"
-          className="border-gray-200 bg-white hover:bg-gray-50 text-gray-900 hover:text-gray-900 h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all"
-          onClick={() => handleTabChange("add")}
-        >
-          <Wallet className="h-5 w-5 md:h-6 md:w-6" />
-          <div className="text-center">
-            <div className="text-sm md:text-base font-semibold">Fund Petty Cash</div>
-            <div className="text-xs md:text-sm opacity-90">Request funds addition</div>
-          </div>
-        </Button>
-      </div>
-
-      {/* Navigation Cards - 3 columns on desktop, responsive on mobile */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+      {/* Navigation Cards - 2 columns on mobile, 4 on desktop */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {navigationCards.map((nav, index) => (
           <Card 
             key={index} 
