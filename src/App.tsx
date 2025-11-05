@@ -38,6 +38,7 @@ const OrgAccount = lazy(() => import("./pages/OrgAccount"));
 const OrgUsers = lazy(() => import("./pages/OrgUsers"));
 const PayBills = lazy(() => import("./pages/PayBills"));
 const ProviderSelection = lazy(() => import("./pages/ProviderSelection"));
+const CardNumberEntry = lazy(() => import("./pages/CardNumberEntry"));
 const Unauthorized = lazy(() => import("./pages/Unauthorized"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -151,6 +152,7 @@ const AppRoutes = () => {
           } />
           <Route path="pay-bills" element={<PayBills />} />
           <Route path="pay-bills/provider-selection" element={<ProviderSelection />} />
+          <Route path="pay-bills/card-entry" element={<CardNumberEntry />} />
         </Route>
 
         {/* Redirect authenticated users to appropriate dashboard */}

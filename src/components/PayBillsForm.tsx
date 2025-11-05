@@ -18,9 +18,10 @@ interface PayBillsFormProps {
   onClose: () => void;
   initialCategory?: string;
   initialProvider?: string;
+  initialAccountNumber?: string;
 }
 
-const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: PayBillsFormProps) => {
+const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider, initialAccountNumber }: PayBillsFormProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { wallets } = useOrganization();
@@ -29,7 +30,7 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
   const [selectedProvider, setSelectedProvider] = useState(initialProvider || "");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [amount, setAmount] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
+  const [accountNumber, setAccountNumber] = useState(initialAccountNumber || "");
   const [paymentSource, setPaymentSource] = useState<"main_wallet" | "petty_cash_wallet">("main_wallet");
   const [isProcessing, setIsProcessing] = useState(false);
   const [pettyCashWallets, setPettyCashWallets] = useState<any[]>([]);
@@ -57,7 +58,10 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
         setSelectedDistrict("");
       }
     }
-  }, [initialCategory, initialProvider]);
+    if (initialAccountNumber) {
+      setAccountNumber(initialAccountNumber);
+    }
+  }, [initialCategory, initialProvider, initialAccountNumber]);
 
   // Fetch real wallet balances
   useEffect(() => {
@@ -392,7 +396,15 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
                           ? "border-blue-500 bg-blue-50"
                           : "border-gray-200 hover:border-blue-300"
                       }`}
-                      onClick={() => setSelectedProvider(provider.id)}
+                      onClick={() => {
+                        // For TV and Tax, navigate to card entry screen
+                        if (selectedBill === 'tv' || selectedBill === 'tax') {
+                          navigate(`/org/pay-bills/card-entry?category=${selectedBill}&provider=${provider.id}`);
+                          onClose();
+                        } else {
+                          setSelectedProvider(provider.id);
+                        }
+                      }}
                     >
                       <CardContent className="p-3 sm:p-4">
                         <div className="flex flex-col items-center gap-2">

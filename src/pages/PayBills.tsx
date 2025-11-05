@@ -45,11 +45,19 @@ const PayBills: React.FC = () => {
   useEffect(() => {
     const category = searchParams.get('category');
     const provider = searchParams.get('provider');
+    const cardNumber = searchParams.get('cardNumber');
     if (category && provider) {
       // Store the values and open the form dialog
       setInitialCategory(category);
       setInitialProvider(provider);
       setIsCreateDialogOpen(true);
+      // If cardNumber is provided (from CardNumberEntry), set it in form data
+      if (cardNumber) {
+        setFormData(prev => ({
+          ...prev,
+          account_number: cardNumber
+        }));
+      }
       // Clear the URL params
       setSearchParams({});
     }
@@ -592,14 +600,19 @@ const PayBills: React.FC = () => {
 
       {/* Pay Bills Form Dialog (for mobile navigation) */}
       <PayBillsForm 
-        isOpen={isCreateDialogOpen} 
+        isOpen={isCreateDialogOpen}
         onClose={() => {
           setIsCreateDialogOpen(false);
           setInitialCategory(undefined);
           setInitialProvider(undefined);
+          setFormData(prev => ({
+            ...prev,
+            account_number: ''
+          }));
         }}
         initialCategory={initialCategory}
         initialProvider={initialProvider}
+        initialAccountNumber={formData.account_number}
       />
       </div>
     </div>

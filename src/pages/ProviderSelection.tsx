@@ -83,8 +83,13 @@ const ProviderSelection: React.FC = () => {
   const IconComponent = selectedCategory.icon;
 
   const handleProviderSelect = (providerId: string) => {
-    // Navigate back to pay bills page - the PayBills page will handle opening the form
-    navigate(`/org/pay-bills?category=${category}&provider=${providerId}`);
+    // For TV and Tax providers, navigate to card number entry screen
+    if (category === 'tv' || category === 'tax') {
+      navigate(`/org/pay-bills/card-entry?category=${category}&provider=${providerId}`);
+    } else {
+      // For Water and Electricity, navigate directly to pay bills page
+      navigate(`/org/pay-bills?category=${category}&provider=${providerId}`);
+    }
   };
 
   return (
