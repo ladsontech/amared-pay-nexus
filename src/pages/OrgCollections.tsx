@@ -339,28 +339,27 @@ const Collections = () => {
           <p className="text-xs text-gray-500 mt-0.5">Mobile money & payment links</p>
         </div>
 
-        <div className="flex flex-col space-y-3 px-2 md:px-0">
+        <div className="flex flex-col space-y-3 md:space-y-4 px-2 md:px-0">
           <div className="hidden md:block">
             <h1 className="text-xl md:text-2xl font-semibold text-slate-900">Collections & Payment Links</h1>
             <p className="text-sm text-muted-foreground">Manage mobile money collections and payment links (UGX only)</p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2">
-            {/** Only show if user can view reports **/}
-            {hasPermission("view_department_reports") && (
-              <Button variant="outline" asChild>
-                <Link to="/org/reports/collections" className="flex items-center space-x-2">
-                  <FileText className="h-4 w-4" />
-                  <span>View Collections Report</span>
-                </Link>
-              </Button>
-            )}
+
+          {/* Major Action Cards - Collections and Payment Links */}
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" className="flex items-center justify-center space-x-2 w-full sm:w-auto">
-                  <Plus className="h-4 w-4" />
-                  <span className="hidden sm:inline">Initiate Collection</span>
-                  <span className="sm:hidden">Collection</span>
-                </Button>
+                <Card className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md">
+                  <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+                    <Smartphone className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+                    <CardTitle className="text-sm md:text-base font-semibold text-white">
+                      Collections
+                    </CardTitle>
+                    <CardDescription className="text-xs md:text-sm text-blue-100">
+                      Initiate collection
+                    </CardDescription>
+                  </CardContent>
+                </Card>
               </SheetTrigger>
               <SheetContent className="w-full sm:max-w-md">
                 <SheetHeader>
@@ -407,11 +406,17 @@ const Collections = () => {
 
             <Sheet>
               <SheetTrigger asChild>
-                <Button className="flex items-center justify-center space-x-2 w-full sm:w-auto">
-                  <LinkIcon className="h-4 w-4" />
-                  <span className="hidden sm:inline">Create Payment Link</span>
-                  <span className="sm:hidden">Payment Link</span>
-                </Button>
+                <Card className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md">
+                  <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+                    <LinkIcon className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+                    <CardTitle className="text-sm md:text-base font-semibold text-white">
+                      Payment Links
+                    </CardTitle>
+                    <CardDescription className="text-xs md:text-sm text-blue-100">
+                      Create payment link
+                    </CardDescription>
+                  </CardContent>
+                </Card>
               </SheetTrigger>
               <SheetContent className="w-full sm:max-w-md">
                 <SheetHeader>
@@ -428,69 +433,69 @@ const Collections = () => {
               </SheetContent>
             </Sheet>
           </div>
-        </div>
 
-        {/* Tabs - Compact Mobile */}
-        <div className="flex space-x-1 bg-gray-50 md:bg-muted p-0.5 md:p-1 rounded-lg w-full sm:w-fit overflow-x-auto">
-          <button
-            onClick={() => setActiveTab("collections")}
-            className={`px-3 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-1 sm:flex-none h-8 md:h-auto ${
-              activeTab === "collections"
-                ? "bg-white md:bg-background text-blue-600 md:text-foreground shadow-sm"
-                : "text-gray-600 md:text-muted-foreground hover:text-blue-600 md:hover:text-foreground"
-            }`}
-          >
-            Collections
-          </button>
-          <button
-            onClick={() => setActiveTab("links")}
-            className={`px-3 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-1 sm:flex-none h-8 md:h-auto ${
-              activeTab === "links"
-                ? "bg-white md:bg-background text-blue-600 md:text-foreground shadow-sm"
-                : "text-gray-600 md:text-muted-foreground hover:text-blue-600 md:hover:text-foreground"
-            }`}
-          >
-            Payment Links
-          </button>
+          {/* Tabs - Compact Mobile */}
+          <div className="flex space-x-1 bg-gray-50 md:bg-muted p-0.5 md:p-1 rounded-lg w-full sm:w-fit overflow-x-auto">
+            <button
+              onClick={() => setActiveTab("collections")}
+              className={`px-3 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-1 sm:flex-none h-8 md:h-auto ${
+                activeTab === "collections"
+                  ? "bg-white md:bg-background text-blue-600 md:text-foreground shadow-sm"
+                  : "text-gray-600 md:text-muted-foreground hover:text-blue-600 md:hover:text-foreground"
+              }`}
+            >
+              Collections
+            </button>
+            <button
+              onClick={() => setActiveTab("links")}
+              className={`px-3 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-1 sm:flex-none h-8 md:h-auto ${
+                activeTab === "links"
+                  ? "bg-white md:bg-background text-blue-600 md:text-foreground shadow-sm"
+                  : "text-gray-600 md:text-muted-foreground hover:text-blue-600 md:hover:text-foreground"
+              }`}
+            >
+              Payment Links
+            </button>
+          </div>
         </div>
 
         {/* Summary Cards - Compact Mobile */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4 lg:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
           {activeTab === "collections" ? (
             <>
-              <Card className="border border-slate-100 bg-white shadow-sm">
-                <CardHeader className="pb-2 md:pb-4">
-                  <CardTitle className="text-xs md:text-base sm:text-lg">Total Collections</CardTitle>
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                  <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">Total Collections</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-2.5 md:pb-4">
-                  <div className="text-base md:text-xl sm:text-2xl font-bold">{collections.length}</div>
-                  <p className="text-[9px] md:text-sm text-muted-foreground">All time</p>
+                <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                  <div className="text-lg md:text-2xl font-bold text-gray-900">{collections.length}</div>
+                  <p className="text-[9px] md:text-xs text-gray-600 mt-1">All time</p>
                 </CardContent>
               </Card>
-              <Card className="border border-slate-100 bg-white shadow-sm">
-                <CardHeader className="pb-2 md:pb-4">
-                  <CardTitle className="text-xs md:text-base sm:text-lg">Successful</CardTitle>
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                  <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">Successful</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-2.5 md:pb-4">
-                  <div className="text-base md:text-xl sm:text-2xl font-bold text-green-600">
+                <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                  <div className="text-lg md:text-2xl font-bold text-green-600">
                     {collections.filter(c => c.status === "successful").length}
                   </div>
-                  <p className="text-[9px] md:text-sm text-muted-foreground">Completed</p>
+                  <p className="text-[9px] md:text-xs text-gray-600 mt-1">Completed</p>
                 </CardContent>
               </Card>
-              <Card className="border border-slate-100 bg-white shadow-sm col-span-2 lg:col-span-1">
-                <CardHeader className="pb-2 md:pb-4">
-                  <CardTitle className="text-xs md:text-base sm:text-lg">Total Amount</CardTitle>
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow col-span-2 md:col-span-1">
+                <CardHeader className="pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                  <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">Total Amount</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-2.5 md:pb-4">
-                  <div className="text-base md:text-xl sm:text-2xl font-bold">
+                <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                  <div className="text-lg md:text-2xl font-bold text-gray-900">
                     UGX {(collections.reduce((sum, c) => sum + c.amount, 0) / 1000).toFixed(0)}K
                   </div>
-                  <p className="text-[9px] md:text-sm text-muted-foreground mb-2 md:mb-3">Total collected</p>
+                  <p className="text-[9px] md:text-xs text-gray-600 mt-1">Total collected</p>
                   <div className="flex gap-1.5 md:gap-2 mt-2 md:mt-3">
                     <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
                       <DialogTrigger asChild>
-                        <Button size="sm" variant="outline" className="flex-1 h-8 md:h-9 text-[10px] md:text-sm">
+                        <Button size="sm" variant="outline" className="flex-1 h-7 md:h-9 text-[10px] md:text-xs px-2 md:px-3">
                           <Building className="h-2.5 w-2.5 md:h-3 md:w-3 mr-0.5 md:mr-1" />
                           <span className="hidden sm:inline">Send to Bank</span>
                           <span className="sm:hidden">Bank</span>
@@ -549,7 +554,7 @@ const Collections = () => {
 
                     <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                       <DialogTrigger asChild>
-                        <Button size="sm" variant="outline" className="flex-1 h-8 md:h-9 text-[10px] md:text-sm">
+                        <Button size="sm" variant="outline" className="flex-1 h-7 md:h-9 text-[10px] md:text-xs px-2 md:px-3">
                           <Phone className="h-2.5 w-2.5 md:h-3 md:w-3 mr-0.5 md:mr-1" />
                           Withdraw
                         </Button>
@@ -599,49 +604,49 @@ const Collections = () => {
                   </div>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Payments via Links</CardTitle>
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow col-span-2 md:col-span-3">
+                <CardHeader className="pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                  <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">Payments via Links</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
+                <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                  <div className="text-lg md:text-2xl font-bold text-gray-900">
                     {paymentLinks.reduce((sum, link) => sum + link.successfulPayments, 0)}
                   </div>
-                  <p className="text-sm text-muted-foreground">Successful payments</p>
+                  <p className="text-[9px] md:text-xs text-gray-600 mt-1">Successful payments</p>
                 </CardContent>
               </Card>
             </>
           ) : (
             <>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Total Links</CardTitle>
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                  <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">Total Links</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{paymentLinks.length}</div>
-                  <p className="text-sm text-muted-foreground">Active collection links</p>
+                <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                  <div className="text-lg md:text-2xl font-bold text-gray-900">{paymentLinks.length}</div>
+                  <p className="text-[9px] md:text-xs text-gray-600 mt-1">Active collection links</p>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Total Payees</CardTitle>
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                  <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">Total Payees</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
+                <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                  <div className="text-lg md:text-2xl font-bold text-gray-900">
                     {paymentLinks.reduce((sum, link) => sum + link.totalPayees, 0)}
                   </div>
-                  <p className="text-sm text-muted-foreground">All-time payees</p>
+                  <p className="text-[9px] md:text-xs text-gray-600 mt-1">All-time payees</p>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Total Collected</CardTitle>
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow col-span-2 md:col-span-1">
+                <CardHeader className="pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                  <CardTitle className="text-xs md:text-sm font-medium text-gray-900 leading-tight">Total Collected</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
+                <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                  <div className="text-lg md:text-2xl font-bold text-gray-900">
                     UGX {paymentLinks.reduce((sum, link) => sum + (link.amount * link.successfulPayments), 0).toLocaleString()}
                   </div>
-                  <p className="text-sm text-muted-foreground">From payment links</p>
+                  <p className="text-[9px] md:text-xs text-gray-600 mt-1">From payment links</p>
                 </CardContent>
               </Card>
             </>
@@ -673,9 +678,19 @@ const Collections = () => {
             </Select>
           )}
           <div className="flex gap-2">
+            {hasPermission("view_department_reports") && (
+              <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-9 md:h-10 text-xs md:text-sm px-3" asChild>
+                <Link to="/org/reports/collections" className="flex items-center justify-center space-x-2">
+                  <FileText className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline">Reports</span>
+                  <span className="sm:hidden">Report</span>
+                </Link>
+              </Button>
+            )}
             <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-9 md:h-10 text-xs md:text-sm px-3">
               <Download className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1 md:mr-2" />
-              Export
+              <span className="hidden sm:inline">Export</span>
+              <span className="sm:hidden">Export</span>
             </Button>
           </div>
         </div>
@@ -700,54 +715,53 @@ const Collections = () => {
           </div>
         ) : activeTab === "collections" ? (
           <>
-            <div className="space-y-2 md:space-y-4 px-2 md:px-0">
+            <div className="space-y-2 md:space-y-3 px-2 md:px-0">
               {filteredCollections.map((collection) => (
-                <Card key={collection.id} className="hover:shadow-lg transition-shadow bg-white border border-gray-100 shadow-sm">
-                  <CardContent className="p-2.5 md:p-4 lg:p-6">
+                <Card key={collection.id} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                  <CardContent className="p-3 md:p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-4">
-                      <div className="flex items-start space-x-2 md:space-x-3 sm:space-x-4 min-w-0 flex-1">
-                        <div className="w-8 h-8 md:w-10 md:h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Smartphone className="h-3.5 w-3.5 md:h-5 md:w-5 sm:h-6 sm:w-6 text-blue-600" />
+                      <div className="flex items-start space-x-2 md:space-x-3 min-w-0 flex-1">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Smartphone className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-0.5 md:mb-1">
-                            <h3 className="font-semibold text-xs md:text-sm sm:text-base truncate">{collection.reference}</h3>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                            <h3 className="font-semibold text-xs md:text-sm truncate">{collection.reference}</h3>
                             <Badge className={`${getStatusColor(collection.status)} text-[9px] md:text-xs w-fit`}>
                               {collection.status || 'pending'}
                             </Badge>
                           </div>
-                          <p className="text-[10px] md:text-xs sm:text-sm text-muted-foreground break-all line-clamp-1">
+                          <p className="text-[10px] md:text-xs text-gray-600 break-all line-clamp-1">
                             {collection.phone_number || 'N/A'} • {collection.reason || 'No reason'}
                           </p>
                           {collection.message && (
-                            <p className="text-[9px] md:text-xs text-muted-foreground line-clamp-1">
+                            <p className="text-[9px] md:text-xs text-gray-500 line-clamp-1 mt-0.5">
                               {collection.message}
                             </p>
                           )}
-                          <p className="text-[9px] md:text-xs text-muted-foreground">
-                            {new Date(collection.created_at).toLocaleString()}
+                          <p className="text-[9px] md:text-xs text-gray-500 mt-0.5">
+                            {new Date(collection.created_at).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
-                      <div className="text-left sm:text-right flex-shrink-0">
-                        <div className="text-sm md:text-lg font-bold">
-                          UGX {(collection.amount / 1000).toFixed(0)}K
-                        </div>
-                        {collection.charge > 0 && (
-                          <div className="text-[9px] md:text-xs text-muted-foreground">
-                            Charge: UGX {(collection.charge / 1000).toFixed(0)}K
+                      <div className="text-left sm:text-right flex-shrink-0 flex items-center sm:items-end sm:flex-col gap-2">
+                        <div>
+                          <div className="text-sm md:text-base font-bold text-gray-900">
+                            UGX {(collection.amount / 1000).toFixed(0)}K
                           </div>
-                        )}
-                        <div className="text-[9px] md:text-xs sm:text-sm text-muted-foreground capitalize">
-                          {collection.status || 'pending'}
+                          {collection.charge > 0 && (
+                            <div className="text-[9px] md:text-xs text-gray-500">
+                              Charge: UGX {(collection.charge / 1000).toFixed(0)}K
+                            </div>
+                          )}
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => setSelectedCollection(collection)}
-                          className="mt-1 h-6 text-[9px] md:text-xs"
+                          className="h-7 md:h-8 text-[9px] md:text-xs px-2"
                         >
-                          <Eye className="h-3 w-3 mr-1" />
+                          <Eye className="h-3 w-3 md:h-3.5 md:w-3.5 mr-1" />
                           Details
                         </Button>
                       </div>
@@ -854,66 +868,66 @@ const Collections = () => {
           </Dialog>
           </>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2 md:space-y-3 px-2 md:px-0">
             {filteredPaymentLinks.map((link) => (
-              <Card key={link.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-4 md:p-6">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex-1 space-y-3">
+              <Card key={link.id} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="p-3 md:p-4">
+                  <div className="flex flex-col gap-3 md:gap-4">
+                    <div className="flex-1 space-y-2">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                        <h3 className="font-semibold text-base md:text-lg">{link.reference}</h3>
-                        <Badge className={`${getStatusColor(link.status)} w-fit`}>
+                        <h3 className="font-semibold text-xs md:text-sm">{link.reference}</h3>
+                        <Badge className={`${getStatusColor(link.status)} text-[9px] md:text-xs w-fit`}>
                           <span className="capitalize">{link.status}</span>
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{link.paymentReason}</p>
-                                              <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 text-sm">
-                          <div>
-                            <p className="text-muted-foreground text-xs">Amount</p>
-                            <p className="font-medium">UGX {link.amount.toLocaleString()}</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground text-xs">Total Payees</p>
-                            <p className="font-medium">{link.totalPayees}</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground text-xs">Successful</p>
-                            <p className="font-medium text-green-600">{link.successfulPayments}</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground text-xs">Unique Payers</p>
-                            <p className="font-medium">{Array.from(new Set(link.paymentHistory.filter((p) => p.status === "completed").map((p) => p.phoneNumber))).length}</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground text-xs">Pending</p>
-                            <p className="font-medium text-yellow-600">{link.pendingPayments}</p>
-                          </div>
+                      <p className="text-[10px] md:text-xs text-gray-600">{link.paymentReason}</p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3">
+                        <div>
+                          <p className="text-[9px] md:text-xs text-gray-500">Amount</p>
+                          <p className="font-medium text-xs md:text-sm text-gray-900">UGX {link.amount.toLocaleString()}</p>
                         </div>
+                        <div>
+                          <p className="text-[9px] md:text-xs text-gray-500">Total Payees</p>
+                          <p className="font-medium text-xs md:text-sm text-gray-900">{link.totalPayees}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] md:text-xs text-gray-500">Successful</p>
+                          <p className="font-medium text-xs md:text-sm text-green-600">{link.successfulPayments}</p>
+                        </div>
+                        <div className="hidden md:block">
+                          <p className="text-[9px] md:text-xs text-gray-500">Unique Payers</p>
+                          <p className="font-medium text-xs md:text-sm text-gray-900">{Array.from(new Set(link.paymentHistory.filter((p) => p.status === "completed").map((p) => p.phoneNumber))).length}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] md:text-xs text-gray-500">Pending</p>
+                          <p className="font-medium text-xs md:text-sm text-yellow-600">{link.pendingPayments}</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="flex flex-wrap gap-1.5 md:gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => copyToClipboard(link.link)}
-                        className="flex items-center justify-center space-x-2 flex-1 sm:flex-none"
+                        className="flex items-center justify-center space-x-1.5 h-7 md:h-8 text-[9px] md:text-xs px-2 md:px-3 flex-1 sm:flex-none"
                       >
-                        <Copy className="h-4 w-4" />
+                        <Copy className="h-3 w-3 md:h-3.5 md:w-3.5" />
                         <span>Copy Link</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex items-center justify-center space-x-2 flex-1 sm:flex-none"
+                        className="flex items-center justify-center space-x-1.5 h-7 md:h-8 text-[9px] md:text-xs px-2 md:px-3 flex-1 sm:flex-none"
                       >
-                        <QrCode className="h-4 w-4" />
+                        <QrCode className="h-3 w-3 md:h-3.5 md:w-3.5" />
                         <span>QR Code</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex items-center justify-center space-x-2 flex-1 sm:flex-none"
+                        className="flex items-center justify-center space-x-1.5 h-7 md:h-8 text-[9px] md:text-xs px-2 md:px-3 flex-1 sm:flex-none"
                       >
-                        <Share className="h-4 w-4" />
+                        <Share className="h-3 w-3 md:h-3.5 md:w-3.5" />
                         <span>Share</span>
                       </Button>
                       <Dialog>
@@ -922,32 +936,32 @@ const Collections = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => setSelectedLinkHistory(link)}
-                            className="flex items-center justify-center space-x-2 flex-1 sm:flex-none"
+                            className="flex items-center justify-center space-x-1.5 h-7 md:h-8 text-[9px] md:text-xs px-2 md:px-3 flex-1 sm:flex-none"
                           >
-                            <History className="h-4 w-4" />
+                            <History className="h-3 w-3 md:h-3.5 md:w-3.5" />
                             <span>History</span>
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>Payment History - {link.reference}</DialogTitle>
                             <DialogDescription>
                               Individual payments made through this link
                             </DialogDescription>
                           </DialogHeader>
-                          <div className="space-y-4">
+                          <div className="space-y-3">
                             {link.paymentHistory.map((payment) => (
-                              <div key={payment.id} className="flex items-center justify-between p-3 border rounded-lg">
+                              <div key={payment.id} className="flex items-center justify-between p-3 border rounded-lg bg-white">
                                 <div>
-                                  <p className="font-medium">{payment.payerName}</p>
-                                  <p className="text-sm text-muted-foreground">{payment.phoneNumber}</p>
-                                  <p className="text-xs text-muted-foreground">
+                                  <p className="font-medium text-sm">{payment.payerName}</p>
+                                  <p className="text-xs text-gray-600">{payment.phoneNumber}</p>
+                                  <p className="text-[10px] text-gray-500">
                                     {new Date(payment.paidAt).toLocaleString()}
                                   </p>
                                 </div>
                                 <div className="text-right">
-                                  <p className="font-medium">UGX {payment.amount.toLocaleString()}</p>
-                                  <Badge className={getStatusColor(payment.status)}>
+                                  <p className="font-medium text-sm">UGX {payment.amount.toLocaleString()}</p>
+                                  <Badge className={`${getStatusColor(payment.status)} text-[9px]`}>
                                     {payment.status}
                                   </Badge>
                                 </div>
@@ -956,114 +970,6 @@ const Collections = () => {
                           </div>
                         </DialogContent>
                       </Dialog>
-                      <div className="flex gap-1">
-                        <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
-                          <DialogTrigger asChild>
-                            <Button size="sm" variant="outline">
-                              <Building className="h-4 w-4 mr-1" />
-                              Send to Bank
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Send to Bank</DialogTitle>
-                              <DialogDescription>
-                                Transfer collection funds to bank account
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div className="space-y-2">
-                                <Label htmlFor="bank-amount">Amount (UGX)</Label>
-                                <Input
-                                  id="bank-amount"
-                                  type="number"
-                                  placeholder="Enter amount"
-                                  value={bankTransferData.amount}
-                                  onChange={(e) => setBankTransferData({...bankTransferData, amount: e.target.value})}
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="bank-account">Bank Account</Label>
-                                <Select 
-                                  value={bankTransferData.bankAccount} 
-                                  onValueChange={(value) => setBankTransferData({...bankTransferData, bankAccount: value})}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select bank account" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="stanbic-4567">Stanbic Bank - ***4567</SelectItem>
-                                    <SelectItem value="centenary-8901">Centenary Bank - ***8901</SelectItem>
-                                    <SelectItem value="dfcu-2345">DFCU Bank - ***2345</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="bank-description">Description</Label>
-                                <Input
-                                  id="bank-description"
-                                  placeholder="Transfer description"
-                                  value={bankTransferData.description}
-                                  onChange={(e) => setBankTransferData({...bankTransferData, description: e.target.value})}
-                                />
-                              </div>
-                              <Button onClick={handleSendToBank} className="w-full">
-                                Send to Bank
-                              </Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-
-                        <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
-                          <DialogTrigger asChild>
-                            <Button size="sm" variant="outline">
-                              <Phone className="h-4 w-4 mr-1" />
-                              Withdraw
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Withdraw by Phone</DialogTitle>
-                              <DialogDescription>
-                                Send collection funds to mobile money account
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div className="space-y-2">
-                                <Label htmlFor="withdraw-amount">Amount (UGX)</Label>
-                                <Input
-                                  id="withdraw-amount"
-                                  type="number"
-                                  placeholder="Enter amount"
-                                  value={withdrawData.amount}
-                                  onChange={(e) => setWithdrawData({...withdrawData, amount: e.target.value})}
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="withdraw-phone">Phone Number</Label>
-                                <Input
-                                  id="withdraw-phone"
-                                  placeholder="+256701234567"
-                                  value={withdrawData.phoneNumber}
-                                  onChange={(e) => setWithdrawData({...withdrawData, phoneNumber: e.target.value})}
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="withdraw-description">Description</Label>
-                                <Input
-                                  id="withdraw-description"
-                                  placeholder="Withdrawal description"
-                                  value={withdrawData.description}
-                                  onChange={(e) => setWithdrawData({...withdrawData, description: e.target.value})}
-                                />
-                              </div>
-                              <Button onClick={handleWithdraw} className="w-full">
-                                Withdraw
-                              </Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
                     </div>
                   </div>
                 </CardContent>
