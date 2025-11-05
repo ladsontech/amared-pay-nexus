@@ -41,7 +41,7 @@ const CardNumberEntry: React.FC = () => {
   }
 
   const handleContinue = () => {
-    if (!cardNumber.trim()) {
+    if (!cardNumber.trim() || !category || !provider) {
       return;
     }
     // Navigate to pay bills page with category, provider, and card number
@@ -57,7 +57,7 @@ const CardNumberEntry: React.FC = () => {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => navigate(`/org/pay-bills/provider-selection?category=${category}`)}
+            onClick={() => navigate(category ? `/org/pay-bills/provider-selection?category=${category}` : '/org/pay-bills')}
             className="flex-shrink-0"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -103,9 +103,9 @@ const CardNumberEntry: React.FC = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
         <Button
           onClick={handleContinue}
-          disabled={!cardNumber.trim()}
+          disabled={!cardNumber.trim() || !category || !provider}
           className={`w-full h-12 text-base font-medium ${
-            cardNumber.trim()
+            cardNumber.trim() && category && provider
               ? 'bg-blue-600 hover:bg-blue-700 text-white'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
@@ -118,4 +118,3 @@ const CardNumberEntry: React.FC = () => {
 };
 
 export default CardNumberEntry;
-

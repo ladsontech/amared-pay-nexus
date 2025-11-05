@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Zap, Droplets, Tv, Building } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { organizationService } from '@/services/organizationService';
 
 const ProviderSelection: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const category = searchParams.get('category');
-  const { user } = useAuth();
 
   const billCategories = [
     {
