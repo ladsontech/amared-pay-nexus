@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet, TrendingDown, AlertTriangle, Bell, History, CheckCircle, FileText, Plus } from "lucide-react";
+import { Wallet, TrendingDown, AlertTriangle, Bell, History, CheckCircle, FileText, Receipt } from "lucide-react";
 import { PettyCashWallet, PettyCashTransaction, PettyCashExpense } from "@/services/organizationService";
 import { useSearchParams } from "react-router-dom";
 
@@ -61,12 +61,6 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
 
   const navigationCards = [
     {
-      title: "Add Transaction",
-      description: "Create new transaction",
-      icon: Plus,
-      tab: "add",
-    },
-    {
       title: "History",
       description: "View transaction history",
       icon: History,
@@ -125,20 +119,52 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
         ))}
       </div>
 
-      {/* Navigation Cards - 2 columns on mobile, 4 on desktop */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      {/* Action Buttons - Request Expense and Request Cash Addition */}
+      <div className="grid grid-cols-2 gap-3 md:gap-4">
+        <Card 
+          className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+          onClick={() => handleTabChange("add")}
+        >
+          <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+            <Receipt className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
+            <CardTitle className="text-sm md:text-base font-semibold text-blue-900">
+              Request Expense
+            </CardTitle>
+            <CardDescription className="text-xs md:text-sm text-blue-700">
+              Submit expense request
+            </CardDescription>
+          </CardContent>
+        </Card>
+        <Card 
+          className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+          onClick={() => handleTabChange("add")}
+        >
+          <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+            <Wallet className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
+            <CardTitle className="text-sm md:text-base font-semibold text-blue-900">
+              Request Cash Addition
+            </CardTitle>
+            <CardDescription className="text-xs md:text-sm text-blue-700">
+              Add funds to wallet
+            </CardDescription>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Navigation Cards - 2 columns on mobile, 3 on desktop */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
         {navigationCards.map((nav, index) => (
           <Card 
             key={index} 
-            className="bg-white border border-gray-200 hover:shadow-md cursor-pointer transition-all active:scale-[0.98] shadow-sm"
+            className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
             onClick={() => handleTabChange(nav.tab)}
           >
             <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-              <nav.icon className="h-6 w-6 md:h-8 md:w-8 text-gray-600 mb-1" />
-              <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
+              <nav.icon className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
+              <CardTitle className="text-sm md:text-base font-semibold text-blue-900">
                 {nav.title}
               </CardTitle>
-              <CardDescription className="text-xs md:text-sm text-gray-600">
+              <CardDescription className="text-xs md:text-sm text-blue-700">
                 {nav.description}
               </CardDescription>
             </CardContent>

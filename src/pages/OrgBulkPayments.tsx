@@ -342,17 +342,6 @@ const BulkPayments = () => {
           <h1 className="text-xl md:text-2xl font-semibold text-slate-900">Bulk Payments</h1>
           <p className="text-sm text-muted-foreground">Manage and monitor your bulk payment transactions</p>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
-          {hasPermission("view_department_reports") && (
-            <Button variant="outline" asChild className="w-full sm:w-auto text-xs sm:text-sm">
-              <Link to="/org/reports?tab=bulk-payments" className="flex items-center justify-center space-x-2">
-                <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">View Bulk Payments Report</span>
-                <span className="sm:hidden">Reports</span>
-              </Link>
-            </Button>
-          )}
-        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setSearchParams(prev => { const p = new URLSearchParams(prev); p.set('tab', val); return p; }); }} className="w-full">
@@ -407,57 +396,36 @@ const BulkPayments = () => {
             </Card>
           </div>
 
-          {/* Navigation Cards - All tabs accessible from overview */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          {/* Create Options - Bank Payments and Mobile Payments at the top */}
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
             <Card 
-              className="bg-white border border-gray-200 hover:shadow-md cursor-pointer transition-all active:scale-[0.98] shadow-sm"
+              className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
               onClick={() => handleTabChange("bank")}
             >
               <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-                <CreditCard className="h-6 w-6 md:h-8 md:w-8 text-gray-600 mb-1" />
-                <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
+                <CreditCard className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+                <CardTitle className="text-sm md:text-base font-semibold text-white">
                   Bank Payments
                 </CardTitle>
-                <CardDescription className="text-xs md:text-sm text-gray-600">
+                <CardDescription className="text-xs md:text-sm text-blue-100">
                   Create bank transfers
                 </CardDescription>
               </CardContent>
             </Card>
             <Card 
-              className="bg-white border border-gray-200 hover:shadow-md cursor-pointer transition-all active:scale-[0.98] shadow-sm"
+              className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
               onClick={() => handleTabChange("mobile")}
             >
               <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-                <Upload className="h-6 w-6 md:h-8 md:w-8 text-gray-600 mb-1" />
-                <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
+                <Upload className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+                <CardTitle className="text-sm md:text-base font-semibold text-white">
                   Mobile Payments
                 </CardTitle>
-                <CardDescription className="text-xs md:text-sm text-gray-600">
+                <CardDescription className="text-xs md:text-sm text-blue-100">
                   Create mobile money
                 </CardDescription>
               </CardContent>
             </Card>
-            {hasPermission("approve_bulk_payments") && (
-              <Card 
-                className="bg-white border border-gray-200 hover:shadow-md cursor-pointer transition-all active:scale-[0.98] shadow-sm"
-                onClick={() => handleTabChange("approvals")}
-              >
-                <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-                  <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-gray-600 mb-1" />
-                  <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
-                    Approvals
-                  </CardTitle>
-                  <CardDescription className="text-xs md:text-sm text-gray-600">
-                    Review pending requests
-                    {pendingApprovals > 0 && (
-                      <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
-                        {pendingApprovals}
-                      </span>
-                    )}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            )}
           </div>
 
           {/* Search and Filters */}
@@ -657,6 +625,57 @@ const BulkPayments = () => {
               </CardContent>
             </Card>
           )}
+
+          {/* Approvals and Reports at the bottom */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+            {hasPermission("approve_bulk_payments") && (
+              <Card 
+                className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+                onClick={() => handleTabChange("approvals")}
+              >
+                <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+                  <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
+                  <CardTitle className="text-sm md:text-base font-semibold text-blue-900">
+                    Approvals
+                  </CardTitle>
+                  <CardDescription className="text-xs md:text-sm text-blue-700">
+                    Review pending requests
+                    {pendingApprovals > 0 && (
+                      <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                        {pendingApprovals}
+                      </span>
+                    )}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            )}
+            {hasPermission("view_department_reports") && (
+              <Card 
+                className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+              >
+                <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+                  <FileText className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
+                  <CardTitle className="text-sm md:text-base font-semibold text-blue-900">
+                    Reports
+                  </CardTitle>
+                  <CardDescription className="text-xs md:text-sm text-blue-700">
+                    View bulk payments reports
+                  </CardDescription>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2 w-full border-blue-200 bg-white hover:bg-blue-50 text-blue-700"
+                    asChild
+                  >
+                    <Link to="/org/reports?tab=bulk-payments" className="flex items-center justify-center space-x-2">
+                      <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="text-xs sm:text-sm">View Reports</span>
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="bank" className="space-y-4">
