@@ -15,7 +15,6 @@ import PettyCashReconciliation from "@/components/petty-cash/PettyCashReconcilia
 import PendingApprovals from "@/components/petty-cash/PendingApprovals";
 import BulkPaymentApprovals from "@/components/petty-cash/BulkPaymentApprovals";
 import { useSearchParams, Link } from "react-router-dom";
-import EnhancedPayBillsForm from "@/components/EnhancedPayBillsForm";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -24,7 +23,6 @@ const PettyCash = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") as string || "overview";
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [isPayBillsOpen, setIsPayBillsOpen] = useState(false);
   const [isCreateWalletOpen, setIsCreateWalletOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<string>("");
   const [currencies, setCurrencies] = useState<any[]>([]);
@@ -243,9 +241,6 @@ const PettyCash = () => {
             <TabsTrigger value="add" className="text-[11px] font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm h-9">
               Add
             </TabsTrigger>
-            <TabsTrigger value="bills" className="text-[11px] font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm h-9">
-              Bills
-            </TabsTrigger>
             <TabsTrigger value="history" className="text-[11px] font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm h-9">
               History
             </TabsTrigger>
@@ -264,10 +259,9 @@ const PettyCash = () => {
 
         {/* Desktop Tabs */}
         <div className="hidden md:block">
-          <TabsList className="grid w-full grid-cols-6 h-auto">
+          <TabsList className="grid w-full grid-cols-5 h-auto">
             <TabsTrigger value="overview" className="text-sm">Overview</TabsTrigger>
             <TabsTrigger value="add" className="text-sm">Add Transaction</TabsTrigger>
-            <TabsTrigger value="bills" className="text-sm">Pay Bills</TabsTrigger>
             <TabsTrigger value="history" className="text-sm">History</TabsTrigger>
             <TabsTrigger value="approvals" className="text-sm">PC Approvals</TabsTrigger>
             <TabsTrigger value="reconciliation" className="text-sm">Reconciliation</TabsTrigger>
@@ -312,87 +306,6 @@ const PettyCash = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="bills" className="space-y-3 md:space-y-4 mt-4 md:mt-6">
-          <Card className="bg-white border border-gray-100 shadow-sm md:shadow-lg">
-            <CardHeader className="pb-3 md:pb-4">
-              <CardTitle className="text-base md:text-lg font-bold text-black flex items-center gap-2">
-                <FileText className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
-                Pay Bills
-              </CardTitle>
-              <CardDescription className="text-xs md:text-sm text-gray-600">
-                Pay utility bills using your Main Wallet or Petty Cash funds
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 md:space-y-4 px-3 md:px-6 pb-3 md:pb-6">
-              <div className="grid grid-cols-2 gap-2 md:grid-cols-2 md:gap-4">
-                {/* Balance Cards - Compact */}
-                <Card className="border border-blue-200 bg-blue-50/50">
-                  <CardContent className="p-2.5 md:p-4 text-center">
-                    <Wallet className="h-5 w-5 md:h-8 md:w-8 mx-auto mb-1 md:mb-2 text-blue-600" />
-                    <p className="text-[10px] md:text-sm font-semibold text-black">Main Wallet</p>
-                    {loading ? (
-                      <p className="text-base md:text-2xl font-bold text-blue-600 mt-0.5 md:mt-1">Loading...</p>
-                    ) : mainWallet ? (
-                      <>
-                        <p className="text-base md:text-2xl font-bold text-blue-600 mt-0.5 md:mt-1">
-                          {formatBalance(mainBalance, mainCurrency)}
-                        </p>
-                        <p className="text-[9px] md:text-xs text-gray-600 mt-0.5">Available</p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-base md:text-2xl font-bold text-gray-400 mt-0.5 md:mt-1">No Wallet</p>
-                        <p className="text-[9px] md:text-xs text-gray-500 mt-0.5">Not configured</p>
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-                
-                <Card className="border border-green-200 bg-green-50/50">
-                  <CardContent className="p-2.5 md:p-4 text-center">
-                    <Wallet className="h-5 w-5 md:h-8 md:w-8 mx-auto mb-1 md:mb-2 text-green-600" />
-                    <p className="text-[10px] md:text-sm font-semibold text-black">Petty Cash</p>
-                    {loading ? (
-                      <p className="text-base md:text-2xl font-bold text-green-600 mt-0.5 md:mt-1">Loading...</p>
-                    ) : pettyCashWallet ? (
-                      <>
-                        <p className="text-base md:text-2xl font-bold text-green-600 mt-0.5 md:mt-1">
-                          {formatBalance(pettyCashBalance, pettyCurrency)}
-                        </p>
-                        <p className="text-[9px] md:text-xs text-gray-600 mt-0.5">Available</p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-base md:text-2xl font-bold text-gray-400 mt-0.5 md:mt-1">No Wallet</p>
-                        <p className="text-[9px] md:text-xs text-gray-500 mt-0.5">Not configured</p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="mt-2 text-xs"
-                          onClick={handleOpenCreateWallet}
-                        >
-                          <Plus className="h-3 w-3 mr-1" />
-                          Create Wallet
-                        </Button>
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-              
-              <Button 
-                onClick={() => setIsPayBillsOpen(true)} 
-                className="w-full h-10 md:h-12 text-sm md:text-base" 
-                size="lg"
-                disabled={!mainWallet && !pettyCashWallet}
-              >
-                <FileText className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
-                Start Bill Payment
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
         <TabsContent value="history" className="space-y-3 md:space-y-4 mt-4 md:mt-6">
           <div className="bg-white rounded-lg border border-gray-100 shadow-sm md:shadow-lg">
             <TransactionHistory />
@@ -411,9 +324,6 @@ const PettyCash = () => {
           </div>
         </TabsContent>
       </Tabs>
-
-      {/* Pay Bills Modal */}
-      <EnhancedPayBillsForm isOpen={isPayBillsOpen} onClose={() => setIsPayBillsOpen(false)} />
 
       {/* Create Petty Cash Wallet Dialog */}
       <Dialog open={isCreateWalletOpen} onOpenChange={setIsCreateWalletOpen}>

@@ -12,9 +12,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/hooks/useOrganization";
 import { organizationService, UpdateStaffRequest } from "@/services/organizationService";
 import { StaffCreationForm } from "@/components/StaffCreationForm";
-import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, Building, Phone, Send, Target, Calendar, BarChart3, ChevronRight, Eye, ArrowUpRight, Plus, Edit, Trash2, UserPlus } from "lucide-react";
+import { DollarSign, Wallet, TrendingUp, TrendingDown, Activity, Users, CheckCircle, Clock, AlertCircle, Building, Phone, Send, Target, Calendar, BarChart3, ChevronRight, Eye, ArrowUpRight, Plus, Edit, Trash2, UserPlus, CreditCard } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 const OrgDashboard = () => {
+  const navigate = useNavigate();
   const {
     user,
     hasPermission
@@ -283,7 +285,14 @@ const OrgDashboard = () => {
                 </div>
                 
                 {/* Quick Actions */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
+                  <Button 
+                    onClick={() => navigate('/org/pay-bills')}
+                    className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Pay Bills
+                  </Button>
                   <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
                     <DialogTrigger asChild>
                       <Button className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm">
@@ -479,6 +488,59 @@ const OrgDashboard = () => {
             </Card>
           </div>
 
+          {/* Services Section - Pay Bills Feature Card */}
+          <div className="mt-6">
+            <Card className="bg-white border border-gray-100 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold text-black flex items-center justify-between">
+                  <span>Pay Bills</span>
+                  <Button 
+                    onClick={() => navigate('/org/pay-bills')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Pay Bills Now
+                  </Button>
+                </CardTitle>
+                <CardDescription>
+                  Pay utility bills including water, electricity, TV subscriptions, and taxes
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer" onClick={() => navigate('/org/pay-bills')}>
+                    <div className="p-2 bg-blue-100 rounded-lg mb-2">
+                      <Activity className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">Water</span>
+                    <span className="text-xs text-gray-500">NWSC</span>
+                  </div>
+                  <div className="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer" onClick={() => navigate('/org/pay-bills')}>
+                    <div className="p-2 bg-blue-100 rounded-lg mb-2">
+                      <Activity className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">Electricity</span>
+                    <span className="text-xs text-gray-500">UEDCL</span>
+                  </div>
+                  <div className="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer" onClick={() => navigate('/org/pay-bills')}>
+                    <div className="p-2 bg-blue-100 rounded-lg mb-2">
+                      <Activity className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">TV</span>
+                    <span className="text-xs text-gray-500">DSTV, GOTV, etc</span>
+                  </div>
+                  <div className="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer" onClick={() => navigate('/org/pay-bills')}>
+                    <div className="p-2 bg-blue-100 rounded-lg mb-2">
+                      <Activity className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">Tax</span>
+                    <span className="text-xs text-gray-500">URA, KCCA</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Payment Metrics Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
             <Card className="bg-white border border-gray-100 shadow-lg">
@@ -569,7 +631,14 @@ const OrgDashboard = () => {
             </div>
             
             {/* Mobile Quick Actions - Compact */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
+              <Button 
+                onClick={() => navigate('/org/pay-bills')}
+                className="bg-white/20 hover:bg-white/30 text-white border-0 text-[11px] py-2 h-9"
+              >
+                <CreditCard className="h-3 w-3 mr-1" />
+                Pay Bills
+              </Button>
               <Dialog open={sendToBankOpen} onOpenChange={setSendToBankOpen}>
                 <DialogTrigger asChild>
                   <Button className="bg-white/20 hover:bg-white/30 text-white border-0 text-[11px] py-2 h-9">
