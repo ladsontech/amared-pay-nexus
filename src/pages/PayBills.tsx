@@ -172,47 +172,47 @@ const PayBills: React.FC = () => {
         </div>
 
         {/* Wallet Balances - Two Column Grid */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-6">
           {/* Main Wallet Card */}
           <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-100">
-                    <Wallet className="h-5 w-5 text-blue-600" />
+            <CardHeader className="pb-2 sm:pb-3 px-2 sm:px-6 pt-3 sm:pt-6">
+              <div className="flex items-center justify-between gap-1">
+                <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                  <div className="p-1 sm:p-2 rounded-lg bg-blue-100 flex-shrink-0">
+                    <Wallet className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-blue-600" />
                   </div>
-                  <div>
-                    <CardTitle className="text-base font-semibold text-gray-900">Main Wallet</CardTitle>
-                    <p className="text-xs text-gray-500 mt-0.5">{mainWallet?.currency?.name || 'Currency'}</p>
+                  <div className="min-w-0">
+                    <CardTitle className="text-xs sm:text-sm md:text-base font-semibold text-gray-900 truncate">Main Wallet</CardTitle>
+                    <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 truncate">{mainWallet?.currency?.name || 'Currency'}</p>
                   </div>
                 </div>
                 {mainWallet && (
-                  <Badge className="bg-green-100 text-green-800 text-xs px-2">
+                  <Badge className="bg-green-100 text-green-800 text-[10px] sm:text-xs px-1 sm:px-2 flex-shrink-0">
                     Active
                   </Badge>
                 )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-2 sm:px-6 pb-3 sm:pb-6">
               {walletsLoading ? (
-                <div className="flex items-center gap-2 py-6">
-                  <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                  <span className="text-sm text-gray-600">Loading balance...</span>
+                <div className="flex items-center gap-1 sm:gap-2 py-3 sm:py-6">
+                  <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 animate-spin text-blue-600" />
+                  <span className="text-[10px] sm:text-xs md:text-sm text-gray-600">Loading...</span>
                 </div>
               ) : mainWallet ? (
                 <>
-                  <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
+                  <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 break-words">
                     {formatCurrency(mainBalance, mainCurrency)}
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <CheckCircle className="h-3 w-3 text-green-600" />
-                    <span>Available balance</span>
+                  <div className="flex items-center gap-1 text-[10px] sm:text-xs text-gray-500">
+                    <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-green-600 flex-shrink-0" />
+                    <span className="truncate">Available</span>
                   </div>
                 </>
               ) : (
-                <div className="py-6">
-                  <div className="text-base text-gray-500 mb-2">No wallet found</div>
-                  <p className="text-xs text-gray-400">Please contact your administrator</p>
+                <div className="py-3 sm:py-6">
+                  <div className="text-xs sm:text-sm md:text-base text-gray-500 mb-1">No wallet</div>
+                  <p className="text-[10px] sm:text-xs text-gray-400">Contact admin</p>
                 </div>
               )}
             </CardContent>
@@ -220,50 +220,50 @@ const PayBills: React.FC = () => {
 
           {/* Petty Cash Wallet Card */}
           <Card className={`border shadow-sm hover:shadow-md transition-shadow ${hasPettyCashWallet ? 'border-green-200' : 'border-gray-200'}`}>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${hasPettyCashWallet ? 'bg-green-100' : 'bg-gray-100'}`}>
-                    <DollarSign className={`h-5 w-5 ${hasPettyCashWallet ? 'text-green-600' : 'text-gray-400'}`} />
+            <CardHeader className="pb-2 sm:pb-3 px-2 sm:px-6 pt-3 sm:pt-6">
+              <div className="flex items-center justify-between gap-1">
+                <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                  <div className={`p-1 sm:p-2 rounded-lg flex-shrink-0 ${hasPettyCashWallet ? 'bg-green-100' : 'bg-gray-100'}`}>
+                    <DollarSign className={`h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 ${hasPettyCashWallet ? 'text-green-600' : 'text-gray-400'}`} />
                   </div>
-                  <div>
-                    <CardTitle className="text-base font-semibold text-gray-900">Petty Cash</CardTitle>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                  <div className="min-w-0">
+                    <CardTitle className="text-xs sm:text-sm md:text-base font-semibold text-gray-900 truncate">Petty Cash</CardTitle>
+                    <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 truncate">
                       {hasPettyCashWallet ? (pettyCashWallet?.currency?.name || 'Currency') : 'Not configured'}
                     </p>
                   </div>
                 </div>
                 {hasPettyCashWallet ? (
-                  <Badge className="bg-green-100 text-green-800 text-xs px-2">
+                  <Badge className="bg-green-100 text-green-800 text-[10px] sm:text-xs px-1 sm:px-2 flex-shrink-0">
                     Active
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="text-xs px-2 border-gray-300 text-gray-500">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs px-1 sm:px-2 border-gray-300 text-gray-500 flex-shrink-0">
                     Not Set
                   </Badge>
                 )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-2 sm:px-6 pb-3 sm:pb-6">
               {walletsLoading ? (
-                <div className="flex items-center gap-2 py-6">
-                  <Loader2 className="h-5 w-5 animate-spin text-gray-600" />
-                  <span className="text-sm text-gray-600">Loading balance...</span>
+                <div className="flex items-center gap-1 sm:gap-2 py-3 sm:py-6">
+                  <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 animate-spin text-gray-600" />
+                  <span className="text-[10px] sm:text-xs md:text-sm text-gray-600">Loading...</span>
                 </div>
               ) : hasPettyCashWallet ? (
                 <>
-                  <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
+                  <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 break-words">
                     {formatCurrency(pettyCashBalance, pettyCurrency)}
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <CheckCircle className="h-3 w-3 text-green-600" />
-                    <span>Available balance</span>
+                  <div className="flex items-center gap-1 text-[10px] sm:text-xs text-gray-500">
+                    <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-green-600 flex-shrink-0" />
+                    <span className="truncate">Available</span>
                   </div>
                 </>
               ) : (
-                <div className="py-6">
-                  <div className="text-base text-gray-500 mb-2">Petty cash wallet not set up</div>
-                  <p className="text-xs text-gray-400">Contact your administrator to set up petty cash</p>
+                <div className="py-3 sm:py-6">
+                  <div className="text-xs sm:text-sm md:text-base text-gray-500 mb-1">Not set up</div>
+                  <p className="text-[10px] sm:text-xs text-gray-400">Contact admin</p>
                 </div>
               )}
             </CardContent>
