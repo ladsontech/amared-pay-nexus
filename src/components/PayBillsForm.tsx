@@ -114,8 +114,8 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider, initi
   }, [user?.organizationId, isOpen]);
 
   // Get main wallet (non-petty cash wallet)
-  const mainWallet = mainWallets.find(w => !w.petty_cash_wallet);
-  const pettyCashWallet = pettyCashWallets[0];
+  const mainWallet = mainWallets.find(w => !w.petty_cash_wallet) || null;
+  const pettyCashWallet = pettyCashWallets && pettyCashWallets.length > 0 ? pettyCashWallets[0] : null;
 
   // Get balances from API - ensure we're using real values
   const walletBalance = mainWallet?.balance ?? 0;
@@ -629,7 +629,15 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider, initi
                           ? "border-blue-500 bg-blue-50"
                           : "border-gray-200 hover:border-blue-300"
                       }`}
-                      onClick={() => setSelectedProvider(provider.id)}
+                      onClick={() => {
+                        // For TV and Tax, navigate to card entry screen
+                        if (selectedBill === 'tv' || selectedBill === 'tax') {
+                          navigate(`/org/pay-bills/card-entry?category=${selectedBill}&provider=${provider.id}`);
+                          onClose();
+                        } else {
+                          setSelectedProvider(provider.id);
+                        }
+                      }}
                     >
                       <CardContent className="p-3 sm:p-4">
                         <div className="flex flex-col items-center gap-2">
