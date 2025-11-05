@@ -1,12 +1,14 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download } from "lucide-react";
-import { collectionReportData } from "@/data/reportData";
+import { Download, Loader2 } from "lucide-react";
+import { paymentService, Collection } from "@/services/paymentService";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 function exportCsv(filename: string, rows: Array<Record<string, any>>) {
   if (!rows.length) return;
@@ -30,7 +32,7 @@ function exportCsv(filename: string, rows: Array<Record<string, any>>) {
   URL.revokeObjectURL(url);
 }
 
-const statusColor = (status: string) => {
+const statusColor = (status: string | null) => {
   switch (status) {
     case "successful":
     case "active":
@@ -48,13 +50,47 @@ const statusColor = (status: string) => {
 };
 
 const CollectionsReport = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [methodFilter, setMethodFilter] = useState<string>("all");
-  const [fromDate, setFromDate] = useState<string>("2024-01-01");
-  const [toDate, setToDate] = useState<string>("2024-12-31");
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+
+  useEffect(() => {
+    const fetchCollections = async () => {
+      if (!user?.organizationId) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const response = await paymentService.getCollections({
+          organization: user.organizationId,
+          limit: 100
+        });
+        setCollections(response.results);
+      } catch (error: any) {
+        console.error("Error fetching collections:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to load collections. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCollections();
+  }, [user?.organizationId, toast]);
 
   const inRange = (iso: string) => {
+    if (!fromDate || !toDate) return true;
     const d = new Date(iso).getTime();
     const from = new Date(`${fromDate}T00:00:00`).getTime();
     const to = new Date(`${toDate}T23:59:59`).getTime();
@@ -62,28 +98,46 @@ const CollectionsReport = () => {
   };
 
   const filtered = useMemo(() => {
-    return collectionReportData
-      .filter((c) => inRange(c.createdAt))
+    return collections
+      .filter((c) => inRange(c.created_at))
       .filter((c) => (statusFilter === "all" ? true : c.status === statusFilter))
-      .filter((c) => (methodFilter === "all" ? true : c.method === methodFilter))
-      .filter((c) => `${c.id} ${c.reference} ${c.phoneNumber}`.toLowerCase().includes(search.toLowerCase()))
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [search, statusFilter, methodFilter, fromDate, toDate]);
+      .filter((c) => {
+        // Collections don't have a mode field, so we'll filter by phone_number presence
+        // Collections with phone_number are typically mobile money
+        if (methodFilter === "all") return true;
+        if (methodFilter === "mobile_money") return !!c.phone_number;
+        if (methodFilter === "bank_transfer") return !c.phone_number;
+        return true;
+      })
+      .filter((c) => {
+        const searchText = `${c.id} ${c.reason || ""} ${c.phone_number || ""}`.toLowerCase();
+        return searchText.includes(search.toLowerCase());
+      })
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [collections, search, statusFilter, methodFilter, fromDate, toDate]);
 
-  const totalAmount = useMemo(() => filtered.reduce((s, c) => s + c.amount, 0), [filtered]);
+  const totalAmount = useMemo(() => filtered.reduce((s, c) => s + (c.amount || 0), 0), [filtered]);
   const countSuccessful = useMemo(() => filtered.filter((c) => c.status === "successful").length, [filtered]);
 
   const handleExport = () => {
     exportCsv("collections-report.csv", filtered.map((c) => ({
       ID: c.id,
-      PhoneNumber: c.phoneNumber,
-      Method: c.method,
-      Status: c.status,
-      Amount: c.amount,
-      Reference: c.reference,
-      CreatedAt: c.createdAt
+      PhoneNumber: c.phone_number || "N/A",
+      Method: c.mode || "N/A",
+      Status: c.status || "N/A",
+      Amount: c.amount || 0,
+      Reason: c.reason || "N/A",
+      CreatedAt: c.created_at
     })));
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -172,7 +226,7 @@ const CollectionsReport = () => {
             <div className="sm:col-span-2 lg:col-span-2 xl:col-span-2">
               <label className="text-xs font-medium">Search</label>
               <Input 
-                placeholder="Search ID, reference, or phone" 
+                placeholder="Search ID, reason, or phone" 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)} 
                 className="text-xs sm:text-sm h-9 sm:h-10"
@@ -188,9 +242,9 @@ const CollectionsReport = () => {
             <TableRow>
               <TableHead className="text-xs sm:text-sm">ID</TableHead>
               <TableHead className="text-xs sm:text-sm">Phone</TableHead>
-              <TableHead className="text-xs sm:text-sm">Method</TableHead>
               <TableHead className="text-xs sm:text-sm">Status</TableHead>
               <TableHead className="text-xs sm:text-sm">Amount</TableHead>
+              <TableHead className="text-xs sm:text-sm">Reason</TableHead>
               <TableHead className="text-xs sm:text-sm">Reference</TableHead>
               <TableHead className="text-xs sm:text-sm">Created</TableHead>
             </TableRow>
@@ -201,22 +255,30 @@ const CollectionsReport = () => {
                 <TableCell className="font-medium text-xs sm:text-sm p-2 sm:p-4">
                   <span className="break-all">{c.id}</span>
                 </TableCell>
-                <TableCell className="text-xs sm:text-sm p-2 sm:p-4">{c.phoneNumber}</TableCell>
-                <TableCell className="capitalize text-xs sm:text-sm p-2 sm:p-4">{c.method.replace("_", " ")}</TableCell>
+                <TableCell className="text-xs sm:text-sm p-2 sm:p-4">{c.phone_number || "N/A"}</TableCell>
                 <TableCell className="p-2 sm:p-4">
-                  <Badge className={`${statusColor(c.status)} text-xs`}>{c.status}</Badge>
+                  <Badge className={`${statusColor(c.status)} text-xs`}>
+                    {c.status || "N/A"}
+                  </Badge>
                 </TableCell>
-                <TableCell className="text-xs sm:text-sm p-2 sm:p-4 whitespace-nowrap">UGX {c.amount.toLocaleString()}</TableCell>
+                <TableCell className="text-xs sm:text-sm p-2 sm:p-4 whitespace-nowrap">
+                  UGX {(c.amount || 0).toLocaleString()}
+                </TableCell>
                 <TableCell className="text-xs sm:text-sm p-2 sm:p-4">
-                  <span className="break-all">{c.reference}</span>
+                  <span className="break-all">{c.reason || "N/A"}</span>
                 </TableCell>
-                <TableCell className="text-xs sm:text-sm p-2 sm:p-4 whitespace-nowrap">{new Date(c.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell className="text-xs sm:text-sm p-2 sm:p-4">
+                  <span className="break-all">{c.reference || "N/A"}</span>
+                </TableCell>
+                <TableCell className="text-xs sm:text-sm p-2 sm:p-4 whitespace-nowrap">
+                  {new Date(c.created_at).toLocaleDateString()}
+                </TableCell>
               </TableRow>
             ))}
             {filtered.length === 0 && (
               <TableRow>
                 <TableCell colSpan={7} className="text-center text-muted-foreground text-xs sm:text-sm p-4 sm:p-6">
-                  No records for selected filters.
+                  {isLoading ? "Loading..." : "No records for selected filters."}
                 </TableCell>
               </TableRow>
             )}

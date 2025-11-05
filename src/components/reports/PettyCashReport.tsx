@@ -1,37 +1,26 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Filter } from "lucide-react";
-import { pettyCashStartingFloat, pettyCashTransactions, PettyCashTransaction } from "@/data/reportData";
+import { Download, Loader2 } from "lucide-react";
+import { organizationService, PettyCashTransaction } from "@/services/organizationService";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { useOrganization } from "@/hooks/useOrganization";
 
-// Calculate running balance for each transaction
-function calculateRunningBalances(transactions: PettyCashTransaction[], startingBalance: number) {
-  const sorted = [...transactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  let runningBalance = startingBalance;
-  
-  return sorted.map(transaction => {
-    const openingBalance = runningBalance;
-    if (transaction.type === "addition") {
-      runningBalance += transaction.amount;
-    } else {
-      runningBalance -= transaction.amount;
-    }
-    const closingBalance = runningBalance;
-    
-    return {
-      ...transaction,
-      openingBalance,
-      closingBalance
-    };
-  });
+interface TransactionWithBalance extends PettyCashTransaction {
+  openingBalance: number;
+  closingBalance: number;
+  displayDate: string;
+  displayType: "expense" | "addition";
+  displayCategory: string;
+  displayPayee: string;
 }
 
 function parseDate(dateStr: string): Date {
-  // Ensure consistent parsing for YYYY-MM-DD
   return new Date(`${dateStr}T00:00:00`);
 }
 
@@ -61,78 +50,240 @@ function exportCsv(filename: string, rows: Array<Record<string, any>>) {
   URL.revokeObjectURL(url);
 }
 
+// Calculate running balance for each transaction
+function calculateRunningBalances(
+  transactions: TransactionWithBalance[],
+  startingBalance: number
+): TransactionWithBalance[] {
+  const sorted = [...transactions].sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
+  let runningBalance = startingBalance;
+
+  return sorted.map((transaction) => {
+    const openingBalance = runningBalance;
+    if (transaction.type === "credit") {
+      runningBalance += transaction.amount;
+    } else if (transaction.type === "debit") {
+      runningBalance -= transaction.amount;
+    }
+    const closingBalance = runningBalance;
+
+    return {
+      ...transaction,
+      openingBalance,
+      closingBalance,
+    };
+  });
+}
+
 const PettyCashReport = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const { pettyCashWallets } = useOrganization();
+  const [transactions, setTransactions] = useState<PettyCashTransaction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("approved");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
-  // Derive date range from dataset so we show data by default
+  // Initialize date range
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+
+  // Get date range from transactions
   const datasetRange = useMemo(() => {
-    const dates = pettyCashTransactions.map((t) => parseDate(t.date).getTime());
+    if (transactions.length === 0) {
+      const today = new Date();
+      const lastMonth = new Date(today);
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+      return {
+        from: lastMonth.toISOString().slice(0, 10),
+        to: today.toISOString().slice(0, 10),
+      };
+    }
+    const dates = transactions.map((t) => new Date(t.created_at).getTime());
     const min = new Date(Math.min(...dates));
     const max = new Date(Math.max(...dates));
     const toYmd = (d: Date) => d.toISOString().slice(0, 10);
     return { from: toYmd(min), to: toYmd(max) };
-  }, []);
+  }, [transactions]);
 
-  const [fromDate, setFromDate] = useState<string>(datasetRange.from);
-  const [toDate, setToDate] = useState<string>(datasetRange.to);
+  // Update date range when transactions are loaded
+  useEffect(() => {
+    if (!fromDate && !toDate && datasetRange.from && datasetRange.to) {
+      setFromDate(datasetRange.from);
+      setToDate(datasetRange.to);
+    }
+  }, [datasetRange, fromDate, toDate]);
 
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!user?.organizationId) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        
+        // Fetch all petty cash transactions
+        const response = await organizationService.getPettyCashTransactions({
+          organization: user.organizationId,
+          limit: 1000
+        });
+
+        setTransactions(response.results);
+      } catch (error: any) {
+        console.error("Error fetching petty cash transactions:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to load petty cash transactions. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, [user?.organizationId, toast]);
+
+  // Map API transactions to report format
+  const mappedTransactions = useMemo<TransactionWithBalance[]>(() => {
+    return transactions.map((t) => {
+      // Extract category from title or use default
+      const titleParts = (t.title || "").split("-");
+      const category = titleParts.length > 1 ? titleParts[0].trim() : "General";
+      const description = titleParts.length > 1 ? titleParts.slice(1).join("-").trim() : (t.title || "Transaction");
+      
+      // Map type: credit = addition, debit = expense
+      const displayType = t.type === "credit" ? "addition" : "expense";
+      
+      // Extract payee from updated_by user
+      const payee = t.updated_by
+        ? `${t.updated_by.first_name || ""} ${t.updated_by.last_name || ""}`.trim() || t.updated_by.username || "N/A"
+        : "N/A";
+
+      return {
+        ...t,
+        displayDate: t.created_at.split("T")[0],
+        displayType,
+        displayCategory: category,
+        displayPayee: payee,
+        openingBalance: 0,
+        closingBalance: 0,
+      };
+    });
+  }, [transactions]);
+
+  // Get categories from transactions
   const categories = useMemo(() => {
     const set = new Set<string>();
-    pettyCashTransactions.forEach((t) => set.add(t.category));
+    mappedTransactions.forEach((t) => set.add(t.displayCategory));
     return Array.from(set).sort();
-  }, []);
+  }, [mappedTransactions]);
 
   const dateInRange = (dateStr: string) => {
-    const d = parseDate(dateStr).getTime();
-    const from = parseDate(fromDate).getTime();
-    const to = parseDate(toDate).getTime();
+    if (!fromDate || !toDate) return true;
+    const d = new Date(dateStr).getTime();
+    const from = new Date(`${fromDate}T00:00:00`).getTime();
+    const to = new Date(`${toDate}T23:59:59`).getTime();
     return d >= from && d <= to;
   };
 
-  const filtered = useMemo<PettyCashTransaction[]>(() => {
-    return pettyCashTransactions
-      .filter((t) => dateInRange(t.date))
+  // Get starting balance from petty cash wallet
+  const startingBalance = useMemo(() => {
+    if (pettyCashWallets && pettyCashWallets.length > 0) {
+      // Calculate balance from transactions before the date range
+      const beforeTransactions = mappedTransactions.filter(
+        (t) => new Date(t.created_at).getTime() < new Date(`${fromDate}T00:00:00`).getTime()
+      );
+      let balance = pettyCashWallets[0].balance || 0;
+      
+      // Adjust for transactions before the date range
+      beforeTransactions.forEach((t) => {
+        if (t.type === "credit") {
+          balance -= t.amount;
+        } else if (t.type === "debit") {
+          balance += t.amount;
+        }
+      });
+      
+      return balance;
+    }
+    return 0;
+  }, [pettyCashWallets, mappedTransactions, fromDate]);
+
+  const filtered = useMemo<TransactionWithBalance[]>(() => {
+    return mappedTransactions
+      .filter((t) => dateInRange(t.displayDate))
       .filter((t) => (statusFilter === "all" ? true : t.status === statusFilter))
-      .filter((t) => (categoryFilter === "all" ? true : t.category === categoryFilter))
+      .filter((t) => (categoryFilter === "all" ? true : t.displayCategory === categoryFilter))
       .filter((t) => {
-        const text = `${t.id} ${t.description} ${t.category} ${t.payee ?? ""}`.toLowerCase();
+        const text = `${t.id} ${t.title || ""} ${t.displayCategory} ${t.displayPayee}`.toLowerCase();
         return text.includes(search.toLowerCase());
       })
-      .sort((a, b) => parseDate(b.date).getTime() - parseDate(a.date).getTime()); // Most recent first
-  }, [fromDate, toDate, statusFilter, categoryFilter, search]);
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [mappedTransactions, fromDate, toDate, statusFilter, categoryFilter, search]);
 
+  // Calculate opening balance for filtered transactions
   const openingBalance = useMemo(() => {
-    const before = pettyCashTransactions
-      .filter((t) => parseDate(t.date).getTime() < parseDate(fromDate).getTime())
-      .filter((t) => (statusFilter === "all" ? true : t.status === statusFilter));
-    const additions = before.filter((t) => t.type === "addition").reduce((s, t) => s + t.amount, 0);
-    const expenses = before.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
-    return pettyCashStartingFloat + additions - expenses;
-  }, [fromDate, statusFilter]);
+    const before = mappedTransactions.filter(
+      (t) => new Date(t.created_at).getTime() < new Date(`${fromDate}T00:00:00`).getTime()
+    );
+    let balance = startingBalance;
+    before.forEach((t) => {
+      if (t.type === "credit") {
+        balance += t.amount;
+      } else if (t.type === "debit") {
+        balance -= t.amount;
+      }
+    });
+    return balance;
+  }, [mappedTransactions, fromDate, startingBalance]);
 
   // Calculate balances for filtered transactions
   const transactionsWithBalances = useMemo(() => {
     return calculateRunningBalances(filtered, openingBalance);
   }, [filtered, openingBalance]);
 
-  const inflows = useMemo(() => filtered.filter((t) => t.type === "addition").reduce((s, t) => s + t.amount, 0), [filtered]);
-  const outflows = useMemo(() => filtered.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0), [filtered]);
-  const closingBalance = useMemo(() => openingBalance + inflows - outflows, [openingBalance, inflows, outflows]);
+  const inflows = useMemo(
+    () => filtered.filter((t) => t.displayType === "addition").reduce((s, t) => s + t.amount, 0),
+    [filtered]
+  );
+  const outflows = useMemo(
+    () => filtered.filter((t) => t.displayType === "expense").reduce((s, t) => s + t.amount, 0),
+    [filtered]
+  );
+  const closingBalance = useMemo(
+    () => openingBalance + inflows - outflows,
+    [openingBalance, inflows, outflows]
+  );
 
   const handleExport = () => {
-    exportCsv("petty-cash-report.csv", filtered.map((t) => ({
-      Date: t.date,
-      ID: t.id,
-      Type: t.type,
-      Description: t.description,
-      Category: t.category,
-      Status: t.status,
-      Payee: t.payee ?? "",
-      Amount: (t.type === "expense" ? -t.amount : t.amount)
-    })));
+    exportCsv(
+      "petty-cash-report.csv",
+      filtered.map((t) => ({
+        Date: t.displayDate,
+        ID: t.id,
+        Type: t.displayType,
+        Description: t.title || "N/A",
+        Category: t.displayCategory,
+        Status: t.status || "N/A",
+        Payee: t.displayPayee,
+        Amount: t.displayType === "expense" ? -t.amount : t.amount,
+      }))
+    );
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -156,14 +307,14 @@ const PettyCashReport = () => {
                 <h4 className="text-base font-semibold text-black mb-1">Total Inflows (Additions)</h4>
                 <div className="text-xl font-bold text-green-700">+UGX {inflows.toLocaleString()}</div>
                 <p className="text-xs text-gray-600 mt-1">
-                  {filtered.filter(t => t.type === "addition").length} transactions
+                  {filtered.filter((t) => t.displayType === "addition").length} transactions
                 </p>
               </div>
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <h4 className="text-base font-semibold text-black mb-1">Total Outflows (Expenses)</h4>
                 <div className="text-xl font-bold text-red-700">-UGX {outflows.toLocaleString()}</div>
                 <p className="text-xs text-gray-600 mt-1">
-                  {filtered.filter(t => t.type === "expense").length} transactions
+                  {filtered.filter((t) => t.displayType === "expense").length} transactions
                 </p>
               </div>
             </div>
@@ -171,11 +322,11 @@ const PettyCashReport = () => {
             {/* Net Movement */}
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
               <h4 className="text-base font-semibold text-black mb-1">Net Movement</h4>
-              <div className={`text-xl font-bold ${(inflows - outflows) >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-                {(inflows - outflows) >= 0 ? '+' : ''}UGX {(inflows - outflows).toLocaleString()}
+              <div className={`text-xl font-bold ${inflows - outflows >= 0 ? "text-green-700" : "text-red-700"}`}>
+                {inflows - outflows >= 0 ? "+" : ""}UGX {(inflows - outflows).toLocaleString()}
               </div>
               <p className="text-xs text-gray-600 mt-1">
-                {(inflows - outflows) >= 0 ? 'Net increase' : 'Net decrease'} in fund
+                {inflows - outflows >= 0 ? "Net increase" : "Net decrease"} in fund
               </p>
             </div>
 
@@ -185,7 +336,9 @@ const PettyCashReport = () => {
               <p className="text-sm text-gray-600 mb-2">Cash available at end of period ({toDate})</p>
               <div className="text-2xl font-bold text-blue-600">UGX {closingBalance.toLocaleString()}</div>
               <div className="mt-2 text-sm text-gray-600">
-                <span className="font-medium">Calculation:</span> Opening ({openingBalance.toLocaleString()}) + Inflows ({inflows.toLocaleString()}) - Outflows ({outflows.toLocaleString()}) = {closingBalance.toLocaleString()}
+                <span className="font-medium">Calculation:</span> Opening ({openingBalance.toLocaleString()}) + Inflows (
+                {inflows.toLocaleString()}) - Outflows ({outflows.toLocaleString()}) ={" "}
+                {closingBalance.toLocaleString()}
               </div>
             </div>
           </div>
@@ -222,7 +375,7 @@ const PettyCashReport = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-white z-50">
                   <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="pending_approval">Pending</SelectItem>
                   <SelectItem value="rejected">Rejected</SelectItem>
                   <SelectItem value="all">All</SelectItem>
                 </SelectContent>
@@ -237,13 +390,19 @@ const PettyCashReport = () => {
                 <SelectContent className="bg-white z-50">
                   <SelectItem value="all">All</SelectItem>
                   {categories.map((c) => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="lg:col-span-2">
-              <Input placeholder="Search description, ID, or payee" value={search} onChange={(e) => setSearch(e.target.value)} />
+              <Input
+                placeholder="Search description, ID, or payee"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
             </div>
           </div>
         </CardContent>
@@ -275,27 +434,34 @@ const PettyCashReport = () => {
               <TableBody>
                 {transactionsWithBalances.map((t) => (
                   <TableRow key={t.id} className="hover:bg-blue-50">
-                    <TableCell className="font-medium">{t.date}</TableCell>
+                    <TableCell className="font-medium">{t.displayDate}</TableCell>
                     <TableCell className="font-medium text-blue-600">{t.id}</TableCell>
-                    <TableCell>{t.description}</TableCell>
-                    <TableCell className="hidden md:table-cell">{t.category}</TableCell>
-                    <TableCell className="hidden md:table-cell">{t.payee ?? "-"}</TableCell>
+                    <TableCell>{t.title || "N/A"}</TableCell>
+                    <TableCell className="hidden md:table-cell">{t.displayCategory}</TableCell>
+                    <TableCell className="hidden md:table-cell">{t.displayPayee}</TableCell>
                     <TableCell className="text-right font-medium text-gray-700">
                       UGX {t.openingBalance.toLocaleString()}
                     </TableCell>
-                    <TableCell className={`font-bold ${t.type === "expense" ? "text-red-600" : "text-green-600"}`}>
-                      {t.type === "expense" ? "-" : "+"}UGX {t.amount.toLocaleString()}
+                    <TableCell
+                      className={`font-bold ${t.displayType === "expense" ? "text-red-600" : "text-green-600"}`}
+                    >
+                      {t.displayType === "expense" ? "-" : "+"}UGX {t.amount.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-right font-bold text-black">
                       UGX {t.closingBalance.toLocaleString()}
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      <Badge variant="outline" className={
-                        t.status === "approved" ? "text-green-700 border-green-200" : 
-                        t.status === "pending" ? "text-yellow-700 border-yellow-200" : 
-                        "text-red-700 border-red-200"
-                      }>
-                        {t.status}
+                      <Badge
+                        variant="outline"
+                        className={
+                          t.status === "approved"
+                            ? "text-green-700 border-green-200"
+                            : t.status === "pending_approval"
+                            ? "text-yellow-700 border-yellow-200"
+                            : "text-red-700 border-red-200"
+                        }
+                      >
+                        {t.status || "N/A"}
                       </Badge>
                     </TableCell>
                   </TableRow>
