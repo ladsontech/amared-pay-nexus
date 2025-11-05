@@ -131,24 +131,48 @@ const BillAmountEntry: React.FC = () => {
         throw new Error(`${paymentSource === "main_wallet" ? "Main" : "Petty Cash"} wallet not found`);
       }
 
+      if (!wallet.currency?.id) {
+        throw new Error('Wallet currency information is missing');
+      }
+
+      // Map bill type to API type (same as PayBillsForm)
+      const apiTypeMap: Record<string, "electricity" | "water" | "internet" | "airtime" | null> = {
+        "water": "water",
+        "electricity": "electricity",
+        "tv": null,
+        "tax": null
+      };
+
+      // Create reference - include district for NWSC if available
+      const reference = district ? `${district} - ${accountNumber}` : accountNumber;
+
       // Create bill payment
       await organizationService.createBillPayment({
         organization: user.organizationId,
-        wallet: wallet.id,
-        wallet_type: paymentSource === "main_wallet" ? "wallet" : "petty_cash_wallet",
-        type: category,
+        currency: wallet.currency.id,
         biller_name: providerConfig.name,
         account_number: accountNumber,
-        amount: numAmount,
-        currency: wallet.currency?.id || 1,
+        amount: Math.round(numAmount),
+        type: apiTypeMap[category || ''] || null,
+        wallet_type: paymentSource,
+        status: "pending",
+        reference: reference
+      });
+
+      toast({
+        title: "Bill Payment Submitted",
+        description: `${providerConfig.name} bill of ${selectedCurrency} ${Math.round(numAmount).toLocaleString()} has been submitted successfully`,
       });
 
       // Navigate back to pay bills page with success
       navigate('/org/pay-bills?success=true');
     } catch (error: any) {
       console.error('Payment error:', error);
-      // Show error toast (you may want to add toast here)
-      alert(error.message || 'Failed to process payment. Please try again.');
+      toast({
+        title: "Payment Failed",
+        description: error.message || 'Failed to process payment. Please try again.',
+        variant: "destructive",
+      });
     } finally {
       setIsProcessing(false);
     }
