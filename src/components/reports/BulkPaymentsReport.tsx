@@ -1,13 +1,14 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Eye } from "lucide-react";
-import { bulkPaymentReportData } from "@/data/reportData";
-import BulkPaymentDetailsModal from "@/components/BulkPaymentDetailsModal";
+import { Download, Eye, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { paymentService, BulkPayment, Link, Transaction } from "@/services/paymentService";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 function exportCsv(filename: string, rows: Array<Record<string, any>>) {
   if (!rows.length) return;
@@ -34,9 +35,25 @@ function exportCsv(filename: string, rows: Array<Record<string, any>>) {
 const statusColor = (status: string) => {
   switch (status) {
     case "completed":
+    case "approved":
       return "bg-green-100 text-green-800";
     case "processing":
       return "bg-blue-100 text-blue-800";
+    case "pending":
+    case "pending_approval":
+      return "bg-yellow-100 text-yellow-800";
+    case "failed":
+    case "rejected":
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
+const transactionStatusColor = (status: string | null) => {
+  switch (status) {
+    case "successful":
+      return "bg-green-100 text-green-800";
     case "pending":
       return "bg-yellow-100 text-yellow-800";
     case "failed":
@@ -46,20 +63,112 @@ const statusColor = (status: string) => {
   }
 };
 
+interface BulkPaymentWithDetails extends BulkPayment {
+  links: Link[];
+  transactions: Transaction[];
+  successfulCount: number;
+  failedCount: number;
+  pendingCount: number;
+}
+
 const BulkPaymentsReport = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [fromDate, setFromDate] = useState<string>("2024-01-01");
-  const [toDate, setToDate] = useState<string>("2024-12-31");
-  const [selectedPayment, setSelectedPayment] = useState<typeof bulkPaymentReportData[0] | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [bulkPayments, setBulkPayments] = useState<BulkPaymentWithDetails[]>([]);
+  const [expandedPayments, setExpandedPayments] = useState<Set<string>>(new Set());
 
-  const handleViewDetails = (payment: typeof bulkPaymentReportData[0]) => {
-    setSelectedPayment(payment);
-    setIsModalOpen(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user?.organizationId) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        
+        // Fetch bulk payments
+        const bulkPaymentsResponse = await paymentService.getBulkPayments({
+          organization: user.organizationId,
+          limit: 100
+        });
+
+        // Fetch links for all bulk payments
+        const linksPromises = bulkPaymentsResponse.results.map(bp =>
+          paymentService.getLinks({
+            bulk_payment: bp.id,
+            limit: 100
+          })
+        );
+        const linksResponses = await Promise.all(linksPromises);
+        const allLinks = linksResponses.flatMap(response => response.results);
+
+        // Fetch transactions for all links
+        const transactionPromises = allLinks.map(link =>
+          paymentService.getTransactions({
+            link: link.id,
+            limit: 100
+          }).catch(() => ({ results: [] }))
+        );
+        const transactionResponses = await Promise.all(transactionPromises);
+        const allTransactions = transactionResponses.flatMap(response => response.results);
+
+        // Combine data
+        const bulkPaymentsWithDetails: BulkPaymentWithDetails[] = bulkPaymentsResponse.results.map(bp => {
+          const paymentLinks = allLinks.filter(link => link.bulk_payment.id === bp.id);
+          const paymentTransactions = paymentLinks.flatMap(link =>
+            allTransactions.filter(tx => tx.link === link.id)
+          );
+
+          const successfulCount = paymentTransactions.filter(tx => tx.status === "successful").length;
+          const failedCount = paymentTransactions.filter(tx => tx.status === "failed").length;
+          const pendingCount = paymentTransactions.filter(tx => tx.status === "pending").length;
+
+          return {
+            ...bp,
+            links: paymentLinks,
+            transactions: paymentTransactions,
+            successfulCount,
+            failedCount,
+            pendingCount
+          };
+        });
+
+        setBulkPayments(bulkPaymentsWithDetails);
+      } catch (error: any) {
+        console.error("Error fetching bulk payments report:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to load bulk payments report. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user?.organizationId, toast]);
+
+  const togglePayment = (paymentId: string) => {
+    setExpandedPayments(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(paymentId)) {
+        newSet.delete(paymentId);
+      } else {
+        newSet.add(paymentId);
+      }
+      return newSet;
+    });
   };
 
   const inRange = (iso: string) => {
+    if (!fromDate || !toDate) return true;
     const d = new Date(iso).getTime();
     const from = new Date(`${fromDate}T00:00:00`).getTime();
     const to = new Date(`${toDate}T23:59:59`).getTime();
@@ -67,29 +176,45 @@ const BulkPaymentsReport = () => {
   };
 
   const filtered = useMemo(() => {
-    return bulkPaymentReportData
-      .filter((p) => inRange(p.createdAt))
+    return bulkPayments
+      .filter((p) => inRange(p.created_at))
       .filter((p) => (statusFilter === "all" ? true : p.status === statusFilter))
-      .filter((p) => `${p.id} ${p.description}`.toLowerCase().includes(search.toLowerCase()))
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [search, statusFilter, fromDate, toDate]);
+      .filter((p) => `${p.id} ${p.reference}`.toLowerCase().includes(search.toLowerCase()))
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [search, statusFilter, fromDate, toDate, bulkPayments]);
 
-  const totalAmount = useMemo(() => filtered.reduce((s, p) => s + p.amount, 0), [filtered]);
-  const totalRecipients = useMemo(() => filtered.reduce((s, p) => s + p.recipients, 0), [filtered]);
-  const totalSuccessful = useMemo(() => filtered.reduce((s, p) => s + p.recipientDetails.successful, 0), [filtered]);
-  const totalPending = useMemo(() => filtered.reduce((s, p) => s + p.recipientDetails.pending, 0), [filtered]);
-  const totalFailed = useMemo(() => filtered.reduce((s, p) => s + p.recipientDetails.failed, 0), [filtered]);
+  const totalAmount = useMemo(() => filtered.reduce((s, p) => s + p.total_amount, 0), [filtered]);
+  const totalRecipients = useMemo(() => filtered.reduce((s, p) => s + p.links.length, 0), [filtered]);
+  const totalSuccessful = useMemo(() => filtered.reduce((s, p) => s + p.successfulCount, 0), [filtered]);
+  const totalPending = useMemo(() => filtered.reduce((s, p) => s + p.pendingCount, 0), [filtered]);
+  const totalFailed = useMemo(() => filtered.reduce((s, p) => s + p.failedCount, 0), [filtered]);
 
   const handleExport = () => {
-    exportCsv("bulk-payments-report.csv", filtered.map((p) => ({
-      ID: p.id,
-      Description: p.description,
-      Status: p.status,
-      Recipients: p.recipients,
-      Amount: p.amount,
-      CreatedAt: p.createdAt
-    })));
+    const exportData = filtered.flatMap(payment => 
+      payment.links.map(link => {
+        const transaction = payment.transactions.find(tx => tx.link === link.id);
+        return {
+          "Payment ID": payment.id,
+          "Reference": payment.reference,
+          "Link ID": link.id,
+          "Beneficiary Name": link.beneficiary_name || "N/A",
+          "Beneficiary Phone": link.beneficiary_phone_number || "N/A",
+          "Amount": link.amount,
+          "Transaction Status": transaction?.status || "N/A",
+          "Created At": new Date(payment.created_at).toLocaleDateString()
+        };
+      })
+    );
+    exportCsv("bulk-payments-report.csv", exportData);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -152,80 +277,234 @@ const BulkPaymentsReport = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-white z-50">
                   <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="failed">Failed</SelectItem>
+                  <SelectItem value="pending_approval">Pending Approval</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="lg:col-span-2">
               <label className="sr-only">Search</label>
-              <Input placeholder="Search ID or description" value={search} onChange={(e) => setSearch(e.target.value)} />
+              <Input placeholder="Search ID or reference" value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="rounded-md border overflow-x-auto">
-        <Table className="min-w-[700px]">
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Recipients</TableHead>
-              <TableHead>Success/Pending/Failed</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((p) => (
-              <TableRow key={p.id} className="hover:bg-gray-50">
-                <TableCell className="font-medium">{p.id}</TableCell>
-                <TableCell>{p.description}</TableCell>
-                <TableCell>
-                  <Badge className={statusColor(p.status)}>{p.status}</Badge>
-                </TableCell>
-                <TableCell>{p.recipients}</TableCell>
-                <TableCell>
-                  <div className="flex gap-1 text-xs">
-                    <span className="text-green-600">{p.recipientDetails.successful}✓</span>
-                    <span className="text-yellow-600">{p.recipientDetails.pending}⏳</span>
-                    <span className="text-red-600">{p.recipientDetails.failed}✗</span>
-                  </div>
-                </TableCell>
-                <TableCell>UGX {p.amount.toLocaleString()}</TableCell>
-                <TableCell>{new Date(p.createdAt).toLocaleDateString()}</TableCell>
-                <TableCell>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleViewDetails(p)}
-                    className="text-xs"
-                  >
-                    <Eye className="h-3 w-3 mr-1" />
-                    View
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-            {filtered.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center text-muted-foreground">No records for selected filters.</TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <div className="space-y-4">
+        {filtered.map((payment) => {
+          const isExpanded = expandedPayments.has(payment.id);
+          const successfulLinks = payment.links.filter(link => {
+            const tx = payment.transactions.find(t => t.link === link.id);
+            return tx?.status === "successful";
+          });
+          const failedLinks = payment.links.filter(link => {
+            const tx = payment.transactions.find(t => t.link === link.id);
+            return tx?.status === "failed";
+          });
+          const pendingLinks = payment.links.filter(link => {
+            const tx = payment.transactions.find(t => t.link === link.id);
+            return !tx || tx.status === "pending";
+          });
 
-      <BulkPaymentDetailsModal 
-        payment={selectedPayment}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+          return (
+            <Card key={payment.id} className="overflow-hidden">
+              <CardHeader 
+                className="cursor-pointer hover:bg-gray-50 transition-colors"
+                onClick={() => togglePayment(payment.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CardTitle className="text-base sm:text-lg">{payment.id}</CardTitle>
+                      <Badge className={statusColor(payment.status || "")}>
+                        {payment.status || "N/A"}
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-sm">
+                      Reference: {payment.reference}
+                    </CardDescription>
+                    <div className="flex flex-wrap gap-4 mt-2 text-xs sm:text-sm">
+                      <span className="text-muted-foreground">
+                        Amount: <span className="font-semibold">UGX {payment.total_amount.toLocaleString()}</span>
+                      </span>
+                      <span className="text-muted-foreground">
+                        Recipients: <span className="font-semibold">{payment.links.length}</span>
+                      </span>
+                      <span className="text-green-600">
+                        Successful: <span className="font-semibold">{payment.successfulCount}</span>
+                      </span>
+                      <span className="text-yellow-600">
+                        Pending: <span className="font-semibold">{payment.pendingCount}</span>
+                      </span>
+                      <span className="text-red-600">
+                        Failed: <span className="font-semibold">{payment.failedCount}</span>
+                      </span>
+                      <span className="text-muted-foreground">
+                        Created: {new Date(payment.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); togglePayment(payment.id); }}>
+                    {isExpanded ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </CardHeader>
+
+              {isExpanded && (
+                  <CardContent className="pt-0 space-y-4">
+                    {/* Successful Transactions */}
+                    {successfulLinks.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-green-700 mb-2 flex items-center gap-2">
+                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                          Successful Payments ({successfulLinks.length})
+                        </h4>
+                        <div className="rounded-md border overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead className="text-xs">Beneficiary Name</TableHead>
+                                <TableHead className="text-xs">Phone Number</TableHead>
+                                <TableHead className="text-xs">Amount</TableHead>
+                                <TableHead className="text-xs">Status</TableHead>
+                                <TableHead className="text-xs">Date</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {successfulLinks.map((link) => {
+                                const tx = payment.transactions.find(t => t.link === link.id);
+                                return (
+                                  <TableRow key={link.id}>
+                                    <TableCell className="text-xs">{link.beneficiary_name || "N/A"}</TableCell>
+                                    <TableCell className="text-xs">{link.beneficiary_phone_number || "N/A"}</TableCell>
+                                    <TableCell className="text-xs font-medium">UGX {link.amount.toLocaleString()}</TableCell>
+                                    <TableCell>
+                                      <Badge className={transactionStatusColor(tx?.status || null)}>
+                                        {tx?.status || "N/A"}
+                                      </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-xs">
+                                      {tx ? new Date(tx.created_at).toLocaleDateString() : "N/A"}
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Failed Transactions */}
+                    {failedLinks.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-red-700 mb-2 flex items-center gap-2">
+                          <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                          Failed Payments ({failedLinks.length})
+                        </h4>
+                        <div className="rounded-md border overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead className="text-xs">Beneficiary Name</TableHead>
+                                <TableHead className="text-xs">Phone Number</TableHead>
+                                <TableHead className="text-xs">Amount</TableHead>
+                                <TableHead className="text-xs">Status</TableHead>
+                                <TableHead className="text-xs">Date</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {failedLinks.map((link) => {
+                                const tx = payment.transactions.find(t => t.link === link.id);
+                                return (
+                                  <TableRow key={link.id}>
+                                    <TableCell className="text-xs">{link.beneficiary_name || "N/A"}</TableCell>
+                                    <TableCell className="text-xs">{link.beneficiary_phone_number || "N/A"}</TableCell>
+                                    <TableCell className="text-xs font-medium">UGX {link.amount.toLocaleString()}</TableCell>
+                                    <TableCell>
+                                      <Badge className={transactionStatusColor(tx?.status || null)}>
+                                        {tx?.status || "N/A"}
+                                      </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-xs">
+                                      {tx ? new Date(tx.created_at).toLocaleDateString() : "N/A"}
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Pending Transactions */}
+                    {pendingLinks.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-yellow-700 mb-2 flex items-center gap-2">
+                          <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                          Pending Payments ({pendingLinks.length})
+                        </h4>
+                        <div className="rounded-md border overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead className="text-xs">Beneficiary Name</TableHead>
+                                <TableHead className="text-xs">Phone Number</TableHead>
+                                <TableHead className="text-xs">Amount</TableHead>
+                                <TableHead className="text-xs">Status</TableHead>
+                                <TableHead className="text-xs">Date</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {pendingLinks.map((link) => {
+                                const tx = payment.transactions.find(t => t.link === link.id);
+                                return (
+                                  <TableRow key={link.id}>
+                                    <TableCell className="text-xs">{link.beneficiary_name || "N/A"}</TableCell>
+                                    <TableCell className="text-xs">{link.beneficiary_phone_number || "N/A"}</TableCell>
+                                    <TableCell className="text-xs font-medium">UGX {link.amount.toLocaleString()}</TableCell>
+                                    <TableCell>
+                                      <Badge className={transactionStatusColor(tx?.status || null)}>
+                                        {tx?.status || "Pending"}
+                                      </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-xs">
+                                      {tx ? new Date(tx.created_at).toLocaleDateString() : "N/A"}
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+                    )}
+
+                    {payment.links.length === 0 && (
+                      <div className="text-center py-4 text-sm text-muted-foreground">
+                        No payment links found for this bulk payment.
+                      </div>
+                    )}
+                  </CardContent>
+              )}
+            </Card>
+          );
+        })}
+
+        {filtered.length === 0 && (
+          <Card>
+            <CardContent className="text-center py-12">
+              <p className="text-muted-foreground">No bulk payments found for the selected filters.</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };

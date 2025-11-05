@@ -632,18 +632,18 @@ const BulkPayments = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             {hasPermission("approve_bulk_payments") && (
               <Card 
-                className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+                className="bg-gray-50 border border-gray-200 hover:bg-gray-100 cursor-pointer transition-all active:scale-[0.98] shadow-md hover:shadow-lg"
                 onClick={() => handleTabChange("approvals")}
               >
                 <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-                  <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
-                  <CardTitle className="text-sm md:text-base font-semibold text-blue-900">
+                  <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-gray-700 mb-1" />
+                  <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
                     Approvals
                   </CardTitle>
-                  <CardDescription className="text-xs md:text-sm text-blue-700">
+                  <CardDescription className="text-xs md:text-sm text-gray-600">
                     Review pending requests
                     {pendingApprovals > 0 && (
-                      <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                      <span className="ml-2 px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full text-xs font-semibold">
                         {pendingApprovals}
                       </span>
                     )}
@@ -653,20 +653,20 @@ const BulkPayments = () => {
             )}
             {hasPermission("view_department_reports") && (
               <Card 
-                className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+                className="bg-gray-50 border border-gray-200 hover:bg-gray-100 cursor-pointer transition-all active:scale-[0.98] shadow-md hover:shadow-lg"
               >
                 <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-                  <FileText className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
-                  <CardTitle className="text-sm md:text-base font-semibold text-blue-900">
+                  <FileText className="h-6 w-6 md:h-8 md:w-8 text-gray-700 mb-1" />
+                  <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
                     Reports
                   </CardTitle>
-                  <CardDescription className="text-xs md:text-sm text-blue-700">
+                  <CardDescription className="text-xs md:text-sm text-gray-600">
                     View bulk payments reports
                   </CardDescription>
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="mt-2 w-full border-blue-200 bg-white hover:bg-blue-50 text-blue-700"
+                    className="mt-2 w-full border-gray-300 bg-white hover:bg-gray-50 text-gray-700"
                     asChild
                   >
                     <Link to="/org/reports?tab=bulk-payments" className="flex items-center justify-center space-x-2">
