@@ -208,24 +208,8 @@ const OrganizationLayout = () => {
               {/* Mobile Only: Sidebar Trigger on Right */}
               <SidebarTrigger className="md:hidden h-8 w-8" />
               
-              {/* Desktop Only: Active Users, Impersonating Badge, and Account Menu */}
-              <div className="hidden md:flex items-center gap-2">
-              {/* Active Users Indicator */}
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary border border-border">
-                <Users className="h-4 w-4 text-primary" />
-                <div className="text-xs">
-                  <span className="font-semibold text-foreground">{activeStaff}</span>
-                  <span className="text-muted-foreground ml-1">active staff</span>
-                </div>
-              </div>
-              
-              {isImpersonating && (
-                <Badge className="bg-orange-100 text-orange-800 border-orange-300">
-                  <Shield className="h-3 w-3 mr-1" />
-                  Admin Viewing as Owner
-                </Badge>
-              )}
-              {isMobile ? (
+              {/* Mobile Only: Account Menu Button */}
+              {isMobile && (
                 <>
                   <Button 
                     variant="ghost" 
@@ -300,7 +284,25 @@ const OrganizationLayout = () => {
                     </SheetContent>
                   </Sheet>
                 </>
-              ) : (
+              )}
+
+              {/* Desktop Only: Active Users, Impersonating Badge, and Account Menu */}
+              <div className="hidden md:flex items-center gap-2">
+                {/* Active Users Indicator */}
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary border border-border">
+                  <Users className="h-4 w-4 text-primary" />
+                  <div className="text-xs">
+                    <span className="font-semibold text-foreground">{activeStaff}</span>
+                    <span className="text-muted-foreground ml-1">active staff</span>
+                  </div>
+                </div>
+                
+                {isImpersonating && (
+                  <Badge className="bg-orange-100 text-orange-800 border-orange-300">
+                    <Shield className="h-3 w-3 mr-1" />
+                    Admin Viewing as Owner
+                  </Badge>
+                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-secondary border-2 border-transparent hover:border-border transition-all duration-200">
@@ -351,7 +353,6 @@ const OrganizationLayout = () => {
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
-              )}
               </div>
             </div>
           </div>
