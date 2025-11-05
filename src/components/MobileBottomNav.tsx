@@ -62,12 +62,6 @@ const MobileBottomNav = ({ items, extraActions, onLogout }: MobileBottomNavProps
       icon: DollarSign, 
       label: "Collect", 
       show: true 
-    },
-    { 
-      path: "/org/deposits", 
-      icon: Building, 
-      label: "Deposits", 
-      show: true 
     }
   ];
 
@@ -138,6 +132,15 @@ const MobileBottomNav = ({ items, extraActions, onLogout }: MobileBottomNavProps
               ? extraActions(() => setDrawerOpen(false))
               : (extraActions ?? (
             <div className="grid grid-cols-2 gap-3">
+              <button 
+                className="bg-secondary border border-border rounded-xl p-4 text-left hover:bg-accent transition-colors"
+                onClick={() => { navigate("/org/deposits"); setDrawerOpen(false); }}
+              >
+                <Building className="h-5 w-5 text-primary mb-2" />
+                <p className="text-sm font-medium text-foreground">Deposits</p>
+                <p className="text-xs text-muted-foreground">Bank deposits</p>
+              </button>
+              
               <button 
                 className="bg-secondary border border-border rounded-xl p-4 text-left hover:bg-accent transition-colors"
                 onClick={() => { navigate("/org/approvals"); setDrawerOpen(false); }}
