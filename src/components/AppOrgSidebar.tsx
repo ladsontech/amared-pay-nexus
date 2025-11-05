@@ -60,8 +60,9 @@ export default function AppOrgSidebar() {
   const isActive = (path: string) => location.pathname === path;
   const items = orgItems; // Always show all items; disable ones without permission
 
-  const handleNavClick = () => {
+  const handleNavClick = (e?: React.MouseEvent) => {
     if (isMobile) {
+      // Close drawer immediately when clicking any navigation item
       setOpenMobile(false);
     }
   };
@@ -113,7 +114,11 @@ export default function AppOrgSidebar() {
                       aria-disabled={!canAccess}
                       className="hover:bg-secondary data-[active=true]:bg-secondary data-[active=true]:text-primary data-[active=true]:border-r-3 data-[active=true]:border-primary data-[active=true]:font-bold transition-all duration-200"
                     >
-                      <NavLink to={item.url} end onClick={handleNavClick}>
+                      <NavLink 
+                        to={item.url} 
+                        end 
+                        onClick={handleNavClick}
+                      >
                         <item.icon className="mr-3 h-5 w-5" />
                         <span className="font-semibold">{item.title}</span>
                       </NavLink>
@@ -165,6 +170,20 @@ export default function AppOrgSidebar() {
                 </Badge>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              asChild
+              onClick={() => {
+                if (isMobile) {
+                  setOpenMobile(false);
+                }
+              }}
+            >
+              <NavLink to="/org/account" className="cursor-pointer">
+                <User className="mr-2 h-4 w-4" />
+                <span>Account Settings</span>
+              </NavLink>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className={isImpersonating ? "text-orange-600 font-medium" : "text-red-600 font-medium"}>
               <LogOut className="mr-2 h-4 w-4" />
