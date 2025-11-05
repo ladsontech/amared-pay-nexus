@@ -175,11 +175,21 @@ const OrganizationLayout = () => {
   const orgName = (isImpersonating ? user?.organization?.name : organization?.name) || user?.organization?.name || 'Organization';
   const orgLogo = (isImpersonating ? user?.organization?.logo : organization?.logo) || user?.organization?.logo;
 
+  // Check if we're on a payment page where MobileBottomNav is hidden
+  const isPaymentPage = location.pathname.includes('/bulk-payments/bank') || 
+                       location.pathname.includes('/bulk-payments/mobile') ||
+                       location.pathname.includes('/request-expense') ||
+                       location.pathname.includes('/request-cash-addition');
+
   return <SidebarProvider>
-      {/* Sidebar - Hidden on mobile to prevent drawer */}
-      <div className="hidden md:block">
+      {/* Sidebar - Hidden on mobile except on payment pages where navigation is needed */}
+      {isMobile && isPaymentPage ? (
         <AppOrgSidebar />
-      </div>
+      ) : (
+        <div className="hidden md:block">
+          <AppOrgSidebar />
+        </div>
+      )}
       <SidebarInset className="flex flex-col bg-white">
         {/* Header - Sticky instead of fixed for better layout */}
         <header className="sticky top-0 z-40 border-b border-gray-200 bg-white backdrop-blur-xl supports-[backdrop-filter]:bg-white shadow-sm md:shadow-lg">
@@ -208,6 +218,11 @@ const OrganizationLayout = () => {
 
             {/* Right Side: Mobile Drawer Icon on Right, Desktop Controls */}
             <div className="flex items-center gap-2">
+              {/* Mobile Only: Sidebar Trigger - Only show on payment pages where MobileBottomNav is hidden */}
+              {isMobile && isPaymentPage && (
+                <SidebarTrigger className="h-8 w-8" />
+              )}
+              
               {/* Mobile Only: Account Menu Button */}
               {isMobile && (
                 <>
