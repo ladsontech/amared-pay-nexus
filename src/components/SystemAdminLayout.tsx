@@ -26,17 +26,17 @@ const SystemAdminLayout = () => {
   };
 
   return (
-    <SidebarProvider className="bg-white">
+    <SidebarProvider className="bg-white overflow-x-hidden">
       {/* Sidebar - Hidden on mobile to prevent drawer */}
       <div className="hidden md:block">
         <AppSystemSidebar />
       </div>
 
       {/* Content - SidebarInset automatically handles spacing for sidebar */}
-      <SidebarInset className="flex flex-col bg-white">
-        {/* Header - Compact Mobile */}
-        <header className="sticky top-0 z-40 border-b border-gray-200 bg-white backdrop-blur-xl supports-[backdrop-filter]:bg-white shadow-sm md:shadow-lg">
-          <div className="w-full flex h-12 md:h-16 items-stretch justify-between px-3 md:px-6">
+      <SidebarInset className="flex flex-col bg-white min-h-screen overflow-x-hidden">
+        {/* Header - Fixed on Mobile, Sticky on Desktop */}
+        <header className={`${isMobile ? 'fixed top-0 left-0 right-0' : 'sticky top-0'} z-40 border-b border-gray-200 bg-white backdrop-blur-xl supports-[backdrop-filter]:bg-white shadow-sm md:shadow-lg`}>
+          <div className="w-full flex h-12 md:h-16 items-stretch justify-between px-3 md:px-6 max-w-full overflow-x-hidden">
             <div className="flex items-center gap-2 md:gap-4">
               <img src="/Almapay_appbar_logo.png" alt="Alma Pay logo" className="h-full w-auto object-contain" />
               <div className="hidden sm:flex items-center gap-2 md:gap-3">
@@ -195,16 +195,28 @@ const SystemAdminLayout = () => {
           </div>
         </header>
 
-        {/* Main Content */}
-        <div className="flex-1 pb-16 md:pb-0 bg-white overflow-y-auto">
-          <div className="container py-4 md:py-8 px-3 sm:px-4 md:px-6 max-w-full overflow-x-hidden">
-            <Outlet />
+        {/* Main Content - Proper spacing for fixed header and bottom nav */}
+        {isMobile ? (
+          <div className="flex-1 bg-white overflow-y-auto overflow-x-hidden pt-12 pb-16">
+            <div className="w-full max-w-full overflow-x-hidden">
+              <div className="container py-4 px-3 sm:px-4 max-w-full">
+                <Outlet />
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex-1 bg-white overflow-y-auto overflow-x-hidden">
+            <div className="w-full max-w-full overflow-x-hidden">
+              <div className="container py-4 md:py-8 px-3 sm:px-4 md:px-6 max-w-full">
+                <Outlet />
+              </div>
+            </div>
+          </div>
+        )}
       </SidebarInset>
 
-      {/* Mobile Bottom Navigation */}
-      <AdminMobileBottomNav />
+      {/* Mobile Bottom Navigation - Fixed */}
+      {isMobile && <AdminMobileBottomNav />}
     </SidebarProvider>
   );
 };

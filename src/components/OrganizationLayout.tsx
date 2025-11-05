@@ -181,7 +181,7 @@ const OrganizationLayout = () => {
                        location.pathname.includes('/request-expense') ||
                        location.pathname.includes('/request-cash-addition');
 
-  return <SidebarProvider>
+  return <SidebarProvider className="overflow-x-hidden">
       {/* Sidebar - Hidden on mobile except on payment pages where navigation is needed */}
       {isMobile && isPaymentPage ? (
         <AppOrgSidebar />
@@ -190,10 +190,10 @@ const OrganizationLayout = () => {
           <AppOrgSidebar />
         </div>
       )}
-      <SidebarInset className="flex flex-col bg-white">
-        {/* Header - Sticky instead of fixed for better layout */}
-        <header className="sticky top-0 z-40 border-b border-gray-200 bg-white backdrop-blur-xl supports-[backdrop-filter]:bg-white shadow-sm md:shadow-lg">
-          <div className="w-full flex h-12 md:h-16 items-stretch justify-between px-3 md:px-6">
+      <SidebarInset className="flex flex-col bg-white min-h-screen overflow-x-hidden">
+        {/* Header - Fixed on Mobile, Sticky on Desktop */}
+        <header className={`${isMobile ? 'fixed top-0 left-0 right-0' : 'sticky top-0'} z-40 border-b border-gray-200 bg-white backdrop-blur-xl supports-[backdrop-filter]:bg-white shadow-sm md:shadow-lg`}>
+          <div className="w-full flex h-12 md:h-16 items-stretch justify-between px-3 md:px-6 max-w-full overflow-x-hidden">
             <div className="flex items-center gap-2 md:gap-4">
               {/* Organization Logo and Name */}
               <div className="flex items-center gap-2 md:gap-3 min-w-0">
@@ -384,16 +384,28 @@ const OrganizationLayout = () => {
           </div>
         </header>
 
-        {/* Main Content - Full width and properly positioned */}
-        <div className="flex-1 pb-16 md:pb-0 bg-white overflow-y-auto">
-          <div className="container py-4 md:py-8 px-3 sm:px-4 md:px-6 max-w-full overflow-x-hidden">
-            <Outlet />
+        {/* Main Content - Proper spacing for fixed header and bottom nav */}
+        {isMobile ? (
+          <div className={`flex-1 bg-white overflow-y-auto overflow-x-hidden pt-12 ${!isPaymentPage ? 'pb-16' : ''}`}>
+            <div className="w-full max-w-full overflow-x-hidden">
+              <div className="container py-4 px-3 sm:px-4 max-w-full">
+                <Outlet />
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex-1 bg-white overflow-y-auto overflow-x-hidden">
+            <div className="w-full max-w-full overflow-x-hidden">
+              <div className="container py-4 md:py-8 px-3 sm:px-4 md:px-6 max-w-full">
+                <Outlet />
+              </div>
+            </div>
+          </div>
+        )}
       </SidebarInset>
 
-      {/* Mobile Bottom Navigation - Hide on payment pages */}
-      {!location.pathname.includes('/bulk-payments/bank') && 
+      {/* Mobile Bottom Navigation - Fixed - Hide on payment pages */}
+      {isMobile && !location.pathname.includes('/bulk-payments/bank') && 
        !location.pathname.includes('/bulk-payments/mobile') &&
        !location.pathname.includes('/request-expense') &&
        !location.pathname.includes('/request-cash-addition') &&
