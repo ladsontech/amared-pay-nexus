@@ -15,7 +15,8 @@ import {
   Wallet,
   CreditCard,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -119,7 +120,7 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
       id: 'electricity',
       name: 'Electricity',
       icon: Zap,
-      color: 'text-orange-600 bg-orange-100',
+      color: 'text-blue-600 bg-blue-100',
       providers: [
         { id: 'uedcl_postpaid', name: 'UEDCL Post Paid', accountFormat: 'Meter Number XXXXXXXXXX', minAmount: 5000, maxAmount: 2000000, fees: 1000 },
         { id: 'uedcl_light', name: 'UEDCL Light', accountFormat: 'Meter Number XXXXXXXXXX', minAmount: 5000, maxAmount: 2000000, fees: 1000 }
@@ -129,7 +130,7 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
       id: 'tv',
       name: 'TV',
       icon: Tv,
-      color: 'text-purple-600 bg-purple-100',
+      color: 'text-blue-600 bg-blue-100',
       providers: [
         { id: 'dstv', name: 'DSTV', accountFormat: 'SmartCard XXXXXXXXXX', minAmount: 15000, maxAmount: 500000, fees: 500 },
         { id: 'startimes', name: 'STARTIMES', accountFormat: 'SmartCard XXXXXXXXXX', minAmount: 6000, maxAmount: 150000, fees: 300 },
@@ -282,15 +283,33 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
     return baseAmount + fees;
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6">
-        <DialogHeader className="pb-3 sm:pb-4">
-          <DialogTitle className="text-base sm:text-lg md:text-xl">Pay Bills - Enhanced Categories</DialogTitle>
-        </DialogHeader>
+  // On mobile, render as full page, on desktop as dialog
+  if (isMobile && isOpen) {
+    return (
+      <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
+        <div className="min-h-screen pb-20">
+          {/* Mobile Header with Back Button */}
+          <div className="sticky top-0 bg-white border-b border-gray-200 z-10">
+            <div className="flex items-center gap-3 p-4">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onClose}
+                className="flex-shrink-0"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div className="flex items-center gap-2 flex-1">
+                <CreditCard className="h-5 w-5 text-blue-600" />
+                <h1 className="text-lg font-semibold text-gray-900">Pay Bills</h1>
+              </div>
+            </div>
+          </div>
 
-        <div className="space-y-4 sm:space-y-6">
-          {/* Payment Source Selection */}
+          {/* Mobile Content */}
+          <div className="p-4 space-y-4">
+            {/* Payment Source Selection */}
           <Card>
             <CardContent className="p-3 sm:p-4">
               <Label className="text-xs sm:text-sm font-medium mb-2 sm:mb-3 block">Select Payment Source</Label>
@@ -503,46 +522,49 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
               </CardContent>
             </Card>
           )}
+          </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4">
-            <Button 
-              variant="outline" 
-              onClick={onClose}
-              className="w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handlePayBill}
-              disabled={
-                !selectedCategory || 
-                !selectedProvider || 
-                !accountNumber || 
-                !amount || 
-                isProcessing ||
-                getTotalAmount() > balances[paymentSource] ||
-                (selectedProviderData?.minAmount && parseInt(amount) < selectedProviderData.minAmount)
-              }
-              className="flex-1 w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10"
-            >
-              {isProcessing ? (
-                <>
-                  <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                  Pay Bill - UGX {getTotalAmount().toLocaleString()}
-                </>
-              )}
-            </Button>
+          {/* Mobile Footer */}
+          <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 space-y-2">
+              <Button
+                onClick={handlePayBill}
+                disabled={
+                  !selectedCategory || 
+                  !selectedProvider || 
+                  !accountNumber || 
+                  !amount || 
+                  isProcessing ||
+                  getTotalAmount() > balances[paymentSource] ||
+                  (selectedProviderData?.minAmount && parseInt(amount) < selectedProviderData.minAmount)
+                }
+                className="w-full bg-blue-600 hover:bg-blue-700 text-sm h-12"
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Pay Bill - UGX {getTotalAmount().toLocaleString()}
+                  </>
+                )}
+              </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
+      </div>
+    );
+  }
+
+  // Desktop: Render as Dialog
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+        <DialogHeader className="pb-3 sm:pb-4">
+          <DialogTitle className="text-base sm:text-lg md:text-xl">Pay Bills - Enhanced Categories</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4 sm:space-y-6">
 
 export default EnhancedPayBillsForm;

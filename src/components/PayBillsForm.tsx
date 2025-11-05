@@ -258,20 +258,32 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
     }
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-3 sm:p-6">
-        <DialogHeader className="pb-3 sm:pb-4">
-          <DialogTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
-            <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
-            Pay Bills
-          </DialogTitle>
-          <DialogDescription className="text-xs sm:text-sm">
-            Pay utility bills and services using your available funds
-          </DialogDescription>
-        </DialogHeader>
+  // On mobile, render as full page, on desktop as dialog
+  if (isMobile && isOpen) {
+    return (
+      <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
+        <div className="min-h-screen pb-20">
+          {/* Mobile Header with Back Button */}
+          <div className="sticky top-0 bg-white border-b border-gray-200 z-10">
+            <div className="flex items-center gap-3 p-4">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onClose}
+                className="flex-shrink-0"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div className="flex items-center gap-2 flex-1">
+                <CreditCard className="h-5 w-5 text-blue-600" />
+                <h1 className="text-lg font-semibold text-gray-900">Pay Bills</h1>
+              </div>
+            </div>
+          </div>
 
-        <div className="space-y-3 sm:space-y-4">
+          {/* Mobile Content */}
+          <div className="p-4 space-y-4">
           {/* Payment Source Selection */}
           <div className="space-y-2">
             <Label className="text-xs sm:text-sm font-medium">Payment Source *</Label>
@@ -348,6 +360,230 @@ const PayBillsForm = ({ isOpen, onClose, initialCategory, initialProvider }: Pay
 
           {/* Provider Selection as Cards */}
           {selectedBillType && !isMobile && (
+            <div className="space-y-2">
+              <Label className="text-xs sm:text-sm font-medium">Select Provider</Label>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                {selectedBillType.providers.map((provider) => {
+                  const IconComponent = selectedBillType.icon;
+                  return (
+                    <Card
+                      key={provider.id}
+                      className={`cursor-pointer transition-all hover:shadow-md ${
+                        selectedProvider === provider.id
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 hover:border-blue-300"
+                      }`}
+                      onClick={() => setSelectedProvider(provider.id)}
+                    >
+                      <CardContent className="p-3 sm:p-4">
+                        <div className="flex flex-col items-center gap-2">
+                          <IconComponent className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+                          <span className="text-xs sm:text-sm font-medium text-center">{provider.name}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Selected Source Info */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5 sm:p-3">
+            <div className="flex items-center justify-between text-xs sm:text-sm">
+              <span className="text-gray-700 font-medium">
+                Available Balance:
+              </span>
+              <span className="font-bold text-blue-600">
+                {selectedCurrency} {selectedBalance.toLocaleString()}
+              </span>
+            </div>
+            {amount && canAfford && (
+              <div className="flex items-center justify-between text-xs sm:text-sm mt-2 pt-2 border-t border-blue-200">
+                <span className="text-gray-700 font-medium">Balance after payment:</span>
+                <span className="font-bold text-black">{selectedCurrency} {remainingBalance.toLocaleString()}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Account Number */}
+          {selectedProviderData && (
+            <div className="space-y-2">
+              <Label className="text-xs sm:text-sm font-medium">{selectedProviderData.accountLabel}</Label>
+              <Input
+                placeholder={selectedProviderData.placeholder}
+                value={accountNumber}
+                onChange={(e) => setAccountNumber(e.target.value)}
+                className="bg-white text-xs sm:text-sm h-9 sm:h-10"
+              />
+            </div>
+          )}
+
+          {/* Amount */}
+          <div className="space-y-2">
+            <Label className="text-xs sm:text-sm font-medium">Amount ({selectedCurrency})</Label>
+            <Input
+              type="number"
+              placeholder="Enter bill amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="bg-white text-xs sm:text-sm h-9 sm:h-10"
+              min={1}
+            />
+            {amount && !canAfford && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-2 sm:p-2.5">
+                <p className="text-xs text-red-700 font-medium mb-1">
+                  ⚠️ Insufficient {paymentSource === "main_wallet" ? "wallet" : "petty cash"} balance
+                </p>
+                <p className="text-[10px] sm:text-xs text-red-600">
+                  Available: {selectedCurrency} {selectedBalance.toLocaleString()} | Required: {selectedCurrency} {parseFloat(amount).toLocaleString()}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Payment Confirmation */}
+          {amount && canAfford && selectedBill && selectedProvider && accountNumber && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-2.5 sm:p-3">
+              <h4 className="text-xs sm:text-sm font-semibold text-black mb-2">Payment Summary</h4>
+              <div className="space-y-1.5 text-[10px] sm:text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Bill Type:</span>
+                  <span className="font-medium text-black text-right">{selectedBillType?.name} - {selectedProviderData?.name}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Account:</span>
+                  <span className="font-medium text-black truncate ml-2">{accountNumber}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Amount:</span>
+                  <span className="font-bold text-black">{selectedCurrency} {parseFloat(amount).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Payment Source:</span>
+                  <span className="font-medium text-black">
+                    {paymentSource === "main_wallet" ? "Main Wallet" : "Petty Cash"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center pt-1.5 border-t border-green-300">
+                  <span className="text-gray-600">Remaining Balance:</span>
+                  <span className="font-bold text-green-700">{selectedCurrency} {remainingBalance.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          )}
+          </div>
+
+          {/* Mobile Footer */}
+          <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 space-y-2">
+            <Button 
+              onClick={handlePayBill} 
+              disabled={!selectedBill || !selectedProvider || !amount || !accountNumber || !canAfford || isProcessing}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-sm h-12"
+            >
+              {isProcessing ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>Processing...</span>
+                </div>
+              ) : (
+                <>
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Pay {selectedCurrency} {amount ? parseFloat(amount).toLocaleString() : '0'}
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop: Render as Dialog
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+        <DialogHeader className="pb-3 sm:pb-4">
+          <DialogTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+            <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
+            Pay Bills
+          </DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
+            Pay utility bills and services using your available funds
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-3 sm:space-y-4">
+          {/* Payment Source Selection */}
+          <div className="space-y-2">
+            <Label className="text-xs sm:text-sm font-medium">Payment Source *</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              <Button
+                type="button"
+                variant={paymentSource === "main_wallet" ? "default" : "outline"}
+                onClick={() => setPaymentSource("main_wallet")}
+                disabled={!mainWallet}
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 h-auto gap-2"
+              >
+                <div className="flex items-center gap-2">
+                  <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                  <span className="text-xs sm:text-sm font-medium">Main Wallet</span>
+                </div>
+                {mainWallet && (
+                  <span className="text-xs sm:text-sm font-bold text-right">
+                    {mainWallet?.currency?.symbol || "UGX"} {walletBalance.toLocaleString()}
+                  </span>
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant={paymentSource === "petty_cash_wallet" ? "default" : "outline"}
+                onClick={() => setPaymentSource("petty_cash_wallet")}
+                disabled={!pettyCashWallet}
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 h-auto gap-2"
+              >
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                  <span className="text-xs sm:text-sm font-medium">Petty Cash</span>
+                </div>
+                {pettyCashWallet && (
+                  <span className="text-xs sm:text-sm font-bold text-right">
+                    {pettyCashWallet?.currency?.symbol || "UGX"} {pettyCashBalance.toLocaleString()}
+                  </span>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Bill Type Selection */}
+          <div className="space-y-2">
+            <Label className="text-xs sm:text-sm font-medium">Select Bill Type</Label>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              {billTypes.map((bill) => {
+                const IconComponent = bill.icon;
+                return (
+                  <Button
+                    key={bill.id}
+                    type="button"
+                    variant={selectedBill === bill.id ? "default" : "outline"}
+                    onClick={() => {
+                      setSelectedBill(bill.id);
+                      setSelectedProvider("");
+                    }}
+                    className="flex flex-col items-center p-3 sm:p-4 h-auto gap-2"
+                  >
+                    <IconComponent className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                    <div className="text-center">
+                      <div className="text-xs sm:text-sm font-medium">{bill.name}</div>
+                    </div>
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Provider Selection as Cards */}
+          {selectedBillType && (
             <div className="space-y-2">
               <Label className="text-xs sm:text-sm font-medium">Select Provider</Label>
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
