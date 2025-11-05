@@ -15,10 +15,18 @@ import { organizationService } from "@/services/organizationService";
 interface AddTransactionProps {
   currentBalance: number;
   setCurrentBalance?: (balance: number) => void;
+  initialTransactionType?: "expense" | "addition";
 }
 
-const AddTransaction = ({ currentBalance, setCurrentBalance }: AddTransactionProps) => {
-  const [transactionType, setTransactionType] = useState<"expense" | "addition">("expense");
+const AddTransaction = ({ currentBalance, setCurrentBalance, initialTransactionType }: AddTransactionProps) => {
+  const [transactionType, setTransactionType] = useState<"expense" | "addition">(initialTransactionType || "expense");
+  
+  // Update transaction type when initialTransactionType prop changes
+  useEffect(() => {
+    if (initialTransactionType) {
+      setTransactionType(initialTransactionType);
+    }
+  }, [initialTransactionType]);
   const [expenseFormData, setExpenseFormData] = useState({
     amount: "",
     description: "",

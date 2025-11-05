@@ -122,29 +122,39 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
       {/* Action Buttons - Request Expense and Request Cash Addition */}
       <div className="grid grid-cols-2 gap-3 md:gap-4">
         <Card 
-          className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
-          onClick={() => handleTabChange("add")}
+          className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+          onClick={() => {
+            const params = new URLSearchParams(searchParams);
+            params.set('tab', 'add');
+            params.set('type', 'expense');
+            setSearchParams(params);
+          }}
         >
           <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-            <Receipt className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
-            <CardTitle className="text-sm md:text-base font-semibold text-blue-900">
+            <Receipt className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+            <CardTitle className="text-sm md:text-base font-semibold text-white">
               Request Expense
             </CardTitle>
-            <CardDescription className="text-xs md:text-sm text-blue-700">
+            <CardDescription className="text-xs md:text-sm text-blue-100">
               Submit expense request
             </CardDescription>
           </CardContent>
         </Card>
         <Card 
-          className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
-          onClick={() => handleTabChange("add")}
+          className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+          onClick={() => {
+            const params = new URLSearchParams(searchParams);
+            params.set('tab', 'add');
+            params.set('type', 'addition');
+            setSearchParams(params);
+          }}
         >
           <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-            <Wallet className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
-            <CardTitle className="text-sm md:text-base font-semibold text-blue-900">
+            <Wallet className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+            <CardTitle className="text-sm md:text-base font-semibold text-white">
               Request Cash Addition
             </CardTitle>
-            <CardDescription className="text-xs md:text-sm text-blue-700">
+            <CardDescription className="text-xs md:text-sm text-blue-100">
               Add funds to wallet
             </CardDescription>
           </CardContent>
@@ -156,15 +166,15 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
         {navigationCards.map((nav, index) => (
           <Card 
             key={index} 
-            className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+            className="bg-white border border-gray-200 hover:shadow-md cursor-pointer transition-all active:scale-[0.98] shadow-sm"
             onClick={() => handleTabChange(nav.tab)}
           >
             <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-              <nav.icon className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
-              <CardTitle className="text-sm md:text-base font-semibold text-blue-900">
+              <nav.icon className="h-6 w-6 md:h-8 md:w-8 text-gray-600 mb-1" />
+              <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
                 {nav.title}
               </CardTitle>
-              <CardDescription className="text-xs md:text-sm text-blue-700">
+              <CardDescription className="text-xs md:text-sm text-gray-600">
                 {nav.description}
               </CardDescription>
             </CardContent>

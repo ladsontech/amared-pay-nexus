@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,16 @@ import { Loader2 } from "lucide-react";
 const PettyCash = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") as string || "overview";
+  const transactionTypeParam = searchParams.get("type") as "expense" | "addition" | null;
   const [activeTab, setActiveTab] = useState(initialTab);
+  
+  // Update activeTab when URL params change (e.g., when navigating from overview cards)
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab") || "overview";
+    if (tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams, activeTab]);
   const [isCreateWalletOpen, setIsCreateWalletOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<string>("");
   const [currencies, setCurrencies] = useState<any[]>([]);
@@ -229,6 +238,10 @@ const PettyCash = () => {
       setSearchParams(prev => {
         const p = new URLSearchParams(prev);
         p.set('tab', val);
+        // Clear type param when switching away from add tab
+        if (val !== 'add') {
+          p.delete('type');
+        }
         return p;
       });
     }} className="w-full">
@@ -255,7 +268,10 @@ const PettyCash = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
-              <AddTransaction currentBalance={currentBalance} />
+              <AddTransaction 
+                currentBalance={currentBalance} 
+                initialTransactionType={transactionTypeParam || undefined}
+              />
             </CardContent>
           </Card>
         </TabsContent>
