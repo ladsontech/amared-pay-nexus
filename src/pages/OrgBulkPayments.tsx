@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Search, Filter, Download, Eye, CreditCard, Upload, Trash2, Check, AlertCircle, FileText } from "lucide-react";
+import { Plus, Search, Filter, Download, Eye, CreditCard, Upload, Trash2, Check, AlertCircle, FileText, Wallet, Bell, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -102,6 +102,19 @@ const BulkPayments = () => {
       (payment.reference && payment.reference.toLowerCase().includes(searchTerm.toLowerCase())) ||
       payment.total_amount.toString().includes(searchTerm)
   );
+
+  // Calculate stats for overview
+  const totalPayments = bulkPayments.length;
+  const pendingApprovals = bulkPayments.filter(p => p.status === 'pending_approval' || (!p.is_approved && !p.status)).length;
+  const totalAmount = bulkPayments.reduce((sum, p) => sum + p.total_amount, 0);
+  const approvedPayments = bulkPayments.filter(p => p.is_approved || p.status === 'approved').length;
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', tab);
+    setSearchParams(params);
+  };
 
   const getStatusColor = (status: string | null) => {
     switch (status) {
@@ -352,7 +365,111 @@ const BulkPayments = () => {
           )}
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="space-y-4 md:space-y-6">
+          {/* Stats Cards - 2 columns on mobile, 4 on desktop */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <Card className="bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                <CardTitle className="text-xs md:text-sm font-medium text-blue-800 leading-tight">
+                  Total Payments
+                </CardTitle>
+                <FileText className="h-4 w-4 md:h-5 md:w-5 text-blue-600 flex-shrink-0" />
+              </CardHeader>
+              <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                <div className="text-lg md:text-2xl font-bold text-blue-700 truncate">{totalPayments}</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                <CardTitle className="text-xs md:text-sm font-medium text-blue-800 leading-tight">
+                  Pending Approvals
+                </CardTitle>
+                <Bell className="h-4 w-4 md:h-5 md:w-5 text-blue-600 flex-shrink-0" />
+              </CardHeader>
+              <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                <div className="text-lg md:text-2xl font-bold text-blue-700 truncate">{pendingApprovals}</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                <CardTitle className="text-xs md:text-sm font-medium text-blue-800 leading-tight">
+                  Total Amount
+                </CardTitle>
+                <Wallet className="h-4 w-4 md:h-5 md:w-5 text-blue-600 flex-shrink-0" />
+              </CardHeader>
+              <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                <div className="text-lg md:text-2xl font-bold text-blue-700 truncate">
+                  UGX {totalAmount.toLocaleString()}
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 md:px-6 pt-3 md:pt-6">
+                <CardTitle className="text-xs md:text-sm font-medium text-blue-800 leading-tight">
+                  Approved
+                </CardTitle>
+                <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-blue-600 flex-shrink-0" />
+              </CardHeader>
+              <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+                <div className="text-lg md:text-2xl font-bold text-blue-700 truncate">{approvedPayments}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Action Buttons - Bank Payments and Mobile Payments */}
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
+            <Button
+              variant="default"
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2"
+              onClick={() => handleTabChange("bank")}
+            >
+              <CreditCard className="h-5 w-5 md:h-6 md:w-6" />
+              <div className="text-center">
+                <div className="text-sm md:text-base font-semibold">Bank Payments</div>
+                <div className="text-xs md:text-sm opacity-90">Create bank transfers</div>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="border-blue-200 bg-white hover:bg-blue-50 text-blue-700 hover:text-blue-800 h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2"
+              onClick={() => handleTabChange("mobile")}
+            >
+              <Upload className="h-5 w-5 md:h-6 md:w-6" />
+              <div className="text-center">
+                <div className="text-sm md:text-base font-semibold">Mobile Payments</div>
+                <div className="text-xs md:text-sm opacity-90">Create mobile money</div>
+              </div>
+            </Button>
+          </div>
+
+          {/* Navigation Cards */}
+          {hasPermission("approve_bulk_payments") && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+              <Card 
+                className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all hover:shadow-md active:scale-[0.98]"
+                onClick={() => handleTabChange("approvals")}
+              >
+                <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+                  <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
+                  <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
+                    Approvals
+                  </CardTitle>
+                  <CardDescription className="text-xs md:text-sm text-gray-600">
+                    Review pending requests
+                    {pendingApprovals > 0 && (
+                      <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                        {pendingApprovals}
+                      </span>
+                    )}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Search and Filters */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -379,17 +496,17 @@ const BulkPayments = () => {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {[1, 2, 3].map((i) => (
-                <Card key={i} className="animate-pulse border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
+                <Card key={i} className="animate-pulse bg-blue-50 border border-blue-200">
                   <CardHeader>
-                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-6 bg-blue-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-blue-200 rounded w-1/2"></div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      <div className="h-4 bg-gray-200 rounded"></div>
-                      <div className="h-4 bg-gray-200 rounded"></div>
-                      <div className="h-4 bg-gray-200 rounded"></div>
-                      <div className="h-10 bg-gray-200 rounded mt-4"></div>
+                      <div className="h-4 bg-blue-200 rounded"></div>
+                      <div className="h-4 bg-blue-200 rounded"></div>
+                      <div className="h-4 bg-blue-200 rounded"></div>
+                      <div className="h-10 bg-blue-200 rounded mt-4"></div>
                     </div>
                   </CardContent>
                 </Card>
@@ -398,7 +515,7 @@ const BulkPayments = () => {
           ) : filteredPayments.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredPayments.map((payment) => (
-                <Card key={payment.id} className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100/50">
+                <Card key={payment.id} className="bg-blue-50 border border-blue-200 hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base sm:text-lg">{payment.reference || `BP-${payment.id.substring(0, 8)}`}</CardTitle>
