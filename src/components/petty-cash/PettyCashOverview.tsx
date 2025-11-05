@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet, TrendingDown, AlertTriangle, Bell, Plus, History, CheckCircle, FileText } from "lucide-react";
+import { Wallet, TrendingDown, AlertTriangle, Bell, Receipt, History, CheckCircle, FileText } from "lucide-react";
 import { PettyCashWallet, PettyCashTransaction, PettyCashExpense } from "@/services/organizationService";
 import { useSearchParams } from "react-router-dom";
 
@@ -53,50 +53,36 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
       title: "Monthly Spending",
       value: `UGX ${monthlySpending.toLocaleString()}`,
       icon: TrendingDown,
-      color: "text-orange-700",
-      iconColor: "text-orange-600",
+      color: "text-blue-700",
+      iconColor: "text-blue-600",
     },
     {
       title: "Pending Approvals",
       value: pendingApprovals.toString(),
       icon: Bell,
-      color: "text-purple-700",
-      iconColor: "text-purple-600",
+      color: "text-blue-700",
+      iconColor: "text-blue-600",
     }
   ];
 
   const navigationCards = [
     {
-      title: "Add Transaction",
-      description: "Create new transaction",
-      icon: Plus,
-      tab: "add",
-      color: "bg-green-50 border-green-200 hover:bg-green-100",
-      iconColor: "text-green-600",
-    },
-    {
       title: "History",
       description: "View transaction history",
       icon: History,
       tab: "history",
-      color: "bg-blue-50 border-blue-200 hover:bg-blue-100",
-      iconColor: "text-blue-600",
     },
     {
       title: "Approvals",
       description: "Review pending requests",
       icon: CheckCircle,
       tab: "approvals",
-      color: "bg-purple-50 border-purple-200 hover:bg-purple-100",
-      iconColor: "text-purple-600",
     },
     {
       title: "Reconciliation",
       description: "Reconcile transactions",
       icon: FileText,
       tab: "reconciliation",
-      color: "bg-indigo-50 border-indigo-200 hover:bg-indigo-100",
-      iconColor: "text-indigo-600",
     }
   ];
 
@@ -139,16 +125,44 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
         ))}
       </div>
 
-      {/* Navigation Cards - 2 columns on mobile and desktop */}
+      {/* Action Buttons - Request Expense and Fund Petty Cash */}
       <div className="grid grid-cols-2 gap-3 md:gap-4">
+        <Button
+          variant="default"
+          size="lg"
+          className="bg-blue-600 hover:bg-blue-700 text-white h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2"
+          onClick={() => handleTabChange("add")}
+        >
+          <Receipt className="h-5 w-5 md:h-6 md:w-6" />
+          <div className="text-center">
+            <div className="text-sm md:text-base font-semibold">Request Expense</div>
+            <div className="text-xs md:text-sm opacity-90">Submit expense request</div>
+          </div>
+        </Button>
+        <Button
+          variant="outline"
+          size="lg"
+          className="border-blue-200 bg-white hover:bg-blue-50 text-blue-700 hover:text-blue-800 h-auto py-4 md:py-6 flex flex-col items-center justify-center gap-2"
+          onClick={() => handleTabChange("add")}
+        >
+          <Wallet className="h-5 w-5 md:h-6 md:w-6" />
+          <div className="text-center">
+            <div className="text-sm md:text-base font-semibold">Fund Petty Cash</div>
+            <div className="text-xs md:text-sm opacity-90">Request funds addition</div>
+          </div>
+        </Button>
+      </div>
+
+      {/* Navigation Cards - 3 columns on desktop, responsive on mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
         {navigationCards.map((nav, index) => (
           <Card 
             key={index} 
-            className={`${nav.color} cursor-pointer transition-all hover:shadow-md active:scale-[0.98]`}
+            className="bg-blue-50 border border-blue-200 hover:bg-blue-100 cursor-pointer transition-all hover:shadow-md active:scale-[0.98]"
             onClick={() => handleTabChange(nav.tab)}
           >
             <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-              <nav.icon className={`h-6 w-6 md:h-8 md:w-8 ${nav.iconColor} mb-1`} />
+              <nav.icon className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-1" />
               <CardTitle className="text-sm md:text-base font-semibold text-gray-900">
                 {nav.title}
               </CardTitle>
@@ -160,90 +174,64 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        <Card className="bg-blue-50 border border-blue-200">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base md:text-lg">Recent Transactions</CardTitle>
-            <CardDescription className="text-sm text-blue-700">Latest petty cash activities</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 md:space-y-3">
-              {pettyCashTransactions.slice(0, 3).map((transaction, index) => {
-                const isCredit = transaction.type === 'credit';
-                const amount = isCredit ? transaction.amount : -transaction.amount;
-                const date = new Date(transaction.created_at);
-                const now = new Date();
-                const diffTime = Math.abs(now.getTime() - date.getTime());
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
-                let dateText = '';
-                if (diffDays === 0) dateText = 'Today';
-                else if (diffDays === 1) dateText = 'Yesterday';
-                else dateText = `${diffDays} days ago`;
-
-                return (
-                  <div key={transaction.id} className="flex items-center justify-between p-2 md:p-3 border rounded-lg bg-white">
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium text-sm md:text-base truncate">{transaction.title || (isCredit ? 'Cash Added' : 'Expense')}</p>
-                      <p className="text-xs md:text-sm text-muted-foreground">
-                        {isCredit ? 'Addition' : 'Expense'} • {dateText}
-                      </p>
-                    </div>
-                    <div className={`font-medium text-blue-700 text-sm md:text-base ml-2 flex-shrink-0`}>
-                      {amount > 0 ? '+' : ''}UGX {Math.abs(amount).toLocaleString()}
-                    </div>
-                  </div>
-                );
-              })}
-              {pettyCashTransactions.length === 0 && (
-                <div className="text-center py-4 text-muted-foreground text-sm md:text-base">
-                  No recent transactions
-                </div>
-              )}
+      {/* Recent Transactions */}
+      <Card className="bg-blue-50 border border-blue-200">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base md:text-lg">Recent Transactions</CardTitle>
+              <CardDescription className="text-sm text-blue-700">Latest petty cash activities</CardDescription>
             </div>
-          </CardContent>
-        </Card>
+            {pendingApprovals > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-white border-blue-200 hover:bg-blue-100 text-blue-700"
+                onClick={() => handleTabChange("approvals")}
+              >
+                <Bell className="h-4 w-4 mr-2" />
+                {pendingApprovals} Pending
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2 md:space-y-3">
+            {pettyCashTransactions.slice(0, 3).map((transaction, index) => {
+              const isCredit = transaction.type === 'credit';
+              const amount = isCredit ? transaction.amount : -transaction.amount;
+              const date = new Date(transaction.created_at);
+              const now = new Date();
+              const diffTime = Math.abs(now.getTime() - date.getTime());
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              
+              let dateText = '';
+              if (diffDays === 0) dateText = 'Today';
+              else if (diffDays === 1) dateText = 'Yesterday';
+              else dateText = `${diffDays} days ago`;
 
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base md:text-lg">Quick Actions</CardTitle>
-            <CardDescription className="text-sm text-blue-700">Common petty cash operations</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2 md:space-y-3">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 transition-colors"
-              onClick={() => handleTabChange("add")}
-            >
-              <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2 text-blue-600" />
-              <span className="text-sm md:text-base">Add Transaction</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 transition-colors"
-              onClick={() => handleTabChange("history")}
-            >
-              <History className="h-4 w-4 md:h-5 md:w-5 mr-2 text-blue-600" />
-              <span className="text-sm md:text-base">View History</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-300 transition-colors"
-              onClick={() => handleTabChange("approvals")}
-            >
-              <Bell className="h-4 w-4 md:h-5 md:w-5 mr-2 text-purple-600" />
-              <span className="text-sm md:text-base">
-                Review Approvals
-                {pendingApprovals > 0 && (
-                  <span className="ml-2 px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
-                    {pendingApprovals}
-                  </span>
-                )}
-              </span>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+              return (
+                <div key={transaction.id} className="flex items-center justify-between p-2 md:p-3 border rounded-lg bg-white">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm md:text-base truncate">{transaction.title || (isCredit ? 'Cash Added' : 'Expense')}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">
+                      {isCredit ? 'Addition' : 'Expense'} • {dateText}
+                    </p>
+                  </div>
+                  <div className={`font-medium text-blue-700 text-sm md:text-base ml-2 flex-shrink-0`}>
+                    {amount > 0 ? '+' : ''}UGX {Math.abs(amount).toLocaleString()}
+                  </div>
+                </div>
+              );
+            })}
+            {pettyCashTransactions.length === 0 && (
+              <div className="text-center py-4 text-muted-foreground text-sm md:text-base">
+                No recent transactions
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
