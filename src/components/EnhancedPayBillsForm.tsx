@@ -8,12 +8,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Phone, 
   Building, 
   Zap, 
   Droplets, 
   Tv, 
-  GraduationCap, 
   Wallet,
   CreditCard,
   CheckCircle,
@@ -96,58 +94,44 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
 
   const billCategories: BillCategory[] = [
     {
-      id: 'airtime',
-      name: 'Airtime & Data',
-      icon: Phone,
+      id: 'water',
+      name: 'Water',
+      icon: Droplets,
       color: 'text-blue-600 bg-blue-100',
       providers: [
-        { id: 'mtn', name: 'MTN Uganda', accountFormat: '256XXXXXXXXX', minAmount: 500, maxAmount: 500000, fees: 0 },
-        { id: 'airtel', name: 'Airtel Uganda', accountFormat: '256XXXXXXXXX', minAmount: 500, maxAmount: 500000, fees: 0 },
-        { id: 'utl', name: 'Uganda Telecom', accountFormat: '256XXXXXXXXX', minAmount: 500, maxAmount: 100000, fees: 0 }
+        { id: 'nwsc', name: 'NWSC', accountFormat: 'Customer Number XXXXXXX', minAmount: 10000, maxAmount: 1000000, fees: 800 }
       ]
     },
     {
-      id: 'government',
-      name: 'Government Services',
-      icon: Building,
-      color: 'text-green-600 bg-green-100',
-      providers: [
-        { id: 'ura', name: 'Uganda Revenue Authority (URA)', accountFormat: 'TIN XXXXXXXXXX', minAmount: 10000, fees: 2000 },
-        { id: 'nssf', name: 'National Social Security Fund (NSSF)', accountFormat: 'NSSF XXXXXXXX', minAmount: 50000, fees: 1500 },
-        { id: 'kcca', name: 'Kampala Capital City Authority (KCCA)', accountFormat: 'Property ID XXXX', minAmount: 25000, fees: 1000 }
-      ]
-    },
-    {
-      id: 'utilities',
-      name: 'Utilities',
+      id: 'electricity',
+      name: 'Electricity',
       icon: Zap,
       color: 'text-orange-600 bg-orange-100',
       providers: [
-        { id: 'umeme', name: 'UMEME (Electricity)', accountFormat: 'Meter Number XXXXXXXXXX', minAmount: 5000, maxAmount: 2000000, fees: 1000 },
-        { id: 'nwsc', name: 'NWSC (Water)', accountFormat: 'Customer Number XXXXXXX', minAmount: 10000, maxAmount: 1000000, fees: 800 },
-        { id: 'gas', name: 'Gas Stations', accountFormat: 'Account XXXXXXXX', minAmount: 20000, fees: 500 }
+        { id: 'uedcl_postpaid', name: 'UEDCL Post Paid', accountFormat: 'Meter Number XXXXXXXXXX', minAmount: 5000, maxAmount: 2000000, fees: 1000 },
+        { id: 'uedcl_light', name: 'UEDCL Light', accountFormat: 'Meter Number XXXXXXXXXX', minAmount: 5000, maxAmount: 2000000, fees: 1000 }
       ]
     },
     {
-      id: 'entertainment',
-      name: 'Pay TV & Entertainment',
+      id: 'tv',
+      name: 'TV',
       icon: Tv,
       color: 'text-purple-600 bg-purple-100',
       providers: [
-        { id: 'dstv', name: 'DSTV Uganda', accountFormat: 'SmartCard XXXXXXXXXX', minAmount: 15000, maxAmount: 500000, fees: 500 },
-        { id: 'gotv', name: 'GOTV Uganda', accountFormat: 'IUC Number XXXXXXXXX', minAmount: 8000, maxAmount: 200000, fees: 300 },
-        { id: 'startimes', name: 'StarTimes Uganda', accountFormat: 'SmartCard XXXXXXXXXX', minAmount: 6000, maxAmount: 150000, fees: 300 }
+        { id: 'dstv', name: 'DSTV', accountFormat: 'SmartCard XXXXXXXXXX', minAmount: 15000, maxAmount: 500000, fees: 500 },
+        { id: 'startimes', name: 'STARTIMES', accountFormat: 'SmartCard XXXXXXXXXX', minAmount: 6000, maxAmount: 150000, fees: 300 },
+        { id: 'gotv', name: 'GOTV', accountFormat: 'IUC Number XXXXXXXXX', minAmount: 8000, maxAmount: 200000, fees: 300 },
+        { id: 'azam_tv', name: 'AZAM TV', accountFormat: 'SmartCard XXXXXXXXXX', minAmount: 10000, maxAmount: 200000, fees: 300 }
       ]
     },
     {
-      id: 'education',
-      name: 'School Fees & Education',
-      icon: GraduationCap,
-      color: 'text-indigo-600 bg-indigo-100',
+      id: 'tax',
+      name: 'Tax',
+      icon: Building,
+      color: 'text-green-600 bg-green-100',
       providers: [
-        { id: 'universities', name: 'Universities (General)', accountFormat: 'Student ID XXXXXXXX', minAmount: 100000, fees: 2000 },
-        { id: 'primary-schools', name: 'Primary Schools', accountFormat: 'Student ID XXXXX', minAmount: 50000, fees: 1000 },
-        { id: 'secondary-schools', name: 'Secondary Schools', accountFormat: 'Student ID XXXXXX', minAmount: 75000, fees: 1500 }
+        { id: 'ura', name: 'URA', accountFormat: 'TIN XXXXXXXXXX', minAmount: 10000, fees: 2000 },
+        { id: 'kcca', name: 'KCCA', accountFormat: 'Property ID XXXX', minAmount: 25000, fees: 1000 }
       ]
     }
   ];
@@ -163,11 +147,15 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const mockCustomerData = {
-      'umeme': { name: 'KAMPALA OFFICE COMPLEX', balance: 125000, dueDate: '2024-02-15' },
       'nwsc': { name: 'TECH SOLUTIONS LTD', balance: 85000, dueDate: '2024-02-20' },
+      'uedcl_postpaid': { name: 'KAMPALA OFFICE COMPLEX', balance: 125000, dueDate: '2024-02-15' },
+      'uedcl_light': { name: 'KAMPALA OFFICE COMPLEX', balance: 125000, dueDate: '2024-02-15' },
       'dstv': { name: 'JOHN DOE', package: 'Compact Plus', balance: 65000, dueDate: '2024-02-10' },
-      'mtn': { name: 'JANE SMITH', number: accountNumber },
-      'ura': { name: 'BUSINESS ENTERPRISES LTD', tin: accountNumber, status: 'Active' }
+      'startimes': { name: 'JOHN DOE', package: 'Nova', balance: 45000, dueDate: '2024-02-10' },
+      'gotv': { name: 'JOHN DOE', package: 'Jinja', balance: 35000, dueDate: '2024-02-10' },
+      'azam_tv': { name: 'JOHN DOE', package: 'Premium', balance: 55000, dueDate: '2024-02-10' },
+      'ura': { name: 'BUSINESS ENTERPRISES LTD', tin: accountNumber, status: 'Active' },
+      'kcca': { name: 'BUSINESS ENTERPRISES LTD', propertyId: accountNumber, status: 'Active' }
     };
 
     setCustomerInfo(mockCustomerData[selectedProvider as keyof typeof mockCustomerData] || null);
@@ -231,8 +219,10 @@ const EnhancedPayBillsForm: React.FC<EnhancedPayBillsFormProps> = ({ isOpen, onC
 
       // Map category to bill type
       const billTypeMap: Record<string, "electricity" | "water" | "internet" | "airtime" | undefined> = {
-        'airtime': 'airtime',
-        'utilities': selectedProvider === 'umeme' ? 'electricity' : selectedProvider === 'nwsc' ? 'water' : undefined,
+        'water': 'water',
+        'electricity': 'electricity',
+        'tv': undefined,
+        'tax': undefined,
       };
 
       const billType = billTypeMap[selectedCategory] || undefined;

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Receipt, Wallet, DollarSign, Zap, Wifi, Droplets } from "lucide-react";
+import { Wallet, DollarSign, Zap, Droplets, Tv, Building2, CreditCard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/hooks/useOrganization";
 import { organizationService } from "@/services/organizationService";
@@ -22,6 +22,7 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
   const { user } = useAuth();
   const { wallets } = useOrganization();
   const [selectedBill, setSelectedBill] = useState("");
+  const [selectedProvider, setSelectedProvider] = useState("");
   const [amount, setAmount] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [paymentSource, setPaymentSource] = useState<"main_wallet" | "petty_cash_wallet">("main_wallet");
@@ -92,45 +93,51 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
 
   const billTypes = [
     { 
-      id: "electricity", 
-      name: "Electricity", 
-      icon: Zap, 
-      provider: "UMEME",
-      accountLabel: "Meter Number",
-      placeholder: "Enter meter number"
-    },
-    { 
-      id: "internet", 
-      name: "Internet", 
-      icon: Wifi, 
-      provider: "MTN/Airtel",
-      accountLabel: "Account Number",
-      placeholder: "Enter account number"
-    },
-    { 
       id: "water", 
       name: "Water", 
       icon: Droplets, 
-      provider: "NWSC",
-      accountLabel: "Customer Number",
-      placeholder: "Enter customer number"
+      providers: [
+        { id: "nwsc", name: "NWSC", accountLabel: "Customer Number", placeholder: "Enter customer number" }
+      ]
     },
     { 
-      id: "airtime", 
-      name: "Airtime", 
-      icon: Receipt, 
-      provider: "Mobile Network",
-      accountLabel: "Phone Number",
-      placeholder: "Enter phone number"
+      id: "electricity", 
+      name: "Electricity", 
+      icon: Zap, 
+      providers: [
+        { id: "uedcl_postpaid", name: "UEDCL Post Paid", accountLabel: "Meter Number", placeholder: "Enter meter number" },
+        { id: "uedcl_light", name: "UEDCL Light", accountLabel: "Meter Number", placeholder: "Enter meter number" }
+      ]
+    },
+    { 
+      id: "tv", 
+      name: "TV", 
+      icon: Tv, 
+      providers: [
+        { id: "dstv", name: "DSTV", accountLabel: "SmartCard Number", placeholder: "Enter SmartCard number" },
+        { id: "startimes", name: "STARTIMES", accountLabel: "SmartCard Number", placeholder: "Enter SmartCard number" },
+        { id: "gotv", name: "GOTV", accountLabel: "IUC Number", placeholder: "Enter IUC number" },
+        { id: "azam_tv", name: "AZAM TV", accountLabel: "SmartCard Number", placeholder: "Enter SmartCard number" }
+      ]
+    },
+    { 
+      id: "tax", 
+      name: "Tax", 
+      icon: Building2, 
+      providers: [
+        { id: "ura", name: "URA", accountLabel: "TIN Number", placeholder: "Enter TIN number" },
+        { id: "kcca", name: "KCCA", accountLabel: "Property ID", placeholder: "Enter property ID" }
+      ]
     }
   ];
 
   const selectedBillType = billTypes.find(bill => bill.id === selectedBill);
+  const selectedProviderData = selectedBillType?.providers.find(p => p.id === selectedProvider);
   const canAfford = amount ? parseFloat(amount) <= selectedBalance : true;
   const remainingBalance = amount ? selectedBalance - parseFloat(amount) : selectedBalance;
 
   const handlePayBill = async () => {
-    if (!selectedBill || !amount || !accountNumber) {
+    if (!selectedBill || !selectedProvider || !amount || !accountNumber) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields",
@@ -181,14 +188,22 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
     setIsProcessing(true);
 
     try {
+      // Map bill type to API type
+      const apiTypeMap: Record<string, "electricity" | "water" | "internet" | "airtime" | null> = {
+        "water": "water",
+        "electricity": "electricity",
+        "tv": null,
+        "tax": null
+      };
+      
       // Create bill payment
       await organizationService.createBillPayment({
         organization: user.organizationId,
         currency: selectedWallet.currency.id,
-        biller_name: selectedBillType?.provider || selectedBillType?.name || "Unknown",
+        biller_name: selectedProviderData?.name || selectedBillType?.name || "Unknown",
         account_number: accountNumber.trim(),
         amount: Math.round(parseFloat(amount)),
-        type: selectedBill as "electricity" | "water" | "internet" | "airtime" | null,
+        type: apiTypeMap[selectedBill] || null,
         wallet_type: paymentSource,
         status: "pending",
         reference: null
@@ -196,11 +211,12 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
       
       toast({
         title: "Bill Payment Submitted",
-        description: `${selectedBillType?.name} bill of ${selectedCurrency} ${parseFloat(amount).toLocaleString()} has been submitted successfully`,
+        description: `${selectedProviderData?.name || selectedBillType?.name} bill of ${selectedCurrency} ${parseFloat(amount).toLocaleString()} has been submitted successfully`,
       });
 
       // Reset form
       setSelectedBill("");
+      setSelectedProvider("");
       setAmount("");
       setAccountNumber("");
       setPaymentSource("main_wallet");
@@ -222,7 +238,7 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-3 sm:p-6">
         <DialogHeader className="pb-3 sm:pb-4">
           <DialogTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
-            <Receipt className="h-4 w-4 sm:h-5 sm:w-5" />
+            <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
             Pay Bills
           </DialogTitle>
           <DialogDescription className="text-xs sm:text-sm">
@@ -283,19 +299,40 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
                     key={bill.id}
                     type="button"
                     variant={selectedBill === bill.id ? "default" : "outline"}
-                    onClick={() => setSelectedBill(bill.id)}
+                    onClick={() => {
+                      setSelectedBill(bill.id);
+                      setSelectedProvider("");
+                    }}
                     className="flex flex-col items-center p-3 sm:p-4 h-auto gap-2"
                   >
                     <IconComponent className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                     <div className="text-center">
                       <div className="text-xs sm:text-sm font-medium">{bill.name}</div>
-                      <div className="text-[10px] sm:text-xs text-gray-500">{bill.provider}</div>
                     </div>
                   </Button>
                 );
               })}
             </div>
           </div>
+
+          {/* Provider Selection */}
+          {selectedBillType && (
+            <div className="space-y-2">
+              <Label className="text-xs sm:text-sm font-medium">Select Provider</Label>
+              <Select value={selectedProvider} onValueChange={setSelectedProvider}>
+                <SelectTrigger className="h-9 sm:h-10 text-xs sm:text-sm">
+                  <SelectValue placeholder="Choose a provider" />
+                </SelectTrigger>
+                <SelectContent>
+                  {selectedBillType.providers.map((provider) => (
+                    <SelectItem key={provider.id} value={provider.id}>
+                      {provider.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Selected Source Info */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5 sm:p-3">
@@ -316,11 +353,11 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
           </div>
 
           {/* Account Number */}
-          {selectedBillType && (
+          {selectedProviderData && (
             <div className="space-y-2">
-              <Label className="text-xs sm:text-sm font-medium">{selectedBillType.accountLabel}</Label>
+              <Label className="text-xs sm:text-sm font-medium">{selectedProviderData.accountLabel}</Label>
               <Input
-                placeholder={selectedBillType.placeholder}
+                placeholder={selectedProviderData.placeholder}
                 value={accountNumber}
                 onChange={(e) => setAccountNumber(e.target.value)}
                 className="bg-white text-xs sm:text-sm h-9 sm:h-10"
@@ -352,13 +389,13 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
           </div>
 
           {/* Payment Confirmation */}
-          {amount && canAfford && selectedBill && accountNumber && (
+          {amount && canAfford && selectedBill && selectedProvider && accountNumber && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-2.5 sm:p-3">
               <h4 className="text-xs sm:text-sm font-semibold text-black mb-2">Payment Summary</h4>
               <div className="space-y-1.5 text-[10px] sm:text-xs">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Bill Type:</span>
-                  <span className="font-medium text-black text-right">{selectedBillType?.name} ({selectedBillType?.provider})</span>
+                  <span className="font-medium text-black text-right">{selectedBillType?.name} - {selectedProviderData?.name}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Account:</span>
@@ -394,7 +431,7 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
           </Button>
           <Button 
             onClick={handlePayBill} 
-            disabled={!selectedBill || !amount || !accountNumber || !canAfford || isProcessing}
+            disabled={!selectedBill || !selectedProvider || !amount || !accountNumber || !canAfford || isProcessing}
             className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm h-9 sm:h-10"
           >
             {isProcessing ? (
@@ -404,7 +441,7 @@ const PayBillsForm = ({ isOpen, onClose }: PayBillsFormProps) => {
               </div>
             ) : (
               <>
-                <Receipt className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 Pay {selectedCurrency} {amount ? parseFloat(amount).toLocaleString() : '0'}
               </>
             )}

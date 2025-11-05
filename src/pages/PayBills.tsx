@@ -185,10 +185,10 @@ const PayBills: React.FC = () => {
 
   const getTypeLabel = (type?: string) => {
     switch (type) {
-      case 'electricity': return 'Electricity';
       case 'water': return 'Water';
-      case 'internet': return 'Internet';
-      case 'airtime': return 'Airtime';
+      case 'electricity': return 'Electricity';
+      case 'tv': return 'TV';
+      case 'tax': return 'Tax';
       default: return 'Other';
     }
   };
@@ -487,10 +487,10 @@ const PayBills: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">None</SelectItem>
-                  <SelectItem value="electricity">Electricity</SelectItem>
                   <SelectItem value="water">Water</SelectItem>
-                  <SelectItem value="internet">Internet</SelectItem>
-                  <SelectItem value="airtime">Airtime</SelectItem>
+                  <SelectItem value="electricity">Electricity</SelectItem>
+                  <SelectItem value="tv">TV</SelectItem>
+                  <SelectItem value="tax">Tax</SelectItem>
                 </SelectContent>
               </Select>
             </div>
