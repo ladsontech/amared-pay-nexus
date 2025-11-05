@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Building, LogOut, Crown, User, CreditCard, Shield, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import AppOrgSidebar from "./AppOrgSidebar";
 import MobileBottomNav from "./MobileBottomNav";
@@ -18,6 +19,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const OrganizationLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const {
     user,
     logout,
@@ -205,8 +207,10 @@ const OrganizationLayout = () => {
 
             {/* Right Side: Mobile Drawer Icon on Right, Desktop Controls */}
             <div className="flex items-center gap-2">
-              {/* Mobile Only: Sidebar Trigger on Right */}
-              <SidebarTrigger className="md:hidden h-8 w-8" />
+              {/* Mobile Only: Sidebar Trigger on Right - Hidden on dashboard */}
+              {isMobile && location.pathname !== '/org/dashboard' && (
+                <SidebarTrigger className="h-8 w-8" />
+              )}
               
               {/* Mobile Only: Account Menu Button */}
               {isMobile && (
@@ -270,7 +274,18 @@ const OrganizationLayout = () => {
                             {user?.role || 'staff'}
                           </Badge>
                         </div>
-                        <div className="pt-4 border-t">
+                        <div className="pt-4 space-y-2 border-t">
+                          <Button
+                            onClick={() => {
+                              setAccountMenuOpen(false);
+                              navigate('/org/account');
+                            }}
+                            variant="outline"
+                            className="w-full"
+                          >
+                            <User className="mr-2 h-4 w-4" />
+                            Edit Account Information
+                          </Button>
                           <Button
                             onClick={handleLogout}
                             variant={isImpersonating ? "outline" : "destructive"}
