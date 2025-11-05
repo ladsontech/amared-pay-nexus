@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Wallet, TrendingDown, AlertTriangle, Bell, History, CheckCircle, FileText, Receipt } from "lucide-react";
 import { PettyCashWallet, PettyCashTransaction, PettyCashExpense } from "@/services/organizationService";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 
 interface PettyCashOverviewProps {
   currentBalance: number;
@@ -121,44 +121,36 @@ const PettyCashOverview = ({ currentBalance, pettyCashWallets, pettyCashTransact
 
       {/* Action Buttons - Request Expense and Request Cash Addition */}
       <div className="grid grid-cols-2 gap-3 md:gap-4">
-        <Card 
-          className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
-          onClick={() => {
-            const params = new URLSearchParams(searchParams);
-            params.set('tab', 'add');
-            params.set('type', 'expense');
-            setSearchParams(params);
-          }}
-        >
-          <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-            <Receipt className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
-            <CardTitle className="text-sm md:text-base font-semibold text-white">
-              Request Expense
-            </CardTitle>
-            <CardDescription className="text-xs md:text-sm text-blue-100">
-              Submit expense request
-            </CardDescription>
-          </CardContent>
-        </Card>
-        <Card 
-          className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
-          onClick={() => {
-            const params = new URLSearchParams(searchParams);
-            params.set('tab', 'add');
-            params.set('type', 'addition');
-            setSearchParams(params);
-          }}
-        >
-          <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
-            <Wallet className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
-            <CardTitle className="text-sm md:text-base font-semibold text-white">
-              Request Cash Addition
-            </CardTitle>
-            <CardDescription className="text-xs md:text-sm text-blue-100">
-              Add funds to wallet
-            </CardDescription>
-          </CardContent>
-        </Card>
+        <Link to="/org/petty-cash/request-expense" className="block">
+          <Card 
+            className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+          >
+            <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+              <Receipt className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+              <CardTitle className="text-sm md:text-base font-semibold text-white">
+                Request Expense
+              </CardTitle>
+              <CardDescription className="text-xs md:text-sm text-blue-100">
+                Submit expense request
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/org/petty-cash/request-cash-addition" className="block">
+          <Card 
+            className="bg-blue-600 border border-blue-700 hover:bg-blue-700 cursor-pointer transition-all active:scale-[0.98] shadow-sm hover:shadow-md"
+          >
+            <CardContent className="p-4 md:p-6 flex flex-col items-center justify-center text-center space-y-2">
+              <Wallet className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+              <CardTitle className="text-sm md:text-base font-semibold text-white">
+                Request Cash Addition
+              </CardTitle>
+              <CardDescription className="text-xs md:text-sm text-blue-100">
+                Add funds to wallet
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Navigation Cards - 2 columns on mobile, 3 on desktop */}

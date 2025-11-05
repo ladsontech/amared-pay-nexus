@@ -25,6 +25,8 @@ const SystemSettings = lazy(() => import("./pages/SystemSettings"));
 // Removed: SystemAlerts
 const OrgDashboard = lazy(() => import("./pages/OrgDashboard"));
 const OrgPettyCash = lazy(() => import("./pages/OrgPettyCash"));
+const RequestExpense = lazy(() => import("./pages/RequestExpense"));
+const RequestCashAddition = lazy(() => import("./pages/RequestCashAddition"));
 const OrgBulkPayments = lazy(() => import("./pages/OrgBulkPayments"));
 const OrgCollections = lazy(() => import("./pages/OrgCollections"));
 const OrgDeposits = lazy(() => import("./pages/OrgDeposits"));
@@ -101,6 +103,16 @@ const AppRoutes = () => {
           <Route path="petty-cash" element={
             <ProtectedRoute requiredPermissions={["access_petty_cash"]}>
               <OrgPettyCash />
+            </ProtectedRoute>
+          } />
+          <Route path="petty-cash/request-expense" element={
+            <ProtectedRoute requiredPermissions={["access_petty_cash"]}>
+              <RequestExpense />
+            </ProtectedRoute>
+          } />
+          <Route path="petty-cash/request-cash-addition" element={
+            <ProtectedRoute requiredPermissions={["access_petty_cash"]}>
+              <RequestCashAddition />
             </ProtectedRoute>
           } />
           <Route path="bulk-payments" element={
