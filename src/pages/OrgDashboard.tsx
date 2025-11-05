@@ -277,11 +277,7 @@ const OrgDashboard = () => {
                   <Eye className="h-5 w-5 opacity-70" />
                 </div>
                 <div className="mb-6">
-                  <p className="text-3xl font-bold mb-2">UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M</p>
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-green-300" />
-                    <span className="text-sm text-blue-100">+12.5% this month</span>
-                  </div>
+                  <p className="text-3xl font-bold mb-2">UGX {dashboardData.walletBalance.toLocaleString()}</p>
                 </div>
                 
                 {/* Quick Actions */}
@@ -400,11 +396,7 @@ const OrgDashboard = () => {
                       <p className="text-xs text-gray-500">Total received</p>
                     </div>
                   </div>
-                  <p className="text-xl font-bold text-black">UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingUp className="h-3 w-3 text-blue-600" />
-                    <span className="text-xs text-gray-600">+8.2%</span>
-                  </div>
+                  <p className="text-xl font-bold text-black">UGX {dashboardData.totalCollections.toLocaleString()}</p>
                 </CardContent>
               </Card>
 
@@ -419,11 +411,7 @@ const OrgDashboard = () => {
                       <p className="text-xs text-gray-500">Available cash</p>
                     </div>
                   </div>
-                  <p className="text-xl font-bold text-black">UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingUp className="h-3 w-3 text-blue-600" />
-                    <span className="text-xs text-gray-600">+5.3%</span>
-                  </div>
+                  <p className="text-xl font-bold text-black">UGX {dashboardData.pettyCashBalance.toLocaleString()}</p>
                 </CardContent>
               </Card>
             </div>
@@ -438,11 +426,11 @@ const OrgDashboard = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Total Collections</span>
-                    <span className="text-lg font-bold text-black">UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M</span>
+                    <span className="text-lg font-bold text-black">UGX {dashboardData.totalCollections.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Petty Cash</span>
-                    <span className="text-lg font-bold text-black">UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K</span>
+                    <span className="text-lg font-bold text-black">UGX {dashboardData.pettyCashBalance.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Successful Collections</span>
@@ -476,7 +464,7 @@ const OrgDashboard = () => {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-bold text-black">UGX {(transaction.amount / 1000).toFixed(0)}K</p>
+                          <p className="text-sm font-bold text-black">UGX {transaction.amount.toLocaleString()}</p>
                           <Badge className={`text-xs ${getStatusColor(transaction.status)}`}>
                             {transaction.status}
                           </Badge>
@@ -551,7 +539,7 @@ const OrgDashboard = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Total Amount</span>
-                    <span className="text-lg font-bold text-black">UGX {(dashboardData.paymentMetrics.totalBulkPayments / 1000000).toFixed(1)}M</span>
+                    <span className="text-lg font-bold text-black">UGX {dashboardData.paymentMetrics.totalBulkPayments.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Approved</span>
@@ -573,7 +561,7 @@ const OrgDashboard = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Total Withdraws</span>
-                    <span className="text-lg font-bold text-black">UGX {(dashboardData.paymentMetrics.totalWithdraws / 1000000).toFixed(1)}M</span>
+                    <span className="text-lg font-bold text-black">UGX {dashboardData.paymentMetrics.totalWithdraws.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Successful</span>
@@ -595,15 +583,15 @@ const OrgDashboard = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Total Collections</span>
-                    <span className="text-sm font-bold text-green-600">UGX {(dashboardData.paymentMetrics.totalCollections / 1000000).toFixed(1)}M</span>
+                    <span className="text-sm font-bold text-green-600">UGX {dashboardData.paymentMetrics.totalCollections.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Total Bulk Payments</span>
-                    <span className="text-sm font-bold text-blue-600">UGX {(dashboardData.paymentMetrics.totalBulkPayments / 1000000).toFixed(1)}M</span>
+                    <span className="text-sm font-bold text-blue-600">UGX {dashboardData.paymentMetrics.totalBulkPayments.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Total Withdraws</span>
-                    <span className="text-sm font-bold text-purple-600">UGX {(dashboardData.paymentMetrics.totalWithdraws / 1000000).toFixed(1)}M</span>
+                    <span className="text-sm font-bold text-purple-600">UGX {dashboardData.paymentMetrics.totalWithdraws.toLocaleString()}</span>
                   </div>
                 </div>
               </CardContent>
@@ -623,11 +611,7 @@ const OrgDashboard = () => {
               <Eye className="h-3.5 w-3.5 opacity-70" />
             </div>
             <div className="space-y-0.5 mb-3">
-              <p className="text-xl font-bold">UGX {(dashboardData.walletBalance / 1000000).toFixed(1)}M</p>
-              <div className="flex items-center gap-1">
-                <TrendingUp className="h-3 w-3" />
-                <span className="text-[10px] opacity-90">+12.5%</span>
-              </div>
+              <p className="text-xl font-bold">UGX {dashboardData.walletBalance.toLocaleString()}</p>
             </div>
             
             {/* Mobile Quick Actions - Compact */}
@@ -740,11 +724,7 @@ const OrgDashboard = () => {
                 <DollarSign className="h-3.5 w-3.5 text-blue-600" />
                 <span className="text-[10px] text-gray-500 font-medium">Collections</span>
               </div>
-              <p className="text-base font-bold text-black leading-tight">UGX {(dashboardData.totalCollections / 1000000).toFixed(1)}M</p>
-              <div className="flex items-center gap-0.5 mt-0.5">
-                <TrendingUp className="h-2.5 w-2.5 text-green-600" />
-                <span className="text-[9px] text-gray-500">+8.2%</span>
-              </div>
+              <p className="text-base font-bold text-black leading-tight">UGX {dashboardData.totalCollections.toLocaleString()}</p>
             </div>
 
             {/* Petty Cash Card */}
@@ -753,11 +733,7 @@ const OrgDashboard = () => {
                 <Wallet className="h-3.5 w-3.5 text-green-600" />
                 <span className="text-[10px] text-gray-500 font-medium">Petty Cash</span>
               </div>
-              <p className="text-base font-bold text-black leading-tight">UGX {(dashboardData.pettyCashBalance / 1000).toFixed(0)}K</p>
-              <div className="flex items-center gap-0.5 mt-0.5">
-                <TrendingUp className="h-2.5 w-2.5 text-green-600" />
-                <span className="text-[9px] text-gray-500">+5.3%</span>
-              </div>
+              <p className="text-base font-bold text-black leading-tight">UGX {dashboardData.pettyCashBalance.toLocaleString()}</p>
             </div>
 
             {/* Transactions */}
@@ -831,7 +807,7 @@ const OrgDashboard = () => {
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-xs md:text-sm font-bold text-black">
-                        UGX {(transaction.amount / 1000).toFixed(0)}K
+                        UGX {transaction.amount.toLocaleString()}
                       </p>
                       <StatusIcon className="h-2.5 w-2.5 md:h-3 md:w-3 text-gray-400 ml-auto mt-0.5" />
                     </div>
@@ -851,8 +827,8 @@ const OrgDashboard = () => {
                 </div>
                 <Progress value={dashboardData.teamMetrics.budgetUsed / dashboardData.teamMetrics.monthlyBudget * 100} className="h-1.5 md:h-2 mb-2 md:mb-3" />
                 <div className="flex justify-between text-[9px] md:text-xs text-gray-500">
-                  <span>Used: UGX {(dashboardData.teamMetrics.budgetUsed / 1000000).toFixed(1)}M</span>
-                  <span>Total: UGX {(dashboardData.teamMetrics.monthlyBudget / 1000000).toFixed(1)}M</span>
+                  <span>Used: UGX {dashboardData.teamMetrics.budgetUsed.toLocaleString()}</span>
+                  <span>Total: UGX {dashboardData.teamMetrics.monthlyBudget.toLocaleString()}</span>
                 </div>
               </div>
             </div>}
