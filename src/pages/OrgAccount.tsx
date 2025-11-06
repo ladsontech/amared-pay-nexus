@@ -13,11 +13,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { User, Mail, Phone, MapPin, Calendar, Shield, Building2, Briefcase, CreditCard, Globe, Hash } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLocation } from 'react-router-dom';
 
 export default function OrgAccount() {
   const { user: authUser, changePassword } = useAuth();
   const { organization, stats, loading: orgLoading } = useOrganizationData();
   const isMobile = useIsMobile();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,6 +34,13 @@ export default function OrgAccount() {
     new_password: '',
     confirm_password: ''
   });
+
+  // Handle hash navigation (e.g., /org/account#security)
+  useEffect(() => {
+    if (location.hash === '#security') {
+      setActiveTab('security');
+    }
+  }, [location.hash]);
 
   // Use auth user data directly
   useEffect(() => {
@@ -127,7 +137,7 @@ export default function OrgAccount() {
         </p>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className={`${isMobile ? 'grid w-full grid-cols-3' : 'inline-flex'}`}>
           <TabsTrigger value="profile" className={isMobile ? 'text-xs' : ''}>
             <User className="h-4 w-4 mr-2" />

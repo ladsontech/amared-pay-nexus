@@ -5,45 +5,63 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   Settings, 
   Bell, 
-  User, 
-  Building,
-  Save,
-  Plus,
-  Trash2,
-  Edit,
   Layout,
-  Upload,
+  Save,
   Sparkles,
-  Loader2
+  Loader2,
+  ChevronRight,
+  User,
+  Building2,
+  Shield,
+  Tag,
+  Mail,
+  Smartphone,
+  Globe,
+  FileText,
+  ArrowLeft
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getOrganizationLogoUrl } from "@/utils/organizationAvatar";
 import { useNavigate } from "react-router-dom";
 import { organizationService } from "@/services/organizationService";
 import { useOrganization } from "@/hooks/useOrganization";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+type SettingsSection = {
+  id: string;
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  items: SettingsItem[];
+};
+
+type SettingsItem = {
+  id: string;
+  title: string;
+  description?: string;
+  type: 'switch' | 'button' | 'link' | 'info';
+  value?: boolean;
+  action?: () => void;
+  href?: string;
+  badge?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+};
 
 const OrgSettings = () => {
   const { user, hasPermission } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { organization, loading: orgLoading, updateOrganization } = useOrganization();
   
-  const [profileSettings, setProfileSettings] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    department: user?.department || ''
-  });
-
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [isSavingLogo, setIsSavingLogo] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
@@ -54,7 +72,6 @@ const OrgSettings = () => {
   });
 
   const [interfaceSettings, setInterfaceSettings] = useState({
-    menuPlacement: 'header', // 'header' or 'sidebar'
     compactMode: false,
     darkMode: false
   });
@@ -62,7 +79,6 @@ const OrgSettings = () => {
   const [expenseCategories, setExpenseCategories] = useState<Array<{id: string, name: string, description: string, budget: number, spent: number, count: number}>>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
 
-  // Category definitions based on API enum values
   const categoryDefinitions: Record<string, { name: string; description: string }> = {
     office_supplies: { name: 'Office Supplies', description: 'Stationery, equipment, and office materials' },
     travel: { name: 'Travel', description: 'Business travel expenses and transportation' },
@@ -74,27 +90,14 @@ const OrgSettings = () => {
     other: { name: 'Other', description: 'Other miscellaneous expenses' }
   };
 
-   // Fetch profile settings on mount
-   useEffect(() => {
-     if (user) {
-       setProfileSettings({
-         name: user.name || '',
-         email: user.email || '',
-         department: user.department || ''
-       });
-     }
-   }, [user]);
+  useEffect(() => {
+    if (organization?.logo) {
+      setLogoUrl(organization.logo);
+    } else {
+      setLogoUrl("");
+    }
+  }, [organization?.logo]);
 
-   // Update logo URL when organization changes
-   useEffect(() => {
-     if (organization?.logo) {
-       setLogoUrl(organization.logo);
-     } else {
-       setLogoUrl("");
-     }
-   }, [organization?.logo]);
-
-  // Fetch expense categories from actual expenses
   useEffect(() => {
     const fetchCategories = async () => {
       if (!user?.organizationId || !organization?.id) {
@@ -105,19 +108,17 @@ const OrgSettings = () => {
       try {
         setLoadingCategories(true);
         
-        // First, get the organization's petty cash wallet to filter expenses
         const wallets = await organizationService.getPettyCashWallets({
           organization: organization.id,
           limit: 10
         });
 
-        // Fetch petty cash expenses for all wallets in the organization
         const allExpenses: any[] = [];
         for (const wallet of wallets.results) {
           try {
             const expenses = await organizationService.getPettyCashExpenses({
               petty_cash_wallet: wallet.id,
-              limit: 1000, // Get a large number to calculate stats
+              limit: 1000,
               offset: 0
             });
             allExpenses.push(...expenses.results);
@@ -126,7 +127,6 @@ const OrgSettings = () => {
           }
         }
 
-        // Group expenses by category and calculate totals
         const categoryStats: Record<string, { spent: number; count: number }> = {};
         
         allExpenses.forEach((expense) => {
@@ -138,8 +138,7 @@ const OrgSettings = () => {
           categoryStats[category].count += 1;
         });
 
-        // Build categories array from all available categories
-        const allCategories = Object.keys(categoryDefinitions).map((categoryKey, index) => {
+        const allCategories = Object.keys(categoryDefinitions).map((categoryKey) => {
           const stats = categoryStats[categoryKey] || { spent: 0, count: 0 };
           const def = categoryDefinitions[categoryKey];
           
@@ -147,13 +146,12 @@ const OrgSettings = () => {
             id: categoryKey,
             name: def.name,
             description: def.description,
-            budget: 0, // Budgets would need a separate endpoint
+            budget: 0,
             spent: stats.spent,
             count: stats.count
           };
         });
 
-        // Sort by spent amount (descending), then by name
         allCategories.sort((a, b) => {
           if (b.spent !== a.spent) return b.spent - a.spent;
           return a.name.localeCompare(b.name);
@@ -162,13 +160,7 @@ const OrgSettings = () => {
         setExpenseCategories(allCategories);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
-        toast({
-          title: "Error loading categories",
-          description: "Could not load expense categories. Showing default categories.",
-          variant: "destructive",
-        });
-        // Fallback to default categories based on enum values
-        const defaultCategories = Object.keys(categoryDefinitions).map((key, index) => ({
+        const defaultCategories = Object.keys(categoryDefinitions).map((key) => ({
           id: key,
           name: categoryDefinitions[key].name,
           description: categoryDefinitions[key].description,
@@ -183,15 +175,7 @@ const OrgSettings = () => {
     };
 
     fetchCategories();
-  }, [user?.organizationId, organization?.id, toast]);
-
-  const handleSaveProfile = () => {
-    // Profile updates would be handled via API in production
-    toast({
-      title: "Profile updated",
-      description: "Your profile settings have been saved successfully.",
-    });
-  };
+  }, [user?.organizationId, organization?.id]);
 
   const handleSaveNotifications = () => {
     toast({
@@ -203,634 +187,643 @@ const OrgSettings = () => {
   const handleSaveInterface = () => {
     toast({
       title: "Interface settings updated",
-      description: "Your interface preferences have been saved. Please refresh to see changes.",
+      description: "Your interface preferences have been saved.",
     });
   };
 
-  const handleAddCategory = () => {
-    toast({
-      title: "Info",
-      description: "Categories are predefined based on expense types. You cannot add custom categories.",
-    });
+  const handleSaveLogo = async () => {
+    if (!organization) return;
+    
+    const orgId = user?.organization?.id || user?.organizationId;
+    if (!orgId) {
+      toast({
+        title: "Error",
+        description: "Organization ID not found",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSavingLogo(true);
+    try {
+      await updateOrganization({
+        logo: logoUrl.trim() || null,
+      });
+      toast({
+        title: "Logo updated",
+        description: "Organization logo has been updated successfully",
+      });
+      setTimeout(() => window.location.reload(), 500);
+    } catch (error: any) {
+      console.error("Logo update error:", error);
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update logo. Please check the URL format and try again.",
+        variant: "destructive",
+      });
+      setLogoUrl(organization.logo || "");
+    } finally {
+      setIsSavingLogo(false);
+    }
   };
 
-  const handleDeleteCategory = (id: string) => {
-    toast({
-      title: "Info",
-      description: "Categories are predefined and cannot be deleted. They are based on expense types used in petty cash.",
-    });
-  };
+  const settingsSections: SettingsSection[] = [
+    {
+      id: 'notifications',
+      title: 'Notifications',
+      icon: Bell,
+      items: [
+        {
+          id: 'email',
+          title: 'Email Notifications',
+          description: 'Receive email updates about your account activity',
+          type: 'switch',
+          value: notificationSettings.emailNotifications,
+          action: () => setNotificationSettings({...notificationSettings, emailNotifications: !notificationSettings.emailNotifications})
+        },
+        {
+          id: 'transactions',
+          title: 'Transaction Alerts',
+          description: 'Get notified when transactions need your attention',
+          type: 'switch',
+          value: notificationSettings.transactionAlerts,
+          action: () => setNotificationSettings({...notificationSettings, transactionAlerts: !notificationSettings.transactionAlerts})
+        },
+        ...(hasPermission('approve_transactions') ? [{
+          id: 'approvals',
+          title: 'Approval Reminders',
+          description: 'Reminders for pending approvals',
+          type: 'switch' as const,
+          value: notificationSettings.approvalReminders,
+          action: () => setNotificationSettings({...notificationSettings, approvalReminders: !notificationSettings.approvalReminders})
+        }] : []),
+        {
+          id: 'reports',
+          title: 'Weekly Reports',
+          description: 'Receive weekly summary reports via email',
+          type: 'switch',
+          value: notificationSettings.weeklyReports,
+          action: () => setNotificationSettings({...notificationSettings, weeklyReports: !notificationSettings.weeklyReports})
+        },
+        {
+          id: 'push',
+          title: 'Push Notifications',
+          description: 'Receive push notifications in your browser',
+          type: 'switch',
+          value: notificationSettings.pushNotifications,
+          action: () => setNotificationSettings({...notificationSettings, pushNotifications: !notificationSettings.pushNotifications})
+        }
+      ]
+    },
+    {
+      id: 'interface',
+      title: 'Interface',
+      icon: Layout,
+      items: [
+        {
+          id: 'compact',
+          title: 'Compact Mode',
+          description: 'Reduce spacing and use smaller elements',
+          type: 'switch',
+          value: interfaceSettings.compactMode,
+          action: () => setInterfaceSettings({...interfaceSettings, compactMode: !interfaceSettings.compactMode})
+        },
+        {
+          id: 'dark',
+          title: 'Dark Mode',
+          description: 'Use dark theme for the interface',
+          type: 'switch',
+          value: interfaceSettings.darkMode,
+          action: () => setInterfaceSettings({...interfaceSettings, darkMode: !interfaceSettings.darkMode})
+        }
+      ]
+    },
+    {
+      id: 'organization',
+      title: 'Organization',
+      icon: Building2,
+      items: [
+        {
+          id: 'logo',
+          title: 'Organization Logo',
+          description: 'Update your organization logo',
+          type: 'button',
+          action: () => setActiveSection('logo')
+        },
+        {
+          id: 'details',
+          title: 'Organization Details',
+          description: 'View organization information',
+          type: 'link',
+          href: '/org/account',
+          icon: ChevronRight
+        },
+        ...(user?.role === 'owner' ? [{
+          id: 'onboarding',
+          title: 'Restart Setup',
+          description: 'Reset and restart the onboarding process',
+          type: 'button' as const,
+          action: () => {
+            localStorage.removeItem(`onboarding_complete_${user?.organizationId}`);
+            toast({
+              title: "Onboarding reset",
+              description: "The onboarding will appear on your next page refresh.",
+            });
+            setTimeout(() => window.location.reload(), 1500);
+          }
+        }] : [])
+      ]
+    },
+    {
+      id: 'account',
+      title: 'Account',
+      icon: User,
+      items: [
+        {
+          id: 'profile',
+          title: 'Profile Settings',
+          description: 'Manage your personal information',
+          type: 'link',
+          href: '/org/account',
+          icon: ChevronRight
+        },
+        {
+          id: 'security',
+          title: 'Security & Password',
+          description: 'Change your password and security settings',
+          type: 'link',
+          href: '/org/account#security',
+          icon: ChevronRight
+        }
+      ]
+    }
+  ];
 
-  return (
-    <div className="space-y-4 sm:space-y-6 p-3 sm:p-0">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold">Settings</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Manage your account and organization preferences
-          </p>
+  const renderSettingsItem = (item: SettingsItem) => {
+    if (item.type === 'switch') {
+      return (
+        <div key={item.id} className="flex items-center justify-between py-3 px-1">
+          <div className="flex-1 min-w-0 pr-4">
+            <Label className="text-sm font-medium text-foreground">{item.title}</Label>
+            {item.description && (
+              <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
+            )}
+          </div>
+          <Switch
+            checked={item.value}
+            onCheckedChange={item.action}
+          />
         </div>
-      </div>
+      );
+    }
 
-      <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto gap-1 overflow-x-auto">
-          <TabsTrigger value="profile" className="text-[10px] sm:text-xs lg:text-sm py-2">Profile</TabsTrigger>
-          <TabsTrigger value="notifications" className="text-[10px] sm:text-xs lg:text-sm py-2">Notifications</TabsTrigger>
-          <TabsTrigger value="interface" className="text-[10px] sm:text-xs lg:text-sm py-2">Interface</TabsTrigger>
-          <TabsTrigger value="categories" className="text-[10px] sm:text-xs lg:text-sm py-2">Categories</TabsTrigger>
-          <TabsTrigger value="organization" className="text-[10px] sm:text-xs lg:text-sm py-2">Organization</TabsTrigger>
-        </TabsList>
+    if (item.type === 'link' || item.type === 'button') {
+      const content = (
+        <div className="flex items-center justify-between py-3 px-1 flex-1">
+          <div className="flex-1 min-w-0 pr-4">
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium text-foreground">{item.title}</Label>
+              {item.badge && (
+                <Badge variant="secondary" className="text-xs">{item.badge}</Badge>
+              )}
+            </div>
+            {item.description && (
+              <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
+            )}
+          </div>
+          {item.icon ? (
+            <item.icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          ) : (
+            <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          )}
+        </div>
+      );
 
-        <TabsContent value="profile">
+      if (item.type === 'link' && item.href) {
+        return (
+          <button
+            key={item.id}
+            onClick={() => navigate(item.href!)}
+            className="w-full text-left hover:bg-accent/50 transition-colors rounded-lg"
+          >
+            {content}
+          </button>
+        );
+      }
+
+      return (
+        <button
+          key={item.id}
+          onClick={item.action}
+          className="w-full text-left hover:bg-accent/50 transition-colors rounded-lg"
+        >
+          {content}
+        </button>
+      );
+    }
+
+    return null;
+  };
+
+  // Mobile View - List-based interface
+  if (isMobile) {
+    if (activeSection === 'logo') {
+      return (
+        <div className="space-y-4 pb-20">
+          {/* Mobile Header */}
+          <div className="flex items-center gap-3 mb-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setActiveSection(null)}
+              className="h-9 w-9"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-lg font-bold">Organization Logo</h1>
+              <p className="text-xs text-muted-foreground">Update your organization logo</p>
+            </div>
+          </div>
+
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Profile Settings
-              </CardTitle>
-              <CardDescription>
-                Update your personal information and preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 sm:space-y-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-                <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
-                  <AvatarImage src={user?.avatar} alt={user?.name} />
-                  <AvatarFallback className="text-base sm:text-lg">{user?.name?.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 w-full sm:w-auto">
-                  <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                    Change Photo
-                  </Button>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                    JPG, PNG or GIF. Max size 2MB.
-                  </p>
-                </div>
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex justify-center">
+                <img 
+                  src={getOrganizationLogoUrl(user?.organization)} 
+                  alt={user?.organization?.name || 'Organization logo'} 
+                  className="h-24 w-24 rounded-xl object-cover border-2 border-blue-200"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Logo URL</Label>
+                <Input
+                  type="url"
+                  value={logoUrl}
+                  onChange={(e) => setLogoUrl(e.target.value)}
+                  placeholder="https://example.com/logo.png"
+                  disabled={isSavingLogo}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter a direct link to your organization logo image
+                </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-xs sm:text-sm">Full Name</Label>
-                  <Input
-                    id="name"
-                    value={profileSettings.name}
-                    onChange={(e) => setProfileSettings({...profileSettings, name: e.target.value})}
-                    className="text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-xs sm:text-sm">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={profileSettings.email}
-                    onChange={(e) => setProfileSettings({...profileSettings, email: e.target.value})}
-                    className="text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="department" className="text-xs sm:text-sm">Department</Label>
-                  <Input
-                    id="department"
-                    value={profileSettings.department}
-                    onChange={(e) => setProfileSettings({...profileSettings, department: e.target.value})}
-                    className="text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role" className="text-xs sm:text-sm">Role</Label>
-                  <Input
-                    id="role"
-                    value={user?.role || 'N/A'}
-                    disabled
-                    className="text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <Button onClick={handleSaveProfile} className="w-full sm:w-auto text-xs sm:text-sm">
-                  <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                  Save Changes
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="notifications">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Notification Preferences
-              </CardTitle>
-              <CardDescription>
-                Choose how you want to be notified about activities
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5 flex-1 pr-4">
-                      <Label className="text-xs sm:text-sm">Email Notifications</Label>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground">
-                        Receive email updates about your account activity
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notificationSettings.emailNotifications}
-                      onCheckedChange={(checked) => 
-                        setNotificationSettings({...notificationSettings, emailNotifications: checked})
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5 flex-1 pr-4">
-                      <Label className="text-xs sm:text-sm">Transaction Alerts</Label>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground">
-                        Get notified when transactions need your attention
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notificationSettings.transactionAlerts}
-                      onCheckedChange={(checked) => 
-                        setNotificationSettings({...notificationSettings, transactionAlerts: checked})
-                      }
-                    />
-                  </div>
-                </div>
-
-                {hasPermission('approve_transactions') && (
-                  <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5 flex-1 pr-4">
-                        <Label className="text-xs sm:text-sm">Approval Reminders</Label>
-                        <p className="text-[10px] sm:text-xs text-muted-foreground">
-                          Reminders for pending approvals
-                        </p>
-                      </div>
-                      <Switch
-                        checked={notificationSettings.approvalReminders}
-                        onCheckedChange={(checked) => 
-                          setNotificationSettings({...notificationSettings, approvalReminders: checked})
-                        }
-                      />
-                    </div>
-                  </div>
+              <Button 
+                onClick={handleSaveLogo} 
+                disabled={isSavingLogo || logoUrl === (organization?.logo || "")}
+                className="w-full"
+              >
+                {isSavingLogo ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Logo
+                  </>
                 )}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
 
-                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5 flex-1 pr-4">
-                      <Label className="text-xs sm:text-sm">Weekly Reports</Label>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground">
-                        Receive weekly summary reports via email
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notificationSettings.weeklyReports}
-                      onCheckedChange={(checked) => 
-                        setNotificationSettings({...notificationSettings, weeklyReports: checked})
-                      }
-                    />
+    return (
+      <div className="space-y-1 pb-20">
+        {/* Mobile Header */}
+        <div className="sticky top-12 bg-white border-b border-gray-100 -mx-3 sm:-mx-4 md:mx-0 px-3 sm:px-4 md:px-0 py-4 mb-4 z-10">
+          <h1 className="text-xl font-bold text-black">Settings</h1>
+          <p className="text-sm text-gray-600">Manage your preferences</p>
+        </div>
+
+        {/* Settings Sections */}
+        {settingsSections.map((section) => (
+          <Card key={section.id} className="border-0 shadow-none bg-transparent">
+            <CardHeader className="pb-2 pt-4">
+              <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                <section.icon className="h-4 w-4" />
+                {section.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0 px-0">
+              <div className="bg-white rounded-lg border border-gray-100 divide-y divide-gray-100">
+                {section.items.map((item) => (
+                  <div key={item.id}>
+                    {renderSettingsItem(item)}
                   </div>
-                </div>
-
-                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5 flex-1 pr-4">
-                      <Label className="text-xs sm:text-sm">Push Notifications</Label>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground">
-                        Receive push notifications in your browser
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notificationSettings.pushNotifications}
-                      onCheckedChange={(checked) => 
-                        setNotificationSettings({...notificationSettings, pushNotifications: checked})
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <Button onClick={handleSaveNotifications} className="w-full sm:w-auto text-xs sm:text-sm">
-                  <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                  Save Preferences
-                </Button>
+                ))}
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        ))}
 
-        <TabsContent value="interface">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Layout className="h-5 w-5" />
-                Interface Settings
-              </CardTitle>
-              <CardDescription>
-                Customize your interface layout and appearance
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 sm:space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Menu Placement</Label>
-                  <Select 
-                    value={interfaceSettings.menuPlacement} 
-                    onValueChange={(value) => setInterfaceSettings({...interfaceSettings, menuPlacement: value})}
-                  >
-                    <SelectTrigger className="text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="header">Header Navigation</SelectItem>
-                      <SelectItem value="sidebar">Sidebar Navigation</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    Choose where to display the main navigation menu
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5 flex-1 pr-4">
-                      <Label className="text-xs sm:text-sm">Compact Mode</Label>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground">
-                        Reduce spacing and use smaller elements
-                      </p>
-                    </div>
-                    <Switch
-                      checked={interfaceSettings.compactMode}
-                      onCheckedChange={(checked) => 
-                        setInterfaceSettings({...interfaceSettings, compactMode: checked})
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2 p-3 border border-slate-100 rounded-lg bg-slate-50 sm:bg-transparent sm:border-0 sm:rounded-none">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5 flex-1 pr-4">
-                      <Label className="text-xs sm:text-sm">Dark Mode</Label>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground">
-                        Use dark theme for the interface
-                      </p>
-                    </div>
-                    <Switch
-                      checked={interfaceSettings.darkMode}
-                      onCheckedChange={(checked) => 
-                        setInterfaceSettings({...interfaceSettings, darkMode: checked})
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <Button onClick={handleSaveInterface} className="w-full sm:w-auto text-xs sm:text-sm">
-                  <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                  Save Interface Settings
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="categories">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span className="text-base sm:text-lg">Expense Categories</span>
-                </div>
-                {hasPermission('manage_team') && (
-                  <Button onClick={handleAddCategory} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                    <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                    Add Category
-                  </Button>
-                )}
-              </CardTitle>
-              <CardDescription>
-                Manage expense categories and their budgets
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+        {/* Expense Categories Section */}
+        <Card className="border-0 shadow-none bg-transparent">
+          <CardHeader className="pb-2 pt-4">
+            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+              <Tag className="h-4 w-4" />
+              Expense Categories
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 px-0">
+            <div className="bg-white rounded-lg border border-gray-100">
               {loadingCategories ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
-                  <span className="ml-2 text-sm text-muted-foreground">Loading categories...</span>
+                  <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                  <span className="ml-2 text-sm text-muted-foreground">Loading...</span>
                 </div>
               ) : expenseCategories.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-sm text-muted-foreground">No expense categories found.</p>
+                  <p className="text-sm text-muted-foreground">No categories found</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {expenseCategories.map((category) => (
-                    <div key={category.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 border border-slate-200 rounded-lg bg-white">
-                      <div className="flex-1 space-y-1 min-w-0">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                          <h3 className="font-medium text-sm sm:text-base truncate">{category.name}</h3>
-                          <div className="flex gap-2 flex-wrap">
+                <div className="divide-y divide-gray-100">
+                  {expenseCategories.map((category, index) => (
+                    <div key={category.id} className="py-3 px-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground">{category.name}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{category.description}</p>
+                          <div className="flex gap-2 mt-2">
                             {category.spent > 0 && (
-                              <Badge variant="outline" className="text-xs sm:text-sm w-fit">
-                                Spent: UGX {category.spent.toLocaleString()}
+                              <Badge variant="outline" className="text-xs">
+                                UGX {category.spent.toLocaleString()}
                               </Badge>
                             )}
                             {category.count > 0 && (
-                              <Badge variant="secondary" className="text-xs sm:text-sm w-fit">
+                              <Badge variant="secondary" className="text-xs">
                                 {category.count} {category.count === 1 ? 'expense' : 'expenses'}
                               </Badge>
                             )}
                           </div>
                         </div>
-                        <p className="text-xs sm:text-sm text-muted-foreground">{category.description}</p>
                       </div>
-                      {hasPermission('manage_team') && (
-                        <div className="flex items-center gap-2 sm:space-x-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3"
-                            onClick={() => {
-                              toast({
-                                title: "Info",
-                                description: "Category budgets are not yet supported by the API. Categories are automatically derived from expense types.",
-                              });
-                            }}
-                          >
-                            <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <span className="hidden sm:inline ml-2">Edit</span>
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleDeleteCategory(category.id)}
-                            className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <span className="hidden sm:inline ml-2">Delete</span>
-                          </Button>
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+            <p className="text-xs text-muted-foreground mt-3 px-1">
+              Categories are automatically derived from expense types
+            </p>
+          </CardContent>
+        </Card>
 
-        <TabsContent value="organization">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <Building className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span className="text-base sm:text-lg">Organization Settings</span>
+        {/* Save Buttons */}
+        <div className="space-y-3 pt-4">
+          <Button 
+            onClick={handleSaveNotifications} 
+            className="w-full"
+            variant="outline"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            Save Notification Settings
+          </Button>
+          <Button 
+            onClick={handleSaveInterface} 
+            className="w-full"
+            variant="outline"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            Save Interface Settings
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop View - Traditional Card Layout
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">Settings</h1>
+        <p className="text-sm text-muted-foreground">
+          Manage your account and organization preferences
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Notifications */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Notification Preferences
+            </CardTitle>
+            <CardDescription>
+              Choose how you want to be notified about activities
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {settingsSections.find(s => s.id === 'notifications')?.items.map((item) => (
+              <div key={item.id} className="flex items-center justify-between py-2">
+                <div className="space-y-0.5 flex-1 pr-4">
+                  <Label className="text-sm">{item.title}</Label>
+                  {item.description && (
+                    <p className="text-xs text-muted-foreground">{item.description}</p>
+                  )}
                 </div>
-                {user?.role === 'owner' && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      localStorage.removeItem(`onboarding_complete_${user?.organizationId}`);
-                      toast({
-                        title: "Onboarding reset",
-                        description: "The onboarding will appear on your next page refresh.",
-                      });
-                      setTimeout(() => {
-                        window.location.reload();
-                      }, 1500);
-                    }}
-                    className="w-full sm:w-auto text-xs sm:text-sm"
-                  >
-                    <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                    Restart Setup
-                  </Button>
-                )}
-              </CardTitle>
-              <CardDescription>
-                View and manage organization-wide settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 sm:space-y-6">
-              {/* Logo Upload Section */}
-              <div className="space-y-3 sm:space-y-4">
-                <Label className="text-xs sm:text-sm">Organization Logo</Label>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-                  <div className="relative flex-shrink-0">
-                    <img 
-                      src={getOrganizationLogoUrl(user?.organization)} 
-                      alt={user?.organization?.name || 'Organization logo'} 
-                      className="h-16 w-16 sm:h-20 sm:w-20 rounded-lg object-cover border-2 border-blue-200"
-                      onError={(e) => {
-                        // Fallback to default avatar if logo fails to load
-                        const target = e.currentTarget as HTMLImageElement;
-                        target.src = getOrganizationLogoUrl(user?.organization);
-                      }}
-                    />
-                  </div>
-                  <div className="flex-1 space-y-2 w-full">
-                    <div className="flex gap-2">
-                      <Input
-                        type="url"
-                        value={logoUrl}
-                        onChange={(e) => setLogoUrl(e.target.value)}
-                        onBlur={async () => {
-                          if (!organization) return;
-                          
-                          const orgId = user?.organization?.id || user?.organizationId;
-                          if (!orgId) {
-                            toast({
-                              title: "Error",
-                              description: "Organization ID not found",
-                              variant: "destructive",
-                            });
-                            return;
-                          }
-
-                          // Only save if URL changed
-                          if (logoUrl === (organization.logo || "")) {
-                            return;
-                          }
-
-                          setIsSavingLogo(true);
-                          try {
-                            await updateOrganization({
-                              logo: logoUrl.trim() || null,
-                            });
-                            toast({
-                              title: "Logo updated",
-                              description: "Organization logo has been updated successfully",
-                            });
-                            // Refresh to show new logo
-                            setTimeout(() => window.location.reload(), 500);
-                          } catch (error: any) {
-                            console.error("Logo update error:", error);
-                            toast({
-                              title: "Update failed",
-                              description: error.message || "Failed to update logo. Please check the URL format and try again.",
-                              variant: "destructive",
-                            });
-                            // Reset to original value on error
-                            setLogoUrl(organization.logo || "");
-                          } finally {
-                            setIsSavingLogo(false);
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.currentTarget.blur();
-                          }
-                        }}
-                        disabled={isSavingLogo}
-                        placeholder="https://example.com/logo.png"
-                        className="text-xs sm:text-sm"
-                      />
-                      <Button
-                        type="button"
-                        onClick={async () => {
-                          if (!organization) return;
-                          
-                          const orgId = user?.organization?.id || user?.organizationId;
-                          if (!orgId) {
-                            toast({
-                              title: "Error",
-                              description: "Organization ID not found",
-                              variant: "destructive",
-                            });
-                            return;
-                          }
-
-                          setIsSavingLogo(true);
-                          try {
-                            await updateOrganization({
-                              logo: logoUrl.trim() || null,
-                            });
-                            toast({
-                              title: "Logo updated",
-                              description: "Organization logo has been updated successfully",
-                            });
-                            // Refresh to show new logo
-                            setTimeout(() => window.location.reload(), 500);
-                          } catch (error: any) {
-                            console.error("Logo update error:", error);
-                            toast({
-                              title: "Update failed",
-                              description: error.message || "Failed to update logo. Please check the URL format and try again.",
-                              variant: "destructive",
-                            });
-                            // Reset to original value on error
-                            setLogoUrl(organization.logo || "");
-                          } finally {
-                            setIsSavingLogo(false);
-                          }
-                        }}
-                        disabled={isSavingLogo || logoUrl === (organization?.logo || "")}
-                        size="sm"
-                        className="text-xs sm:text-sm"
-                      >
-                        {isSavingLogo ? (
-                          <>
-                            <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 animate-spin" />
-                            <span className="hidden sm:inline">Saving...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                            <span className="hidden sm:inline">Save</span>
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      Enter a direct link to your organization logo image. Press Enter or click Save to update.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Organization Name</Label>
-                  <Input value={organization?.name || 'Loading...'} disabled className="text-sm" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Organization ID</Label>
-                  <Input value={user?.organizationId || 'Loading...'} disabled className="text-sm" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Company Registration ID</Label>
-                  <Input value={organization?.company_reg_id || 'Not set'} disabled className="text-sm" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Tax ID (TIN)</Label>
-                  <Input value={organization?.tin || 'Not set'} disabled className="text-sm" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs sm:text-sm">Organization Address</Label>
-                <Textarea
-                  value={organization?.address || 'Not set'}
-                  disabled
-                  rows={3}
-                  className="text-sm"
+                <Switch
+                  checked={item.value}
+                  onCheckedChange={item.action}
                 />
               </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Created On</Label>
-                  <Input 
-                    value={organization?.created_at ? new Date(organization.created_at).toLocaleDateString() : 'N/A'} 
-                    disabled 
-                    className="text-sm" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm">Last Updated</Label>
-                  <Input 
-                    value={organization?.updated_at ? new Date(organization.updated_at).toLocaleDateString() : 'N/A'} 
-                    disabled 
-                    className="text-sm" 
-                  />
-                </div>
-              </div>
+            ))}
+            <Button onClick={handleSaveNotifications} className="w-full mt-4">
+              <Save className="h-4 w-4 mr-2" />
+              Save Preferences
+            </Button>
+          </CardContent>
+        </Card>
 
-              <div className="flex justify-between items-center pt-4 border-t">
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  To update organization details, visit the Organization tab
-                </p>
-                {hasPermission('manage_team') && (
-                  <Button onClick={() => navigate('/org/settings')} variant="outline">
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit Details
-                  </Button>
-                )}
+        {/* Interface */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Layout className="h-5 w-5" />
+              Interface Settings
+            </CardTitle>
+            <CardDescription>
+              Customize your interface layout and appearance
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {settingsSections.find(s => s.id === 'interface')?.items.map((item) => (
+              <div key={item.id} className="flex items-center justify-between py-2">
+                <div className="space-y-0.5 flex-1 pr-4">
+                  <Label className="text-sm">{item.title}</Label>
+                  {item.description && (
+                    <p className="text-xs text-muted-foreground">{item.description}</p>
+                  )}
+                </div>
+                <Switch
+                  checked={item.value}
+                  onCheckedChange={item.action}
+                />
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            ))}
+            <Button onClick={handleSaveInterface} className="w-full mt-4">
+              <Save className="h-4 w-4 mr-2" />
+              Save Interface Settings
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Organization */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5" />
+              Organization Settings
+            </CardTitle>
+            <CardDescription>
+              Manage organization-wide settings
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Logo Upload */}
+            <div className="space-y-3">
+              <Label>Organization Logo</Label>
+              <div className="flex items-center gap-4">
+                <img 
+                  src={getOrganizationLogoUrl(user?.organization)} 
+                  alt={user?.organization?.name || 'Organization logo'} 
+                  className="h-16 w-16 rounded-lg object-cover border-2 border-blue-200"
+                />
+                <div className="flex-1 space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      type="url"
+                      value={logoUrl}
+                      onChange={(e) => setLogoUrl(e.target.value)}
+                      placeholder="https://example.com/logo.png"
+                      disabled={isSavingLogo}
+                      className="text-sm"
+                    />
+                    <Button
+                      onClick={handleSaveLogo}
+                      disabled={isSavingLogo || logoUrl === (organization?.logo || "")}
+                      size="sm"
+                    >
+                      {isSavingLogo ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Save className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Enter a direct link to your organization logo image
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Organization Links */}
+            <div className="space-y-2">
+              <Button
+                variant="outline"
+                className="w-full justify-between"
+                onClick={() => navigate('/org/account')}
+              >
+                <span>View Organization Details</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Account */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Account Settings
+            </CardTitle>
+            <CardDescription>
+              Manage your personal account
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button
+              variant="outline"
+              className="w-full justify-between"
+              onClick={() => navigate('/org/account')}
+            >
+              <span>Profile Settings</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-between"
+              onClick={() => navigate('/org/account#security')}
+            >
+              <span>Security & Password</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Expense Categories */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Tag className="h-5 w-5" />
+              Expense Categories
+            </CardTitle>
+            <CardDescription>
+              View expense categories and their usage statistics
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loadingCategories ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+                <span className="ml-2 text-sm text-muted-foreground">Loading categories...</span>
+              </div>
+            ) : expenseCategories.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-sm text-muted-foreground">No expense categories found.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {expenseCategories.map((category) => (
+                  <div key={category.id} className="p-4 border border-gray-200 rounded-lg bg-white">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 space-y-1">
+                        <h3 className="font-medium text-sm">{category.name}</h3>
+                        <p className="text-xs text-muted-foreground">{category.description}</p>
+                        <div className="flex gap-2 mt-2">
+                          {category.spent > 0 && (
+                            <Badge variant="outline" className="text-xs">
+                              UGX {category.spent.toLocaleString()}
+                            </Badge>
+                          )}
+                          {category.count > 0 && (
+                            <Badge variant="secondary" className="text-xs">
+                              {category.count} {category.count === 1 ? 'expense' : 'expenses'}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground mt-4">
+              Categories are automatically derived from expense types used in petty cash transactions.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
